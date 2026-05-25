@@ -25,12 +25,13 @@ export class SwalService {
     });
   }
 
-  warning(title: string, text?: string) {
+  warning(title: string, text?: string, html?: string) {
     Swal.close();
     return Swal.fire({
       icon: 'warning',
       title,
       text,
+      html,
       confirmButtonColor: '#f59e0b',
     });
   }

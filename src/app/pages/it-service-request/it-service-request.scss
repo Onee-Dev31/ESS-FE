@@ -1489,6 +1489,114 @@ $table-label-bg: var(--border-toolbar);
   }
 }
 
+.dropzone {
+  border: 1.5px dashed var(--border);
+  border-radius: 14px;
+  background: var(--bg-page);
+  padding: 18px;
+  text-align: center;
+  cursor: pointer;
+  transition:
+    border-color 0.2s,
+    background 0.2s;
+
+  &:hover {
+    border-color: var(--primary);
+    background: color-mix(in srgb, var(--primary), var(--bg-card) 94%);
+  }
+}
+
+.dropzone-text {
+  margin: 0;
+  color: var(--text-header);
+  font-size: $font-size-label;
+  font-weight: 600;
+}
+
+.dropzone-icon {
+  color: var(--primary);
+  margin-right: 8px;
+}
+
+.dropzone-hint {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 6px;
+  margin: 10px 0 0;
+  color: var(--text-muted);
+  font-size: $font-size-hint;
+
+  span {
+    border: 1px solid var(--border-color);
+    border-radius: 999px;
+    background: var(--bg-card);
+    padding: 2px 8px;
+  }
+}
+
+.file-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  margin-top: 12px;
+
+  @include mobile {
+    grid-template-columns: 1fr;
+  }
+}
+
+.file-item,
+.summary-file-item {
+  min-width: 0;
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  background: var(--bg-page);
+  color: var(--text-header);
+  padding: 8px 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  text-align: left;
+
+  .file-icon,
+  i:first-child {
+    color: var(--primary);
+    flex-shrink: 0;
+  }
+
+  .file-name,
+  span {
+    min-width: 0;
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .file-remove {
+    width: 22px;
+    height: 22px;
+    border-radius: 999px;
+    color: var(--text-muted);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+
+    &:hover {
+      color: var(--danger);
+      background: color-mix(in srgb, var(--danger), transparent 90%);
+    }
+  }
+
+  &:hover {
+    border-color: var(--primary);
+    background: var(--bg-card);
+  }
+}
+
 @keyframes blink-border {
   0%,
   100% {

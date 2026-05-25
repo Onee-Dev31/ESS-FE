@@ -129,7 +129,7 @@
     </div>
 
     <div class="form-section">
-      <div class="form-group mb-4">
+      <div class="form-group">
         <label class="detail-section">
           <div class="form-label">
             <i class="fas fa-align-left"></i>
@@ -151,6 +151,55 @@
           [ngModel]="requestDetails()"
           (ngModelChange)="requestDetails.set($event)"
         ></textarea>
+      </div>
+    </div>
+
+    <div class="form-section">
+      <div class="form-group mb-4">
+        <label class="form-label">
+          <i class="fas fa-paperclip field-icon"></i>
+          ไฟล์แนบ
+        </label>
+        <div
+          class="dropzone"
+          (click)="fileInput.click()"
+          (dragover)="onDragOver($event)"
+          (drop)="onDrop($event)"
+        >
+          <p class="dropzone-text">
+            <i class="fas fa-cloud-upload-alt dropzone-icon"></i>
+            คลิกหรือลากไฟล์มาวางที่นี่
+          </p>
+          <p class="dropzone-hint">
+            @for (ext of FILE_CONFIG.allowedExtensions; track ext) {
+              <span>{{ ext.toUpperCase() }}</span>
+            }
+            <span>สูงสุด {{ FILE_CONFIG.maxFiles }} ไฟล์</span>
+            <span>ไม่เกิน {{ FILE_CONFIG.maxSizeMB }} MB</span>
+          </p>
+          <input
+            type="file"
+            #fileInput
+            style="display: none"
+            multiple
+            (change)="onFileSelected($event)"
+          />
+        </div>
+
+        @if (attachments().length > 0) {
+          <div class="file-list">
+            @for (file of attachments(); track file.name; let i = $index) {
+              <button class="file-item" type="button" (click)="viewFile(file)">
+                <i class="fas fa-file-alt file-icon"></i>
+                <span class="file-name">{{ file.name }}</span>
+                <i
+                  class="fas fa-times file-remove"
+                  (click)="removeAttachment(i); $event.stopPropagation()"
+                ></i>
+              </button>
+            }
+          </div>
+        }
       </div>
     </div>
 
@@ -475,6 +524,20 @@
               </div>
             </div>
           }
+
+          @if (attachments().length > 0) {
+            <div class="summary-section">
+              <h3>ไฟล์แนบ (Attachments)</h3>
+              <div class="summary-list">
+                @for (file of attachments(); track file.name) {
+                  <button class="summary-file-item" type="button" (click)="viewFile(file)">
+                    <i class="fas fa-file-alt"></i>
+                    <span>{{ file.name }}</span>
+                  </button>
+                }
+              </div>
+            </div>
+          }
         </div>
         <div class="modal-footer">
           <button class="btn-cancel" (click)="closeSummaryModal()">แก้ไข</button>
@@ -491,4 +554,9 @@
     [type]="isAnnounceChooseFreelance() ? 1 : 2"
   >
   </app-example-service-request-modal>
+}
+
+@if (isPreviewModalOpen()) {
+  <app-file-preview-modal [files]="previewFiles()" (onClose)="closePreview()">
+  </app-file-preview-modal>
 }
