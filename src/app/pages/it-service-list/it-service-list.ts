@@ -78,7 +78,22 @@ export class ItService implements OnInit {
   isTicketDetailOpen = signal(false);
   IS_CHAT_OPEN = signal(false);
 
-  // ticketId → number of notes that were visible when chat was last opened/read
+  private readonly CHAT_READ_KEY = 'ess_user_chat_read';
+
+  private loadChatReadCounts(): Map<number, number> {
+    try {
+      const raw = localStorage.getItem(this.CHAT_READ_KEY);
+      const obj = raw ? JSON.parse(raw) : {};
+      return new Map(Object.entries(obj).map(([k, v]) => [Number(k), v as number]));
+    } catch {
+      return new Map();
+    }
+  }
+
+  private saveChatReadCounts(m: Map<number, number>) {
+    localStorage.setItem(this.CHAT_READ_KEY, JSON.stringify(Object.fromEntries(m)));
+  }
+
   private chatReadCounts = signal<Map<number, number>>(new Map());
 
   unreadChatCount = computed(() => {
@@ -205,6 +220,7 @@ export class ItService implements OnInit {
   }
 
   ngOnInit() {
+    this.chatReadCounts.set(this.loadChatReadCounts());
     this.getMyTicket();
     this.checkScreen();
     this.checkMobile();
@@ -445,6 +461,7 @@ export class ItService implements OnInit {
     this.chatReadCounts.update((m) => {
       const next = new Map(m);
       next.set(ticket.ticketId, total);
+      this.saveChatReadCounts(next);
       return next;
     });
   }

@@ -268,6 +268,22 @@ export class DashboardIT implements OnInit {
   isTicketDetailOpen = signal(false);
   IS_CHAT_OPEN = signal(false);
 
+  private readonly CHAT_READ_KEY = 'ess_it_chat_read';
+
+  private loadChatReadCounts(): Map<number, number> {
+    try {
+      const raw = localStorage.getItem(this.CHAT_READ_KEY);
+      const obj = raw ? JSON.parse(raw) : {};
+      return new Map(Object.entries(obj).map(([k, v]) => [Number(k), v as number]));
+    } catch {
+      return new Map();
+    }
+  }
+
+  private saveChatReadCounts(m: Map<number, number>) {
+    localStorage.setItem(this.CHAT_READ_KEY, JSON.stringify(Object.fromEntries(m)));
+  }
+
   private chatReadCounts = signal<Map<number, number>>(new Map());
 
   unreadChatCount = computed(() => {
@@ -414,6 +430,7 @@ export class DashboardIT implements OnInit {
   }
 
   ngOnInit() {
+    this.chatReadCounts.set(this.loadChatReadCounts());
     this.checkScreen();
     const hasTrigger = this.signalrService.refreshTrigger() > 0;
     this.signalrService.refreshTrigger.set(0);
@@ -681,6 +698,7 @@ export class DashboardIT implements OnInit {
     this.chatReadCounts.update((m) => {
       const next = new Map(m);
       next.set(ticket.ticketId, total);
+      this.saveChatReadCounts(next);
       return next;
     });
   }
