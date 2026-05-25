@@ -1,9 +1,16 @@
 <div class="toast-container" aria-live="polite" aria-atomic="true">
   @for (toast of toastService.toasts(); track toast.id) {
     <div class="toast toast-{{ toast.type }}" role="alert">
-      <div class="toast-content">
+      <div
+        class="toast-content"
+        [class.toast-clickable]="!!toast.route"
+        (click)="onToastClick(toast)"
+      >
         <i class="fas {{ getIcon(toast.type) }} toast-icon"></i>
         <span class="toast-message">{{ toast.message }}</span>
+        @if (toast.route) {
+          <i class="fas fa-arrow-right toast-arrow"></i>
+        }
       </div>
       <button class="toast-close" (click)="close(toast.id)" aria-label="ปิด">
         <i class="fas fa-times"></i>

@@ -126,7 +126,15 @@ export class NotificationService {
               const msg = buildMsg(data);
               if (msg) {
                 this.lastToastTime = Date.now();
-                this.toastService.info(msg);
+                const routeInfo = this.resolveRoute({
+                  notificationType: event,
+                  recipientRole: '',
+                  targetType: '',
+                  ticketId: this.toNumber(data?.ticketId ?? data?.ticket_id),
+                  ticketNumber: this.toText(data?.ticketNumber ?? data?.ticket_number) ?? null,
+                  title: msg,
+                });
+                this.toastService.info(msg, undefined, routeInfo.route ?? undefined, routeInfo.queryParams ?? undefined);
               }
             }
           });
@@ -340,11 +348,32 @@ export class NotificationService {
       this.realtimeTick.update((tick) => tick + 1);
       this.refreshAll();
 
-      const record = this.extractRealtimeRecord(payload);
+      const record = this.extractRealtimeRecord(payload) as any;
       const title =
-        this.toText((record as any)?.title ?? (record as any)?.notification_title) ?? 'แจ้งเตือนใหม่';
+        this.toText(record?.title ?? record?.notification_title) ?? 'แจ้งเตือนใหม่';
+
+      const payloadData = this.parsePayload(record?.payload_json ?? record?.payloadJson);
+      const ticketId = this.toNumber(
+        record?.ticket_id ?? record?.ticketId ?? payloadData?.['ticketId'] ?? payloadData?.['ticket_id'],
+      );
+      const ticketNumber =
+        this.toText(
+          record?.ticket_number ?? record?.ticketNumber ??
+          payloadData?.['ticketNumber'] ?? payloadData?.['ticket_number'],
+        ) ?? null;
+
+      const routeInfo = this.resolveRoute({
+        notificationType: this.toText(record?.notification_type ?? record?.notificationType) ?? '',
+        recipientRole: this.toText(record?.recipient_role ?? record?.recipientRole) ?? '',
+        targetType: this.toText(record?.target_type ?? record?.targetType) ?? '',
+        ticketId,
+        ticketNumber,
+        title,
+      });
+
       this.lastToastTime = Date.now();
-      if (!document.hidden) this.toastService.info(title);
+      if (!document.hidden)
+        this.toastService.info(title, undefined, routeInfo.route ?? undefined, routeInfo.queryParams ?? undefined);
     });
   }
 
