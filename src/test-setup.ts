@@ -1,28 +1,41 @@
 import { beforeEach, vi } from 'vitest';
 
-vi.mock('@microsoft/signalr', () => ({
-  HubConnectionBuilder: vi.fn().mockReturnValue({
-    withUrl: vi.fn().mockReturnThis(),
-    withAutomaticReconnect: vi.fn().mockReturnThis(),
-    configureLogging: vi.fn().mockReturnThis(),
-    build: vi.fn().mockReturnValue({
-      start: vi.fn().mockResolvedValue(undefined),
-      on: vi.fn(),
-      onreconnected: vi.fn(),
-      invoke: vi.fn().mockResolvedValue(undefined),
-      stop: vi.fn().mockResolvedValue(undefined),
-    }),
-  }),
-  LogLevel: { None: 0 },
-  HttpTransportType: { WebSockets: 1 },
-  HubConnectionState: {
-    Disconnected: 'Disconnected',
-    Connecting: 'Connecting',
-    Connected: 'Connected',
-    Disconnecting: 'Disconnecting',
-    Reconnecting: 'Reconnecting',
-  },
-}));
+vi.mock('@microsoft/signalr', () => {
+  class MockHubConnectionBuilder {
+    withUrl() {
+      return this;
+    }
+    withAutomaticReconnect() {
+      return this;
+    }
+    configureLogging() {
+      return this;
+    }
+    build() {
+      return {
+        start: vi.fn().mockResolvedValue(undefined),
+        on: vi.fn(),
+        onclose: vi.fn(),
+        onreconnecting: vi.fn(),
+        onreconnected: vi.fn(),
+        invoke: vi.fn().mockResolvedValue(undefined),
+        stop: vi.fn().mockResolvedValue(undefined),
+      };
+    }
+  }
+  return {
+    HubConnectionBuilder: MockHubConnectionBuilder,
+    LogLevel: { None: 0 },
+    HttpTransportType: { WebSockets: 1 },
+    HubConnectionState: {
+      Disconnected: 'Disconnected',
+      Connecting: 'Connecting',
+      Connected: 'Connected',
+      Disconnecting: 'Disconnecting',
+      Reconnecting: 'Reconnecting',
+    },
+  };
+});
 
 Object.defineProperty(window, 'matchMedia', {
   writable: true,
