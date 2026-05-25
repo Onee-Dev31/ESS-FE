@@ -833,6 +833,7 @@ export class DashboardIT implements OnInit {
     const participants: any[] = [];
     const seen = new Set<string>([myCode]); // exclude self
 
+    // requester
     if (ticket.requester?.emp_code && !seen.has(ticket.requester.emp_code)) {
       seen.add(ticket.requester.emp_code);
       participants.push({
@@ -843,8 +844,11 @@ export class DashboardIT implements OnInit {
       });
     }
 
-    for (const step of ticket.assignTimeline || []) {
-      for (const a of step.Assignee || []) {
+    // assignees of the latest step only (not historical approvers)
+    const timeline: any[] = ticket.assignTimeline || [];
+    const latestStep = timeline.length > 0 ? timeline[timeline.length - 1] : null;
+    if (latestStep) {
+      for (const a of latestStep.Assignee || []) {
         if (a.empCode && !seen.has(a.empCode)) {
           seen.add(a.empCode);
           participants.push({
@@ -854,16 +858,6 @@ export class DashboardIT implements OnInit {
             adUser: a.adUser || a.aduser || '',
           });
         }
-      }
-      const cb = step.createBy;
-      if (cb?.empCode && !seen.has(cb.empCode)) {
-        seen.add(cb.empCode);
-        participants.push({
-          Nickname: cb.nickName || cb.fullName || '',
-          FullNameThai: cb.fullName || '',
-          CODEEMPID: cb.empCode,
-          adUser: cb.adUser || cb.aduser || '',
-        });
       }
     }
 
