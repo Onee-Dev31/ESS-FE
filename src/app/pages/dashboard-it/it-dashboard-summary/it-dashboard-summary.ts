@@ -22,6 +22,7 @@ import { MasterDataService } from '../../../services/master-data.service';
 import { ViewChildren, QueryList } from '@angular/core';
 import { PaginationComponent } from '../../../components/shared/pagination/pagination';
 import { createListingComputeds_v2, createListingState } from '../../../utils/listing.util';
+import { environment } from '../../../../environments/environment';
 
 @Component({
   selector: 'app-it-dashboard-summary',
@@ -193,6 +194,10 @@ export class ItDashboardSummary {
     private cdr: ChangeDetectorRef,
     private masterService: MasterDataService,
   ) {}
+
+  getEmployeeImage(empCode: string): string {
+    return `${environment.employeeImageUrl}/${empCode}.jpg`;
+  }
 
   ngOnInit(): void {
     this.selectStatus('all', false);
@@ -766,7 +771,7 @@ export class ItDashboardSummary {
     // console.log(params);
     this.itServiceService.getTicketByStatus(params).subscribe({
       next: (res: any) => {
-        // console.log(res);
+        console.log(res);
         this.allRequests.set(res.data);
         this.listing.totalItems.set(res.pagination.total ?? 0);
         this.listing.totalPages.set(res.pagination.totalPages ?? 1);
@@ -779,8 +784,9 @@ export class ItDashboardSummary {
         this.filteredTicketLogs = this.ticketLogs.map((t: any) => ({
           ...t,
           assignees: t.groups_assignees_json ? JSON.parse(t.groups_assignees_json) : [],
+          assignees_mock: ['OTD01050', 'OTD01128', 'OTD01125'],
         }));
-        // console.log(this.filteredTicketLogs);
+        console.log(this.filteredTicketLogs);
 
         this.cdr.detectChanges();
       },
