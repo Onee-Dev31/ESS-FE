@@ -434,7 +434,7 @@
 </ng-template>
 
 @if ((!isMobile || isTicketDetailOpen()) && selectedTicket(); as t) {
-  <div class="floating-chat" [class.is-open]="IS_CHAT_OPEN()">
+  <div class="floating-chat" [class.is-open]="IS_CHAT_OPEN()" #floatingChatRef>
     @if (IS_CHAT_OPEN()) {
       <section class="floating-chat__panel" aria-label="Ticket chat">
         <div class="floating-chat__header">

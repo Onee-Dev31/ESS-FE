@@ -126,6 +126,15 @@ export class ItService implements OnInit {
     this.checkMobile();
   }
 
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent) {
+    if (!this.IS_CHAT_OPEN()) return;
+    const el = this.floatingChatRef?.nativeElement;
+    if (el && !el.contains(event.target as Node)) {
+      this.closeChat();
+    }
+  }
+
   checkScreen() {
     const width = window.innerWidth;
     this.isLaptop = width >= 1024 && width <= 1440;
@@ -137,6 +146,7 @@ export class ItService implements OnInit {
 
   @ViewChild('cardBody') cardBodyEl?: ElementRef<HTMLElement>;
   @ViewChild('chatTextareaRef') chatTextareaRef?: ElementRef<HTMLTextAreaElement>;
+  @ViewChild('floatingChatRef') floatingChatRef?: ElementRef<HTMLElement>;
 
   private itServiceMock = inject(ItServiceMockService);
   private itServiceService = inject(ItServiceService);

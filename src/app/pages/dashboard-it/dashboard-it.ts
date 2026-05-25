@@ -287,6 +287,7 @@ export class DashboardIT implements OnInit {
   private pendingMentionAdUsers = new Set<string>();
 
   @ViewChild('chatTextareaRef') chatTextareaRef?: ElementRef<HTMLTextAreaElement>;
+  @ViewChild('floatingChatRef') floatingChatRef?: ElementRef<HTMLElement>;
 
   private _chatMessage = '';
   get chatMessage() { return this._chatMessage; }
@@ -322,6 +323,15 @@ export class DashboardIT implements OnInit {
   @HostListener('window:resize')
   onResize() {
     this.checkScreen();
+  }
+
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent) {
+    if (!this.IS_CHAT_OPEN()) return;
+    const el = this.floatingChatRef?.nativeElement;
+    if (el && !el.contains(event.target as Node)) {
+      this.closeChat();
+    }
   }
 
   checkScreen() {
