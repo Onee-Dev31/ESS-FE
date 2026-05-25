@@ -523,6 +523,7 @@ export class DashboardIT implements OnInit {
       return new Set(s);
     });
     this.selectTicket(String(ticketId));
+    this.IS_CHAT_OPEN.set(true);
   }
 
   selectTicket(ticketId: string) {
@@ -884,13 +885,13 @@ export class DashboardIT implements OnInit {
   }
 
   viewFile(file: any) {
-    console.log(file);
+    // console.log(file);
     this.previewFiles.set([this.fileConverter.buildPreviewFile(file)]);
     this.isPreviewModalOpen.set(true);
   }
 
   viewFileChat(file: any) {
-    console.log(file);
+    // console.log(file);
     let url = '';
 
     if (file.file) {
