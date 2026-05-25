@@ -12,7 +12,8 @@ import {
   ElementRef,
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { EMPTY } from 'rxjs';
+import { EMPTY, interval, firstValueFrom } from 'rxjs';
+import { filter } from 'rxjs/operators';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { Attachment, StatusKey, TicketItem } from '../../interfaces/it-dashboard.interface';
@@ -462,6 +463,14 @@ export class DashboardIT implements OnInit {
           }
         }
       });
+
+    // Poll for new notes every 5s while chat panel is open (fallback when SignalR doesn't reach all parties)
+    interval(5000)
+      .pipe(
+        takeUntilDestroyed(this.destroyRef),
+        filter(() => this.IS_CHAT_OPEN() && !!this.selectedTicket()),
+      )
+      .subscribe(() => this.refreshChatNotes());
 
     this.signalrService.ticketStatusTrigger
       .pipe(takeUntilDestroyed(this.destroyRef))
@@ -1171,6 +1180,23 @@ export class DashboardIT implements OnInit {
     return notes;
   }
 
+  private async refreshChatNotes() {
+    const ticket = this.selectedTicket();
+    if (!ticket?.ticketId) return;
+    try {
+      const res: any = await firstValueFrom(this.getTicketById(String(ticket.ticketId)));
+      const replyAttachments = (res.attachments ?? []).filter((f: any) => f.reply_id);
+      const itNotes = await this.buildItNotes(res.replies ?? [], replyAttachments);
+      const currentIds = new Set((ticket.itNotes ?? []).map((n: any) => n.id));
+      const hasNew = itNotes.some((n: any) => !currentIds.has(n.id));
+      if (!hasNew) return;
+      this.selectedTicket.update((t) => (t ? { ...t, itNotes } : t));
+      this.scrollToBottom();
+    } catch {
+      // silent fail — chat still works, just won't show new messages until next poll
+    }
+  }
+
   scrollToBottom() {
     setTimeout(() => {
       const el = this.cardBodyEl?.nativeElement;
@@ -1871,19 +1897,24 @@ export class DashboardIT implements OnInit {
         }
         if (!silent) this.swalService.close();
 
-        const requesterAdUser = this.selectedTicket()?.requesterAduser;
+        const ticket = this.selectedTicket();
+        const requesterAdUser = ticket?.requesterAduser;
         const userData = this.authService.userData();
         const senderAdUser = this.authService.currentUser() ?? '';
         const senderName = `${userData?.NAMFIRSTT ?? ''} ${userData?.NAMLASTT ?? ''}`.trim();
 
         if (requesterAdUser && senderAdUser) {
+          const assigneeAdUsers = ((ticket?.assignments ?? []) as any[])
+            .map((a) => (a.aduser || a.adUser || '').toLowerCase())
+            .filter((u) => !!u && u !== senderAdUser.toLowerCase());
+          const allRecipients = [...new Set([...assigneeAdUsers, ...(data.mentionedAdUsers ?? [])])];
           this.signalrService.noteNotify(
             data.id,
             requesterAdUser,
             senderAdUser,
             senderName,
             data.message,
-            data.mentionedAdUsers ?? [],
+            allRecipients,
           );
         }
 

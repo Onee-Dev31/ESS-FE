@@ -39,7 +39,8 @@ import { ServicesDetailModal } from '../../components/modals/services-detail-mod
 import { FileConverterService } from '../../services/file-converter';
 import { SignalrService } from '../../services/signalr.service';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { EMPTY } from 'rxjs';
+import { EMPTY, interval, firstValueFrom } from 'rxjs';
+import { filter } from 'rxjs/operators';
 import { NzTooltipModule } from 'ng-zorro-antd/tooltip';
 import { NzModalModule } from 'ng-zorro-antd/modal';
 import { CcModal } from '../dashboard-it/modal/cc-modal/cc-modal';
@@ -258,6 +259,31 @@ export class ItService implements OnInit {
           }
         }
       });
+
+    // Poll for new notes every 5s while chat panel is open (fallback when SignalR doesn't reach all parties)
+    interval(5000)
+      .pipe(
+        takeUntilDestroyed(this.destroyRef),
+        filter(() => this.IS_CHAT_OPEN() && !!this.selectedTicket()),
+      )
+      .subscribe(() => this.refreshChatNotes());
+  }
+
+  private async refreshChatNotes() {
+    const ticket = this.selectedTicket();
+    if (!ticket?.ticketId) return;
+    try {
+      const res: any = await firstValueFrom(this.itServiceService.getTicketById(String(ticket.ticketId)));
+      const replyAttachments = (res.attachments ?? []).filter((f: any) => f.reply_id);
+      const itNotes = await this.buildItNotes(res.replies ?? [], replyAttachments);
+      const currentIds = new Set((ticket.itNotes ?? []).map((n: any) => n.id));
+      const hasNew = itNotes.some((n: any) => !currentIds.has(n.id));
+      if (!hasNew) return;
+      this.selectedTicket.update((t) => (t ? { ...t, itNotes } : t));
+      this.scrollToBottom();
+    } catch {
+      // silent fail
+    }
   }
 
   private applyStatusChange(ticketId: any, rawStatus: string) {
