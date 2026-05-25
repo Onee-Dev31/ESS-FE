@@ -608,10 +608,11 @@ export class ItService implements OnInit {
     const ticket = this.selectedTicket();
     if (!ticket) return [];
 
+    const myEmpCode = this.authService.userData()?.CODEMPID;
     const participants: any[] = [];
     const seen = new Set<string>();
 
-    if (ticket.requester?.emp_code) {
+    if (ticket.requester?.emp_code && ticket.requester.emp_code !== myEmpCode) {
       seen.add(ticket.requester.emp_code);
       participants.push({
         Nickname: ticket.requester.nickname || ticket.requester.fullname || '',
@@ -625,7 +626,7 @@ export class ItService implements OnInit {
     const latestStep = timeline.length > 0 ? timeline[timeline.length - 1] : null;
     if (latestStep) {
       for (const a of latestStep.Assignee || []) {
-        if (a.empCode && !seen.has(a.empCode)) {
+        if (a.empCode && !seen.has(a.empCode) && a.empCode !== myEmpCode) {
           seen.add(a.empCode);
           participants.push({
             Nickname: a.nickName || a.fullName || '',
