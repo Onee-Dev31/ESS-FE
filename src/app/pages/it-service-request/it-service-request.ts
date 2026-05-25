@@ -77,13 +77,21 @@ export class ITServiceRequestComponent implements OnInit {
   IS_EXAMPLE = signal<boolean>(false);
 
   isSystemCategorySelected = signal(false);
+  private readonly BASIC_SYSTEM_SERVICE_ID = 22;
+  isBasicSystemServiceSelected = computed(() =>
+    this.serviceOptions().some(
+      (service) => service.id === this.BASIC_SYSTEM_SERVICE_ID && service.checked,
+    ),
+  );
   IsOneeJob: boolean = false;
   applicantId: string = '';
   detailJobs: any = null;
   isFormValid = computed(() => {
     const services = this.serviceOptions();
     const hasService = services.some((s) => s.checked);
-    const isRequestSystemChecked = services.find((s) => s.value === 'request_system')?.checked;
+    const isRequestSystemChecked = services.some(
+      (s) => s.checked && (s.id === this.BASIC_SYSTEM_SERVICE_ID || s.value === 'requser'),
+    );
     let subValidationPassed = true;
 
     if (isRequestSystemChecked) {
@@ -255,13 +263,29 @@ export class ITServiceRequestComponent implements OnInit {
     const selectedValues = this.serviceOptions()
       .filter((s) => s.checked)
       .map((s) => s.value);
-    this.isSystemCategorySelected.set(selectedValues.includes('request_system'));
+    this.syncBasicSystemSelection();
+    this.isSystemCategorySelected.set(
+      selectedValues.includes('requser') || this.isBasicSystemServiceSelected(),
+    );
 
-    if (!selectedValues.includes('request_system')) {
+    if (!selectedValues.includes('requser') && !this.isBasicSystemServiceSelected()) {
       this.selectedSystemTypes.set([]);
       this.userSubOptions.update((items) => items.map((i) => ({ ...i, checked: false })));
       this.systemSubOptions.update((items) => items.map((i) => ({ ...i, checked: false })));
     }
+  }
+
+  private syncBasicSystemSelection() {
+    const shouldSelectBasic = this.isBasicSystemServiceSelected();
+
+    if (!shouldSelectBasic) {
+      return;
+    }
+
+    this.selectedSystemTypes.update((types) =>
+      types.includes('user') ? types : [...types, 'user'],
+    );
+    this.userSubOptions.update((items) => items.map((item) => ({ ...item, checked: true })));
   }
 
   toggleUserSubOption(index: number) {
@@ -295,7 +319,9 @@ export class ITServiceRequestComponent implements OnInit {
       return;
     }
 
-    const isRequestSystem = selectedServices.some((s) => s.value === 'request_system');
+    const isRequestSystem = selectedServices.some(
+      (s) => s.id === this.BASIC_SYSTEM_SERVICE_ID || s.value === 'requser',
+    );
     if (isRequestSystem) {
       if (this.selectedSystemTypes().length === 0) {
         this.swalService.warning('แจ้งเตือน', 'กรุณาเลือกประเภทระบบ (Basic หรือ Specific)');
@@ -511,12 +537,14 @@ export class ITServiceRequestComponent implements OnInit {
   getServiceType() {
     this.itServiceService.getServiceType().subscribe({
       next: (res) => {
-        // console.log(res.data);
-        const mappedServices_main = res.data.mainServices.map((item: any) => ({
-          ...item,
-          checked: false,
-          disabled: false,
-        }));
+        console.log(res.data);
+        const mappedServices_main = res.data.mainServices
+          .filter((item: any) => item.id !== 6)
+          .map((item: any) => ({
+            ...item,
+            checked: false,
+            disabled: false,
+          }));
 
         this.serviceOptions.set(mappedServices_main);
 
