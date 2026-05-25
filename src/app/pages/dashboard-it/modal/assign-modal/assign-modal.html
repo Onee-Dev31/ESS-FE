@@ -46,10 +46,7 @@
       <div class="assign-modal-body">
         <div class="selected-chips" *ngIf="selectedAssigneeEmpCodes.length > 0">
           <div class="chip" *ngFor="let emp of selectedAssigneeEmpCodes">
-            <img
-              [src]="'https://empimg.oneeclick.co:8048/employeeimage/' + emp.id + '.jpg'"
-              (error)="onImgError($event)"
-            />
+            <img [src]="getEmployeeImage(emp.id)" (error)="onImgError($event)" />
 
             <span>{{ emp.id }}</span>
 
@@ -84,7 +81,7 @@
 
               <div class="assign-avatar">
                 <img
-                  [src]="'https://empimg.oneeclick.co:8048/employeeimage/' + emp.id + '.jpg'"
+                  [src]="getEmployeeImage(emp.id)"
                   loading="lazy"
                   (error)="onImgError($event)"
                   (click)="openImage(emp.id); $event.stopPropagation()"

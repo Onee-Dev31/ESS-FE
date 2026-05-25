@@ -22,6 +22,7 @@ import { ApprovalAllowanceService } from '../../services/approval-allowance';
 import { APPROVAL_STATUS_TABS } from '../../config/approval.config';
 import { StatusUtil } from '../../utils/status.util';
 import { AuthService } from '../../services/auth.service';
+import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-approval-allowance',
@@ -319,7 +320,7 @@ export class ApprovalAllowanceComponent implements OnInit {
       type: 'allowance',
       originalData: {
         ...claim,
-        employeeImageUrl: `https://empimg.oneeclick.co:8048/employeeimage/${claim.employeeCode}.jpg`,
+        employeeImageUrl: `${environment.employeeImageUrl}/${claim.employeeCode}.jpg`,
         expenseTypeName: 'เบิกค่าเบี้ยเลี้ยง',
       },
     };

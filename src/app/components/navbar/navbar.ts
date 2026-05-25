@@ -16,6 +16,7 @@ import { ThemeService } from '../../services/theme.service';
 import { NotificationService } from '../../services/notification.service';
 import { NotificationInboxItem } from '../../interfaces/notification.interface';
 import { EmptyStateComponent } from '../shared/empty-state/empty-state';
+import { environment } from '../../../environments/environment';
 
 interface SearchMenuItem {
   label: string;
@@ -34,6 +35,9 @@ interface SearchMenuItem {
   styleUrl: './navbar.scss',
 })
 export class NavbarComponent {
+  getEmployeeImage(empCode: string): string {
+    return `${environment.employeeImageUrl}/${empCode}.jpg`;
+  }
   private sidebarService = inject(SidebarService);
   private authService = inject(AuthService);
   private router = inject(Router);

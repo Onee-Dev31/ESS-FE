@@ -1060,8 +1060,16 @@ textarea.form-input {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 10px;
   padding: 14px 14px 10px;
   border-bottom: 1px solid rgba(15, 23, 42, 0.06);
+}
+
+.tk-left__heading {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
 }
 
 .tk-left__title {
@@ -1070,10 +1078,133 @@ textarea.form-input {
   color: var(--text-header);
 }
 
+.team-ticket-btn {
+  border: 1px solid color-mix(in srgb, var(--primary), transparent 65%);
+  border-radius: 9px;
+  background: color-mix(in srgb, var(--primary), transparent 90%);
+  color: var(--primary);
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1;
+  padding: 5px 8px;
+  transition: 0.2s;
+  white-space: nowrap;
+
+  &:hover {
+    background: var(--primary);
+    color: #fff;
+  }
+
+  &:disabled {
+    background: var(--bg-table-head);
+    border-color: var(--border-table-head);
+    color: var(--text-muted);
+    cursor: not-allowed;
+  }
+}
+
 .tk-left__select {
   border-radius: 10px;
   width: 130px;
   text-align: right;
+}
+
+.team-head-select {
+  width: 100%;
+}
+
+.team-head-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+
+  label {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--text-sub);
+  }
+}
+
+::ng-deep .team-ticket-modal .ant-modal-body {
+  padding: 12px !important;
+}
+
+::ng-deep .team-ticket-modal .ant-modal-content {
+  border-radius: 16px !important;
+  overflow: hidden;
+}
+
+::ng-deep .team-ticket-modal .ant-modal-header {
+  border-radius: 16px 16px 0 0 !important;
+}
+
+::ng-deep .team-ticket-modal .filter-select .ant-select-selector {
+  height: 38px !important;
+  border: 1px solid var(--border-table-head) !important;
+  border-radius: 8px !important;
+  background: var(--input-bg) !important;
+  padding: 0 12px !important;
+
+  .ant-select-selection-search-input {
+    height: 36px !important;
+  }
+
+  .ant-select-selection-placeholder,
+  .ant-select-selection-item {
+    line-height: 36px !important;
+    color: var(--input-text);
+  }
+}
+
+::ng-deep .team-ticket-modal .filter-select.ant-select-focused .ant-select-selector {
+  border-color: $primary !important;
+  box-shadow: none !important;
+}
+
+::ng-deep .team-ticket-modal .ant-modal-footer {
+  padding: 12px 20px !important;
+  border-top: 1px solid var(--border-toolbar) !important;
+
+  .ant-btn {
+    height: 38px;
+    min-width: 88px;
+    border-radius: 8px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    transition: 0.2s;
+  }
+
+  .ant-btn-default {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    color: var(--text);
+
+    &:hover {
+      background: var(--bg-table-head);
+      border-color: var(--border);
+      color: var(--text);
+    }
+  }
+
+  .ant-btn-primary {
+    background: $primary;
+    border-color: $primary;
+    color: #fff;
+
+    &:hover:not(:disabled) {
+      background: color-mix(in srgb, $primary, black 12%);
+      border-color: color-mix(in srgb, $primary, black 12%);
+      color: #fff;
+    }
+
+    &:disabled {
+      background: var(--bg-table-head);
+      border-color: var(--border-table-head);
+      color: var(--text-muted);
+      cursor: not-allowed;
+    }
+  }
 }
 
 ::ng-deep .ant-select-arrow .anticon > svg {

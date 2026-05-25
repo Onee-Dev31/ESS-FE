@@ -22,6 +22,7 @@ import dayjs from 'dayjs';
 import { NzTooltipModule } from 'ng-zorro-antd/tooltip';
 import { ConfirmModal } from './modal/confirm-modal/confirm-modal';
 import { AuthService } from '../../services/auth.service';
+import { environment } from '../../../environments/environment';
 
 interface EmployeeFormData {
   empCode: string; //CODEMPID
@@ -58,6 +59,10 @@ interface EmployeeFormData {
   styleUrl: './resign-management.scss',
 })
 export class ResignManagement {
+  getEmployeeImage(empCode: string): string {
+    return `${environment.employeeImageUrl}/${empCode}.jpg`;
+  }
+
   pageTitle = signal<string>('รายการพนักงาน');
 
   private loadingService = inject(LoadingService);

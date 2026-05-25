@@ -2,7 +2,21 @@
   <!-- LEFT -->
   <aside class="tk-left">
     <div class="tk-left__top">
-      <div class="tk-left__title">Tickets</div>
+      <div class="tk-left__heading">
+        <div class="tk-left__title">Tickets</div>
+        @if (canViewTeamTicketsButton()) {
+          <button
+            class="team-ticket-btn"
+            type="button"
+            [disabled]="isTeamTicketsExporting"
+            nz-tooltip
+            nzTooltipTitle="Team tickets"
+            (click)="onTeamTicketsClick()"
+          >
+            Team
+          </button>
+        }
+      </div>
       <nz-select
         class="tk-left__select"
         [(ngModel)]="filterStatus"
@@ -153,6 +167,44 @@
     </app-file-preview-modal>
   }
 </div>
+
+<nz-modal
+  [(nzVisible)]="isHeadPickerOpen"
+  nzTitle="Team"
+  nzClassName="team-ticket-modal"
+  (nzOnCancel)="closeHeadPicker()"
+  [nzFooter]="teamTicketFooter"
+>
+  <ng-container *nzModalContent>
+    <div class="team-head-field">
+      <label>Approver</label>
+      <nz-select
+        class="team-head-select filter-select"
+        nzShowSearch
+        nzAllowClear
+        nzPlaceHolder="Select approver"
+        [(ngModel)]="selectedTeamHeadCode"
+      >
+        @for (head of teamHeadOptions; track head.code) {
+          <nz-option [nzValue]="head.code" [nzLabel]="head.label"></nz-option>
+        }
+      </nz-select>
+    </div>
+  </ng-container>
+</nz-modal>
+
+<ng-template #teamTicketFooter>
+  <button nz-button type="button" (click)="closeHeadPicker()">Cancel</button>
+  <button
+    nz-button
+    nzType="primary"
+    type="button"
+    [disabled]="!selectedTeamHeadCode || isTeamTicketsExporting"
+    (click)="confirmTeamHead()"
+  >
+    OK
+  </button>
+</ng-template>
 
 <!-- DESKTOP: replace-tk-right (1200px) -->
 @if (!isMobile) {
@@ -365,9 +417,7 @@
             <div class="note__who">
               <div class="avatar">
                 <app-avatar-preview-modal
-                  [src]="
-                    'https://empimg.oneeclick.co:8048/employeeimage/' + n.createBy.empCode + '.jpg'
-                  "
+                  [src]="getEmployeeImage(n.createBy.empCode)"
                   [name]="n.createBy.nickName"
                 />
               </div>
@@ -468,11 +518,7 @@
                 <div class="note__who">
                   <div class="avatar">
                     <app-avatar-preview-modal
-                      [src]="
-                        'https://empimg.oneeclick.co:8048/employeeimage/' +
-                        n.createBy.empCode +
-                        '.jpg'
-                      "
+                      [src]="getEmployeeImage(n.createBy.empCode)"
                       [name]="n.createBy.nickName"
                     />
                   </div>
@@ -649,7 +695,7 @@
     <div class="side-profile">
       <div class="side-avatar">
         <app-avatar-preview-modal
-          [src]="'https://empimg.oneeclick.co:8048/employeeimage/' + requester.emp_code + '.jpg'"
+          [src]="getEmployeeImage(requester.emp_code)"
           [name]="
             requester.nickname
               ? requester.fullname + ' (' + requester.nickname + ')'
@@ -736,7 +782,7 @@
             <div class="assignee-item" *ngFor="let a of step.Assignee" (click)="selectAssignee(a)">
               <div class="avatar">
                 <img
-                  [src]="'https://empimg.oneeclick.co:8048/employeeimage/' + a.empCode + '.jpg'"
+                  [src]="getEmployeeImage(a.empCode)"
                   alt="รูปโปรไฟล์ของ {{ a.nickName || 'ผู้รับผิดชอบ' }}"
                   title="รูปโปรไฟล์ของ {{ a.nickName || 'ผู้รับผิดชอบ' }}"
                   (error)="onImgError($event)"
@@ -755,11 +801,7 @@
                   <div class="assignee-avatar">
                     <div class="side-avatar">
                       <app-avatar-preview-modal
-                        [src]="
-                          'https://empimg.oneeclick.co:8048/employeeimage/' +
-                          selectedAssignee().empCode +
-                          '.jpg'
-                        "
+                        [src]="getEmployeeImage(selectedAssignee().empCode)"
                         [name]="
                           selectedAssignee().nickname
                             ? selectedAssignee().fullname + ' (' + selectedAssignee().nickname + ')'
