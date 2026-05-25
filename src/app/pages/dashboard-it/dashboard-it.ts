@@ -320,7 +320,9 @@ export class DashboardIT implements OnInit {
   @ViewChild('floatingChatRef') floatingChatRef?: ElementRef<HTMLElement>;
 
   private _chatMessage = '';
-  get chatMessage() { return this._chatMessage; }
+  get chatMessage() {
+    return this._chatMessage;
+  }
   set chatMessage(value: string) {
     this._chatMessage = value;
     this.detectMentionTrigger(value);
@@ -812,19 +814,25 @@ export class DashboardIT implements OnInit {
     this.chatMessage = '';
     this.chatAttachments = [];
     this.pendingMentionAdUsers.clear();
-    this.submitNote({
-      id: ticket.ticketId,
-      message,
-      attachments,
-      mentionedAdUsers,
-    }, { silent: true });
+    this.submitNote(
+      {
+        id: ticket.ticketId,
+        message,
+        attachments,
+        mentionedAdUsers,
+      },
+      { silent: true },
+    );
   }
 
   handleChatKeydown(event: KeyboardEvent, ticket: any) {
     if (this.mentionVisible()) {
       if (event.key === 'ArrowDown') {
         event.preventDefault();
-        this.mentionActiveIndex = Math.min(this.mentionActiveIndex + 1, this.mentionResults().length - 1);
+        this.mentionActiveIndex = Math.min(
+          this.mentionActiveIndex + 1,
+          this.mentionResults().length - 1,
+        );
         return;
       }
       if (event.key === 'ArrowUp') {
@@ -872,8 +880,7 @@ export class DashboardIT implements OnInit {
         ? participants.filter((p) => {
             const q = query.toLowerCase();
             return (
-              p.Nickname?.toLowerCase().includes(q) ||
-              p.FullNameThai?.toLowerCase().includes(q)
+              p.Nickname?.toLowerCase().includes(q) || p.FullNameThai?.toLowerCase().includes(q)
             );
           })
         : participants;
@@ -1281,8 +1288,7 @@ export class DashboardIT implements OnInit {
         const files = attachments.filter((a) => a.reply_id === r.id);
         const convertedFiles = await this.fileConverter.convertUrlsToFiles(files);
         const senderRole =
-          requesterAduser &&
-          (r.user_aduser || '').toLowerCase() === requesterAduser.toLowerCase()
+          requesterAduser && (r.user_aduser || '').toLowerCase() === requesterAduser.toLowerCase()
             ? 'requester'
             : 'it-staff';
 
@@ -1312,7 +1318,11 @@ export class DashboardIT implements OnInit {
     try {
       const res: any = await firstValueFrom(this.getTicketById(String(ticket.ticketId)));
       const replyAttachments = (res.attachments ?? []).filter((f: any) => f.reply_id);
-      const itNotes = await this.buildItNotes(res.replies ?? [], replyAttachments, ticket.requesterAduser);
+      const itNotes = await this.buildItNotes(
+        res.replies ?? [],
+        replyAttachments,
+        ticket.requesterAduser,
+      );
       const currentIds = new Set((ticket.itNotes ?? []).map((n: any) => n.id));
       const hasNew = itNotes.some((n: any) => !currentIds.has(n.id));
       if (!hasNew) return;
@@ -2065,7 +2075,9 @@ export class DashboardIT implements OnInit {
           const assigneeAdUsers = ((latestStep?.Assignee ?? []) as any[])
             .map((a: any) => (a.adUser || a.aduser || '').toLowerCase())
             .filter((u: string) => !!u && u !== senderAdUser.toLowerCase());
-          const allRecipients = [...new Set([...assigneeAdUsers, ...(data.mentionedAdUsers ?? [])])];
+          const allRecipients = [
+            ...new Set([...assigneeAdUsers, ...(data.mentionedAdUsers ?? [])]),
+          ];
           this.signalrService.noteNotify(
             data.id,
             requesterAdUser,

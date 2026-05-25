@@ -93,7 +93,10 @@ export class NavbarComponent {
 
     // Prime audio on first user interaction to satisfy browser autoplay policy
     const primeAudio = () => {
-      this.notifyAudio.play().then(() => this.notifyAudio.pause()).catch(() => {});
+      this.notifyAudio
+        .play()
+        .then(() => this.notifyAudio.pause())
+        .catch(() => {});
       document.removeEventListener('click', primeAudio);
     };
     document.addEventListener('click', primeAudio, { once: true });

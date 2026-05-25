@@ -142,7 +142,9 @@ export class ItService implements OnInit {
   });
 
   private _chatMessage = '';
-  get chatMessage() { return this._chatMessage; }
+  get chatMessage() {
+    return this._chatMessage;
+  }
   set chatMessage(value: string) {
     this._chatMessage = value;
     this.detectMentionTrigger(value);
@@ -385,9 +387,15 @@ export class ItService implements OnInit {
     const ticket = this.selectedTicket();
     if (!ticket?.ticketId) return;
     try {
-      const res: any = await firstValueFrom(this.itServiceService.getTicketById(String(ticket.ticketId)));
+      const res: any = await firstValueFrom(
+        this.itServiceService.getTicketById(String(ticket.ticketId)),
+      );
       const replyAttachments = (res.attachments ?? []).filter((f: any) => f.reply_id);
-      const itNotes = await this.buildItNotes(res.replies ?? [], replyAttachments, ticket.requesterAduser);
+      const itNotes = await this.buildItNotes(
+        res.replies ?? [],
+        replyAttachments,
+        ticket.requesterAduser,
+      );
       const currentIds = new Set((ticket.itNotes ?? []).map((n: any) => n.id));
       const hasNew = itNotes.some((n: any) => !currentIds.has(n.id));
       if (!hasNew) return;
@@ -586,7 +594,10 @@ export class ItService implements OnInit {
     this.chatMessage = '';
     this.chatAttachments = [];
     this.pendingMentionAdUsers.clear();
-    this.submitNote({ id: ticket.ticketId, message, attachments, mentionedAdUsers }, { silent: true });
+    this.submitNote(
+      { id: ticket.ticketId, message, attachments, mentionedAdUsers },
+      { silent: true },
+    );
   }
 
   handleChatKeydown(event: KeyboardEvent, ticket: any) {
@@ -707,7 +718,10 @@ export class ItService implements OnInit {
     }
 
     if (participants.length >= 1) {
-      return [{ Nickname: 'All', FullNameThai: 'แจ้งทุกคน', CODEEMPID: '__all__' }, ...participants];
+      return [
+        { Nickname: 'All', FullNameThai: 'แจ้งทุกคน', CODEEMPID: '__all__' },
+        ...participants,
+      ];
     }
     return participants;
   }
@@ -887,7 +901,9 @@ export class ItService implements OnInit {
           const assigneeAdUsers = ((latestStep?.Assignee ?? []) as any[])
             .map((a: any) => (a.adUser || a.aduser || '').toLowerCase())
             .filter((u: string) => !!u && u !== senderAdUser.toLowerCase());
-          const allRecipients = [...new Set([...assigneeAdUsers, ...(data.mentionedAdUsers ?? [])])];
+          const allRecipients = [
+            ...new Set([...assigneeAdUsers, ...(data.mentionedAdUsers ?? [])]),
+          ];
           this.signalrService.noteNotify(
             data.id,
             requesterAdUser,
@@ -906,7 +922,11 @@ export class ItService implements OnInit {
 
       error: (error) => {
         console.error('Assign Ticket Error:', error);
-        if (!silent) this.swalService.warning('เกิดข้อผิดพลาด', error?.message || 'ไม่สามารถติดต่อเซิร์ฟเวอร์ได้');
+        if (!silent)
+          this.swalService.warning(
+            'เกิดข้อผิดพลาด',
+            error?.message || 'ไม่สามารถติดต่อเซิร์ฟเวอร์ได้',
+          );
       },
     });
   }
@@ -1098,8 +1118,7 @@ export class ItService implements OnInit {
         const files = attachments.filter((a) => a.reply_id === r.id);
         const convertedFiles = await this.fileConverter.convertUrlsToFiles(files);
         const senderRole =
-          requesterAduser &&
-          (r.user_aduser || '').toLowerCase() === requesterAduser.toLowerCase()
+          requesterAduser && (r.user_aduser || '').toLowerCase() === requesterAduser.toLowerCase()
             ? 'requester'
             : 'it-staff';
 
