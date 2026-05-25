@@ -8,4 +8,5 @@ export const environment = {
   file_base_url: 'https://localhost:7081',
   pr: 'http://10.31.1.85:5259',
   frontend_url: 'http://10.88.0.31:4200',
+  allowMentionAnyone: false,
 };

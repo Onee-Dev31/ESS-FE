@@ -415,7 +415,7 @@
 </ng-template>
 
 @if ((!isMobile || isTicketDetailOpen()) && selectedTicket(); as t) {
-  <div class="floating-chat" [class.is-open]="IS_CHAT_OPEN()">
+  <div class="floating-chat" [class.is-open]="IS_CHAT_OPEN()" #floatingChatRef>
     @if (IS_CHAT_OPEN()) {
       <section class="floating-chat__panel" aria-label="Ticket chat">
         <div class="floating-chat__header">
@@ -450,9 +450,11 @@
           <div class="note-list" *ngIf="t.itNotes.length; else noNoteFloating">
             <div
               class="note"
-              *ngFor="let n of t.itNotes.slice()"
+              *ngFor="let n of t.itNotes.slice(); let last = last"
               [class.note--me]="n.createBy.empCode === currentUserEmpCode"
               [class.note--they]="n.createBy.empCode !== currentUserEmpCode"
+              [class.note--requester]="n.createBy.senderRole === 'requester'"
+              [class.note--it-staff]="n.createBy.senderRole === 'it-staff'"
             >
               <div class="note__top">
                 <div class="note__who">
@@ -486,12 +488,71 @@
                   <i class="fas fa-download download-small"></i>
                 </li>
               </ul>
+              <div
+                class="read-receipt"
+                *ngIf="last && readersForNote(n.id).length > 0"
+                [class.read-receipt--me]="n.createBy.empCode === currentUserEmpCode"
+              >
+                <span class="read-receipt__label">Seen</span>
+                <div class="read-receipt__avatars">
+                  <div
+                    class="read-receipt__avatar"
+                    *ngFor="let r of readersForNote(n.id)"
+                    [title]="r.nickName"
+                  >
+                    <img
+                      [src]="
+                        'https://empimg.oneeclick.co:8048/employeeimage/' + r.userCodeempid + '.jpg'
+                      "
+                      [alt]="r.nickName"
+                      (error)="onImgError($event)"
+                    />
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
           <ng-template #noNoteFloating>
             <div class="tk-empty">ยังไม่มีข้อความ</div>
           </ng-template>
         </div>
+
+        @if (mentionVisible() && t.status !== 'Closed' && isAssigned()) {
+          <div class="floating-chat__mention-list" role="listbox">
+            @for (emp of mentionResults(); track emp.CODEEMPID; let i = $index) {
+              <button
+                class="floating-chat__mention-item"
+                [class.is-active]="i === mentionActiveIndex"
+                [class.is-all]="emp.CODEEMPID === '__all__'"
+                type="button"
+                role="option"
+                (mousedown)="$event.preventDefault()"
+                (click)="selectMention(emp)"
+              >
+                @if (emp.CODEEMPID === '__all__') {
+                  <div class="mention-avatar mention-avatar--all">
+                    <i class="fas fa-users"></i>
+                  </div>
+                } @else {
+                  <img
+                    class="mention-avatar"
+                    [src]="
+                      'https://empimg.oneeclick.co:8048/employeeimage/' + emp.CODEEMPID + '.jpg'
+                    "
+                    [alt]="emp.Nickname || emp.FullNameThai"
+                    (error)="onImgError($event)"
+                  />
+                }
+                <div class="mention-info">
+                  <span class="mention-name">{{ emp.Nickname }}</span>
+                  @if (emp.FullNameThai && emp.CODEEMPID !== '__all__') {
+                    <span class="mention-sub">{{ emp.FullNameThai }}</span>
+                  }
+                </div>
+              </button>
+            }
+          </div>
+        }
 
         <div class="floating-chat__composer" *ngIf="t.status !== 'Closed' && isAssigned()">
           <input type="file" multiple hidden #chatFileInput (change)="onChatFileSelected($event)" />
@@ -506,12 +567,12 @@
             <i class="fa-solid fa-paperclip"></i>
           </button>
           <textarea
-            #chatTextarea
+            #chatTextareaRef
             [(ngModel)]="chatMessage"
             rows="1"
-            placeholder="พิมพ์ข้อความ..."
+            placeholder="พิมพ์ข้อความ... (@ เพื่อ mention)"
             aria-label="พิมพ์ข้อความ"
-            (keydown.enter)="handleChatEnter($event, t)"
+            (keydown)="handleChatKeydown($event, t)"
           ></textarea>
           <button
             class="floating-chat__send"
@@ -549,8 +610,8 @@
       (click)="toggleChat()"
     >
       <i class="fa-solid" [ngClass]="IS_CHAT_OPEN() ? 'fa-times' : 'fa-comments'"></i>
-      @if (!IS_CHAT_OPEN() && t.itNotes.length > 0) {
-        <span class="floating-chat__badge">{{ t.itNotes.length }}</span>
+      @if (!IS_CHAT_OPEN() && unreadChatCount() > 0) {
+        <span class="floating-chat__badge">{{ unreadChatCount() }}</span>
       }
     </button>
   </div>

@@ -8,4 +8,5 @@ export const environment = {
   employeeImageUrl: 'https://imgemp.oneeclick.co/employeeimage',
   file_base_url: '',
   frontend_url: '',
+  allowMentionAnyone: false,
 };

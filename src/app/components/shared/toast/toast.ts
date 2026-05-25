@@ -1,6 +1,7 @@
 import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ToastService } from '../../../services/toast';
+import { Router } from '@angular/router';
+import { ToastService, Toast } from '../../../services/toast';
 
 /** ส่วนแสดงผลข้อความแจ้งเตือน (Toast Notification) */
 @Component({
@@ -12,6 +13,7 @@ import { ToastService } from '../../../services/toast';
 })
 export class ToastComponent {
   toastService = inject(ToastService);
+  private router = inject(Router);
 
   getIcon(type: string): string {
     const icons = {
@@ -25,5 +27,11 @@ export class ToastComponent {
 
   close(id: string) {
     this.toastService.remove(id);
+  }
+
+  onToastClick(toast: Toast) {
+    if (!toast.route) return;
+    this.toastService.remove(toast.id);
+    this.router.navigate([toast.route], { queryParams: toast.queryParams ?? undefined });
   }
 }

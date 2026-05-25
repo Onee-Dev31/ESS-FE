@@ -1916,6 +1916,16 @@ textarea.form-input {
     }
   }
 
+  .note--requester {
+    background: color-mix(in srgb, #3b82f6 10%, var(--bg-card));
+    border-color: color-mix(in srgb, #3b82f6 30%, var(--border));
+  }
+
+  .note--it-staff {
+    background: color-mix(in srgb, #7c3aed 10%, var(--bg-card));
+    border-color: color-mix(in srgb, #7c3aed 30%, var(--border));
+  }
+
   .attachment-list {
     display: grid;
     gap: 8px;
@@ -1948,6 +1958,44 @@ textarea.form-input {
     text-overflow: ellipsis;
     white-space: nowrap;
     font-size: 0.8rem;
+  }
+
+  .read-receipt {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    margin-top: 5px;
+    justify-content: flex-start;
+
+    &--me {
+      justify-content: flex-end;
+    }
+
+    &__label {
+      font-size: 10px;
+      color: var(--text-sub);
+    }
+
+    &__avatars {
+      display: flex;
+      gap: 2px;
+    }
+
+    &__avatar {
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      overflow: hidden;
+      border: 1.5px solid var(--bg-card);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+
+      img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+      }
+    }
   }
 }
 
@@ -2039,6 +2087,78 @@ textarea.form-input {
       background: color-mix(in srgb, var(--primary), transparent 88%);
       box-shadow: none;
     }
+  }
+}
+
+.floating-chat__mention-list {
+  border-top: 1px solid var(--border-color);
+  background: var(--bg-card);
+  max-height: 220px;
+  overflow-y: auto;
+  flex-shrink: 0;
+}
+
+.floating-chat__mention-item {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 14px;
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.15s;
+
+  &:hover,
+  &.is-active {
+    background: color-mix(in srgb, var(--primary) 10%, transparent);
+  }
+
+  .mention-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    object-fit: cover;
+    flex-shrink: 0;
+
+    &--all {
+      background: var(--primary);
+      color: #fff;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.8rem;
+    }
+  }
+
+  &.is-all .mention-name {
+    color: var(--primary);
+    font-weight: 700;
+  }
+
+  .mention-info {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    min-width: 0;
+  }
+
+  .mention-name {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--text-header);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .mention-sub {
+    font-size: 0.75rem;
+    color: var(--text-sub);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 }
 

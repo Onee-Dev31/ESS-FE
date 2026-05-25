@@ -139,6 +139,7 @@ describe('DashboardIT', () => {
       'testuser',
       'Test User',
       'hello',
+      [],
     );
   });
 
