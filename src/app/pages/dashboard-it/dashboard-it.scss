@@ -2775,3 +2775,41 @@
     opacity: 0.8;
   }
 }
+
+.read-receipt {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 5px;
+  justify-content: flex-start;
+
+  &--me {
+    justify-content: flex-end;
+  }
+
+  &__label {
+    font-size: 10px;
+    color: var(--text-sub);
+  }
+
+  &__avatars {
+    display: flex;
+    gap: 2px;
+  }
+
+  &__avatar {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 1.5px solid var(--bg-card);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+  }
+}

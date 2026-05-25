@@ -61,6 +61,14 @@ import { NzDatePickerModule } from 'ng-zorro-antd/date-picker';
 import { en_US, NzI18nService } from 'ng-zorro-antd/i18n';
 import { environment } from '../../../environments/environment';
 
+interface ReplyReader {
+  userCodeempid: string;
+  aduser: string;
+  nickName: string;
+  lastReadReplyId: number;
+  readAt: string;
+}
+
 @Component({
   selector: 'app-dashboard-it',
   standalone: true,
@@ -286,6 +294,8 @@ export class DashboardIT implements OnInit {
 
   private chatReadCounts = signal<Map<number, number>>(new Map());
 
+  replyReaders = signal<ReplyReader[]>([]);
+
   unreadChatCount = computed(() => {
     const ticket = this.selectedTicket();
     if (!ticket) return 0;
@@ -502,6 +512,26 @@ export class DashboardIT implements OnInit {
         }
       });
 
+    this.signalrService
+      .on('ChatRead')
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((data: any) => {
+        if (data.ticketId !== this.selectedTicket()?.ticketId) return;
+        this.replyReaders.update((readers) => {
+          const others = readers.filter((r) => r.userCodeempid !== data.userCodeempid);
+          return [
+            ...others,
+            {
+              userCodeempid: data.userCodeempid,
+              aduser: data.aduser ?? '',
+              nickName: data.nickName ?? '',
+              lastReadReplyId: data.lastReadReplyId,
+              readAt: data.readAt ?? new Date().toISOString(),
+            },
+          ];
+        });
+      });
+
     // Poll for new notes every 5s while chat panel is open (fallback when SignalR doesn't reach all parties)
     interval(5000)
       .pipe(
@@ -648,6 +678,7 @@ export class DashboardIT implements OnInit {
       this.selectedTicket.set(objectData);
       if (previousTicketId !== objectData.ticketId) {
         this.clearChatDraft();
+        this.replyReaders.set([]);
       }
       if (options?.openChat) {
         this.IS_CHAT_OPEN.set(true);
@@ -663,6 +694,14 @@ export class DashboardIT implements OnInit {
         this.itServiceService.markTicketRead(ticketId, codeempid).subscribe({
           complete: () => this.signalrService.ticketReadTrigger.next({ ticketId }),
         });
+
+        const lastReply = itNotes[itNotes.length - 1];
+        if (lastReply) {
+          this.itServiceService
+            .markReplyRead(ticketId, codeempid, lastReply.id)
+            .subscribe({ error: () => {} });
+        }
+        this.loadReplyReadStatus(ticketId);
         this.unreadTicketIds.update((s) => {
           const next = new Set(s);
           next.delete(Number(ticketId));
@@ -1254,6 +1293,22 @@ export class DashboardIT implements OnInit {
       const el = this.cardBodyEl?.nativeElement;
       if (el) el.scrollTop = el.scrollHeight;
     }, 0);
+  }
+
+  loadReplyReadStatus(ticketId: string | number) {
+    this.itServiceService.getReplyReadStatus(ticketId).subscribe({
+      next: (res) => {
+        if (res?.readers) this.replyReaders.set(res.readers);
+      },
+      error: () => {},
+    });
+  }
+
+  readersForNote(replyId: number): ReplyReader[] {
+    const myCode = this.authService.userData()?.CODEMPID;
+    return this.replyReaders().filter(
+      (r) => r.lastReadReplyId >= replyId && r.userCodeempid !== myCode,
+    );
   }
 
   isPreviewable(fileName: string): boolean {
@@ -1980,6 +2035,15 @@ export class DashboardIT implements OnInit {
 
         this.selectTicket(data.id);
         this.getAllTickets();
+
+        // mark self as having read up to the latest reply after sending
+        const codeempid = this.authService.userData()?.CODEMPID;
+        const latestNote = (this.selectedTicket()?.itNotes ?? []).slice(-1)[0];
+        if (codeempid && latestNote) {
+          this.itServiceService
+            .markReplyRead(data.id, codeempid, latestNote.id)
+            .subscribe({ error: () => {} });
+        }
       },
       error: (error) => {
         console.error('Assign Ticket Error:', error);

@@ -48,6 +48,15 @@ import { CcModal } from '../dashboard-it/modal/cc-modal/cc-modal';
 import { ReOpenModal } from '../dashboard-it/modal/re-open-modal/re-open-modal';
 import { AvatarPreviewModal } from '../../components/modals/avatar-preview-modal/avatar-preview-modal';
 import { NzDatePickerModule } from 'ng-zorro-antd/date-picker';
+
+interface ReplyReader {
+  userCodeempid: string;
+  aduser: string;
+  nickName: string;
+  lastReadReplyId: number;
+  readAt: string;
+}
+
 @Component({
   selector: 'app-it-service',
   standalone: true,
@@ -95,6 +104,8 @@ export class ItService implements OnInit {
   }
 
   private chatReadCounts = signal<Map<number, number>>(new Map());
+
+  replyReaders = signal<ReplyReader[]>([]);
 
   unreadChatCount = computed(() => {
     const ticket = this.selectedTicket();
@@ -312,6 +323,26 @@ export class ItService implements OnInit {
         }
       });
 
+    this.signalrService
+      .on('ChatRead')
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((data: any) => {
+        if (data.ticketId !== this.selectedTicket()?.ticketId) return;
+        this.replyReaders.update((readers) => {
+          const others = readers.filter((r) => r.userCodeempid !== data.userCodeempid);
+          return [
+            ...others,
+            {
+              userCodeempid: data.userCodeempid,
+              aduser: data.aduser ?? '',
+              nickName: data.nickName ?? '',
+              lastReadReplyId: data.lastReadReplyId,
+              readAt: data.readAt ?? new Date().toISOString(),
+            },
+          ];
+        });
+      });
+
     // Poll for new notes every 5s while chat panel is open (fallback when SignalR doesn't reach all parties)
     interval(5000)
       .pipe(
@@ -447,6 +478,7 @@ export class ItService implements OnInit {
       this.selectedTicket.set(objectData);
       if (previousTicketId !== objectData.ticketId) {
         this.clearChatDraft();
+        this.replyReaders.set([]);
       }
       if (options?.openChat && this.canAccessChat()) {
         this.IS_CHAT_OPEN.set(true);
@@ -460,6 +492,13 @@ export class ItService implements OnInit {
         this.itServiceService.markTicketRead(ticketId, codeempid).subscribe({
           complete: () => this.signalrService.ticketReadTrigger.next({ ticketId }),
         });
+        const lastReply = itNotes[itNotes.length - 1];
+        if (lastReply) {
+          this.itServiceService
+            .markReplyRead(ticketId, codeempid, lastReply.id)
+            .subscribe({ error: () => {} });
+        }
+        this.loadReplyReadStatus(ticketId);
       }
 
       if (this.isMobile) {
@@ -1062,6 +1101,22 @@ export class ItService implements OnInit {
       const el = this.cardBodyEl?.nativeElement;
       if (el) el.scrollTop = el.scrollHeight;
     }, 0);
+  }
+
+  loadReplyReadStatus(ticketId: string | number) {
+    this.itServiceService.getReplyReadStatus(ticketId).subscribe({
+      next: (res) => {
+        if (res?.readers) this.replyReaders.set(res.readers);
+      },
+      error: () => {},
+    });
+  }
+
+  readersForNote(replyId: number): ReplyReader[] {
+    const myCode = this.authService.userData()?.CODEMPID;
+    return this.replyReaders().filter(
+      (r) => r.lastReadReplyId >= replyId && r.userCodeempid !== myCode,
+    );
   }
 
   getTicketStatus(ticket: any) {
