@@ -517,10 +517,12 @@ export class NotificationService {
     const typeStr2 = input.notificationType.toLowerCase();
     const titleStr2 = (input.title ?? '').toLowerCase();
     const isNoteForUser =
-      typeStr2.includes('note') || typeStr2.includes('message') ||
-      typeStr2.includes('reply') || typeStr2.includes('chat') ||
-      titleStr2.includes('ข้อความ') || titleStr2.includes('แชท');
-
+      typeStr2.includes('note') ||
+      typeStr2.includes('message') ||
+      typeStr2.includes('reply') ||
+      typeStr2.includes('chat') ||
+      titleStr2.includes('ข้อความ') ||
+      titleStr2.includes('แชท');
     return {
       route: '/it-service-list',
       queryParams: {
