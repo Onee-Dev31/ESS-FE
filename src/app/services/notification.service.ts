@@ -1,6 +1,7 @@
 import { Injectable, NgZone, computed, effect, inject, signal } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { interval } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
 import { AuthService } from './auth.service';
@@ -131,6 +132,13 @@ export class NotificationService {
           });
         });
     }
+
+    // Polling fallback: refresh every 10s in case SignalR events are missed
+    interval(10000)
+      .pipe(takeUntilDestroyed())
+      .subscribe(() => {
+        if (this.activeUserKey) this.refreshAll();
+      });
   }
 
   refreshAll() {
@@ -147,9 +155,20 @@ export class NotificationService {
     const params = new HttpParams().set('recipientAduser', this.activeUserKey);
     this.http.get<any>(`${this.baseUrl}/unread-count`, { params }).subscribe({
       next: (response) => {
-        const unreadCount = Number(response?.unreadCount ?? response?.count ?? response ?? 0);
-        this.unreadCount.set(Number.isFinite(unreadCount) ? unreadCount : 0);
+        const newCount = Number(response?.unreadCount ?? response?.count ?? response ?? 0);
+        const prevCount = this.unreadCount();
+        const safeCount = Number.isFinite(newCount) ? newCount : 0;
+        this.unreadCount.set(safeCount);
         this.isCountLoading.set(false);
+
+        // Trigger sound + toast when polling detects a new notification
+        if (safeCount > prevCount) {
+          this.realtimeTick.update((t) => t + 1); // always play sound via navbar effect
+          if (Date.now() - this.lastToastTime > 5000 && !document.hidden) {
+            this.lastToastTime = Date.now();
+            this.toastService.info('มีการแจ้งเตือนใหม่');
+          }
+        }
       },
       error: () => {
         this.countError.set('ไม่สามารถโหลดจำนวนแจ้งเตือนใหม่ได้');
@@ -317,14 +336,16 @@ export class NotificationService {
   private handleRealtimeNotification(payload: unknown) {
     if (!this.activeUserKey) return;
 
-    this.realtimeTick.update((tick) => tick + 1);
-    this.refreshAll();
+    this.zone.run(() => {
+      this.realtimeTick.update((tick) => tick + 1);
+      this.refreshAll();
 
-    const record = this.extractRealtimeRecord(payload);
-    const title =
-      this.toText((record as any)?.title ?? (record as any)?.notification_title) ?? 'แจ้งเตือนใหม่';
-    this.lastToastTime = Date.now();
-    if (!document.hidden) this.toastService.info(title);
+      const record = this.extractRealtimeRecord(payload);
+      const title =
+        this.toText((record as any)?.title ?? (record as any)?.notification_title) ?? 'แจ้งเตือนใหม่';
+      this.lastToastTime = Date.now();
+      if (!document.hidden) this.toastService.info(title);
+    });
   }
 
   private extractRealtimeRecord(payload: unknown): NotificationApiRecord | null {
@@ -365,6 +386,7 @@ export class NotificationService {
       targetType: this.toText(item.target_type ?? item.targetType) ?? '',
       ticketId,
       ticketNumber,
+      title: this.toText(item.title) ?? '',
     });
 
     return {
@@ -401,6 +423,7 @@ export class NotificationService {
     targetType: string;
     ticketId: number | null;
     ticketNumber: string | null;
+    title?: string;
   }) {
     const roleText = `${this.authService.userRole() ?? ''},${input.recipientRole}`.toLowerCase();
     const typeText = `${input.notificationType} ${input.targetType}`.toLowerCase();
@@ -439,11 +462,21 @@ export class NotificationService {
     }
 
     if (isItRole) {
+      const typeStr = input.notificationType.toLowerCase();
+      const titleStr = (input.title ?? '').toLowerCase();
+      const isNoteNotification =
+        typeStr.includes('note') ||
+        typeStr.includes('message') ||
+        typeStr.includes('reply') ||
+        typeStr.includes('chat') ||
+        titleStr.includes('ข้อความ') ||
+        titleStr.includes('แชท');
       return {
         route: '/it-dashboard',
         queryParams: {
           ticketId: input.ticketId ?? undefined,
           focusZone: 'tickets',
+          ...(isNoteNotification && { openChat: 'true' }),
           _t: Date.now(),
         },
       };

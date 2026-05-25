@@ -57,6 +57,7 @@ import { NoteForItModal } from './modal/note-for-it-modal/note-for-it-modal';
 import { AvatarPreviewModal } from '../../components/modals/avatar-preview-modal/avatar-preview-modal';
 import { NzDatePickerModule } from 'ng-zorro-antd/date-picker';
 import { en_US, NzI18nService } from 'ng-zorro-antd/i18n';
+import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-dashboard-it',
@@ -264,7 +265,24 @@ export class DashboardIT implements OnInit {
   isSmallMobile = false;
   isTicketDetailOpen = signal(false);
   IS_CHAT_OPEN = signal(false);
-  chatMessage = '';
+
+  mentionResults = signal<any[]>([]);
+  mentionVisible = signal(false);
+  mentionActiveIndex = 0;
+  private mentionQuery = '';
+  private mentionAtIndex = -1;
+  private mentionDebounce: ReturnType<typeof setTimeout> | null = null;
+  private pendingMentionAdUsers = new Set<string>();
+
+  @ViewChild('chatTextareaRef') chatTextareaRef?: ElementRef<HTMLTextAreaElement>;
+
+  private _chatMessage = '';
+  get chatMessage() { return this._chatMessage; }
+  set chatMessage(value: string) {
+    this._chatMessage = value;
+    this.detectMentionTrigger(value);
+  }
+
   chatAttachments: { name: string; size: number; file: File }[] = [];
 
   readonly CHAT_FILE_CONFIG = {
@@ -398,7 +416,9 @@ export class DashboardIT implements OnInit {
           this.myTicket = false;
           this.getAllTickets();
 
-          this.selectTicket(params['ticketId']);
+          this.selectTicket(params['ticketId'], {
+            openChat: params['openChat'] === 'true',
+          });
         }
       });
 
@@ -516,7 +536,7 @@ export class DashboardIT implements OnInit {
     this.selectTicket(String(ticketId));
   }
 
-  selectTicket(ticketId: string) {
+  selectTicket(ticketId: string, options?: { openChat?: boolean }) {
     const previousTicketId = this.selectedTicket()?.ticketId;
 
     this.getTicketById(ticketId).subscribe(async (res: any) => {
@@ -582,6 +602,10 @@ export class DashboardIT implements OnInit {
       if (previousTicketId !== objectData.ticketId) {
         this.clearChatDraft();
       }
+      if (options?.openChat) {
+        this.IS_CHAT_OPEN.set(true);
+        setTimeout(() => this.chatTextareaRef?.nativeElement.focus(), 100);
+      }
       this.scrollToBottom();
 
       console.log(objectData);
@@ -636,6 +660,7 @@ export class DashboardIT implements OnInit {
   private clearChatDraft() {
     this.chatMessage = '';
     this.chatAttachments = [];
+    this.pendingMentionAdUsers.clear();
   }
 
   sendChatMessage(ticket: any) {
@@ -647,13 +672,173 @@ export class DashboardIT implements OnInit {
     }
 
     const attachments = [...this.chatAttachments];
+    const mentionedAdUsers = [...this.pendingMentionAdUsers];
     this.chatMessage = '';
     this.chatAttachments = [];
+    this.pendingMentionAdUsers.clear();
     this.submitNote({
       id: ticket.ticketId,
       message,
       attachments,
-    });
+      mentionedAdUsers,
+    }, { silent: true });
+  }
+
+  handleChatKeydown(event: KeyboardEvent, ticket: any) {
+    if (this.mentionVisible()) {
+      if (event.key === 'ArrowDown') {
+        event.preventDefault();
+        this.mentionActiveIndex = Math.min(this.mentionActiveIndex + 1, this.mentionResults().length - 1);
+        return;
+      }
+      if (event.key === 'ArrowUp') {
+        event.preventDefault();
+        this.mentionActiveIndex = Math.max(this.mentionActiveIndex - 1, 0);
+        return;
+      }
+      if (event.key === 'Enter') {
+        event.preventDefault();
+        const emp = this.mentionResults()[this.mentionActiveIndex];
+        if (emp) this.selectMention(emp);
+        return;
+      }
+      if (event.key === 'Escape') {
+        event.preventDefault();
+        this.closeMention();
+        return;
+      }
+    }
+    if (event.key === 'Enter' && !event.shiftKey) {
+      event.preventDefault();
+      this.sendChatMessage(ticket);
+    }
+  }
+
+  private detectMentionTrigger(value: string) {
+    const atMatch = value.match(/@([^\s@]*)$/);
+    if (atMatch) {
+      this.mentionAtIndex = value.lastIndexOf('@');
+      this.mentionQuery = atMatch[1];
+      this.mentionActiveIndex = 0;
+      this.searchMentionEmployees(this.mentionQuery);
+    } else {
+      this.closeMention();
+    }
+  }
+
+  private searchMentionEmployees(query: string) {
+    if (this.mentionDebounce) clearTimeout(this.mentionDebounce);
+
+    const participants = this.getTicketParticipants();
+
+    if (!query.trim() || !environment.allowMentionAnyone) {
+      const filtered = query.trim()
+        ? participants.filter((p) => {
+            const q = query.toLowerCase();
+            return (
+              p.Nickname?.toLowerCase().includes(q) ||
+              p.FullNameThai?.toLowerCase().includes(q)
+            );
+          })
+        : participants;
+      this.mentionResults.set(filtered);
+      this.mentionVisible.set(filtered.length > 0);
+      this.mentionActiveIndex = 0;
+      return;
+    }
+
+    this.mentionDebounce = setTimeout(() => {
+      this.itServiceService.searchEmployees({ search: query || undefined, pageSize: 8 }).subscribe({
+        next: (res) => {
+          const list = (res.data || []).map((e: any) => ({
+            Nickname: e.Nickname || e.nickname || '',
+            FullNameThai: e.FullNameThai || e.fullname || '',
+            CODEEMPID: e.CODEEMPID || e.codeempid || '',
+          }));
+          this.mentionResults.set(list);
+          this.mentionVisible.set(list.length > 0);
+          this.mentionActiveIndex = 0;
+        },
+        error: () => this.closeMention(),
+      });
+    }, 200);
+  }
+
+  private getTicketParticipants(): any[] {
+    const ticket = this.selectedTicket();
+    if (!ticket) return [];
+
+    const myCode = this.currentUserEmpCode;
+    const participants: any[] = [];
+    const seen = new Set<string>([myCode]); // exclude self
+
+    if (ticket.requester?.emp_code && !seen.has(ticket.requester.emp_code)) {
+      seen.add(ticket.requester.emp_code);
+      participants.push({
+        Nickname: ticket.requester.nickname || ticket.requester.fullname || '',
+        FullNameThai: ticket.requester.fullname || '',
+        CODEEMPID: ticket.requester.emp_code,
+        adUser: ticket.requesterAduser || ticket.requester.aduser || '',
+      });
+    }
+
+    for (const step of ticket.assignTimeline || []) {
+      for (const a of step.Assignee || []) {
+        if (a.empCode && !seen.has(a.empCode)) {
+          seen.add(a.empCode);
+          participants.push({
+            Nickname: a.nickName || a.fullName || '',
+            FullNameThai: a.fullName || '',
+            CODEEMPID: a.empCode,
+            adUser: a.adUser || a.aduser || '',
+          });
+        }
+      }
+      const cb = step.createBy;
+      if (cb?.empCode && !seen.has(cb.empCode)) {
+        seen.add(cb.empCode);
+        participants.push({
+          Nickname: cb.nickName || cb.fullName || '',
+          FullNameThai: cb.fullName || '',
+          CODEEMPID: cb.empCode,
+          adUser: cb.adUser || cb.aduser || '',
+        });
+      }
+    }
+
+    return [{ Nickname: 'All', FullNameThai: 'แจ้งทุกคน', CODEEMPID: '__all__' }, ...participants];
+  }
+
+  selectMention(emp: any) {
+    const name = emp.Nickname || emp.FullNameThai || '';
+    const before = this.chatMessage.substring(0, this.mentionAtIndex);
+    const after = this.chatMessage.substring(this.mentionAtIndex + 1 + this.mentionQuery.length);
+    this._chatMessage = `${before}@${name} ${after}`;
+
+    // Track who was mentioned so we can notify them
+    if (emp.CODEEMPID === '__all__') {
+      for (const p of this.getTicketParticipants()) {
+        const au = (p.adUser || '').toLowerCase();
+        if (au && p.CODEEMPID !== '__all__') this.pendingMentionAdUsers.add(au);
+      }
+    } else {
+      const au = (emp.adUser || emp.AD_USER || emp.aduser || '').toLowerCase();
+      if (au) this.pendingMentionAdUsers.add(au);
+    }
+
+    this.closeMention();
+    setTimeout(() => this.chatTextareaRef?.nativeElement.focus(), 0);
+  }
+
+  closeMention() {
+    this.mentionVisible.set(false);
+    this.mentionResults.set([]);
+    this.mentionQuery = '';
+    this.mentionAtIndex = -1;
+    if (this.mentionDebounce) {
+      clearTimeout(this.mentionDebounce);
+      this.mentionDebounce = null;
+    }
   }
 
   handleChatEnter(event: Event, ticket: any) {
@@ -1664,7 +1849,8 @@ export class DashboardIT implements OnInit {
     this.IS_NOTE_TICKET.set(false);
   }
 
-  submitNote(data: any) {
+  submitNote(data: any, options?: { silent?: boolean }) {
+    const silent = options?.silent ?? false;
     const formData = new FormData();
     formData.append('Message', data.message);
     formData.append('ExecutedBy', this.authService.userData().CODEMPID);
@@ -1674,17 +1860,16 @@ export class DashboardIT implements OnInit {
         formData.append('Files', item.file);
       }
     });
-    // console.log('formData', [...formData.entries()]);
 
-    this.swalService.loading('กำลังบันทึกข้อมูล...');
+    if (!silent) this.swalService.loading('กำลังบันทึกข้อมูล...');
     this.IS_NOTE_TICKET.set(false);
     this.itServiceService.replyTicket(data.id, formData).subscribe({
       next: (res) => {
         if (!res?.success) {
-          this.swalService.warning('ไม่สามารถบันทึกข้อมูลได้');
+          if (!silent) this.swalService.warning('ไม่สามารถบันทึกข้อมูลได้');
           return;
         }
-        this.swalService.close();
+        if (!silent) this.swalService.close();
 
         const requesterAdUser = this.selectedTicket()?.requesterAduser;
         const userData = this.authService.userData();
@@ -1698,23 +1883,27 @@ export class DashboardIT implements OnInit {
             senderAdUser,
             senderName,
             data.message,
+            data.mentionedAdUsers ?? [],
           );
         }
 
-        setTimeout(() => {
-          this.swalService.success(res.message || 'บันทึกสำเร็จ');
-        }, 100);
+        if (!silent) {
+          setTimeout(() => {
+            this.swalService.success(res.message || 'บันทึกสำเร็จ');
+          }, 100);
+        }
 
         this.selectTicket(data.id);
         this.getAllTickets();
       },
       error: (error) => {
         console.error('Assign Ticket Error:', error);
-
-        this.swalService.warning(
-          'เกิดข้อผิดพลาด',
-          error?.message || 'ไม่สามารถติดต่อเซิร์ฟเวอร์ได้',
-        );
+        if (!silent) {
+          this.swalService.warning(
+            'เกิดข้อผิดพลาด',
+            error?.message || 'ไม่สามารถติดต่อเซิร์ฟเวอร์ได้',
+          );
+        }
       },
     });
   }

@@ -1911,6 +1911,64 @@ textarea.form-input {
   }
 }
 
+.floating-chat__mention-list {
+  border-top: 1px solid var(--border-color);
+  background: var(--bg-card);
+  max-height: 220px;
+  overflow-y: auto;
+  flex-shrink: 0;
+}
+
+.floating-chat__mention-item {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 14px;
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.15s;
+
+  &:hover,
+  &.is-active {
+    background: color-mix(in srgb, var(--primary) 10%, transparent);
+  }
+
+  .mention-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    object-fit: cover;
+    flex-shrink: 0;
+  }
+
+  .mention-info {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    min-width: 0;
+  }
+
+  .mention-name {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--text-header);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .mention-sub {
+    font-size: 0.75rem;
+    color: var(--text-sub);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}
+
 .floating-chat__files {
   padding: 10px;
   background: var(--bg-card);

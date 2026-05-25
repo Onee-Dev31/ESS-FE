@@ -75,8 +75,22 @@ export class ItService implements OnInit {
   isSmallMobile = false;
   isTicketDetailOpen = signal(false);
   IS_CHAT_OPEN = signal(false);
-  chatMessage = '';
+
+  private _chatMessage = '';
+  get chatMessage() { return this._chatMessage; }
+  set chatMessage(value: string) {
+    this._chatMessage = value;
+    this.detectMentionTrigger(value);
+  }
+
   chatAttachments: { name: string; size: number; file: File }[] = [];
+
+  mentionResults = signal<any[]>([]);
+  mentionVisible = signal(false);
+  mentionActiveIndex = 0;
+  private mentionQuery = '';
+  private mentionAtIndex = -1;
+  private mentionDebounce: ReturnType<typeof setTimeout> | null = null;
 
   readonly CHAT_FILE_CONFIG = {
     maxFiles: 5,
@@ -109,6 +123,7 @@ export class ItService implements OnInit {
   }
 
   @ViewChild('cardBody') cardBodyEl?: ElementRef<HTMLElement>;
+  @ViewChild('chatTextareaRef') chatTextareaRef?: ElementRef<HTMLTextAreaElement>;
 
   private itServiceMock = inject(ItServiceMockService);
   private itServiceService = inject(ItServiceService);
@@ -415,15 +430,139 @@ export class ItService implements OnInit {
     });
   }
 
-  handleChatEnter(event: Event, ticket: any) {
-    const keyboardEvent = event as KeyboardEvent;
+  handleChatKeydown(event: KeyboardEvent, ticket: any) {
+    if (this.mentionVisible()) {
+      if (event.key === 'ArrowDown') {
+        event.preventDefault();
+        this.mentionActiveIndex = Math.min(
+          this.mentionActiveIndex + 1,
+          this.mentionResults().length - 1,
+        );
+        return;
+      }
+      if (event.key === 'ArrowUp') {
+        event.preventDefault();
+        this.mentionActiveIndex = Math.max(this.mentionActiveIndex - 1, 0);
+        return;
+      }
+      if (event.key === 'Enter') {
+        event.preventDefault();
+        const emp = this.mentionResults()[this.mentionActiveIndex];
+        if (emp) this.selectMention(emp);
+        return;
+      }
+      if (event.key === 'Escape') {
+        event.preventDefault();
+        this.closeMention();
+        return;
+      }
+    }
+    if (event.key === 'Enter' && !event.shiftKey) {
+      event.preventDefault();
+      this.sendChatMessage(ticket);
+    }
+  }
 
-    if (keyboardEvent.shiftKey) {
-      return;
+  private detectMentionTrigger(value: string) {
+    const atMatch = value.match(/@([^\s@]*)$/);
+    console.log('[mention] value:', JSON.stringify(value), 'atMatch:', atMatch);
+    if (atMatch) {
+      this.mentionAtIndex = value.lastIndexOf('@');
+      this.mentionQuery = atMatch[1];
+      this.mentionActiveIndex = 0;
+      this.searchMentionEmployees(this.mentionQuery);
+    } else {
+      this.closeMention();
+    }
+  }
+
+  private searchMentionEmployees(query: string) {
+    if (this.mentionDebounce) clearTimeout(this.mentionDebounce);
+
+    if (!query.trim()) {
+      const participants = this.getTicketParticipants();
+      console.log('[mention] participants from ticket:', participants);
+      if (participants.length > 0) {
+        this.mentionResults.set(participants);
+        this.mentionVisible.set(true);
+        this.mentionActiveIndex = 0;
+        return;
+      }
+      // fallback: load from API when no ticket participants found
     }
 
-    keyboardEvent.preventDefault();
-    this.sendChatMessage(ticket);
+    const delay = query.trim() ? 200 : 0;
+    this.mentionDebounce = setTimeout(() => {
+      this.itServiceService.searchEmployees({ search: query || undefined, pageSize: 8 }).subscribe({
+        next: (res) => {
+          console.log('[mention] API response:', res);
+          const list = (res.data || []).map((e: any) => ({
+            Nickname: e.Nickname || e.nickname || '',
+            FullNameThai: e.FullNameThai || e.fullname || '',
+            CODEEMPID: e.CODEEMPID || e.codeempid || '',
+          }));
+          this.mentionResults.set(list);
+          this.mentionVisible.set(list.length > 0);
+          this.mentionActiveIndex = 0;
+        },
+        error: (err) => {
+          console.error('[mention] API error:', err);
+          this.closeMention();
+        },
+      });
+    }, delay);
+  }
+
+  private getTicketParticipants(): any[] {
+    const ticket = this.selectedTicket();
+    if (!ticket) return [];
+
+    const participants: any[] = [];
+    const seen = new Set<string>();
+
+    if (ticket.requester?.emp_code) {
+      seen.add(ticket.requester.emp_code);
+      participants.push({
+        Nickname: ticket.requester.nickname || ticket.requester.fullname || '',
+        FullNameThai: ticket.requester.fullname || '',
+        CODEEMPID: ticket.requester.emp_code,
+      });
+    }
+
+    for (const step of ticket.assignTimeline || []) {
+      for (const a of step.Assignee || []) {
+        if (a.empCode && !seen.has(a.empCode)) {
+          seen.add(a.empCode);
+          participants.push({
+            Nickname: a.nickName || a.fullName || '',
+            FullNameThai: a.fullName || '',
+            CODEEMPID: a.empCode,
+          });
+        }
+      }
+    }
+
+    return participants;
+  }
+
+  selectMention(emp: any) {
+    const name = emp.Nickname || emp.nickname || emp.FullNameThai || emp.fullname || '';
+    const before = this.chatMessage.substring(0, this.mentionAtIndex);
+    const after = this.chatMessage.substring(this.mentionAtIndex + 1 + this.mentionQuery.length);
+    this.chatMessage = `${before}@${name} ${after}`;
+    this.closeMention();
+    setTimeout(() => this.chatTextareaRef?.nativeElement.focus(), 0);
+  }
+
+  closeMention() {
+    this.mentionVisible.set(false);
+    this.mentionResults.set([]);
+    this.mentionQuery = '';
+    this.mentionAtIndex = -1;
+    if (this.mentionDebounce) {
+      clearTimeout(this.mentionDebounce);
+      this.mentionDebounce = null;
+    }
   }
 
   onChatFileSelected(event: Event) {
@@ -570,12 +709,16 @@ export class ItService implements OnInit {
         const senderAdUser = this.authService.currentUser() ?? '';
         const senderName = `${userData?.NAMFIRSTT ?? ''} ${userData?.NAMLASTT ?? ''}`.trim();
         if (data.id && requesterAdUser && senderAdUser) {
+          const assigneeAdUsers = ((ticket?.assignments ?? []) as any[])
+            .map((a) => (a.aduser || a.adUser || '').toLowerCase())
+            .filter((u) => !!u && u !== senderAdUser.toLowerCase());
           this.signalrService.noteNotify(
             data.id,
             requesterAdUser,
             senderAdUser,
             senderName,
             data.message,
+            assigneeAdUsers,
           );
         }
 

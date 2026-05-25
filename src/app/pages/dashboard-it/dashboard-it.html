@@ -487,6 +487,41 @@
           </ng-template>
         </div>
 
+        @if (mentionVisible() && t.status !== 'Closed' && isAssigned()) {
+          <div class="floating-chat__mention-list" role="listbox">
+            @for (emp of mentionResults(); track emp.CODEEMPID; let i = $index) {
+              <button
+                class="floating-chat__mention-item"
+                [class.is-active]="i === mentionActiveIndex"
+                [class.is-all]="emp.CODEEMPID === '__all__'"
+                type="button"
+                role="option"
+                (mousedown)="$event.preventDefault()"
+                (click)="selectMention(emp)"
+              >
+                @if (emp.CODEEMPID === '__all__') {
+                  <div class="mention-avatar mention-avatar--all">
+                    <i class="fas fa-users"></i>
+                  </div>
+                } @else {
+                  <img
+                    class="mention-avatar"
+                    [src]="'https://empimg.oneeclick.co:8048/employeeimage/' + emp.CODEEMPID + '.jpg'"
+                    [alt]="emp.Nickname || emp.FullNameThai"
+                    (error)="onImgError($event)"
+                  />
+                }
+                <div class="mention-info">
+                  <span class="mention-name">{{ emp.Nickname }}</span>
+                  @if (emp.FullNameThai && emp.CODEEMPID !== '__all__') {
+                    <span class="mention-sub">{{ emp.FullNameThai }}</span>
+                  }
+                </div>
+              </button>
+            }
+          </div>
+        }
+
         <div class="floating-chat__composer" *ngIf="t.status !== 'Closed' && isAssigned()">
           <input type="file" multiple hidden #chatFileInput (change)="onChatFileSelected($event)" />
           <button
@@ -500,11 +535,12 @@
             <i class="fa-solid fa-paperclip"></i>
           </button>
           <textarea
+            #chatTextareaRef
             [(ngModel)]="chatMessage"
             rows="1"
-            placeholder="พิมพ์ข้อความ..."
+            placeholder="พิมพ์ข้อความ... (@ เพื่อ mention)"
             aria-label="พิมพ์ข้อความ"
-            (keydown.enter)="handleChatEnter($event, t)"
+            (keydown)="handleChatKeydown($event, t)"
           ></textarea>
           <button
             class="floating-chat__send"
