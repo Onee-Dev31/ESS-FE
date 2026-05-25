@@ -1,5 +1,5 @@
 <div
-  class="it-request-page"
+  class="it-request-page specific-request-page"
   [style]="
     openBy === 'IT'
       ? 'padding: 0; height: fit-content; background-color: transparent;'
@@ -12,20 +12,20 @@
   ></app-page-header>
 
   <div class="service-form-card">
-    <!-- Card Header -->
-    <div class="service-card-header">
-      <div class="header-icon-wrap">
-        <i class="fas fa-concierge-bell"></i>
-      </div>
+    <div class="specific-card-header">
       <div>
-        <h4 class="header-title">แบบฟอร์มขอรับบริการ IT</h4>
+        <h4 class="header-title">ขอใช้ระบบเฉพาะ</h4>
         <p class="header-subtitle">
-          เลือกประเภทบริการ ระบุผู้ขอสิทธิ์ และรายละเอียดความต้องการของคุณ
+          กรอกข้อมูลแยกตามคน เลือกระบบที่ต้องการ แล้วระบุสิทธิ์ของแต่ละระบบ
         </p>
       </div>
+      <span class="default-service-pill">
+        <i class="fas fa-server"></i>
+        ขอใช้ระบบ
+      </span>
     </div>
 
-    <div class="form-section">
+    <div class="form-section requester-strip">
       <div class="form-group">
         <label class="form-label">
           <i class="fa-solid fa-circle-info"></i>
@@ -45,177 +45,219 @@
       </div>
     </div>
 
-    <div class="form-section two-col">
-      <!-- Open For -->
-      <div class="form-group" *ngIf="!IsOneeJob">
-        <label class="form-label">
-          <i class="fa-solid fa-book-open-reader"></i>
-          เปิดสิทธิ์ให้ (Open For)
-          <span class="required-badge">*</span>
-          <span *ngIf="isAnnounceChooseFreelance()" class="announce"
-            >กรุณากรอกรายละเอียดเพิ่มเติมด้านล่าง</span
-          >
-        </label>
-        <div class="input-pair-row">
-          <nz-select
-            nzShowSearch
-            nzAllowClear
-            nzPlaceHolder=""
-            [ngModel]="selectedOpenFor().value"
-            (ngModelChange)="onOpenForChange($event)"
-            name="openFor"
-            class="form-control-select"
-          >
-            @for (opt of openForOptions(); track opt.value) {
-              <nz-option [nzLabel]="opt.label" [nzValue]="opt.value" />
+    <div class="specific-people">
+      @for (person of specificPeople(); track person.id; let index = $index) {
+        <section class="person-card" [class.primary-person]="index === 0">
+          <div class="person-card-header">
+            <div>
+              <span class="person-index">คนที่ {{ index + 1 }}</span>
+              <h5>ข้อมูลผู้ขอใช้ระบบ</h5>
+            </div>
+            @if (specificPeople().length > 1) {
+              <button
+                class="btn-remove-person"
+                type="button"
+                title="ลบคนนี้"
+                (click)="removeSpecificPerson(person.id)"
+              >
+                <i class="fas fa-trash"></i>
+              </button>
             }
-          </nz-select>
-        </div>
-      </div>
-
-      <!-- Phone -->
-      <div class="form-group">
-        <label class="form-label">
-          <i class="fas fa-phone-alt field-icon"></i>
-          เบอร์โทรติดต่อ (Phone Number)
-          <span class="required-badge">*</span>
-        </label>
-        <input
-          type="text"
-          class="form-control"
-          [value]="phoneModel"
-          (input)="onPhoneInput($event)"
-          placeholder="ระบุเบอร์โทรศัพท์ที่สามารถติดต่อได้..."
-        />
-        @if (phoneError) {
-          <span class="error-text">{{ phoneError }}</span>
-        }
-      </div>
-    </div>
-
-    <div class="form-section">
-      <div class="form-group">
-        <label class="form-label">
-          <i class="fas fa-laptop-medical field-icon"></i>
-          ประเภทบริการ (Service Type) <span class="required-badge">*</span>
-        </label>
-        <div class="checkbox-grid">
-          @for (service of serviceOptions(); track service.value; let i = $index) {
-            <label
-              class="checkbox-item"
-              [class.checked]="service.checked"
-              [class.disabled]="service.disabled"
-            >
-              <input
-                type="checkbox"
-                [checked]="service.checked"
-                [disabled]="service.disabled"
-                (change)="toggleService(i)"
-              />
-              <span class="checkmark"></span>
-              <span class="label-text">{{ service.label }}</span>
-            </label>
-          }
-        </div>
-      </div>
-
-      @if (isSystemCategorySelected()) {
-        <div class="sub-options-section">
-          <h4 class="sub-section-title">กรุณาเลือกประเภท (Please Select Type)</h4>
-
-          <div class="type-selector mb-2">
-            <button
-              class="type-btn"
-              [class.active]="selectedSystemTypes().includes('user')"
-              (click)="toggleSystemType('user')"
-            >
-              <i class="fas fa-users mr-2"></i> ระบบพื้นฐาน (Basic System)
-            </button>
-            <button
-              class="type-btn"
-              [class.active]="selectedSystemTypes().includes('system')"
-              (click)="toggleSystemType('system')"
-            >
-              <i class="fas fa-server mr-2"></i> ระบบเฉพาะ (Specific System)
-            </button>
           </div>
-          @if (selectedSystemTypes().includes('user')) {
-            <div class="basic-system">
-              <b>ระบบพื้นฐาน : </b>
-              @for (opt of userSubOptions(); track opt.value; let last = $last) {
-                <span>{{ opt.label }}{{ !last ? ', ' : '' }}</span>
+
+          <div class="specific-grid highlight-blue">
+            <div class="specific-field">
+              <label>ชื่อ / รหัสพนักงาน <span class="required-badge">*</span></label>
+              <nz-select
+                nzShowSearch
+                nzAllowClear
+                nzPlaceHolder="เลือกพนักงาน"
+                class="form-control-select"
+                [ngModel]="person.openFor"
+                (ngModelChange)="onSpecificOpenForChange(person, $event)"
+                [name]="'openFor' + person.id"
+              >
+                @for (opt of openForOptions(); track opt.value) {
+                  <nz-option [nzLabel]="opt.label" [nzValue]="opt.value" />
+                }
+              </nz-select>
+            </div>
+
+            <div class="specific-field">
+              <label>เบอร์ติดต่อ <span class="required-badge">*</span></label>
+              <input
+                class="form-control"
+                type="text"
+                placeholder="เบอร์ภายในหรือเบอร์มือถือ"
+                [(ngModel)]="person.phone"
+                (ngModelChange)="touchSpecificPeople()"
+                [name]="'phone' + person.id"
+              />
+            </div>
+          </div>
+
+          <div class="specific-field">
+            <label>เลือกระบบเฉพาะ <span class="required-badge">*</span></label>
+            <div class="specific-system-buttons">
+              @for (system of specificSystemChoices; track system.key) {
+                <button
+                  type="button"
+                  class="system-choice"
+                  [class.active]="person.systems.includes(system.key)"
+                  (click)="togglePersonSystem(person, system.key)"
+                >
+                  <i class="fas" [class]="system.icon"></i>
+                  {{ system.label }}
+                </button>
               }
             </div>
-            <!-- <div class="checkbox-grid slide-down">
-              @for (opt of userSubOptions(); track opt.value; let i = $index) {
-                <label class="checkbox-item" [class.checked]="opt.checked">
+          </div>
+
+          @if (person.systems.length) {
+            <div class="system-detail-grid">
+              @if (person.systems.includes('bms')) {
+                <div class="system-detail-card">
+                  <h6>BMS</h6>
                   <input
-                    type="checkbox"
-                    [checked]="opt.checked"
-                    (change)="toggleUserSubOption(i)"
+                    class="form-control"
+                    placeholder="บริษัทที่รับผิดชอบ"
+                    [(ngModel)]="person.bmsCompany"
+                    (ngModelChange)="touchSpecificPeople()"
+                    [name]="'bmsCompany' + person.id"
                   />
-                  <span class="checkmark"></span>
-                  <span class="label-text">{{ opt.label }}</span>
-                </label>
+                  <select
+                    class="form-control"
+                    [(ngModel)]="person.bmsTeam"
+                    (ngModelChange)="touchSpecificPeople()"
+                    [name]="'bmsTeam' + person.id"
+                  >
+                    <option value="">Team / สิทธิ์เหมือนใคร</option>
+                    @for (item of bmsTeams; track item) {
+                      <option [value]="item">{{ item }}</option>
+                    }
+                  </select>
+                  <select
+                    class="form-control"
+                    [(ngModel)]="person.bmsRight"
+                    (ngModelChange)="touchSpecificPeople()"
+                    [name]="'bmsRight' + person.id"
+                  >
+                    <option value="">สิทธิ์</option>
+                    @for (item of bmsRights; track item) {
+                      <option [value]="item">{{ item }}</option>
+                    }
+                  </select>
+                </div>
               }
-            </div> -->
+
+              @if (person.systems.includes('oracle')) {
+                <div class="system-detail-card">
+                  <h6>Oracle</h6>
+                  <input
+                    class="form-control"
+                    placeholder="บริษัทที่รับผิดชอบ"
+                    [(ngModel)]="person.oracleCompany"
+                    (ngModelChange)="touchSpecificPeople()"
+                    [name]="'oracleCompany' + person.id"
+                  />
+                  <select
+                    class="form-control"
+                    [(ngModel)]="person.oracleModule"
+                    (ngModelChange)="touchSpecificPeople()"
+                    [name]="'oracleModule' + person.id"
+                  >
+                    <option value="">Module</option>
+                    @for (item of oracleModules; track item) {
+                      <option [value]="item">{{ item }}</option>
+                    }
+                  </select>
+                  <select
+                    class="form-control"
+                    [(ngModel)]="person.oracleRight"
+                    (ngModelChange)="touchSpecificPeople()"
+                    [name]="'oracleRight' + person.id"
+                  >
+                    <option value="">สิทธิ์</option>
+                    @for (item of oracleRights; track item) {
+                      <option [value]="item">{{ item }}</option>
+                    }
+                  </select>
+                </div>
+              }
+
+              @if (person.systems.includes('onee')) {
+                <div class="system-detail-card">
+                  <h6>OneE</h6>
+                  <select
+                    class="form-control"
+                    [(ngModel)]="person.oneePermission"
+                    (ngModelChange)="touchSpecificPeople()"
+                    [name]="'oneePermission' + person.id"
+                  >
+                    <option value="">Permission ที่ต้องการ</option>
+                    @for (item of oneePermissions; track item) {
+                      <option [value]="item">{{ item }}</option>
+                    }
+                  </select>
+                </div>
+              }
+
+              @if (person.systems.includes('onePortal')) {
+                <div class="system-detail-card">
+                  <h6>One Portal</h6>
+                  <input
+                    class="form-control"
+                    placeholder="บริษัทที่รับผิดชอบ"
+                    [(ngModel)]="person.onePortalCompany"
+                    (ngModelChange)="touchSpecificPeople()"
+                    [name]="'onePortalCompany' + person.id"
+                  />
+                  <select
+                    class="form-control"
+                    [(ngModel)]="person.onePortalResponseType"
+                    (ngModelChange)="touchSpecificPeople()"
+                    [name]="'onePortalResponseType' + person.id"
+                  >
+                    <option value="">Response Type</option>
+                    @for (item of onePortalResponseTypes; track item) {
+                      <option [value]="item">{{ item }}</option>
+                    }
+                  </select>
+                </div>
+              }
+            </div>
           }
 
-          @if (selectedSystemTypes().includes('system')) {
-            <div class="checkbox-grid slide-down mb-2">
-              @for (opt of systemSubOptions(); track opt.value; let i = $index) {
-                <label class="checkbox-item" [class.checked]="opt.checked">
-                  <input
-                    type="checkbox"
-                    [checked]="opt.checked"
-                    (change)="toggleSystemSubOption(i)"
-                  />
-                  <span class="checkmark"></span>
-                  <span class="label-text">{{ opt.label }}</span>
-                </label>
-              }
-            </div>
-          }
-        </div>
+          <div class="specific-field">
+            <label>หมายเหตุเพิ่มเติม</label>
+            <textarea
+              class="form-control note-control"
+              rows="3"
+              placeholder="รายละเอียดเพิ่มเติมของคนนี้..."
+              [(ngModel)]="person.note"
+              (ngModelChange)="touchSpecificPeople()"
+              [name]="'note' + person.id"
+            ></textarea>
+          </div>
+        </section>
       }
     </div>
 
-    <div class="form-section">
-      <div class="form-group mb-4">
-        <label class="detail-section">
-          <div class="form-label">
-            <i class="fas fa-align-left"></i>
-            รายละเอียด (Details)
-            <span class="required-badge">*</span>
-          </div>
-          @if (isShowExample()) {
-            <div class="example" (click)="openExample()">
-              <i class="fa-solid fa-bullhorn"></i> ตัวอย่างการกรอก
-            </div>
-          }
-        </label>
-        <textarea
-          #detailTextarea
-          class="form-control"
-          rows="6"
-          [class.blink]="isAnnounceChooseFreelance()"
-          placeholder="กรอกรายละเอียดความต้องการ..."
-          [ngModel]="requestDetails()"
-          (ngModelChange)="requestDetails.set($event)"
-        ></textarea>
-      </div>
-    </div>
+    <button class="btn-add-person" type="button" (click)="addSpecificPerson()">
+      <i class="fas fa-plus"></i>
+      เพิ่มคน
+    </button>
 
-    <!-- Actions Footer -->
     <div class="form-actions-row">
-      <span class="actions-hint"
-        ><i class="fas fa-info-circle"></i> ตรวจสอบข้อมูลให้ครบถ้วนก่อนส่ง</span
-      >
-      <button class="btn-secondary-action" (click)="clearForm()">
+      <span class="actions-hint">
+        <i class="fas fa-info-circle"></i> ตรวจสอบข้อมูลรายคนให้ครบก่อนส่ง
+      </span>
+      <button class="btn-secondary-action" type="button" (click)="clearForm()">
         <i class="fas fa-eraser mr-2"></i> ล้างข้อมูล
       </button>
       <button
         class="btn-primary-action"
+        type="button"
         (click)="submit()"
         [disabled]="!isFormValid()"
         [class.disabled-btn]="!isFormValid()"
@@ -225,186 +267,6 @@
     </div>
   </div>
 
-  <!-- History Detail Modal -->
-  @if (showHistoryDetailModal() && selectedRequest()) {
-    <div class="modal-overlay">
-      <div class="modal-container">
-        <div class="modal-header">
-          <h3>
-            <i class="fas fa-file-alt mr-2"></i> รายละเอียดคำขอ {{ selectedRequest().displayId }}
-          </h3>
-          <button
-            class="btn-close-modal"
-            (click)="closeHistoryDetailModal()"
-            title="ปิด"
-            aria-label="Close details modal"
-          >
-            <i class="fas fa-times" aria-hidden="true"></i>
-            <!-- <span class="sr-only">ปิด</span> -->
-          </button>
-        </div>
-
-        <div class="modal-body">
-          <!-- 1. Open For -->
-          <div class="summary-section">
-            <h3>
-              <i class="fas fa-user-circle mr-2 text-primary"></i> ข้อมูลผู้ขอสิทธิ์ (Request For)
-            </h3>
-            <table class="info-table vertical-table">
-              <tr>
-                <th>ชื่อผู้ขอสิทธิ์</th>
-                <td>{{ selectedRequest().openFor }}</td>
-              </tr>
-            </table>
-          </div>
-
-          <!-- 2. Status & Date -->
-          <div class="summary-section">
-            <h3>
-              <i class="fas fa-calendar-alt mr-2 text-primary"></i> วันที่และสถานะ (Status & Date)
-            </h3>
-            <table class="info-table vertical-table">
-              <tr>
-                <th>วันที่ขอรับบริการ</th>
-                <td>{{ selectedRequest().date | date: 'dd/MM/yyyy HH:mm' }}</td>
-              </tr>
-              <tr>
-                <th>สถานะ</th>
-                <td>
-                  <span class="status-badge" [class]="selectedRequest().status.toLowerCase()">
-                    <i
-                      class="fas"
-                      [class.fa-check-circle]="selectedRequest().status === 'Approved'"
-                      [class.fa-clock]="selectedRequest().status === 'Pending'"
-                    ></i>
-                    {{ selectedRequest().status }}
-                  </span>
-                </td>
-              </tr>
-              @if (selectedRequest().phoneNumber) {
-                <tr>
-                  <th>เบอร์โทรติดต่อ</th>
-                  <td class="text-primary font-weight-bold">{{ selectedRequest().phoneNumber }}</td>
-                </tr>
-              }
-            </table>
-          </div>
-
-          <!-- 3. Selected Service -->
-          <div class="summary-section">
-            <h3>
-              <i class="fas fa-concierge-bell mr-2 text-primary"></i> บริการที่เลือก (Selected
-              Services)
-            </h3>
-            <table class="info-table vertical-table">
-              <tr>
-                <th>บริการ</th>
-                <td>
-                  <div class="summary-list">
-                    @for (service of selectedRequest().services; track service) {
-                      <div class="summary-item">
-                        @if (selectedRequest().status === 'Pending') {
-                          <i class="fas fa-hourglass-half text-yellow fa-spin"></i>
-                        } @else {
-                          <i class="fas fa-check-circle text-success"></i>
-                        }
-                        <span>{{ service }}</span>
-                      </div>
-                    }
-                  </div>
-                </td>
-              </tr>
-            </table>
-          </div>
-
-          <!-- 4. Selected System (if applicable) -->
-          @if (
-            selectedRequest().systemData && selectedRequest().systemData.selectedTypes.length > 0
-          ) {
-            <div class="summary-section">
-              <h3>
-                <i class="fas fa-desktop mr-2 text-primary"></i> ระบบที่เลือก (Selected Systems)
-              </h3>
-              <table class="info-table vertical-table">
-                @if (selectedRequest().systemData.selectedTypes.includes('user')) {
-                  <tr>
-                    <th>Basic Systems</th>
-                    <td>
-                      <div class="summary-list">
-                        @for (opt of selectedRequest().systemData.userOptions; track opt) {
-                          <div class="summary-item sub-item">
-                            <i class="fas fa-check text-primary"></i>
-                            <span>{{ opt }}</span>
-                          </div>
-                        }
-                      </div>
-                    </td>
-                  </tr>
-                }
-                @if (selectedRequest().systemData.selectedTypes.includes('system')) {
-                  <tr>
-                    <th>Specific Systems</th>
-                    <td>
-                      <div class="summary-list">
-                        @for (opt of selectedRequest().systemData.systemOptions; track opt) {
-                          <div class="summary-item sub-item">
-                            <i class="fas fa-check text-primary"></i>
-                            <span>{{ opt }}</span>
-                          </div>
-                        }
-                      </div>
-                    </td>
-                  </tr>
-                }
-              </table>
-            </div>
-          }
-
-          <!-- 6. Account Credentials (if applicable) -->
-          @if (selectedRequest().emailAccount) {
-            <div class="summary-section">
-              <h3>ข้อมูลบัญชีผู้ใช้งาน (Account Credentials)</h3>
-              <div class="credentials-card">
-                <div class="credential-item">
-                  <i class="fas fa-envelope"></i>
-                  <div class="cred-info">
-                    <span class="cred-label">Email:</span>
-                    <span class="cred-value">{{ selectedRequest().emailAccount.email }}</span>
-                  </div>
-                </div>
-                <div class="credential-item">
-                  <i class="fas fa-key"></i>
-                  <div class="cred-info">
-                    <span class="cred-label">Password:</span>
-                    <span class="cred-value">{{ selectedRequest().emailAccount.password }}</span>
-                  </div>
-                </div>
-              </div>
-              <div class="security-note">
-                <i class="fas fa-shield-alt"></i>
-                <span>กรุณาเปลี่ยนรหัสผ่านทันทีหลังจากการเข้าใช้งานครั้งแรก</span>
-              </div>
-            </div>
-          }
-
-          <!-- 7. Request Details -->
-          @if (selectedRequest().details) {
-            <div class="summary-section">
-              <h3>รายละเอียด (Details)</h3>
-              <div class="detail-text p-3 bg-light rounded text-muted">
-                {{ selectedRequest().details }}
-              </div>
-            </div>
-          }
-        </div>
-
-        <div class="modal-footer">
-          <button class="btn-primary" (click)="closeHistoryDetailModal()">ปิด</button>
-        </div>
-      </div>
-    </div>
-  }
-
   @if (showSummaryModal()) {
     <div class="modal-overlay">
       <div class="modal-container">
@@ -412,135 +274,44 @@
           <h2>สรุปรายละเอียดคำขอ</h2>
           <button
             class="btn-close-modal"
+            type="button"
             (click)="closeSummaryModal()"
             title="ปิด"
             aria-label="Close summary modal"
           >
             <i class="fas fa-times" aria-hidden="true"></i>
-            <!-- <span class="sr-only">ปิด</span> -->
           </button>
         </div>
         <div class="modal-body">
-          <!-- 1. Open For -->
           <div class="summary-section">
-            <h3>
-              <i class="fas fa-user-circle mr-2 text-primary"></i> ข้อมูลผู้ขอสิทธิ์ (Request For)
-            </h3>
-            <table class="info-table vertical-table">
-              <tr>
-                <th>ชื่อผู้ขอสิทธิ์</th>
-                <td>
-                  {{ selectedOpenFor().label }}
-                </td>
-              </tr>
-              @if (phoneNumber()) {
-                <tr>
-                  <th>เบอร์โทรติดต่อ</th>
-                  <td class="text-primary font-weight-bold">{{ phoneNumber() }}</td>
-                </tr>
+            <h3><i class="fas fa-users mr-2 text-primary"></i> รายการผู้ขอใช้ระบบ</h3>
+            <div class="specific-summary-list">
+              @for (person of specificPeople(); track person.id; let index = $index) {
+                <div class="specific-summary-item">
+                  <strong>คนที่ {{ index + 1 }}: {{ getOpenForLabel(person.openFor) }}</strong>
+                  <span>เบอร์ติดต่อ: {{ person.phone }}</span>
+                  <span>ระบบ: {{ getPersonSystemLabels(person) }}</span>
+                </div>
               }
-            </table>
-          </div>
-
-          <!-- 2. Selected Service -->
-          <div class="summary-section">
-            <h3>
-              <i class="fas fa-concierge-bell mr-2 text-primary"></i> บริการที่เลือก (Selected
-              Services)
-            </h3>
-            <table class="info-table vertical-table">
-              <tr>
-                <th>บริการ</th>
-                <td>
-                  <div class="summary-list">
-                    @for (service of serviceOptions(); track service.value) {
-                      @if (service.checked) {
-                        <div class="summary-item">
-                          <i class="fas fa-check-circle text-success"></i>
-                          <span>{{ service.label }}</span>
-                        </div>
-                      }
-                    }
-                  </div>
-                </td>
-              </tr>
-            </table>
-          </div>
-
-          <!-- 3. Selected System (if applicable) -->
-          @if (isSystemCategorySelected()) {
-            <div class="summary-section">
-              <h3>
-                <i class="fas fa-desktop mr-2 text-primary"></i> ระบบที่เลือก (Selected Systems)
-              </h3>
-              <table class="info-table vertical-table">
-                @if (selectedSystemTypes().includes('user')) {
-                  <tr>
-                    <th>Basic Systems</th>
-                    <td>
-                      <div class="summary-list">
-                        @for (opt of userSubOptions(); track opt.value) {
-                          @if (opt.checked) {
-                            <div class="summary-item sub-item">
-                              <i class="fas fa-check text-primary"></i>
-                              <span>{{ opt.label }}</span>
-                            </div>
-                          }
-                        }
-                      </div>
-                    </td>
-                  </tr>
-                }
-                @if (selectedSystemTypes().includes('system')) {
-                  <tr>
-                    <th>Specific Systems</th>
-                    <td>
-                      <div class="summary-list">
-                        @for (opt of systemSubOptions(); track opt.value) {
-                          @if (opt.checked) {
-                            <div class="summary-item sub-item">
-                              <i class="fas fa-check text-primary"></i>
-                              <span>{{ opt.label }}</span>
-                            </div>
-                          }
-                        }
-                      </div>
-                    </td>
-                  </tr>
-                }
-              </table>
             </div>
-          }
+          </div>
 
-          <!-- 4. Request Details -->
           @if (requestDetails()) {
             <div class="summary-section">
-              <h3>รายละเอียด (Details)</h3>
-              <!-- <div class="detail-text p-3 bg-light rounded text-muted">
-                {{ requestDetails() }}
-              </div> -->
-              <div
-                class="detail-text p-3 bg-light rounded text-muted"
-                style="white-space: pre-wrap"
-              >
+              <h3>รายละเอียดที่จะบันทึก</h3>
+              <div class="detail-text p-3 bg-light rounded text-muted" style="white-space: pre-wrap">
                 {{ requestDetails() }}
               </div>
             </div>
           }
         </div>
         <div class="modal-footer">
-          <button class="btn-cancel" (click)="closeSummaryModal()">แก้ไข</button>
-          <button class="btn-confirm" (click)="confirmSubmission()">ยืนยันการส่ง</button>
+          <button class="btn-cancel" type="button" (click)="closeSummaryModal()">แก้ไข</button>
+          <button class="btn-confirm" type="button" (click)="confirmSubmission()">
+            ยืนยันการส่ง
+          </button>
         </div>
       </div>
     </div>
   }
 </div>
-
-@if (IS_EXAMPLE()) {
-  <app-example-service-request-modal
-    (onClose)="closeExample()"
-    [type]="isAnnounceChooseFreelance() ? 1 : 2"
-  >
-  </app-example-service-request-modal>
-}

@@ -22,8 +22,26 @@ import { AuthService } from '../../services/auth.service';
 import { finalize } from 'rxjs';
 import { NzSelectModule } from 'ng-zorro-antd/select';
 import { decryptValue } from '../../utils/crypto.js ';
-import { ExampleServiceRequestModal } from '../../components/modals/example-service-request-modal/example-service-request-modal';
 import { SignalrService } from '../../services/signalr.service';
+
+type SpecificSystemKey = 'bms' | 'oracle' | 'onee' | 'onePortal';
+
+interface SpecificPersonRequest {
+  id: number;
+  openFor: string;
+  phone: string;
+  systems: SpecificSystemKey[];
+  bmsCompany: string;
+  bmsTeam: string;
+  bmsRight: string;
+  oracleCompany: string;
+  oracleModule: string;
+  oracleRight: string;
+  oneePermission: string;
+  onePortalCompany: string;
+  onePortalResponseType: string;
+  note: string;
+}
 
 @Component({
   selector: 'app-it-service-request',
@@ -33,7 +51,6 @@ import { SignalrService } from '../../services/signalr.service';
     FormsModule,
     PageHeaderComponent,
     NzSelectModule,
-    ExampleServiceRequestModal,
   ],
   templateUrl: './it-service-request-specific.html',
   styleUrl: './it-service-request-specific.scss',
@@ -81,34 +98,23 @@ export class ITServiceRequestSpecificComponent implements OnInit {
   applicantId: string = '';
   detailJobs: any = null;
   isFormValid = computed(() => {
-    const services = this.serviceOptions();
-    const hasService = services.some((s) => s.checked);
-    const isRequestSystemChecked = services.find((s) => s.value === 'request_system')?.checked;
-    let subValidationPassed = true;
-
-    if (isRequestSystemChecked) {
-      const types = this.selectedSystemTypes();
-      const hasType = types.length > 0;
-
-      const hasUserType = types.includes('user');
-      const hasSystemType = types.includes('system');
-
-      const userSubSelected = this.userSubOptions().some((o) => o.checked);
-      const systemSubSelected = this.systemSubOptions().some((o) => o.checked);
-
-      // Must have at least one type selected, and if a type is selected, must have sub-options
-      subValidationPassed =
-        hasType && (!hasUserType || userSubSelected) && (!hasSystemType || systemSubSelected);
-    }
-
-    const detailValid = this.requestDetails().trim().length > 0;
-    const phoneValid =
-      this.phoneNumber().length > 0 &&
-      (this.phoneNumber().length === 4 || this.phoneNumber().length === 10);
-    const openForValid = this.selectedOpenFor().value !== null;
-    // const freelanceValid = !this.isFreelanceSelected() || this.freelanceName().trim().length > 0;
-    return hasService && openForValid && subValidationPassed && detailValid && phoneValid;
+    return this.specificPeople().every((person) => this.isSpecificPersonValid(person));
   });
+
+  private nextSpecificPersonId = 1;
+  specificPeople = signal<SpecificPersonRequest[]>([this.createSpecificPerson()]);
+  specificSystemChoices: { key: SpecificSystemKey; label: string; icon: string }[] = [
+    { key: 'oracle', label: 'Oracle', icon: 'fa-database' },
+    { key: 'bms', label: 'BMS', icon: 'fa-briefcase' },
+    { key: 'onee', label: 'OneE', icon: 'fa-layer-group' },
+    { key: 'onePortal', label: 'One Portal', icon: 'fa-globe' },
+  ];
+  oracleModules = ['AP', 'AR', 'CM', 'FA', 'IE', 'INV', 'PJC', 'GL', 'GL Secondary'];
+  oracleRights = ['Super User', 'User', 'Viewer'];
+  bmsTeams = ['Team เดียวกัน', 'สิทธิ์เหมือนคุณ xxx', 'อื่นๆ'];
+  bmsRights = ['ดูข้อมูล', 'เพิ่ม/แก้ไข', 'อนุมัติ', 'Admin'];
+  oneePermissions = ['Accounting', 'Admin', 'Co-Producer', 'Producer', 'Sale'];
+  onePortalResponseTypes = ['Customer', 'Supplier', 'All'];
 
   ngOnInit() {
     this.getServiceType();
@@ -157,6 +163,38 @@ export class ITServiceRequestSpecificComponent implements OnInit {
     } else {
       this.isAnnounceChooseFreelance.set(false);
     }
+  }
+
+  onSpecificOpenForChange(person: SpecificPersonRequest, value: string) {
+    person.openFor = value;
+    this.touchSpecificPeople();
+  }
+
+  touchSpecificPeople() {
+    this.specificPeople.set([...this.specificPeople()]);
+  }
+
+  addSpecificPerson() {
+    this.specificPeople.update((people) => [...people, this.createSpecificPerson()]);
+  }
+
+  removeSpecificPerson(personId: number) {
+    this.specificPeople.update((people) => people.filter((person) => person.id !== personId));
+  }
+
+  togglePersonSystem(person: SpecificPersonRequest, system: SpecificSystemKey) {
+    person.systems = person.systems.includes(system)
+      ? person.systems.filter((item) => item !== system)
+      : [...person.systems, system];
+    this.touchSpecificPeople();
+  }
+
+  getOpenForLabel(value: string): string {
+    return this.openForOptions().find((opt) => opt.value === value)?.label ?? value;
+  }
+
+  getPersonSystemLabels(person: SpecificPersonRequest): string {
+    return person.systems.map((system) => this.getSpecificSystemLabel(system)).join(', ');
   }
 
   openExample() {
@@ -288,6 +326,7 @@ export class ITServiceRequestSpecificComponent implements OnInit {
   showSummaryModal = signal(false);
 
   submit() {
+    this.syncSpecificFormToLegacyFields();
     const selectedServices = this.serviceOptions().filter((s) => s.checked);
 
     if (selectedServices.length === 0) {
@@ -332,16 +371,9 @@ export class ITServiceRequestSpecificComponent implements OnInit {
   }
 
   clearForm() {
-    this.serviceOptions.update((items) => items.map((i) => ({ ...i, checked: false })));
-    this.isSystemCategorySelected.set(false);
-    this.userSubOptions.update((items) => items.map((i) => ({ ...i, checked: false })));
-    this.systemSubOptions.update((items) => items.map((i) => ({ ...i, checked: false })));
-    // this.selectedOpenFor.set('self');
-    // this.otherOpenForName.set('');
+    this.specificPeople.set([this.createSpecificPerson()]);
+    this.setDefaultSpecificService();
     this.requestDetails.set('');
-    this.selectedSystemTypes.set([]);
-
-    this.phoneNumber.set('');
 
     const original = this.authData.employee.TELOFF;
     this.phoneModel = '';
@@ -519,6 +551,7 @@ export class ITServiceRequestSpecificComponent implements OnInit {
         }));
 
         this.serviceOptions.set(mappedServices_main);
+        this.setDefaultSpecificService();
 
         const mappedServices_user = res.data.userSubOptions.map((item: any) => ({
           ...item,
@@ -556,6 +589,11 @@ export class ITServiceRequestSpecificComponent implements OnInit {
               value: defaultOption.value,
               label: defaultOption.label,
             });
+            this.specificPeople.update((people) =>
+              people.map((person, index) =>
+                index === 0 ? { ...person, openFor: defaultOption.value } : person,
+              ),
+            );
           }
         },
         error: (error) => {
@@ -585,5 +623,130 @@ export class ITServiceRequestSpecificComponent implements OnInit {
         console.error('Error fetching data:', error);
       },
     });
+  }
+
+  private createSpecificPerson(): SpecificPersonRequest {
+    const defaultOpenFor = this.authService.userData().CODEMPID ?? '';
+    const defaultPhone = PhoneUtil.formatPhoneNumber(this.authService.userData()?.TELOFF ?? '');
+    return {
+      id: this.nextSpecificPersonId++,
+      openFor: defaultOpenFor,
+      phone: defaultPhone,
+      systems: [],
+      bmsCompany: '',
+      bmsTeam: '',
+      bmsRight: '',
+      oracleCompany: '',
+      oracleModule: '',
+      oracleRight: '',
+      oneePermission: '',
+      onePortalCompany: '',
+      onePortalResponseType: '',
+      note: '',
+    };
+  }
+
+  private isSpecificPersonValid(person: SpecificPersonRequest): boolean {
+    const phoneDigits = (person.phone ?? '').replace(/\D/g, '');
+    const phoneValid = phoneDigits.length === 4 || phoneDigits.length === 10;
+    if (!person.openFor || !phoneValid || person.systems.length === 0) return false;
+
+    return person.systems.every((system) => {
+      if (system === 'bms') return !!person.bmsCompany && !!person.bmsTeam && !!person.bmsRight;
+      if (system === 'oracle') {
+        return !!person.oracleCompany && !!person.oracleModule && !!person.oracleRight;
+      }
+      if (system === 'onee') return !!person.oneePermission;
+      if (system === 'onePortal') {
+        return !!person.onePortalCompany && !!person.onePortalResponseType;
+      }
+      return true;
+    });
+  }
+
+  private setDefaultSpecificService() {
+    this.serviceOptions.update((items) =>
+      items.map((item) => ({
+        ...item,
+        checked: item.value === 'request_system',
+        disabled: item.value !== 'request_system',
+      })),
+    );
+    this.isSystemCategorySelected.set(true);
+    this.selectedSystemTypes.set(['system']);
+    this.userSubOptions.update((items) => items.map((item) => ({ ...item, checked: false })));
+  }
+
+  private syncSpecificFormToLegacyFields() {
+    const people = this.specificPeople();
+    const firstPerson = people[0];
+    if (firstPerson) {
+      const firstOption = this.openForOptions().find((opt) => opt.value === firstPerson.openFor);
+      this.selectedOpenFor.set({
+        value: firstPerson.openFor,
+        label: firstOption?.label ?? firstPerson.openFor,
+      });
+      this.phoneNumber.set(firstPerson.phone);
+      this.phoneModel = firstPerson.phone;
+    }
+
+    this.setDefaultSpecificService();
+    const selectedLabels = new Set(people.flatMap((person) => person.systems.flatMap((system) => this.getSpecificSystemAliases(system))));
+
+    this.systemSubOptions.update((items) =>
+      items.map((item) => ({
+        ...item,
+        checked: selectedLabels.has(`${item.label ?? item.value}`.toLowerCase()),
+      })),
+    );
+    this.requestDetails.set(this.buildSpecificDescription());
+  }
+
+  private buildSpecificDescription(): string {
+    return this.specificPeople()
+      .map((person, index) => {
+        const lines = [
+          `คนที่ ${index + 1}: ${this.getOpenForLabel(person.openFor)}`,
+          `เบอร์ติดต่อ: ${person.phone}`,
+          `ระบบที่ขอ: ${person.systems.map((system) => this.getSpecificSystemLabel(system)).join(', ')}`,
+        ];
+
+        if (person.systems.includes('bms')) {
+          lines.push(
+            `BMS - บริษัทที่รับผิดชอบ: ${person.bmsCompany}, Team/สิทธิ์: ${person.bmsTeam}, สิทธิ์: ${person.bmsRight}`,
+          );
+        }
+        if (person.systems.includes('oracle')) {
+          lines.push(
+            `Oracle - บริษัทที่รับผิดชอบ: ${person.oracleCompany}, Module: ${person.oracleModule}, สิทธิ์: ${person.oracleRight}`,
+          );
+        }
+        if (person.systems.includes('onee')) {
+          lines.push(`OneE - Permission ที่ต้องการ: ${person.oneePermission}`);
+        }
+        if (person.systems.includes('onePortal')) {
+          lines.push(
+            `One Portal - บริษัทที่รับผิดชอบ: ${person.onePortalCompany}, Response Type: ${person.onePortalResponseType}`,
+          );
+        }
+        if (person.note?.trim()) lines.push(`หมายเหตุ: ${person.note.trim()}`);
+
+        return lines.join('\n');
+      })
+      .join('\n\n');
+  }
+
+  getSpecificSystemLabel(system: SpecificSystemKey): string {
+    return this.specificSystemChoices.find((item) => item.key === system)?.label ?? system;
+  }
+
+  private getSpecificSystemAliases(system: SpecificSystemKey): string[] {
+    const aliases: Record<SpecificSystemKey, string[]> = {
+      bms: ['bms'],
+      oracle: ['oracle'],
+      onee: ['onee', 'onee apps', 'one apps'],
+      onePortal: ['one portal', 'oneportal'],
+    };
+    return aliases[system];
   }
 }
