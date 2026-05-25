@@ -1410,6 +1410,35 @@
   }
 }
 
+.modal-overlay.expandDetail {
+  .modal-container {
+    width: 80vw !important;
+  }
+
+  .modal-container > * {
+    flex-direction: row;
+  }
+
+  .top-header-strip {
+    padding: 12px 20px;
+
+    h2 {
+      font-size: $font-size-body;
+    }
+
+    &::after,
+    h2::before {
+      display: none;
+    }
+  }
+
+  .content-card {
+    padding: 22px 24px;
+    box-shadow: none;
+    max-height: none;
+  }
+}
+
 .services {
   display: flex;
   gap: 3px;
