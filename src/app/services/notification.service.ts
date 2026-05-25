@@ -194,8 +194,14 @@ export class NotificationService {
       unreadOnly: this.unreadOnly(),
     }).subscribe({
       next: ({ items, total }) => {
-        // console.log(items);
-        const mapped = items.map((item) => this.mapNotification(item));
+        const visible = items.filter((item) => !this.isChatNotifForApprover(item));
+        const hiddenUnread = items.filter(
+          (item) => this.isChatNotifForApprover(item) && !(item.is_read ?? item.isRead),
+        ).length;
+        if (hiddenUnread > 0) {
+          this.unreadCount.update((c) => Math.max(0, c - hiddenUnread));
+        }
+        const mapped = visible.map((item) => this.mapNotification(item));
         this.items.set(mapped);
         this.hasMore.set(this.computeHasMore(mapped.length, total));
         this.isListLoading.set(false);
@@ -221,7 +227,8 @@ export class NotificationService {
       unreadOnly: this.unreadOnly(),
     }).subscribe({
       next: ({ items, total }) => {
-        const merged = [...this.items(), ...items.map((item) => this.mapNotification(item))];
+        const visible = items.filter((item) => !this.isChatNotifForApprover(item));
+        const merged = [...this.items(), ...visible.map((item) => this.mapNotification(item))];
         const deduped = this.deduplicate(merged);
 
         this.page = nextPage;
@@ -621,6 +628,22 @@ export class NotificationService {
     if (value == null || value === '') return null;
     const number = Number(value);
     return Number.isFinite(number) ? number : null;
+  }
+
+  private isChatNotifForApprover(item: NotificationApiRecord): boolean {
+    const typeStr = (this.toText(item.notification_type ?? item.notificationType) ?? '').toLowerCase();
+    const titleStr = (this.toText(item.title) ?? '').toLowerCase();
+    const isChatType =
+      typeStr.includes('note') || typeStr.includes('reply') ||
+      typeStr.includes('message') || typeStr.includes('chat') ||
+      titleStr.includes('ข้อความ') || titleStr.includes('แชท');
+
+    if (!isChatType) return false;
+
+    const userRole = (this.authService.userRole() ?? '').toLowerCase();
+    const isItRole = [...this.itRoles].some((r) => userRole.includes(r));
+    const isApproverRole = [...this.approverRoles].some((r) => userRole.includes(r));
+    return isApproverRole && !isItRole;
   }
 
   private reset() {
