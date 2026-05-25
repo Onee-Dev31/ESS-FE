@@ -1614,10 +1614,22 @@
   align-items: flex-end;
   gap: 14px;
   pointer-events: none;
+
+  &.is-open::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    background: var(--floating-chat-backdrop);
+    pointer-events: none;
+    animation: floating-chat-backdrop-in 0.18s ease-out;
+  }
 }
 
 .floating-chat__panel,
 .floating-chat__button {
+  position: relative;
+  z-index: 1;
   pointer-events: auto;
 }
 
@@ -1733,6 +1745,7 @@
     width: 84%;
     border-radius: 12px;
     box-shadow: 0 3px 12px rgba(15, 23, 42, 0.06);
+    background: var(--bg-card);
 
     @include mobile {
       width: 92%;
@@ -1974,6 +1987,16 @@
   to {
     opacity: 1;
     transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes floating-chat-backdrop-in {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
   }
 }
 

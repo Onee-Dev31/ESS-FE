@@ -292,11 +292,30 @@ export class DashboardIT implements OnInit {
   };
 
   @ViewChild('cardBody') cardBodyEl?: ElementRef<HTMLElement>;
+  @ViewChild('chatTextarea') chatTextareaEl?: ElementRef<HTMLTextAreaElement>;
   @ViewChild('ticketList') ticketList!: ElementRef;
 
   @HostListener('window:resize')
   onResize() {
     this.checkScreen();
+  }
+
+  @HostListener('window:keydown', ['$event'])
+  onWindowKeydown(event: KeyboardEvent) {
+    if (!event.altKey || event.ctrlKey || event.metaKey || event.shiftKey) {
+      return;
+    }
+
+    if (event.code !== 'KeyC' && event.key.toLowerCase() !== 'c') {
+      return;
+    }
+
+    if (!this.selectedTicket() || (this.isMobile && !this.isTicketDetailOpen())) {
+      return;
+    }
+
+    event.preventDefault();
+    this.toggleChat();
   }
 
   checkScreen() {
@@ -635,6 +654,7 @@ export class DashboardIT implements OnInit {
       const next = !isOpen;
       if (next) {
         this.scrollToBottom();
+        this.focusChatComposer();
       }
       return next;
     });
@@ -647,6 +667,12 @@ export class DashboardIT implements OnInit {
   private clearChatDraft() {
     this.chatMessage = '';
     this.chatAttachments = [];
+  }
+
+  private focusChatComposer() {
+    requestAnimationFrame(() => {
+      setTimeout(() => this.chatTextareaEl?.nativeElement.focus(), 0);
+    });
   }
 
   sendChatMessage(ticket: any) {
