@@ -638,7 +638,7 @@ export class ItService implements OnInit {
       }
     }
 
-    if (participants.length > 1) {
+    if (participants.length >= 1) {
       return [{ Nickname: 'All', FullNameThai: 'แจ้งทุกคน', CODEEMPID: '__all__' }, ...participants];
     }
     return participants;
