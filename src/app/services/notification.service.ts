@@ -169,13 +169,9 @@ export class NotificationService {
         this.unreadCount.set(safeCount);
         this.isCountLoading.set(false);
 
-        // Trigger sound + toast when polling detects a new notification
+        // Trigger sound when polling detects a new notification (no toast — SignalR handles that with actual title)
         if (safeCount > prevCount) {
-          this.realtimeTick.update((t) => t + 1); // always play sound via navbar effect
-          if (Date.now() - this.lastToastTime > 5000 && !document.hidden) {
-            this.lastToastTime = Date.now();
-            this.toastService.info('มีการแจ้งเตือนใหม่');
-          }
+          this.realtimeTick.update((t) => t + 1);
         }
       },
       error: () => {
