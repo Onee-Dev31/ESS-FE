@@ -578,8 +578,8 @@
       (click)="toggleChat()"
     >
       <i class="fa-solid" [ngClass]="IS_CHAT_OPEN() ? 'fa-times' : 'fa-comments'"></i>
-      @if (!IS_CHAT_OPEN() && t.itNotes.length > 0) {
-        <span class="floating-chat__badge">{{ t.itNotes.length }}</span>
+      @if (!IS_CHAT_OPEN() && unreadChatCount() > 0) {
+        <span class="floating-chat__badge">{{ unreadChatCount() }}</span>
       }
     </button>
   </div>

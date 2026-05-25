@@ -4,6 +4,7 @@ import {
   inject,
   OnInit,
   signal,
+  computed,
   effect,
   untracked,
   HostListener,
@@ -266,6 +267,16 @@ export class DashboardIT implements OnInit {
   isSmallMobile = false;
   isTicketDetailOpen = signal(false);
   IS_CHAT_OPEN = signal(false);
+
+  private chatReadCounts = signal<Map<number, number>>(new Map());
+
+  unreadChatCount = computed(() => {
+    const ticket = this.selectedTicket();
+    if (!ticket) return 0;
+    const total = (ticket.itNotes ?? []).length;
+    const read = this.chatReadCounts().get(ticket.ticketId) ?? 0;
+    return Math.max(0, total - read);
+  });
 
   mentionResults = signal<any[]>([]);
   mentionVisible = signal(false);
@@ -615,6 +626,7 @@ export class DashboardIT implements OnInit {
         this.IS_CHAT_OPEN.set(true);
         setTimeout(() => this.chatTextareaRef?.nativeElement.focus(), 100);
       }
+      if (this.IS_CHAT_OPEN()) this.markChatAsRead();
       this.scrollToBottom();
 
       console.log(objectData);
@@ -652,11 +664,23 @@ export class DashboardIT implements OnInit {
     this.closeChat();
   }
 
+  private markChatAsRead() {
+    const ticket = this.selectedTicket();
+    if (!ticket) return;
+    const total = (ticket.itNotes ?? []).length;
+    this.chatReadCounts.update((m) => {
+      const next = new Map(m);
+      next.set(ticket.ticketId, total);
+      return next;
+    });
+  }
+
   toggleChat() {
     this.IS_CHAT_OPEN.update((isOpen) => {
       const next = !isOpen;
       if (next) {
         this.scrollToBottom();
+        this.markChatAsRead();
       }
       return next;
     });
@@ -1192,6 +1216,7 @@ export class DashboardIT implements OnInit {
       if (!hasNew) return;
       this.selectedTicket.update((t) => (t ? { ...t, itNotes } : t));
       this.scrollToBottom();
+      if (this.IS_CHAT_OPEN()) this.markChatAsRead();
     } catch {
       // silent fail — chat still works, just won't show new messages until next poll
     }
