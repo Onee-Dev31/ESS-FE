@@ -48,6 +48,12 @@ const mockItService = {
   markTicketRead: vi.fn(() => of({})),
   replyTicket: vi.fn(),
   getUnreadTickets: vi.fn(() => of([])),
+
+  getSubProblem: vi.fn(() =>
+    of({
+      data: [],
+    }),
+  ),
 };
 
 const mockAuthService = {
