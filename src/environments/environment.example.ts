@@ -7,4 +7,5 @@ export const environment = {
   emp_img_url: 'https://empimg.oneeclick.co:8048/employeeimage',
   file_base_url: 'http://10.88.0.31:5258',
   frontend_url: 'http://10.88.0.31:4200',
+  allowMentionAnyone: false,
 };

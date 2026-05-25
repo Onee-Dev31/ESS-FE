@@ -26,16 +26,40 @@ export class SignalrService {
   recentlySubmittedTickets = new Set<string>();
 
   constructor() {
+    // Build the connection immediately so on() can register handlers before startConnection() is called.
+    this.hubConnection = new signalR.HubConnectionBuilder()
+      .withUrl(`${this.baseUrl}/notificationHub`, {
+        accessTokenFactory: () => {
+          const raw = localStorage.getItem('allData');
+          const allData = raw ? JSON.parse(raw) : null;
+          return allData?.accessToken ?? '';
+        },
+      })
+      .withAutomaticReconnect()
+      .build();
+
+    this.hubConnection.onclose((err) => {
+      console.warn('[SignalR] connection CLOSED', err ?? '');
+    });
+
+    this.hubConnection.onreconnecting((err) => {
+      console.warn('[SignalR] RECONNECTING', err ?? '');
+    });
+
+    this.hubConnection.onreconnected(async () => {
+      await this.joinUserGroups();
+    });
+
     effect(() => {
       const adUser = this.authService.currentUser();
-      const state = this.hubConnection?.state;
+      const state = this.hubConnection.state;
       console.log(`[SignalR effect] currentUser="${adUser}" hubState="${state}"`);
 
-      if (adUser && state === 'Connected') {
+      if (adUser && state === signalR.HubConnectionState.Connected) {
         this.joinUserGroups();
       } else if (!adUser) {
         console.warn('[SignalR effect] ⚠️ currentUser ยังเป็น null — รอ login');
-      } else if (state !== signalR.HubConnectionState.Connected) {
+      } else {
         console.warn(
           `[SignalR effect] ⚠️ hub ยังไม่ Connected (state="${state}") — joinUserGroups จะถูกเรียกอีกครั้งใน onreconnected/startConnection`,
         );
@@ -99,14 +123,18 @@ export class SignalrService {
     senderAdUser: string,
     senderName: string,
     note: string,
+    mentionedAdUsers: string[] = [],
   ) {
-    const body = {
+    const body: Record<string, unknown> = {
       ticketId,
       requesterAdUser: requesterAdUser.toLowerCase(),
       senderAdUser: senderAdUser.toLowerCase(),
       senderName,
       note,
     };
+    if (mentionedAdUsers.length > 0) {
+      body['mentionedAdUsers'] = mentionedAdUsers.map((u) => u.toLowerCase());
+    }
     console.log('[noteNotify] sending →', body);
 
     this.http
@@ -136,23 +164,6 @@ export class SignalrService {
   }
 
   async startConnection() {
-    this.hubConnection = new signalR.HubConnectionBuilder()
-      .withUrl(`${this.baseUrl}/notificationHub`)
-      .withAutomaticReconnect()
-      .build();
-
-    this.hubConnection.onclose((err) => {
-      console.warn('[SignalR] connection CLOSED', err ?? '');
-    });
-
-    this.hubConnection.onreconnecting((err) => {
-      console.warn('[SignalR] RECONNECTING', err ?? '');
-    });
-
-    this.hubConnection.onreconnected(async () => {
-      await this.joinUserGroups();
-    });
-
     try {
       await this.hubConnection.start();
       console.log('[SignalR] Connected');
@@ -173,6 +184,7 @@ export class SignalrService {
       const subject = new Subject<any>();
       this.eventMap.set(eventName, subject);
       this.hubConnection.on(eventName, (data) => {
+        console.log(`[SignalR] ← ${eventName}`, data);
         if (eventName === 'NewTicket') {
           if (data.messageId && this.processedIds.has(data.messageId)) return;
           if (data.messageId) {
@@ -209,14 +221,21 @@ export class SignalrService {
       for (const role of roles) {
         try {
           await this.hubConnection.invoke('JoinGroup', adUser, role);
-        } catch {
-          // backend hub method signature may differ — silently skip
+          console.log(`[SignalR] joined role group "${role}"`);
+        } catch (err) {
+          console.warn(`[SignalR] JoinGroup "${role}" failed:`, err);
         }
       }
     }
 
     if (adUser) {
-      await this.hubConnection.invoke('JoinUserGroup', adUser.toLowerCase());
+      const groupName = `user:${adUser.toLowerCase()}`;
+      try {
+        await this.hubConnection.invoke('JoinUserGroup', adUser.toLowerCase());
+        console.log(`[SignalR] joined group "${groupName}"`);
+      } catch (err) {
+        console.error(`[SignalR] JoinUserGroup "${groupName}" failed:`, err);
+      }
     }
   }
 

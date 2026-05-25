@@ -73,8 +73,12 @@
             </div>
           }
 
-          <div *ngIf="isTagChanged" style="margin: 10px; margin-top: 20px">
+          <div
+            *ngIf="isTagChanged || (selectedTag === 1 && repairCostType === 'paid')"
+            style="margin: 10px; margin-top: 20px"
+          >
             <textarea
+              *ngIf="isTagChanged"
               name="message"
               class="form-input note"
               placeholder="อธิบายรายละเอียด..."
@@ -91,6 +95,13 @@
               <i class="fas fa-paperclip"></i>
               แนบไฟล์
             </button>
+
+            @if (selectedTag === 1 && repairCostType === 'paid' && attachments.length === 0) {
+              <p style="color: var(--danger); font-size: 12px; margin-top: 6px">
+                <i class="fas fa-exclamation-circle"></i>
+                กรุณาแนบไฟล์ใบเสนอราคา / เอกสารประกอบการขออนุมัติ Budget
+              </p>
+            }
 
             @if (attachments.length > 0) {
               <div class="file-chips">
@@ -124,7 +135,12 @@
           <button
             type="submit"
             class="btn-save-custom"
-            [disabled]="!selectedTag || (selectedTag === 1 && !repairCostType) || (isTagChanged && !message.trim())"
+            [disabled]="
+              !selectedTag ||
+              (selectedTag === 1 && !repairCostType) ||
+              (isTagChanged && !message.trim()) ||
+              (selectedTag === 1 && repairCostType === 'paid' && attachments.length === 0)
+            "
           >
             <i class="fas fa-paper-plane"></i> ยืนยัน
           </button>

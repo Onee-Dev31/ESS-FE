@@ -179,6 +179,15 @@
                   </button>
                   <button
                     type="button"
+                    class="act-btn act-refer"
+                    title="ส่งกลับแก้ไข"
+                    *ngIf="req.rawStatus === 'pending'"
+                    (click)="openActionModal(req, 'Referred Back')"
+                  >
+                    <i class="fas fa-undo"></i>
+                  </button>
+                  <button
+                    type="button"
                     class="act-btn act-reject"
                     title="ไม่อนุมัติ"
                     *ngIf="req.rawStatus === 'pending'"
@@ -191,11 +200,25 @@
             </div>
           }
         } @empty {
-          <app-empty-state
-            title="ไม่พบรายการ"
-            description="ไม่พบรายการที่ตรงกับเงื่อนไขการค้นหา"
-            icon="fas fa-inbox"
-          ></app-empty-state>
+          @if (showEmailResubmitHint) {
+            <app-empty-state
+              title="ใบเบิก {{ linkedVoucherNo() }} ได้รับการแก้ไขและส่งคืนแล้ว"
+              description="ขณะนี้อยู่ระหว่างรอผู้อนุมัติขั้นตอนแรก ระบบจะแจ้งให้คุณทราบอีกครั้งเมื่อถึงขั้นตอนของคุณ"
+              icon="fas fa-hourglass-half"
+            ></app-empty-state>
+          } @else if (showResubmitHint) {
+            <app-empty-state
+              title="ไม่มีรายการรออนุมัติในขณะนี้"
+              description="มีรายการที่พนักงานส่งคืนแล้ว แต่อยู่ระหว่างรอผู้อนุมัติลำดับแรกก่อน — กดแท็บ 'Referred Back' เพื่อดูรายการเหล่านั้น"
+              icon="fas fa-hourglass-half"
+            ></app-empty-state>
+          } @else {
+            <app-empty-state
+              title="ไม่พบรายการ"
+              description="ไม่พบรายการที่ตรงกับเงื่อนไขการค้นหา"
+              icon="fas fa-inbox"
+            ></app-empty-state>
+          }
         }
       }
     </div>
@@ -209,9 +232,7 @@
             <tr>
               <th>พนักงาน</th>
               <th>ประเภท</th>
-              <th>วันที่รักษา</th>
-              <th>สถานพยาบาล</th>
-              <th>โรค</th>
+              <th>วันที่เบิก</th>
               <th class="text-right">ยอดเงิน</th>
               <th>สถานะ</th>
               <th>จัดการ</th>
@@ -244,19 +265,15 @@
                     </div>
                   </td>
                   <td>
-                    {{ dateUtil.formatDateToBE(claim.treatmentDateFrom, 'DD/MM/YYYY') }} –
-                    {{ dateUtil.formatDateToBE(claim.treatmentDateTo, 'DD/MM/YYYY') }}
-                    <span class="sub-text">{{ claim.treatmentDays }} วัน</span>
+                    {{ dateUtil.formatDateToBE(req.requestDate, 'DD/MM/YYYY') }}
                   </td>
-                  <td>{{ claim.hospitalName }}</td>
-                  <td>{{ claim.diseaseName }}</td>
                   <td class="text-right">
                     <div class="amount-cell">
                       <div class="amount-main" [class.is-approved]="claim.approvedAmount > 0">
                         @if (claim.approvedAmount > 0) {
                           <i class="fas fa-check check-icon"></i>
                         }
-                        ฿{{ claim.requestedAmount | number: '1.2-2' }}
+                        ฿{{ claim.totalAmount | number: '1.2-2' }}
                       </div>
                       @if (claim.typeTotalLimit > 0) {
                         <div class="budget-section">
@@ -287,12 +304,21 @@
                       @if (req.rawStatus === 'pending') {
                         <button
                           class="act-btn act-approve"
+                          title="อนุมัติ"
                           (click)="openActionModal(req, 'Approved')"
                         >
                           <i class="fas fa-check"></i>
                         </button>
                         <button
+                          class="act-btn act-refer"
+                          title="ส่งกลับแก้ไข"
+                          (click)="openActionModal(req, 'Referred Back')"
+                        >
+                          <i class="fas fa-undo"></i>
+                        </button>
+                        <button
                           class="act-btn act-reject"
+                          title="ไม่อนุมัติ"
                           (click)="openActionModal(req, 'Rejected')"
                         >
                           <i class="fas fa-times"></i>
@@ -305,11 +331,19 @@
             } @empty {
               <tr>
                 <td colspan="9">
-                  <app-empty-state
-                    title="ไม่พบรายการ"
-                    description="ไม่พบรายการที่ตรงกับเงื่อนไขการค้นหา"
-                    icon="fas fa-inbox"
-                  ></app-empty-state>
+                  @if (showResubmitHint) {
+                    <app-empty-state
+                      title="ไม่มีรายการรออนุมัติในขณะนี้"
+                      description="มีรายการที่พนักงานส่งคืนแล้ว แต่อยู่ระหว่างรอผู้อนุมัติลำดับแรกก่อน — กดแท็บ 'Referred Back' เพื่อดูรายการเหล่านั้น"
+                      icon="fas fa-hourglass-half"
+                    ></app-empty-state>
+                  } @else {
+                    <app-empty-state
+                      title="ไม่พบรายการ"
+                      description="ไม่พบรายการที่ตรงกับเงื่อนไขการค้นหา"
+                      icon="fas fa-inbox"
+                    ></app-empty-state>
+                  }
                 </td>
               </tr>
             }

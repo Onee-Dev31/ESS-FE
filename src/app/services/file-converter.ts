@@ -87,6 +87,19 @@ export class FileConverterService {
         url = url.replace('/uploads/freelance', '/freelance');
       }
 
+      //UAT
+      if (url.startsWith('/uploads-uat/tickets-uat')) {
+        url = url.replace('/uploads-uat/tickets-uat', '/ticket');
+      }
+
+      if (url.startsWith('/uploads-uat/claims-uat')) {
+        url = url.replace('/uploads-uat/claims-uat', '/claim');
+      }
+
+      if (url.startsWith('/uploads-uat/freelance-uat')) {
+        url = url.replace('/uploads-uat/freelance-uat', '/freelance');
+      }
+
       url = this.FILE_URL + (url.startsWith('/') ? '' : '/') + url;
     }
 

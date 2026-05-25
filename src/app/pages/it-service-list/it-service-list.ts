@@ -1,6 +1,7 @@
 import {
   Component,
   signal,
+  computed,
   inject,
   ChangeDetectorRef,
   OnInit,
@@ -39,13 +40,23 @@ import { ServicesDetailModal } from '../../components/modals/services-detail-mod
 import { FileConverterService } from '../../services/file-converter';
 import { SignalrService } from '../../services/signalr.service';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { EMPTY } from 'rxjs';
+import { EMPTY, interval, firstValueFrom } from 'rxjs';
+import { filter } from 'rxjs/operators';
 import { NzTooltipModule } from 'ng-zorro-antd/tooltip';
 import { NzModalModule } from 'ng-zorro-antd/modal';
 import { CcModal } from '../dashboard-it/modal/cc-modal/cc-modal';
 import { ReOpenModal } from '../dashboard-it/modal/re-open-modal/re-open-modal';
 import { AvatarPreviewModal } from '../../components/modals/avatar-preview-modal/avatar-preview-modal';
 import { NzDatePickerModule } from 'ng-zorro-antd/date-picker';
+
+interface ReplyReader {
+  userCodeempid: string;
+  aduser: string;
+  nickName: string;
+  lastReadReplyId: number;
+  readAt: string;
+}
+
 @Component({
   selector: 'app-it-service',
   standalone: true,
@@ -74,11 +85,93 @@ export class ItService implements OnInit {
   isMobile = false;
   isSmallMobile = false;
   isTicketDetailOpen = signal(false);
+  IS_CHAT_OPEN = signal(false);
+
+  private readonly CHAT_READ_KEY = 'ess_user_chat_read';
+
+  private loadChatReadCounts(): Map<number, number> {
+    try {
+      const raw = localStorage.getItem(this.CHAT_READ_KEY);
+      const obj = raw ? JSON.parse(raw) : {};
+      return new Map(Object.entries(obj).map(([k, v]) => [Number(k), v as number]));
+    } catch {
+      return new Map();
+    }
+  }
+
+  private saveChatReadCounts(m: Map<number, number>) {
+    localStorage.setItem(this.CHAT_READ_KEY, JSON.stringify(Object.fromEntries(m)));
+  }
+
+  private chatReadCounts = signal<Map<number, number>>(new Map());
+
+  replyReaders = signal<ReplyReader[]>([]);
+
+  unreadChatCount = computed(() => {
+    const ticket = this.selectedTicket();
+    if (!ticket) return 0;
+    const total = (ticket.itNotes ?? []).length;
+    const read = this.chatReadCounts().get(ticket.ticketId) ?? 0;
+    return Math.max(0, total - read);
+  });
+
+  canAccessChat = computed(() => {
+    const ticket = this.selectedTicket();
+    if (!ticket) return false;
+    const myAdUser = (this.authService.currentUser() ?? '').toLowerCase();
+    if ((ticket.requesterAduser ?? '').toLowerCase() === myAdUser) return true;
+    const timeline: any[] = ticket.assignTimeline ?? [];
+    const latestStep = timeline[timeline.length - 1];
+    return (latestStep?.Assignee ?? []).some(
+      (a: any) => (a.adUser || a.aduser || '').toLowerCase() === myAdUser,
+    );
+  });
+
+  private _chatMessage = '';
+  get chatMessage() { return this._chatMessage; }
+  set chatMessage(value: string) {
+    this._chatMessage = value;
+    this.detectMentionTrigger(value);
+  }
+
+  chatAttachments: { name: string; size: number; file: File }[] = [];
+
+  mentionResults = signal<any[]>([]);
+  mentionVisible = signal(false);
+  mentionActiveIndex = 0;
+  private mentionQuery = '';
+  private mentionAtIndex = -1;
+  private mentionDebounce: ReturnType<typeof setTimeout> | null = null;
+  private pendingMentionAdUsers = new Set<string>();
+
+  readonly CHAT_FILE_CONFIG = {
+    maxFiles: 5,
+    maxSizeMB: 5,
+    allowedTypes: [
+      'image/jpeg',
+      'image/png',
+      'image/gif',
+      'application/pdf',
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      'application/vnd.ms-excel',
+    ],
+    allowedExtensions: ['jpg', 'jpeg', 'png', 'gif', 'pdf', 'docx', 'xlsx', 'xls'],
+  };
 
   @HostListener('window:resize')
   onResize() {
     this.checkScreen();
     this.checkMobile();
+  }
+
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent) {
+    if (!this.IS_CHAT_OPEN()) return;
+    const el = this.floatingChatRef?.nativeElement;
+    if (el && !el.contains(event.target as Node)) {
+      this.closeChat();
+    }
   }
 
   checkScreen() {
@@ -91,6 +184,8 @@ export class ItService implements OnInit {
   }
 
   @ViewChild('cardBody') cardBodyEl?: ElementRef<HTMLElement>;
+  @ViewChild('chatTextareaRef') chatTextareaRef?: ElementRef<HTMLTextAreaElement>;
+  @ViewChild('floatingChatRef') floatingChatRef?: ElementRef<HTMLElement>;
 
   private itServiceMock = inject(ItServiceMockService);
   private itServiceService = inject(ItServiceService);
@@ -149,6 +244,7 @@ export class ItService implements OnInit {
   }
 
   ngOnInit() {
+    this.chatReadCounts.set(this.loadChatReadCounts());
     this.getMyTicket();
     this.checkScreen();
     this.checkMobile();
@@ -157,6 +253,7 @@ export class ItService implements OnInit {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((params) => {
         const ticketId = params['ticketId'];
+        const openChat = params['openChat'] === 'true';
         if (ticketId) {
           const id = Number(ticketId);
           this.highlightedTicketId.set(id);
@@ -164,7 +261,7 @@ export class ItService implements OnInit {
             s.delete(id);
             return new Set(s);
           });
-          this.selectTicket(ticketId);
+          this.selectTicket(ticketId, { openChat });
 
           // ✅ Scroll to ticket in sidebar (with retry logic)
           const scrollToTicket = (id: string, retries = 10) => {
@@ -225,6 +322,52 @@ export class ItService implements OnInit {
           }
         }
       });
+
+    this.signalrService
+      .on('ChatRead')
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((data: any) => {
+        if (data.ticketId !== this.selectedTicket()?.ticketId) return;
+        this.replyReaders.update((readers) => {
+          const others = readers.filter((r) => r.userCodeempid !== data.userCodeempid);
+          return [
+            ...others,
+            {
+              userCodeempid: data.userCodeempid,
+              aduser: data.aduser ?? '',
+              nickName: data.nickName ?? '',
+              lastReadReplyId: data.lastReadReplyId,
+              readAt: data.readAt ?? new Date().toISOString(),
+            },
+          ];
+        });
+      });
+
+    // Poll for new notes every 5s while chat panel is open (fallback when SignalR doesn't reach all parties)
+    interval(5000)
+      .pipe(
+        takeUntilDestroyed(this.destroyRef),
+        filter(() => this.IS_CHAT_OPEN() && !!this.selectedTicket()),
+      )
+      .subscribe(() => this.refreshChatNotes());
+  }
+
+  private async refreshChatNotes() {
+    const ticket = this.selectedTicket();
+    if (!ticket?.ticketId) return;
+    try {
+      const res: any = await firstValueFrom(this.itServiceService.getTicketById(String(ticket.ticketId)));
+      const replyAttachments = (res.attachments ?? []).filter((f: any) => f.reply_id);
+      const itNotes = await this.buildItNotes(res.replies ?? [], replyAttachments, ticket.requesterAduser);
+      const currentIds = new Set((ticket.itNotes ?? []).map((n: any) => n.id));
+      const hasNew = itNotes.some((n: any) => !currentIds.has(n.id));
+      if (!hasNew) return;
+      this.selectedTicket.update((t) => (t ? { ...t, itNotes } : t));
+      this.scrollToBottom();
+      if (this.IS_CHAT_OPEN()) this.markChatAsRead();
+    } catch {
+      // silent fail
+    }
   }
 
   private applyStatusChange(ticketId: any, rawStatus: string) {
@@ -274,7 +417,9 @@ export class ItService implements OnInit {
     this.selectTicket(String(ticketId));
   }
 
-  selectTicket(ticketId: string) {
+  selectTicket(ticketId: string, options?: { openChat?: boolean }) {
+    const previousTicketId = this.selectedTicket()?.ticketId;
+
     this.getTicketById(ticketId).subscribe(async (res: any) => {
       console.log(res);
       const ticketAttachments = res.attachments?.filter((f: any) => !f.reply_id) || [];
@@ -291,7 +436,7 @@ export class ItService implements OnInit {
       const ccList = res.ccList;
       this.desNew = ticket.description;
 
-      const itNotes = await this.buildItNotes(replies, replyAttachments);
+      const itNotes = await this.buildItNotes(replies, replyAttachments, ticket.requester_aduser);
       const result = this.buildTimeline(res.timeline, res.timelineAssignees);
       let status = this.getTicketStatus(ticket);
 
@@ -331,6 +476,15 @@ export class ItService implements OnInit {
       // console.log(objectData);
 
       this.selectedTicket.set(objectData);
+      if (previousTicketId !== objectData.ticketId) {
+        this.clearChatDraft();
+        this.replyReaders.set([]);
+      }
+      if (options?.openChat && this.canAccessChat()) {
+        this.IS_CHAT_OPEN.set(true);
+        this.markChatAsRead();
+        setTimeout(() => this.chatTextareaRef?.nativeElement.focus(), 100);
+      }
       this.scrollToBottom();
 
       const codeempid = this.authService.userData()?.CODEMPID;
@@ -338,6 +492,13 @@ export class ItService implements OnInit {
         this.itServiceService.markTicketRead(ticketId, codeempid).subscribe({
           complete: () => this.signalrService.ticketReadTrigger.next({ ticketId }),
         });
+        const lastReply = itNotes[itNotes.length - 1];
+        if (lastReply) {
+          this.itServiceService
+            .markReplyRead(ticketId, codeempid, lastReply.id)
+            .subscribe({ error: () => {} });
+        }
+        this.loadReplyReadStatus(ticketId);
       }
 
       if (this.isMobile) {
@@ -348,6 +509,270 @@ export class ItService implements OnInit {
 
   closeTicketDetail() {
     this.isTicketDetailOpen.set(false);
+    this.closeChat();
+  }
+
+  private markChatAsRead() {
+    const ticket = this.selectedTicket();
+    if (!ticket) return;
+    const total = (ticket.itNotes ?? []).length;
+    this.chatReadCounts.update((m) => {
+      const next = new Map(m);
+      next.set(ticket.ticketId, total);
+      this.saveChatReadCounts(next);
+      return next;
+    });
+  }
+
+  toggleChat() {
+    this.IS_CHAT_OPEN.update((isOpen) => {
+      const next = !isOpen;
+      if (next) {
+        this.scrollToBottom();
+        this.markChatAsRead();
+      }
+      return next;
+    });
+  }
+
+  closeChat() {
+    this.IS_CHAT_OPEN.set(false);
+  }
+
+  canSendChat(ticket: any) {
+    return (
+      ticket?.status !== 'Closed' &&
+      ticket?.status_user !== 'Referred_Back' &&
+      ticket?.status_user !== 'Denied'
+      // && ticket?.status_user !== 'Hold'
+    );
+  }
+
+  sendChatMessage(ticket: any) {
+    const message = this.chatMessage.trim();
+    if (!message) return;
+
+    const attachments = [...this.chatAttachments];
+    const mentionedAdUsers = [...this.pendingMentionAdUsers];
+    this.chatMessage = '';
+    this.chatAttachments = [];
+    this.pendingMentionAdUsers.clear();
+    this.submitNote({ id: ticket.ticketId, message, attachments, mentionedAdUsers }, { silent: true });
+  }
+
+  handleChatKeydown(event: KeyboardEvent, ticket: any) {
+    if (this.mentionVisible()) {
+      if (event.key === 'ArrowDown') {
+        event.preventDefault();
+        this.mentionActiveIndex = Math.min(
+          this.mentionActiveIndex + 1,
+          this.mentionResults().length - 1,
+        );
+        return;
+      }
+      if (event.key === 'ArrowUp') {
+        event.preventDefault();
+        this.mentionActiveIndex = Math.max(this.mentionActiveIndex - 1, 0);
+        return;
+      }
+      if (event.key === 'Enter') {
+        event.preventDefault();
+        const emp = this.mentionResults()[this.mentionActiveIndex];
+        if (emp) this.selectMention(emp);
+        return;
+      }
+      if (event.key === 'Escape') {
+        event.preventDefault();
+        this.closeMention();
+        return;
+      }
+    }
+    if (event.key === 'Enter' && !event.shiftKey) {
+      event.preventDefault();
+      this.sendChatMessage(ticket);
+    }
+  }
+
+  private detectMentionTrigger(value: string) {
+    const atMatch = value.match(/@([^\s@]*)$/);
+    console.log('[mention] value:', JSON.stringify(value), 'atMatch:', atMatch);
+    if (atMatch) {
+      this.mentionAtIndex = value.lastIndexOf('@');
+      this.mentionQuery = atMatch[1];
+      this.mentionActiveIndex = 0;
+      this.searchMentionEmployees(this.mentionQuery);
+    } else {
+      this.closeMention();
+    }
+  }
+
+  private searchMentionEmployees(query: string) {
+    if (this.mentionDebounce) clearTimeout(this.mentionDebounce);
+
+    if (!query.trim()) {
+      const participants = this.getTicketParticipants();
+      console.log('[mention] participants from ticket:', participants);
+      if (participants.length > 0) {
+        this.mentionResults.set(participants);
+        this.mentionVisible.set(true);
+        this.mentionActiveIndex = 0;
+        return;
+      }
+      // fallback: load from API when no ticket participants found
+    }
+
+    const delay = query.trim() ? 200 : 0;
+    this.mentionDebounce = setTimeout(() => {
+      this.itServiceService.searchEmployees({ search: query || undefined, pageSize: 8 }).subscribe({
+        next: (res) => {
+          console.log('[mention] API response:', res);
+          const list = (res.data || []).map((e: any) => ({
+            Nickname: e.Nickname || e.nickname || '',
+            FullNameThai: e.FullNameThai || e.fullname || '',
+            CODEEMPID: e.CODEEMPID || e.codeempid || '',
+          }));
+          this.mentionResults.set(list);
+          this.mentionVisible.set(list.length > 0);
+          this.mentionActiveIndex = 0;
+        },
+        error: (err) => {
+          console.error('[mention] API error:', err);
+          this.closeMention();
+        },
+      });
+    }, delay);
+  }
+
+  private getTicketParticipants(): any[] {
+    const ticket = this.selectedTicket();
+    if (!ticket) return [];
+
+    const myEmpCode = this.authService.userData()?.CODEMPID;
+    const participants: any[] = [];
+    const seen = new Set<string>();
+
+    if (ticket.requester?.emp_code && ticket.requester.emp_code !== myEmpCode) {
+      seen.add(ticket.requester.emp_code);
+      participants.push({
+        Nickname: ticket.requester.nickname || ticket.requester.fullname || '',
+        FullNameThai: ticket.requester.fullname || '',
+        CODEEMPID: ticket.requester.emp_code,
+        adUser: ticket.requesterAduser || ticket.requester.aduser || '',
+      });
+    }
+
+    const timeline: any[] = ticket.assignTimeline || [];
+    const latestStep = timeline.length > 0 ? timeline[timeline.length - 1] : null;
+    if (latestStep) {
+      for (const a of latestStep.Assignee || []) {
+        if (a.empCode && !seen.has(a.empCode) && a.empCode !== myEmpCode) {
+          seen.add(a.empCode);
+          participants.push({
+            Nickname: a.nickName || a.fullName || '',
+            FullNameThai: a.fullName || '',
+            CODEEMPID: a.empCode,
+            adUser: a.adUser || a.aduser || '',
+          });
+        }
+      }
+    }
+
+    if (participants.length >= 1) {
+      return [{ Nickname: 'All', FullNameThai: 'แจ้งทุกคน', CODEEMPID: '__all__' }, ...participants];
+    }
+    return participants;
+  }
+
+  selectMention(emp: any) {
+    const name = emp.Nickname || emp.nickname || emp.FullNameThai || emp.fullname || '';
+    const before = this.chatMessage.substring(0, this.mentionAtIndex);
+    const after = this.chatMessage.substring(this.mentionAtIndex + 1 + this.mentionQuery.length);
+    this._chatMessage = `${before}@${name} ${after}`;
+
+    if (emp.CODEEMPID === '__all__') {
+      for (const p of this.getTicketParticipants()) {
+        const au = (p.adUser || '').toLowerCase();
+        if (au && p.CODEEMPID !== '__all__') this.pendingMentionAdUsers.add(au);
+      }
+    } else {
+      const au = (emp.adUser || emp.AD_USER || emp.aduser || '').toLowerCase();
+      if (au) this.pendingMentionAdUsers.add(au);
+    }
+
+    this.closeMention();
+    setTimeout(() => this.chatTextareaRef?.nativeElement.focus(), 0);
+  }
+
+  closeMention() {
+    this.mentionVisible.set(false);
+    this.mentionResults.set([]);
+    this.mentionQuery = '';
+    this.mentionAtIndex = -1;
+    if (this.mentionDebounce) {
+      clearTimeout(this.mentionDebounce);
+      this.mentionDebounce = null;
+    }
+  }
+
+  onChatFileSelected(event: Event) {
+    const input = event.target as HTMLInputElement;
+    if (input.files) {
+      this.addChatFiles(input.files);
+    }
+    input.value = '';
+  }
+
+  removeChatAttachment(index: number) {
+    this.chatAttachments.splice(index, 1);
+  }
+
+  private clearChatDraft() {
+    this.chatMessage = '';
+    this.chatAttachments = [];
+    this.pendingMentionAdUsers.clear();
+  }
+
+  private addChatFiles(files: FileList) {
+    if (!files || files.length === 0) return;
+
+    const errors: string[] = [];
+    const validFiles: { name: string; size: number; file: File }[] = [];
+
+    for (const file of Array.from(files)) {
+      const reasons: string[] = [];
+
+      if (this.chatAttachments.length + validFiles.length >= this.CHAT_FILE_CONFIG.maxFiles) {
+        reasons.push(`เกินจำนวนสูงสุด ${this.CHAT_FILE_CONFIG.maxFiles} ไฟล์`);
+      }
+
+      const sizeMB = file.size / (1024 * 1024);
+      if (sizeMB > this.CHAT_FILE_CONFIG.maxSizeMB) {
+        reasons.push(`ขนาดเกิน ${this.CHAT_FILE_CONFIG.maxSizeMB} MB`);
+      }
+
+      const ext = file.name.split('.').pop()?.toLowerCase() ?? '';
+      if (
+        !this.CHAT_FILE_CONFIG.allowedTypes.includes(file.type) &&
+        !this.CHAT_FILE_CONFIG.allowedExtensions.includes(ext)
+      ) {
+        reasons.push('ประเภทไฟล์ไม่รองรับ');
+      }
+
+      if (reasons.length > 0) {
+        errors.push(`${file.name} (${reasons.join(', ')})`);
+        continue;
+      }
+
+      validFiles.push({ name: file.name, size: file.size, file });
+    }
+
+    if (errors.length > 0) {
+      this.swalService.warning(errors.join('\n'));
+    }
+
+    if (validFiles.length > 0) {
+      this.chatAttachments = [...this.chatAttachments, ...validFiles];
+    }
   }
 
   showAllServices: boolean = false;
@@ -399,34 +824,28 @@ export class ItService implements OnInit {
     this.IS_NOTE_TICKET.set(false);
   }
 
-  submitNote(data: any) {
+  submitNote(data: any, options?: { silent?: boolean }) {
+    const silent = options?.silent ?? false;
     const formData = new FormData();
     formData.append('Message', data.message);
     formData.append('ExecutedBy', this.authService.userData().CODEMPID);
 
-    data.attachments.forEach((item: any) => {
+    (data.attachments ?? []).forEach((item: any) => {
       if (item?.file instanceof File) {
         formData.append('Files', item.file);
       }
     });
-    // console.log('formData', [...formData.entries()]);
 
-    this.swalService.loading('กำลังบันทึกข้อมูล...');
+    if (!silent) this.swalService.loading('กำลังบันทึกข้อมูล...');
     this.IS_NOTE_TICKET.set(false);
     this.itServiceService.replyTicket(data.id, formData).subscribe({
       next: (res) => {
-        // console.log(res);
-
         if (!res?.success) {
-          this.swalService.warning('ไม่สามารถบันทึกข้อมูลได้');
+          if (!silent) this.swalService.warning('ไม่สามารถบันทึกข้อมูลได้');
           return;
         }
 
-        this.swalService.close();
-
-        setTimeout(() => {
-          this.swalService.success(res.message || 'บันทึกสำเร็จ');
-        }, 100);
+        if (!silent) this.swalService.close();
 
         const ticket = this.selectedTicket();
         const requesterAdUser = ticket?.requesterAduser;
@@ -434,14 +853,23 @@ export class ItService implements OnInit {
         const senderAdUser = this.authService.currentUser() ?? '';
         const senderName = `${userData?.NAMFIRSTT ?? ''} ${userData?.NAMLASTT ?? ''}`.trim();
         if (data.id && requesterAdUser && senderAdUser) {
+          const timeline: any[] = ticket?.assignTimeline ?? [];
+          const latestStep = timeline[timeline.length - 1];
+          const assigneeAdUsers = ((latestStep?.Assignee ?? []) as any[])
+            .map((a: any) => (a.adUser || a.aduser || '').toLowerCase())
+            .filter((u: string) => !!u && u !== senderAdUser.toLowerCase());
+          const allRecipients = [...new Set([...assigneeAdUsers, ...(data.mentionedAdUsers ?? [])])];
           this.signalrService.noteNotify(
             data.id,
             requesterAdUser,
             senderAdUser,
             senderName,
             data.message,
+            allRecipients,
           );
         }
+
+        if (!silent) setTimeout(() => this.swalService.success(res.message || 'บันทึกสำเร็จ'), 100);
 
         this.selectTicket(data.id);
         this.getMyTicket();
@@ -449,11 +877,7 @@ export class ItService implements OnInit {
 
       error: (error) => {
         console.error('Assign Ticket Error:', error);
-
-        this.swalService.warning(
-          'เกิดข้อผิดพลาด',
-          error?.message || 'ไม่สามารถติดต่อเซิร์ฟเวอร์ได้',
-        );
+        if (!silent) this.swalService.warning('เกิดข้อผิดพลาด', error?.message || 'ไม่สามารถติดต่อเซิร์ฟเวอร์ได้');
       },
     });
   }
@@ -580,6 +1004,22 @@ export class ItService implements OnInit {
     this.isPreviewModalOpen.set(true);
   }
 
+  getFileIcon(fileName: string): string {
+    const ext = fileName?.split('.').pop()?.toLowerCase();
+    const iconMap: Record<string, string> = {
+      pdf: 'fas fa-file-pdf',
+      jpg: 'fas fa-file-image',
+      jpeg: 'fas fa-file-image',
+      png: 'fas fa-file-image',
+      gif: 'fas fa-file-image',
+      doc: 'fas fa-file-word',
+      docx: 'fas fa-file-word',
+      xls: 'fas fa-file-excel',
+      xlsx: 'fas fa-file-excel',
+    };
+    return iconMap[ext ?? ''] ?? 'fas fa-file';
+  }
+
   closePreview() {
     this.isPreviewModalOpen.set(false);
   }
@@ -623,11 +1063,16 @@ export class ItService implements OnInit {
     });
   }
 
-  async buildItNotes(replies: any[], attachments: any[]) {
+  async buildItNotes(replies: any[], attachments: any[], requesterAduser?: string) {
     const notes = await Promise.all(
       replies.map(async (r) => {
         const files = attachments.filter((a) => a.reply_id === r.id);
         const convertedFiles = await this.fileConverter.convertUrlsToFiles(files);
+        const senderRole =
+          requesterAduser &&
+          (r.user_aduser || '').toLowerCase() === requesterAduser.toLowerCase()
+            ? 'requester'
+            : 'it-staff';
 
         return {
           id: r.id,
@@ -640,6 +1085,7 @@ export class ItService implements OnInit {
             empCode: r.user_code,
             adUser: r.user_aduser,
             role: 'user',
+            senderRole,
           },
           referred_title: r.Referred_Title,
           isReferred: r.IsReferred,
@@ -655,6 +1101,22 @@ export class ItService implements OnInit {
       const el = this.cardBodyEl?.nativeElement;
       if (el) el.scrollTop = el.scrollHeight;
     }, 0);
+  }
+
+  loadReplyReadStatus(ticketId: string | number) {
+    this.itServiceService.getReplyReadStatus(ticketId).subscribe({
+      next: (res) => {
+        if (res?.readers) this.replyReaders.set(res.readers);
+      },
+      error: () => {},
+    });
+  }
+
+  readersForNote(replyId: number): ReplyReader[] {
+    const myCode = this.authService.userData()?.CODEMPID;
+    return this.replyReaders().filter(
+      (r) => r.lastReadReplyId >= replyId && r.userCodeempid !== myCode,
+    );
   }
 
   getTicketStatus(ticket: any) {

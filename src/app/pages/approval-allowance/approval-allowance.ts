@@ -1,4 +1,6 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, DestroyRef, inject, OnInit, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { ActivatedRoute } from '@angular/router';
 import { DateUtilityService } from '../../services/date-utility.service';
 import { ExportService } from '../../services/export';
 import { ToastService } from '../../services/toast';
@@ -47,6 +49,8 @@ export class ApprovalAllowanceComponent implements OnInit {
   private loadingService = inject(LoadingService);
   private errorService = inject(ErrorService);
   private authService = inject(AuthService);
+  private route = inject(ActivatedRoute);
+  private destroyRef = inject(DestroyRef);
 
   isLoading = this.loadingService.loading('approvals-list');
   isExporting = this.loadingService.loading('export');
@@ -67,17 +71,33 @@ export class ApprovalAllowanceComponent implements OnInit {
   selectedItem = signal<ApprovalItem | null>(null);
   initialAction = signal<'Approved' | 'Rejected' | 'Referred Back' | null>(null);
 
+  linkedVoucherNo = signal<string | null>(null);
   approvals = signal<any[]>([]);
+  summary = signal<{
+    pending: number;
+    approved: number;
+    rejected: number;
+    referredBack: number;
+  } | null>(null);
   showExportMenu = signal<boolean>(false);
   listing = createListingState();
-  medicalTabs = APPROVAL_STATUS_TABS.filter((t) => t !== 'Referred Back');
+  medicalTabs = APPROVAL_STATUS_TABS;
 
   constructor() {
     this.listing.filterStatus.set('Pending');
   }
 
   ngOnInit() {
-    this.loadAllowanceClaims();
+    this.route.queryParams.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((params) => {
+      const voucherNo = params['voucherNo'] || params['ticketNumber'];
+      if (voucherNo || params['_t']) {
+        this.listing.filterStatus.set('Pending');
+        this.listing.searchText.set('');
+        this.listing.currentPage.set(0);
+      }
+      this.linkedVoucherNo.set(voucherNo ?? null);
+      this.loadAllowanceClaims(voucherNo);
+    });
   }
 
   refresh() {
@@ -172,7 +192,34 @@ export class ApprovalAllowanceComponent implements OnInit {
     this.listing.currentPage.set(0);
   }
 
+  get showEmailResubmitHint(): boolean {
+    return (
+      this.listing.filterStatus() === 'Pending' &&
+      this.comps.paginatedData().length === 0 &&
+      this.linkedVoucherNo() !== null
+    );
+  }
+
+  get showResubmitHint(): boolean {
+    return (
+      !this.showEmailResubmitHint &&
+      this.listing.filterStatus() === 'Pending' &&
+      this.comps.paginatedData().length === 0 &&
+      (this.summary()?.referredBack ?? 0) > 0
+    );
+  }
+
   getTabCount(tab: string) {
+    const s = this.summary();
+    if (s) {
+      const map: Record<string, number> = {
+        Pending: s.pending,
+        Approved: s.approved,
+        Rejected: s.rejected,
+        'Referred Back': s.referredBack,
+      };
+      return map[tab] ?? 0;
+    }
     return this.approvals().filter((item) => item.status === tab).length;
   }
 
@@ -279,7 +326,7 @@ export class ApprovalAllowanceComponent implements OnInit {
   }
 
   private mapClaimStatus(status: string): 'Pending' | 'Approved' | 'Rejected' | 'Referred Back' {
-    switch (status?.toUpperCase()) {
+    switch (status?.toUpperCase().replace(/ /g, '_')) {
       case 'APPROVED':
         return 'Approved';
       case 'REJECTED':
@@ -303,6 +350,7 @@ export class ApprovalAllowanceComponent implements OnInit {
     this.approvalAllowanceService.getApprovals(adUser, autoOpenVoucherNo).subscribe({
       next: (res) => {
         this.approvals.set(res.data.map((c: any) => this.mapClaimToApproval(c)));
+        if (res.summary) this.summary.set(res.summary);
         this.listing.currentPage.set(0);
         this.loadingService.stop('approvals-list');
         this.isRefreshing.set(false);

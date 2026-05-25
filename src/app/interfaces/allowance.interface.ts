@@ -10,6 +10,8 @@ export interface AllowanceItem {
   amount: number;
   selected: boolean;
   shiftCode?: string;
+  shiftStart?: string;
+  shiftEnd?: string;
   displayHours?: string;
   actualExtraHours?: number;
   isEligible?: boolean;
@@ -77,6 +79,8 @@ export interface CreateClaimDetail {
   day_type?: string;
   actual_checkin?: string; // "HH:mm"
   actual_checkout?: string;
+  scheduled_start?: string; // "HH:mm"
+  scheduled_end?: string; // "HH:mm"
   extra_hours?: number;
   rate_id?: number | null;
   rate_amount: number;
@@ -110,6 +114,8 @@ export interface MealAllowanceClaimDetail {
   day_type: string;
   actual_checkin: string;
   actual_checkout: string;
+  scheduled_start?: string;
+  scheduled_end?: string;
   extra_hours: number;
   rate_id: number;
   rate_amount: number;

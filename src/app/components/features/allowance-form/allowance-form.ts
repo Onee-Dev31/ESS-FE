@@ -20,7 +20,7 @@ import {
 } from '../../../services/allowance.service';
 import { AuthService } from '../../../services/auth.service';
 import { ToastService } from '../../../services/toast';
-import { switchMap } from 'rxjs';
+import { forkJoin } from 'rxjs';
 import { SwalService } from '../../../services/swal.service';
 import { DateUtilityService } from '../../../services/date-utility.service';
 import { MealAllowanceRate } from '../../../interfaces';
@@ -71,6 +71,21 @@ export class AllowanceFormComponent implements OnInit, OnChanges {
   MODE_EDIT: boolean = false;
   isLoading = true;
 
+  get referredBackReason(): string {
+    const raw = this.requests?.approvals_json;
+    if (!raw) return this.requests?.rejectionReason ?? '';
+    try {
+      const steps = typeof raw === 'string' ? JSON.parse(raw) : raw;
+      if (!Array.isArray(steps)) return '';
+      for (const step of steps) {
+        if (step.remark?.startsWith('ส่งกลับแก้ไข:')) {
+          return step.remark.replace('ส่งกลับแก้ไข:', '').trim();
+        }
+      }
+    } catch {}
+    return '';
+  }
+
   isPolicyPopupOpen = signal(false);
   rates = signal<MealAllowanceRate[]>([]);
 
@@ -78,18 +93,17 @@ export class AllowanceFormComponent implements OnInit, OnChanges {
     this.getRates();
     if (!this.requests) {
       this.loadData();
+    } else {
+      // edit mode: ข้อมูลมาจาก mapData() แล้ว ไม่ต้องรอ getRates() ก่อนแสดง form
+      this.isLoading = false;
     }
-    console.log(this.requests);
   }
 
   ngOnChanges(changes: SimpleChanges) {
-    // if (changes['requestId'] && !changes['requestId'].firstChange) {
-    //   this.loadData();
-    // }
     if (changes['requests'] && this.requests && this.requests !== '') {
-      console.log('requests เข้ามาแล้ว:', this.requests);
       this.MODE_EDIT = true;
       this.mapData();
+      this.enrichShiftTimes();
       return;
     }
   }
@@ -98,26 +112,80 @@ export class AllowanceFormComponent implements OnInit, OnChanges {
     this.generateCalendar();
   }
 
-  mapData() {
-    this.logs = this.requests.details.map((item: any) => {
-      // console.log(item, this.formatDuration(item.extra_hours));
-      return {
-        date: item.work_date,
-        dayType: item.day_type,
-        timeIn: item.actual_checkin,
-        timeOut: item.actual_checkout,
-        hours: item.extra_hours,
-        amount: item.rate_amount ?? 0,
-        actualExtraHours: item.extra_hours ?? item.total_hours ?? 0,
-        displayHours: this.formatDuration(item.extra_hours),
-        selected: true,
-        description: item.description,
-        shiftCode: item.shift_code,
-        isEligible: true,
-        totalHoursText: item.total_hours_text,
-        rateId: item.rate_id,
-      } as AllowanceItem;
+  private mapData() {
+    this.logs = this.requests.details.map(
+      (item: any) =>
+        ({
+          date: (item.work_date ?? '').split('T')[0],
+          dayType: item.day_type,
+          timeIn: item.actual_checkin,
+          timeOut: item.actual_checkout,
+          hours: item.extra_hours,
+          amount: item.rate_amount ?? 0,
+          actualExtraHours: item.extra_hours ?? item.total_hours ?? 0,
+          displayHours: this.formatDuration(item.extra_hours),
+          selected: true,
+          description: item.description,
+          shiftCode: item.shift_code,
+          shiftStart: item.scheduled_start,
+          shiftEnd: item.scheduled_end,
+          isEligible: true,
+          totalHoursText: item.total_hours_text,
+          rateId: item.rate_id,
+        }) as AllowanceItem,
+    );
+  }
+
+  private enrichShiftTimes() {
+    if (this.logs.every((l) => l.shiftStart && l.shiftEnd)) return;
+
+    const employeeCode = this.authService.userData()?.CODEMPID ?? '';
+    if (!employeeCode || this.logs.length === 0) return;
+
+    const months = new Map<string, { year: number; month: number }>();
+    for (const log of this.logs) {
+      if (log.shiftStart && log.shiftEnd) continue;
+      const d = new Date(log.date);
+      const key = `${d.getFullYear()}-${d.getMonth() + 1}`;
+      months.set(key, { year: d.getFullYear(), month: d.getMonth() + 1 });
+    }
+
+    if (months.size === 0) return;
+
+    const calls = Array.from(months.values()).map(({ year, month }) =>
+      this.allowanceService.getEligibleDates(employeeCode, year, month),
+    );
+
+    forkJoin(calls).subscribe({
+      next: (responses) => {
+        const shiftData = new Map<string, { shiftStart: string; shiftEnd: string }>();
+        for (const res of responses) {
+          for (const item of res.data ?? []) {
+            shiftData.set(item.work_date.split('T')[0], {
+              shiftStart: item.scheduled_start,
+              shiftEnd: item.scheduled_end,
+            });
+          }
+        }
+        this.logs = this.logs.map((log) => {
+          if (log.shiftStart && log.shiftEnd) return log;
+          const shift = shiftData.get(log.date);
+          if (!shift?.shiftStart) return log;
+          return { ...log, shiftStart: shift.shiftStart, shiftEnd: shift.shiftEnd };
+        });
+        this.cdr.detectChanges();
+      },
     });
+  }
+
+  dayTypeLabel(code: string | undefined): string {
+    const map: Record<string, string> = {
+      W: 'วันทำงานปกติ',
+      H: 'วันหยุด',
+      T: 'วันหยุดประเพณี',
+      L: 'วันลา',
+    };
+    return code ? (map[code] ?? code) : '-';
   }
 
   formatDuration(hours: number): string {
@@ -201,6 +269,8 @@ export class AllowanceFormComponent implements OnInit, OnChanges {
             selected: false,
             description: '',
             shiftCode: item.shift_code,
+            shiftStart: item.scheduled_start,
+            shiftEnd: item.scheduled_end,
             isEligible: eligible,
             totalHoursText: item.total_hours_text,
             rateId: item.rate_id,
@@ -295,6 +365,8 @@ export class AllowanceFormComponent implements OnInit, OnChanges {
             day_type: log.dayType,
             actual_checkin: log.timeIn,
             actual_checkout: log.timeOut,
+            scheduled_start: log.shiftStart,
+            scheduled_end: log.shiftEnd,
             extra_hours: log.actualExtraHours ?? 0,
             rate_id: log.rateId,
             rate_amount: log.amount,
@@ -303,7 +375,11 @@ export class AllowanceFormComponent implements OnInit, OnChanges {
         })
         .subscribe({
           next: () => {
-            this.swalService.success('แก้ไขใบเบิกสำเร็จ');
+            const msg =
+              this.requests?.status === 'Referred Back'
+                ? 'ส่งคืนสำเร็จ ระบบเริ่มกระบวนการอนุมัติใหม่และแจ้งเตือนผู้อนุมัติทางอีเมลแล้ว'
+                : 'แก้ไขใบเบิกสำเร็จ';
+            this.swalService.success(msg);
             this.closeModal();
           },
           error: () => this.swalService.error('เกิดข้อผิดพลาดในการแก้ไข'),
@@ -321,6 +397,8 @@ export class AllowanceFormComponent implements OnInit, OnChanges {
           day_type: log.dayType,
           actual_checkin: log.timeIn,
           actual_checkout: log.timeOut,
+          scheduled_start: log.shiftStart,
+          scheduled_end: log.shiftEnd,
           extra_hours: log.actualExtraHours,
           rate_id: log.rateId,
           rate_amount: log.amount,

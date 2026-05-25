@@ -7,6 +7,8 @@ import {
   DestroyRef,
   ChangeDetectionStrategy,
 } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { ActivatedRoute } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AllowanceFormComponent } from '../../components/features/allowance-form/allowance-form';
@@ -78,6 +80,8 @@ export class AllowanceComponent implements OnInit {
   private allowanceService = inject(AllowanceService);
   private swalService = inject(SwalService);
   private authService = inject(AuthService);
+  private route = inject(ActivatedRoute);
+  private destroyRef = inject(DestroyRef);
   dateUtil = inject(DateUtilityService);
   private loadingService = inject(LoadingService);
 
@@ -103,8 +107,19 @@ export class AllowanceComponent implements OnInit {
     this.i18n.setLocale(en_US);
   }
 
+  private pendingOpenVoucherNo: string | null = null;
+
   ngOnInit() {
-    this.loadData();
+    this.route.queryParams.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((params) => {
+      const voucherNo = params['voucherNo'] || params['ticketNumber'];
+      if (voucherNo || params['_t']) {
+        this.pendingOpenVoucherNo = voucherNo ?? null;
+        this.listing.filterStatus.set('');
+        this.listing.searchText.set(voucherNo ?? '');
+        this.listing.currentPage.set(0);
+      }
+      this.loadData();
+    });
   }
 
   loadData() {
@@ -138,8 +153,14 @@ export class AllowanceComponent implements OnInit {
 
   private dataFromApi(res: any) {
     const items = res.data ?? [];
-    // console.log(res)
     this.allRequests.set(this.mapApiData(items));
+    if (this.pendingOpenVoucherNo) {
+      const match = this.allRequests().find((r) => r.claimNo === this.pendingOpenVoucherNo);
+      if (match) {
+        this.pendingOpenVoucherNo = null;
+        this.openModal(match.id);
+      }
+    }
 
     this.listing.totalItems.set(res.pagination.total ?? 0);
     this.listing.totalPages.set(res.pagination.totalPages ?? 1);

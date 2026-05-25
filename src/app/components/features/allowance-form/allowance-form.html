@@ -52,8 +52,21 @@
             </div>
           </div>
         </section>
+
+        <!-- referred back reason -->
+        <div
+          class="alert-referred-back"
+          *ngIf="MODE_EDIT && requests.status === 'Referred Back' && referredBackReason"
+        >
+          <i class="fas fa-exclamation-circle"></i>
+          <div>
+            <strong>เหตุผลที่ส่งกลับแก้ไข:</strong>
+            <span>{{ referredBackReason }}</span>
+          </div>
+        </div>
+
         <!-- update -->
-        <section class="filter-controls" *ngIf="MODE_EDIT && requests.status === 'New'">
+        <section class="filter-controls" *ngIf="MODE_EDIT && requests.status === 'Referred Back'">
           <div class="alert-delete" *ngIf="isDelete()">
             <i class="fa-solid fa-triangle-exclamation"></i>
             รายการที่ยกเลิก {{ isDelete() }} รายการ จะถูกลบถาวรเมื่อกด "ลบรายการเบิกทั้งหมด"
@@ -76,7 +89,7 @@
           </div>
         </section>
         <!-- view only -->
-        <section class="filter-controls" *ngIf="MODE_EDIT && requests.status !== 'New'">
+        <section class="filter-controls" *ngIf="MODE_EDIT && requests.status !== 'Referred Back'">
           <div class="alert-delete" *ngIf="isDelete()">
             <i class="fa-solid fa-triangle-exclamation"></i>
             รายการที่ยกเลิก {{ isDelete() }} รายการ จะถูกลบถาวรเมื่อกด "ลบรายการเบิกทั้งหมด"
@@ -92,6 +105,10 @@
           </div>
         </section>
       </div>
+
+      <div>W - เวลาทำงานปกติ</div>
+      <div>H - วันหยุด</div>
+      <div>T - วันหยุดประเพณี</div>
 
       @if (isPolicyPopupOpen()) {
         <div class="policy-popup-overlay" (click)="isPolicyPopupOpen.set(false)">
@@ -180,13 +197,16 @@
                 </td>
                 <td
                   class="text-center bg-gray"
-                  [class.holiday-label]="log.dayType === 'H'"
+                  [class.holiday-label]="log.dayType === 'H' || log.dayType === 'T'"
                   [class.regular-label]="log.dayType === 'W'"
                 >
-                  {{ log.dayType }}
+                  ({{ log.dayType }} = {{ dayTypeLabel(log.dayType) }})
                 </td>
                 <td class="text-center bg-gray shift-code">
-                  {{ log.shiftCode }}
+                  <div>{{ log.shiftCode }}</div>
+                  @if (log.shiftStart && log.shiftEnd) {
+                    <div class="shift-time">{{ log.shiftStart }}-{{ log.shiftEnd }}</div>
+                  }
                 </td>
                 <td class="p-0">
                   <input
@@ -249,21 +269,29 @@
                 <div class="date-info">
                   <span
                     class="day-dot"
-                    [style.background]="log.dayType === 'H' ? 'var(--danger)' : 'var(--primary)'"
+                    [style.background]="
+                      log.dayType === 'H' || log.dayType === 'T'
+                        ? 'var(--danger)'
+                        : 'var(--primary)'
+                    "
                   ></span>
                   <span class="date">{{
                     dateUtil.formatDateToBE(log.date, 'ddd. DD/MM/YYYY')
                   }}</span>
                   <span
                     class="day-type"
-                    [style.color]="log.dayType === 'H' ? 'var(--danger)' : 'var(--text-muted)'"
-                    >({{ log.dayType }})</span
+                    [style.color]="
+                      log.dayType === 'H' || log.dayType === 'T'
+                        ? 'var(--danger)'
+                        : 'var(--text-muted)'
+                    "
+                    >({{ log.dayType }} = {{ dayTypeLabel(log.dayType) }})</span
                   >
                 </div>
                 <label class="sr-only-label">
                   <span class="sr-only">เลือกวันที่ {{ log.date }}</span>
                   <input
-                    *ngIf="!MODE_EDIT || requests.status === 'New'"
+                    *ngIf="!MODE_EDIT || requests.status === 'Referred Back'"
                     type="checkbox"
                     [(ngModel)]="log.selected"
                     (change)="onToggleCheck(log, cardDescInput)"
@@ -277,6 +305,9 @@
                 <div class="grid-item">
                   <label>รหัสกะ</label>
                   <div class="val">{{ log.shiftCode || '-' }}</div>
+                  @if (log.shiftStart && log.shiftEnd) {
+                    <div class="shift-time">{{ log.shiftStart }}-{{ log.shiftEnd }}</div>
+                  }
                 </div>
                 <div class="grid-item">
                   <label>เวลา เข้า - ออก</label>
@@ -295,7 +326,7 @@
               <div class="card-input-section">
                 <label
                   >รายละเอียดการเบิก
-                  @if (log.selected && requests?.status === 'New') {
+                  @if (log.selected && requests?.status === 'Referred Back') {
                     <span class="required">*</span>
                   }
                 </label>
@@ -307,7 +338,9 @@
                   placeholder="ระบุรายละเอียด..."
                   [class.is-invalid]="log.selected && !log.description"
                   (ngModelChange)="onInputChange(log)"
-                  [readonly]="(MODE_EDIT && requests?.status !== 'New') || !log.isEligible"
+                  [readonly]="
+                    (MODE_EDIT && requests?.status !== 'Referred Back') || !log.isEligible
+                  "
                 />
               </div>
             </div>
@@ -316,7 +349,7 @@
       </div>
     </main>
 
-    <div class="form-actions" *ngIf="requests?.status === 'New' || !requests">
+    <div class="form-actions" *ngIf="requests?.status === 'Referred Back' || !requests">
       <button class="btn-submit" (click)="onSubmit()" [disabled]="hasInvalid()">
         <i class="fas fa-check"></i>
         {{
@@ -324,7 +357,9 @@
             ? 'ยืนยันการเบิก'
             : hasDelete()
               ? 'ลบรายการเบิกทั้งหมด'
-              : 'ยืนยันการแก้ไขการเบิก'
+              : requests?.status === 'Referred Back'
+                ? 'ส่งกลับเพื่ออนุมัติ'
+                : 'ยืนยันการแก้ไขการเบิก'
         }}
       </button>
     </div>

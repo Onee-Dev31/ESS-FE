@@ -6,7 +6,8 @@ import { LEAVE_TYPES, LeaveType } from '../interfaces/time-off.interface';
 
 import { DateConfig } from '../interfaces/core.interface';
 import { environment } from '../../environments/environment';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpContext, HttpParams } from '@angular/common/http';
+import { SKIP_ERROR_TOAST } from '../interceptors/error.interceptor';
 
 export interface ClaimType {
   id: string;
@@ -125,5 +126,26 @@ export class MasterDataService {
 
   getRoleMaster(): Observable<any> {
     return this._http.get(`${this.baseUrl}/Master/roles/active`);
+  }
+
+  manageHolidayMaster(payload: any): Observable<any> {
+    return this._http.post(`${this.baseUrl}/Master/manage-holiday`, payload, {
+      context: new HttpContext().set(SKIP_ERROR_TOAST, true),
+    });
+  }
+
+  downloadHolidayTemplate(year?: string): Observable<Blob> {
+    let httpParams = new HttpParams();
+    if (year) httpParams = httpParams.set('year', year);
+    return this._http.get(`${this.baseUrl}/Master/manage-holiday/template`, {
+      params: httpParams,
+      responseType: 'blob',
+    });
+  }
+
+  importHolidayExcel(formData: FormData): Observable<any> {
+    return this._http.post(`${this.baseUrl}/Master/manage-holiday/import`, formData, {
+      context: new HttpContext().set(SKIP_ERROR_TOAST, true),
+    });
   }
 }

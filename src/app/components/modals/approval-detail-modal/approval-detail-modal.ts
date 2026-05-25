@@ -378,10 +378,11 @@ export class ApprovalDetailModalComponent implements OnInit {
   }
 
   private buildPayload(action: string, reason?: string) {
+    const lowerAction = action.toLowerCase();
     return {
-      action: action.toLowerCase(),
+      action: lowerAction,
       reviewedBy: this.authService.userData().CODEMPID,
-      ...(action.toLowerCase() === 'rejected' && {
+      ...((lowerAction === 'rejected' || lowerAction === 'referred back') && {
         rejectionReason: reason?.trim() || '',
       }),
     };
