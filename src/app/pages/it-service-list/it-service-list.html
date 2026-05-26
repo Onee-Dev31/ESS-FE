@@ -697,15 +697,34 @@
                 <button
                   class="floating-chat__emoji-btn"
                   type="button"
-                  title="เลือก Emoji"
-                  aria-label="เลือก Emoji"
-                  (click)="toggleEmojiPicker()"
+                  title="อิโมจิ"
+                  aria-label="อิโมจิ"
+                  (click)="emojiPickerOpen = !emojiPickerOpen; $event.stopPropagation()"
                 >
-                  <i class="fa-regular fa-face-smile"></i>
+                  😊
                 </button>
-                @if (emojiPickerVisible()) {
-                  <div class="floating-chat__emoji-picker" (click)="$event.stopPropagation()">
-                    <emoji-picker (emoji-click)="onEmojiSelect($event)"></emoji-picker>
+                @if (emojiPickerOpen) {
+                  <div class="emoji-backdrop" (click)="emojiPickerOpen = false"></div>
+                  <div class="emoji-picker" (click)="$event.stopPropagation()">
+                    <div class="emoji-picker__tabs">
+                      @for (tab of EMOJI_TABS; track $index) {
+                        <button
+                          type="button"
+                          class="emoji-picker__tab"
+                          [class.active]="emojiPickerTab === $index"
+                          (click)="emojiPickerTab = $index"
+                        >
+                          {{ tab.label }}
+                        </button>
+                      }
+                    </div>
+                    <div class="emoji-picker__grid">
+                      @for (e of EMOJI_TABS[emojiPickerTab].emojis; track e) {
+                        <button type="button" class="emoji-picker__item" (click)="insertEmoji(e)">
+                          {{ e }}
+                        </button>
+                      }
+                    </div>
                   </div>
                 }
               </div>
@@ -716,7 +735,7 @@
                 placeholder="พิมพ์ข้อความ... (พิมพ์ @ เพื่อ mention)"
                 aria-label="พิมพ์ข้อความ"
                 (keydown)="handleChatKeydown($event, t)"
-                (click)="emojiPickerVisible.set(false)"
+                (click)="emojiPickerOpen = false"
               ></textarea>
               <button
                 class="floating-chat__send"
