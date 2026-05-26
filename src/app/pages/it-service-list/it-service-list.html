@@ -538,7 +538,12 @@
                       }
                     </div>
                     @if (canSendChat(t)) {
-                      <button class="note__reply-btn" type="button" title="Reply" (click)="startReply(n)">
+                      <button
+                        class="note__reply-btn"
+                        type="button"
+                        title="Reply"
+                        (click)="startReply(n)"
+                      >
                         <i class="fa-solid fa-reply"></i>
                       </button>
                     }
@@ -547,7 +552,10 @@
                 @if (n.replyTo) {
                   <div class="note__quote">
                     <span class="note__quote-name">{{ n.replyTo.nickName }}</span>
-                    <span class="note__quote-msg">{{ n.replyTo.message | slice:0:100 }}{{ n.replyTo.message.length > 100 ? '...' : '' }}</span>
+                    <span class="note__quote-msg"
+                      >{{ n.replyTo.message | slice: 0 : 100
+                      }}{{ n.replyTo.message.length > 100 ? '...' : '' }}</span
+                    >
                   </div>
                 }
                 <div class="note__msg">
@@ -655,7 +663,10 @@
                 <i class="fa-solid fa-reply"></i>
                 <div class="chat-reply-bar__text">
                   <span class="chat-reply-bar__name">{{ replyingTo().createBy.nickName }}</span>
-                  <span class="chat-reply-bar__msg">{{ replyingTo().message | slice:0:80 }}{{ replyingTo().message.length > 80 ? '...' : '' }}</span>
+                  <span class="chat-reply-bar__msg"
+                    >{{ replyingTo().message | slice: 0 : 80
+                    }}{{ replyingTo().message.length > 80 ? '...' : '' }}</span
+                  >
                 </div>
               </div>
               <button class="chat-reply-bar__cancel" type="button" (click)="cancelReply()">

@@ -2041,7 +2041,10 @@ textarea.form-input {
   color: var(--text-muted);
   cursor: pointer;
   opacity: 0;
-  transition: opacity 0.15s, background 0.15s, color 0.15s;
+  transition:
+    opacity 0.15s,
+    background 0.15s,
+    color 0.15s;
   font-size: 0.75rem;
 
   &:hover {
@@ -2130,7 +2133,9 @@ textarea.form-input {
   color: var(--text-muted);
   cursor: pointer;
   flex-shrink: 0;
-  transition: background 0.15s, color 0.15s;
+  transition:
+    background 0.15s,
+    color 0.15s;
 
   &:hover {
     background: color-mix(in srgb, var(--danger, #ef4444) 12%, transparent);

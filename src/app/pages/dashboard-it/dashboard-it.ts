@@ -1296,7 +1296,15 @@ export class DashboardIT implements OnInit {
   }
 
   async buildItNotes(replies: any[], attachments: any[], requesterAduser?: string) {
-    console.log('[DEBUG reply]', replies.map(r => ({ id: r.id, msg: r.message, parent_reply_id: r.parent_reply_id, parent_message: r.parent_message })));
+    console.log(
+      '[DEBUG reply]',
+      replies.map((r) => ({
+        id: r.id,
+        msg: r.message,
+        parent_reply_id: r.parent_reply_id,
+        parent_message: r.parent_message,
+      })),
+    );
     const notes = await Promise.all(
       replies.map(async (r) => {
         const files = attachments.filter((a) => a.reply_id === r.id);
@@ -1310,9 +1318,15 @@ export class DashboardIT implements OnInit {
         if (r.parent_reply_id) {
           const parent = replies.find((p) => Number(p.id) === Number(r.parent_reply_id));
           if (parent) {
-            replyTo = { message: parent.message, nickName: this.extractNickName(parent.sender_name) };
+            replyTo = {
+              message: parent.message,
+              nickName: this.extractNickName(parent.sender_name),
+            };
           } else if (r.parent_message != null) {
-            replyTo = { message: r.parent_message, nickName: r.parent_sender_name ? this.extractNickName(r.parent_sender_name) : '' };
+            replyTo = {
+              message: r.parent_message,
+              nickName: r.parent_sender_name ? this.extractNickName(r.parent_sender_name) : '',
+            };
           }
         }
 
