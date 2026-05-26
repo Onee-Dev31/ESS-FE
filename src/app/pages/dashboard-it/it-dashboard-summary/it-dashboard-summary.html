@@ -250,11 +250,11 @@
                 <div>{{ data.ticket_number }}</div>
                 <div class="assignee-avatar-list" *ngIf="data.assignees_mock?.length">
                   <img
-                    *ngFor="let empCode of data.assignees_mock"
+                    *ngFor="let emp of data.assignees_json"
                     class="assignee-avatar"
-                    [src]="getEmployeeImage(empCode)"
-                    [alt]="empCode"
-                    [title]="empCode"
+                    [src]="getEmployeeImage(emp.codeempid)"
+                    [alt]="emp.codeempid"
+                    [title]="emp.codeempid"
                   />
                 </div>
               </td>

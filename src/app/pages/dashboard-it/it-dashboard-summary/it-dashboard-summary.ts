@@ -785,6 +785,7 @@ export class ItDashboardSummary {
           ...t,
           assignees: t.groups_assignees_json ? JSON.parse(t.groups_assignees_json) : [],
           assignees_mock: ['OTD01050', 'OTD01128', 'OTD01125'],
+          assignees_json: t.assignees_json ? JSON.parse(t.assignees_json) : [],
         }));
         console.log(this.filteredTicketLogs);
 
