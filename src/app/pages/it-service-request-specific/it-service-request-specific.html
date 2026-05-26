@@ -145,7 +145,7 @@
                   />
                 </div>
 
-                <div class="form-field">
+                <!-- <div class="form-field">
                   <label>รหัสพนักงาน</label>
 
                   <input
@@ -154,7 +154,7 @@
                     [(ngModel)]="person.freelance.employeeCode"
                     [name]="'employeeCode' + person.id"
                   />
-                </div>
+                </div> -->
 
                 <div class="form-field">
                   <label>สังกัดบริษัท</label>
@@ -364,6 +364,7 @@
                         required
                         #company="ngModel"
                         [class.input-error]="company.invalid && company.touched"
+                        (ngModelChange)="touchSpecificPeople()"
                       >
                         <!-- <nz-option nzLabel="เลือกบริษัท" nzValue="" nzDisabled /> -->
                         <nz-option

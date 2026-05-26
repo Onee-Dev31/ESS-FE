@@ -838,12 +838,13 @@ export class ITServiceRequestSpecificComponent implements OnInit {
         if (person.openFor?.isFreelance) {
           sections.push(
             `${index + 1}. Freelance`,
-            `${person.freelance.firstNameTh} ${person.freelance.lastNameTh} (${person.freelance.employeeCode})`,
-            `${person.freelance.firstNameEn} ${person.freelance.lastNameEn}`,
-            `${person.freelance.company?.COMPANY_NAME} (${person.freelance.company?.COMPANY_CODE})`,
-            `${person.freelance.department?.COSTCENT}-${person.freelance.department?.NAMECOSTCENT}`,
-            `${person.freelance.position}`,
-            `${person.freelance.email} (${person.freelance.phone})`,
+            `ชื่อ-นามสกุลภาษาไทย: ${person.freelance.firstNameTh} ${person.freelance.lastNameTh}`,
+            `ชื่อ-นามสกุลภาษาอังกฤษ : ${person.freelance.firstNameEn} ${person.freelance.lastNameEn}`,
+            `บริษัท : ${person.freelance.company?.COMPANY_NAME} (${person.freelance.company?.COMPANY_CODE})`,
+            `แผนก : ${person.freelance.department?.COSTCENT}-${person.freelance.department?.NAMECOSTCENT}`,
+            `ตำแหน่ง : ${person.freelance.position}`,
+            `อีเมล : ${person.freelance.email}`,
+            `เบอร์ : ${person.freelance.phone}`,
           );
         } else {
           sections.push(`${index + 1}. ${person.openFor?.label}`);
@@ -856,7 +857,7 @@ export class ITServiceRequestSpecificComponent implements OnInit {
         // =========================
 
         if (person.systems.includes('oracle') && person.oracle) {
-          sections.push('<strong>ระบบ : Oracle</strong>');
+          sections.push('<div class="summary-system-title">ระบบ : Oracle</div>');
 
           person.oracle.companies.forEach((companyItem: any) => {
             if (companyItem.company) {
@@ -875,8 +876,6 @@ export class ITServiceRequestSpecificComponent implements OnInit {
 
             sections.push('');
           });
-
-          sections.push('<hr>');
         }
 
         // =========================
@@ -884,7 +883,7 @@ export class ITServiceRequestSpecificComponent implements OnInit {
         // =========================
 
         if (person.systems.includes('bms') && person.bms) {
-          sections.push('<strong>ระบบ : BMS</strong>');
+          sections.push('<div class="summary-system-title">ระบบ : BMS</div>');
 
           person.bms.companies.forEach((company: any) => {
             sections.push(`${company.COMPANY_NAME} (${company.COMPANY_CODE})`);
@@ -894,7 +893,7 @@ export class ITServiceRequestSpecificComponent implements OnInit {
             sections.push(`สิทธิ์เหมือน : ${person.bms.detail}`);
           }
 
-          sections.push('<hr>');
+          sections.push('');
         }
 
         // =========================
@@ -902,7 +901,7 @@ export class ITServiceRequestSpecificComponent implements OnInit {
         // =========================
 
         if (person.systems.includes('onePortal') && person.onePortal) {
-          sections.push('<strong>ระบบ : One Portal</strong>');
+          sections.push('<div class="summary-system-title">ระบบ : One Portal</div>');
 
           person.onePortal.companies.forEach((company: any) => {
             sections.push(`${company.COMPANY_NAME} (${company.COMPANY_CODE})`);
@@ -912,7 +911,7 @@ export class ITServiceRequestSpecificComponent implements OnInit {
             sections.push(`ประเภทสิทธิ์ : ${person.onePortal.responseType}`);
           }
 
-          sections.push('<hr>');
+          sections.push('');
         }
 
         // =========================
@@ -920,7 +919,7 @@ export class ITServiceRequestSpecificComponent implements OnInit {
         // =========================
 
         if (person.systems.includes('onee') && person.onee) {
-          sections.push('<strong>ระบบ : OneE</strong>');
+          sections.push('<div class="summary-system-title">ระบบ : OneE</div>');
 
           person.onee.companies.forEach((company: any) => {
             sections.push(`${company.COMPANY_NAME} (${company.COMPANY_CODE})`);
@@ -934,7 +933,7 @@ export class ITServiceRequestSpecificComponent implements OnInit {
             sections.push(`หัวหน้างาน : ${person.onee.supervisor.trim()}`);
           }
 
-          sections.push('<hr>');
+          sections.push('');
         }
 
         // =========================
@@ -947,7 +946,7 @@ export class ITServiceRequestSpecificComponent implements OnInit {
 
         return sections.join('\n');
       })
-      .join('\n==============================\n\n');
+      .join('\n<hr>\n\n');
   }
 
   // MASTER
