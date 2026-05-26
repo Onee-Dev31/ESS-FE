@@ -60,6 +60,7 @@ import { AvatarPreviewModal } from '../../components/modals/avatar-preview-modal
 import { NzDatePickerModule } from 'ng-zorro-antd/date-picker';
 import { en_US, NzI18nService } from 'ng-zorro-antd/i18n';
 import { environment } from '../../../environments/environment';
+import { TicketService } from '../../services/ticket.service';
 
 interface ReplyReader {
   userCodeempid: string;
@@ -567,6 +568,7 @@ export class DashboardIT implements OnInit {
   private swalService = inject(SwalService);
   private fileConverter = inject(FileConverterService);
   private signalrService = inject(SignalrService);
+  private ticketService = inject(TicketService);
   private destroyRef = inject(DestroyRef);
   private route = inject(ActivatedRoute);
   dateUtil = inject(DateUtilityService);
@@ -840,6 +842,21 @@ export class DashboardIT implements OnInit {
           ? 'In Progress'
           : ticket.IT_Status;
 
+      const isOpenForSelf =
+        res.requestFor?.emp_code && res.requestFor.emp_code === res.requester?.emp_code;
+
+      const hasOpenFor = !!res.requestFor?.emp_code;
+
+      const openFor = isOpenForSelf
+        ? { fullname: 'เปิดให้ตนเอง' }
+        : hasOpenFor
+          ? res.requestFor
+          : null;
+
+      this.showRequesterContact = !hasOpenFor || isOpenForSelf;
+
+      console.log(openFor);
+
       const objectData = {
         ticketId: ticket.id,
         ticketNumber: ticket.ticket_number,
@@ -872,7 +889,8 @@ export class DashboardIT implements OnInit {
         assignTimeline: result,
         services: services,
         requester: res.requester,
-        openFor: res.requestFor.emp_code ? res.requestFor : null,
+        openFor: openFor,
+        // openFor: res.requestFor.emp_code ? res.requestFor : null,
         rejection_reason: ticket.rejection_reason,
         ccList: ccList || [],
       };
@@ -973,6 +991,64 @@ export class DashboardIT implements OnInit {
     requestAnimationFrame(() => {
       setTimeout(() => this.chatTextareaEl?.nativeElement.focus(), 0);
     });
+  }
+
+  exportChatHistory(ticket: any) {
+    const ticketId = ticket?.ticketId;
+
+    if (!ticketId || !(ticket?.itNotes?.length > 0)) {
+      return;
+    }
+
+    this.ticketService.exportChatHistory(ticketId).subscribe({
+      next: (response) => {
+        const blob = response.body;
+
+        if (!blob) {
+          return;
+        }
+
+        const contentType = response.headers.get('content-type') || blob.type;
+        if (contentType.toLowerCase().includes('application/json')) {
+          return;
+        }
+
+        this.downloadChatHistoryBlob(
+          blob,
+          this.getExportFileName(response.headers.get('content-disposition'), ticketId),
+        );
+      },
+      error: () => this.msg.warning('ไม่สามารถ export ประวัติการแชทได้'),
+    });
+  }
+
+  private downloadChatHistoryBlob(blob: Blob, fileName: string) {
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+
+    link.href = url;
+    link.download = fileName;
+    link.style.display = 'none';
+
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  }
+
+  private getExportFileName(contentDisposition: string | null, ticketId: string | number): string {
+    if (!contentDisposition) {
+      return `chat-history-${ticketId}.xlsx`;
+    }
+
+    const utf8FileName = contentDisposition.match(/filename\*=UTF-8''([^;]+)/i)?.[1];
+    if (utf8FileName) {
+      return decodeURIComponent(utf8FileName.replace(/"/g, ''));
+    }
+
+    return (
+      contentDisposition.match(/filename="?([^";]+)"?/i)?.[1] || `chat-history-${ticketId}.xlsx`
+    );
   }
 
   sendChatMessage(ticket: any) {

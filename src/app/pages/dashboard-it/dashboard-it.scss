@@ -1735,6 +1735,10 @@
   }
 }
 
+.floating-chat__export {
+  padding-inline: 10px;
+}
+
 .floating-chat__close {
   width: 30px;
   height: 30px;
@@ -2535,7 +2539,7 @@
     flex-direction: column;
     align-items: center;
     margin-top: 4px;
-    font-size: $font-size-label;
+    font-size: $font-size-hint;
   }
 
   .side-detail.openFor {

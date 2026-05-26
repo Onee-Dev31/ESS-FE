@@ -148,4 +148,8 @@ export class MasterDataService {
       context: new HttpContext().set(SKIP_ERROR_TOAST, true),
     });
   }
+
+  MasterPermission(): Observable<any> {
+    return this._http.get(`${this.baseUrl}/Master/MasterPermission`);
+  }
 }
