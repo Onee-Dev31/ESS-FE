@@ -572,6 +572,21 @@ export class DashboardIT implements OnInit {
           ? 'In Progress'
           : ticket.IT_Status;
 
+      const isOpenForSelf =
+        res.requestFor?.emp_code && res.requestFor.emp_code === res.requester?.emp_code;
+
+      const hasOpenFor = !!res.requestFor?.emp_code;
+
+      const openFor = isOpenForSelf
+        ? { fullname: 'เปิดให้ตนเอง' }
+        : hasOpenFor
+          ? res.requestFor
+          : null;
+
+      this.showRequesterContact = !hasOpenFor || isOpenForSelf;
+
+      console.log(openFor);
+
       const objectData = {
         ticketId: ticket.id,
         ticketNumber: ticket.ticket_number,
@@ -604,7 +619,8 @@ export class DashboardIT implements OnInit {
         assignTimeline: result,
         services: services,
         requester: res.requester,
-        openFor: res.requestFor.emp_code ? res.requestFor : null,
+        openFor: openFor,
+        // openFor: res.requestFor.emp_code ? res.requestFor : null,
         rejection_reason: ticket.rejection_reason,
         ccList: ccList || [],
       };
