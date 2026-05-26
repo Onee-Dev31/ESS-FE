@@ -189,41 +189,49 @@
               <h3>รายการเบิก ({{ allowanceDetail()?.details?.length }} รายการ)</h3>
             </div>
             <div class="table-scroll">
-            <table class="modern-table">
-              <thead>
-                <tr>
-                  <th>วันที่</th>
-                  <th>กะ</th>
-                  <th class="text-center">ประเภทวัน</th>
-                  <th>เวลาเข้า - ออก</th>
-                  <th class="text-center">ชั่วโมง OT</th>
-                  <th class="text-right">ยอดเงิน</th>
-                  <th>หมายเหตุ</th>
-                </tr>
-              </thead>
-              <tbody>
-                @for (d of allowanceDetail()?.details; track d.detail_id) {
+              <table class="modern-table">
+                <thead>
                   <tr>
-                    <td data-label="วันที่">{{ dateUtil.formatDateToBE(d.work_date, 'DD/MM/YYYY') }}</td>
-                    <td data-label="กะ">
-                      {{ d.shift_code }}
-                      @if (d.scheduled_start && d.scheduled_end) {
-                        <div class="shift-time-range">{{ d.scheduled_start }} – {{ d.scheduled_end }}</div>
-                      }
-                    </td>
-                    <td data-label="ประเภทวัน" class="text-center">
-                      <span class="ot-day-type" [class.holiday]="d.day_type === 'H'">
-                        {{ d.day_type === 'H' ? 'วันหยุด' : 'วันทำงาน' }}
-                      </span>
-                    </td>
-                    <td data-label="เวลาเข้า - ออก">{{ d.actual_checkin }} – {{ d.actual_checkout }}</td>
-                    <td data-label="ชั่วโมง OT" class="text-center">{{ d.extra_hours }} ชม.</td>
-                    <td data-label="ยอดเงิน" class="text-right">฿{{ d.rate_amount | number: '1.2-2' }}</td>
-                    <td data-label="หมายเหตุ">{{ d.description || '-' }}</td>
+                    <th>วันที่</th>
+                    <th>กะ</th>
+                    <th class="text-center">ประเภทวัน</th>
+                    <th>เวลาเข้า - ออก</th>
+                    <th class="text-center">ชั่วโมง OT</th>
+                    <th class="text-right">ยอดเงิน</th>
+                    <th>หมายเหตุ</th>
                   </tr>
-                }
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  @for (d of allowanceDetail()?.details; track d.detail_id) {
+                    <tr>
+                      <td data-label="วันที่">
+                        {{ dateUtil.formatDateToBE(d.work_date, 'DD/MM/YYYY') }}
+                      </td>
+                      <td data-label="กะ">
+                        {{ d.shift_code }}
+                        @if (d.scheduled_start && d.scheduled_end) {
+                          <div class="shift-time-range">
+                            {{ d.scheduled_start }} – {{ d.scheduled_end }}
+                          </div>
+                        }
+                      </td>
+                      <td data-label="ประเภทวัน" class="text-center">
+                        <span class="ot-day-type" [class.holiday]="d.day_type === 'H'">
+                          {{ d.day_type === 'H' ? 'วันหยุด' : 'วันทำงาน' }}
+                        </span>
+                      </td>
+                      <td data-label="เวลาเข้า - ออก">
+                        {{ d.actual_checkin }} – {{ d.actual_checkout }}
+                      </td>
+                      <td data-label="ชั่วโมง OT" class="text-center">{{ d.extra_hours }} ชม.</td>
+                      <td data-label="ยอดเงิน" class="text-right">
+                        ฿{{ d.rate_amount | number: '1.2-2' }}
+                      </td>
+                      <td data-label="หมายเหตุ">{{ d.description || '-' }}</td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
             </div>
           }
         }
@@ -266,41 +274,49 @@
               <h3>รายการเบิก ({{ vehicleDetail()?.details?.length }} รายการ)</h3>
             </div>
             <div class="table-scroll">
-            <table class="modern-table">
-              <thead>
-                <tr>
-                  <th>วันที่</th>
-                  <th>กะ</th>
-                  <th class="text-center">ประเภทวัน</th>
-                  <th>เวลาเข้า - ออก</th>
-                  <th class="text-center">ชั่วโมง OT</th>
-                  <th class="text-right">ยอดเงิน</th>
-                  <th>หมายเหตุ</th>
-                </tr>
-              </thead>
-              <tbody>
-                @for (d of vehicleDetail()?.details; track d.detail_id) {
+              <table class="modern-table">
+                <thead>
                   <tr>
-                    <td data-label="วันที่">{{ dateUtil.formatDateToBE(d.work_date, 'DD/MM/YYYY') }}</td>
-                    <td data-label="กะ">
-                      {{ d.shift_code }}
-                      @if (d.scheduled_start && d.scheduled_end) {
-                        <div class="shift-time-range">{{ d.scheduled_start }} – {{ d.scheduled_end }}</div>
-                      }
-                    </td>
-                    <td data-label="ประเภทวัน" class="text-center">
-                      <span class="ot-day-type" [class.holiday]="d.day_type === 'H'">
-                        {{ d.day_type === 'H' ? 'วันหยุด' : 'วันทำงาน' }}
-                      </span>
-                    </td>
-                    <td data-label="เวลาเข้า - ออก">{{ d.actual_checkin }} – {{ d.actual_checkout }}</td>
-                    <td data-label="ชั่วโมง OT" class="text-center">{{ d.extra_hours }} ชม.</td>
-                    <td data-label="ยอดเงิน" class="text-right">฿{{ d.rate_amount | number: '1.2-2' }}</td>
-                    <td data-label="หมายเหตุ">{{ d.description || '-' }}</td>
+                    <th>วันที่</th>
+                    <th>กะ</th>
+                    <th class="text-center">ประเภทวัน</th>
+                    <th>เวลาเข้า - ออก</th>
+                    <th class="text-center">ชั่วโมง OT</th>
+                    <th class="text-right">ยอดเงิน</th>
+                    <th>หมายเหตุ</th>
                   </tr>
-                }
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  @for (d of vehicleDetail()?.details; track d.detail_id) {
+                    <tr>
+                      <td data-label="วันที่">
+                        {{ dateUtil.formatDateToBE(d.work_date, 'DD/MM/YYYY') }}
+                      </td>
+                      <td data-label="กะ">
+                        {{ d.shift_code }}
+                        @if (d.scheduled_start && d.scheduled_end) {
+                          <div class="shift-time-range">
+                            {{ d.scheduled_start }} – {{ d.scheduled_end }}
+                          </div>
+                        }
+                      </td>
+                      <td data-label="ประเภทวัน" class="text-center">
+                        <span class="ot-day-type" [class.holiday]="d.day_type === 'H'">
+                          {{ d.day_type === 'H' ? 'วันหยุด' : 'วันทำงาน' }}
+                        </span>
+                      </td>
+                      <td data-label="เวลาเข้า - ออก">
+                        {{ d.actual_checkin }} – {{ d.actual_checkout }}
+                      </td>
+                      <td data-label="ชั่วโมง OT" class="text-center">{{ d.extra_hours }} ชม.</td>
+                      <td data-label="ยอดเงิน" class="text-right">
+                        ฿{{ d.rate_amount | number: '1.2-2' }}
+                      </td>
+                      <td data-label="หมายเหตุ">{{ d.description || '-' }}</td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
             </div>
           }
         }

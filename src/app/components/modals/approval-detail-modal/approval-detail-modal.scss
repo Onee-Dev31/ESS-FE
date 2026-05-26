@@ -853,17 +853,23 @@
 
   .btn-action-green {
     background: var(--green);
-    &:hover { background: color-mix(in srgb, var(--green) 100%, var(--text-reverse) 20%); }
+    &:hover {
+      background: color-mix(in srgb, var(--green) 100%, var(--text-reverse) 20%);
+    }
   }
 
   .btn-action-orange {
     background: var(--orange);
-    &:hover { background: color-mix(in srgb, var(--orange) 100%, var(--text-reverse) 20%); }
+    &:hover {
+      background: color-mix(in srgb, var(--orange) 100%, var(--text-reverse) 20%);
+    }
   }
 
   .btn-action-red {
     background: var(--red);
-    &:hover { background: color-mix(in srgb, var(--red) 100%, var(--text-reverse) 20%); }
+    &:hover {
+      background: color-mix(in srgb, var(--red) 100%, var(--text-reverse) 20%);
+    }
   }
 }
 
@@ -976,7 +982,7 @@
         border-right: none;
       }
 
-      &:nth-last-child(-n+2) {
+      &:nth-last-child(-n + 2) {
         border-bottom: none;
       }
 
