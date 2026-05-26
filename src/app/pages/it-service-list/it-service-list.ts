@@ -1,3 +1,4 @@
+import 'emoji-picker-element';
 import {
   Component,
   signal,
@@ -9,6 +10,7 @@ import {
   DestroyRef,
   ElementRef,
   ViewChild,
+  CUSTOM_ELEMENTS_SCHEMA,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -87,6 +89,7 @@ interface ReplyReader {
     AvatarPreviewModal,
     NzDatePickerModule,
   ],
+  schemas: [CUSTOM_ELEMENTS_SCHEMA],
   templateUrl: './it-service-list.html',
   styleUrl: './it-service-list.scss',
 })
@@ -121,6 +124,7 @@ export class ItService implements OnInit {
 
   replyReaders = signal<ReplyReader[]>([]);
   replyingTo = signal<any>(null);
+  emojiPickerVisible = signal(false);
 
   unreadChatCount = computed(() => {
     const ticket = this.selectedTicket();
@@ -610,6 +614,24 @@ export class ItService implements OnInit {
 
   cancelReply() {
     this.replyingTo.set(null);
+  }
+
+  toggleEmojiPicker() {
+    this.emojiPickerVisible.update((v) => !v);
+  }
+
+  onEmojiSelect(event: any) {
+    const emoji = event.detail?.unicode ?? '';
+    const textarea = this.chatTextareaRef?.nativeElement;
+    if (!textarea) return;
+    const start = textarea.selectionStart ?? this._chatMessage.length;
+    const end = textarea.selectionEnd ?? start;
+    this._chatMessage = this._chatMessage.slice(0, start) + emoji + this._chatMessage.slice(end);
+    this.emojiPickerVisible.set(false);
+    setTimeout(() => {
+      textarea.focus();
+      textarea.setSelectionRange(start + emoji.length, start + emoji.length);
+    }, 0);
   }
 
   handleChatKeydown(event: KeyboardEvent, ticket: any) {

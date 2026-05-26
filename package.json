@@ -57,6 +57,7 @@
     "date-holidays": "^3.26.7",
     "dayjs": "^1.11.19",
     "echarts": "^6.0.0",
+    "emoji-picker-element": "^1.29.1",
     "exceljs": "^4.4.0",
     "file-saver": "^2.0.5",
     "html2canvas": "^1.4.1",
