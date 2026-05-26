@@ -135,6 +135,15 @@ export const routes: Routes = [
         data: { animation: 'ITRequest' },
       },
       {
+        path: 'it-service-request-specific',
+        loadComponent: () =>
+          import('./pages/it-service-request-specific/it-service-request-specific').then(
+            (m) => m.ITServiceRequestSpecificComponent,
+          ),
+        canActivate: [menuGuard],
+        data: { animation: 'ITRequest' },
+      },
+      {
         path: 'freelance-management',
         loadComponent: () =>
           import('./pages/freelance-management/freelance-management').then(

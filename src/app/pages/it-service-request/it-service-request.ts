@@ -24,6 +24,11 @@ import { NzSelectModule } from 'ng-zorro-antd/select';
 import { decryptValue } from '../../utils/crypto.js ';
 import { ExampleServiceRequestModal } from '../../components/modals/example-service-request-modal/example-service-request-modal';
 import { SignalrService } from '../../services/signalr.service';
+import {
+  FilePreviewItem,
+  FilePreviewModalComponent,
+} from '../../components/modals/file-preview-modal/file-preview-modal';
+import dayjs from 'dayjs';
 
 @Component({
   selector: 'app-it-service-request',
@@ -34,6 +39,7 @@ import { SignalrService } from '../../services/signalr.service';
     PageHeaderComponent,
     NzSelectModule,
     ExampleServiceRequestModal,
+    FilePreviewModalComponent,
   ],
   templateUrl: './it-service-request.html',
   styleUrl: './it-service-request.scss',
@@ -58,6 +64,24 @@ export class ITServiceRequestComponent implements OnInit {
   phoneError = '';
   phoneNumber = signal('');
   requestDetails = signal('');
+  attachments = signal<{ name: string; size: number; file: File }[]>([]);
+  isPreviewModalOpen = signal<boolean>(false);
+  previewFiles = signal<FilePreviewItem[]>([]);
+
+  readonly FILE_CONFIG = {
+    maxFiles: 5,
+    maxSizeMB: 5,
+    allowedTypes: [
+      'image/jpeg',
+      'image/png',
+      'image/gif',
+      'application/pdf',
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      'application/vnd.ms-excel',
+    ],
+    allowedExtensions: ['jpg', 'jpeg', 'png', 'gif', 'pdf', 'docx', 'xlsx', 'xls'],
+  };
 
   // CONDITION
   @Input() openBy!: string;
@@ -77,13 +101,21 @@ export class ITServiceRequestComponent implements OnInit {
   IS_EXAMPLE = signal<boolean>(false);
 
   isSystemCategorySelected = signal(false);
+  private readonly BASIC_SYSTEM_SERVICE_ID = 22;
+  isBasicSystemServiceSelected = computed(() =>
+    this.serviceOptions().some(
+      (service) => service.id === this.BASIC_SYSTEM_SERVICE_ID && service.checked,
+    ),
+  );
   IsOneeJob: boolean = false;
   applicantId: string = '';
   detailJobs: any = null;
   isFormValid = computed(() => {
     const services = this.serviceOptions();
     const hasService = services.some((s) => s.checked);
-    const isRequestSystemChecked = services.find((s) => s.value === 'request_system')?.checked;
+    const isRequestSystemChecked = services.some(
+      (s) => s.checked && (s.id === this.BASIC_SYSTEM_SERVICE_ID || s.value === 'requser'),
+    );
     let subValidationPassed = true;
 
     if (isRequestSystemChecked) {
@@ -191,6 +223,133 @@ export class ITServiceRequestComponent implements OnInit {
     this.phoneNumber.set(formatted);
   }
 
+  onDragOver(event: DragEvent) {
+    event.preventDefault();
+  }
+
+  onDrop(event: DragEvent) {
+    event.preventDefault();
+
+    if (event.dataTransfer?.files) {
+      this.addFiles(event.dataTransfer.files);
+    }
+  }
+
+  onFileSelected(event: Event) {
+    const input = event.target as HTMLInputElement;
+    if (input.files) {
+      this.addFiles(input.files);
+    }
+    input.value = '';
+  }
+
+  private addFiles(files: FileList) {
+    if (!files || files.length === 0) return;
+
+    const current = this.attachments();
+    const errorMap = new Map<string, string[]>();
+    const validFiles: { name: string; size: number; file: File }[] = [];
+
+    for (const file of Array.from(files)) {
+      const reasons: string[] = [];
+
+      // max files
+      if (current.length + validFiles.length >= this.FILE_CONFIG.maxFiles) {
+        reasons.push(`อัปโหลดได้สูงสุด ${this.FILE_CONFIG.maxFiles} ไฟล์`);
+      }
+
+      const sizeMB = file.size / (1024 * 1024);
+
+      if (sizeMB > this.FILE_CONFIG.maxSizeMB) {
+        reasons.push(`ขนาดเกิน ${this.FILE_CONFIG.maxSizeMB} MB`);
+      }
+
+      const ext = file.name.split('.').pop()?.toLowerCase() ?? '';
+
+      if (
+        !this.FILE_CONFIG.allowedTypes.includes(file.type) &&
+        !this.FILE_CONFIG.allowedExtensions.includes(ext)
+      ) {
+        reasons.push('ประเภทไฟล์ไม่รองรับ');
+      }
+
+      if (reasons.length > 0) {
+        reasons.forEach((reason) => {
+          // max files ไม่ต้องแสดงชื่อไฟล์
+          if (reason.includes('อัปโหลดได้สูงสุด')) {
+            if (!errorMap.has(reason)) {
+              errorMap.set(reason, []);
+            }
+            return;
+          }
+
+          const fileNames = errorMap.get(reason) ?? [];
+          fileNames.push(file.name);
+          errorMap.set(reason, fileNames);
+        });
+      } else {
+        validFiles.push({
+          name: file.name,
+          size: file.size,
+          file,
+        });
+      }
+    }
+    if (errorMap.size > 0) {
+      const html = Array.from(errorMap.entries())
+        .map(([reason, fileNames]) => {
+          // ไม่มีชื่อไฟล์
+          if (fileNames.length === 0) {
+            return `
+                  <div style="margin-bottom:12px; text-align:center;">
+                    <div style="font-weight:700;">${reason}</div>
+                  </div>
+                `;
+          }
+
+          return `
+              <div style="margin-bottom:12px; text-align:center;">
+                <div style="font-weight:700;">${reason}</div>
+
+                <div style="margin-top:4px; color:#64748b;">
+                  ${fileNames.map((name) => `• ${name}`).join('<br>')}
+                </div>
+              </div>
+            `;
+        })
+        .join('');
+
+      this.swalService.warning('', undefined, html);
+    }
+
+    if (validFiles.length > 0) {
+      this.attachments.set([...current, ...validFiles]);
+    }
+  }
+
+  viewFile(fileObj: { name: string; file: File }) {
+    const url = URL.createObjectURL(fileObj.file);
+    this.previewFiles.set([
+      {
+        fileName: fileObj.name,
+        date: dayjs().format('DD/MM/YYYY HH:mm'),
+        url,
+        type: fileObj.file.type,
+      },
+    ]);
+    this.isPreviewModalOpen.set(true);
+  }
+
+  closePreview() {
+    this.isPreviewModalOpen.set(false);
+  }
+
+  removeAttachment(index: number) {
+    const next = [...this.attachments()];
+    next.splice(index, 1);
+    this.attachments.set(next);
+  }
+
   showRepairModal = signal(false);
 
   repairFormData = signal({
@@ -255,13 +414,29 @@ export class ITServiceRequestComponent implements OnInit {
     const selectedValues = this.serviceOptions()
       .filter((s) => s.checked)
       .map((s) => s.value);
-    this.isSystemCategorySelected.set(selectedValues.includes('request_system'));
+    this.syncBasicSystemSelection();
+    this.isSystemCategorySelected.set(
+      selectedValues.includes('requser') || this.isBasicSystemServiceSelected(),
+    );
 
-    if (!selectedValues.includes('request_system')) {
+    if (!selectedValues.includes('requser') && !this.isBasicSystemServiceSelected()) {
       this.selectedSystemTypes.set([]);
       this.userSubOptions.update((items) => items.map((i) => ({ ...i, checked: false })));
       this.systemSubOptions.update((items) => items.map((i) => ({ ...i, checked: false })));
     }
+  }
+
+  private syncBasicSystemSelection() {
+    const shouldSelectBasic = this.isBasicSystemServiceSelected();
+
+    if (!shouldSelectBasic) {
+      return;
+    }
+
+    this.selectedSystemTypes.update((types) =>
+      types.includes('user') ? types : [...types, 'user'],
+    );
+    this.userSubOptions.update((items) => items.map((item) => ({ ...item, checked: true })));
   }
 
   toggleUserSubOption(index: number) {
@@ -295,7 +470,9 @@ export class ITServiceRequestComponent implements OnInit {
       return;
     }
 
-    const isRequestSystem = selectedServices.some((s) => s.value === 'request_system');
+    const isRequestSystem = selectedServices.some(
+      (s) => s.id === this.BASIC_SYSTEM_SERVICE_ID || s.value === 'requser',
+    );
     if (isRequestSystem) {
       if (this.selectedSystemTypes().length === 0) {
         this.swalService.warning('แจ้งเตือน', 'กรุณาเลือกประเภทระบบ (Basic หรือ Specific)');
@@ -339,6 +516,7 @@ export class ITServiceRequestComponent implements OnInit {
     // this.selectedOpenFor.set('self');
     // this.otherOpenForName.set('');
     this.requestDetails.set('');
+    this.attachments.set([]);
     this.selectedSystemTypes.set([]);
 
     this.phoneNumber.set('');
@@ -393,6 +571,12 @@ export class ITServiceRequestComponent implements OnInit {
 
     systemOptions.forEach((service) => {
       formData.append('serviceTypeIds', service.id.toString());
+    });
+
+    this.attachments().forEach((item) => {
+      if (item?.file instanceof File) {
+        formData.append('files', item.file);
+      }
     });
 
     // console.log('formData', [...formData.entries()]);
@@ -511,12 +695,14 @@ export class ITServiceRequestComponent implements OnInit {
   getServiceType() {
     this.itServiceService.getServiceType().subscribe({
       next: (res) => {
-        // console.log(res.data);
-        const mappedServices_main = res.data.mainServices.map((item: any) => ({
-          ...item,
-          checked: false,
-          disabled: false,
-        }));
+        console.log(res.data);
+        const mappedServices_main = res.data.mainServices
+          .filter((item: any) => item.id !== 6)
+          .map((item: any) => ({
+            ...item,
+            checked: false,
+            disabled: false,
+          }));
 
         this.serviceOptions.set(mappedServices_main);
 

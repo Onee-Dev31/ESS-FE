@@ -246,7 +246,18 @@
 
           <tbody>
             <tr *ngFor="let data of filteredTicketLogs">
-              <td>{{ data.ticket_number }}</td>
+              <td>
+                <div>{{ data.ticket_number }}</div>
+                <div class="assignee-avatar-list" *ngIf="data.assignees_mock?.length">
+                  <img
+                    *ngFor="let emp of data.assignees_json"
+                    class="assignee-avatar"
+                    [src]="getEmployeeImage(emp.codeempid)"
+                    [alt]="emp.codeempid"
+                    [title]="emp.codeempid"
+                  />
+                </div>
+              </td>
               <td>{{ data.subject }}</td>
               <td>{{ data.requester_name || '-' }}</td>
               <td>

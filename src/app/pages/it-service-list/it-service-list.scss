@@ -1817,7 +1817,7 @@ textarea.form-input {
 }
 
 .floating-chat__panel {
-  width: min(420px, calc(100vw - 32px));
+  width: min(440px, calc(100vw - 32px));
   height: min(620px, calc(100vh - 124px));
   background: var(--bg-card);
   border: 1px solid var(--border-color);
@@ -2010,10 +2010,18 @@ textarea.form-input {
 }
 
 .floating-chat__service-hours {
-  margin-top: 6px;
-  margin-bottom: 12px;
-  padding: 9px 12px;
-  border: 1px solid var(--border-color);
+  // margin-top: 6px;
+  // margin-bottom: 12px;
+  // padding: 9px 12px;
+  // border: 1px solid var(--border-color);
+  // border-radius: 12px;
+  // background: var(--bg-card);
+  // color: var(--text-muted);
+  // font-size: $font-size-hint;
+  // line-height: 1.45;
+  // text-align: center;
+  padding: 6px 2px;
+  margin: 2px;
   border-radius: 12px;
   background: var(--bg-card);
   color: var(--text-muted);
@@ -2413,15 +2421,18 @@ textarea.form-input {
 .floating-chat__files {
   padding: 10px;
   background: var(--bg-card);
-  display: flex;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  justify-items: stretch;
   gap: 8px;
-  flex-wrap: wrap;
   border-top: 1px solid var(--border-color);
 }
 
 .floating-chat__file {
-  max-width: 100%;
+  width: 100%;
   min-width: 0;
+  max-width: none;
+  box-sizing: border-box;
   border: 1px solid var(--border-color);
   border-radius: 999px;
   background: var(--bg-page);
@@ -2438,7 +2449,7 @@ textarea.form-input {
 
   span {
     min-width: 0;
-    max-width: 190px;
+    flex: 1;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;

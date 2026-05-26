@@ -1,0 +1,615 @@
+<div
+  class="it-request-page"
+  [style]="
+    openBy === 'IT'
+      ? 'padding: 0; height: fit-content; background-color: transparent;'
+      : 'padding: 40px; min-height: 100vh;'
+  "
+>
+  <app-page-header
+    *ngIf="openBy !== 'IT'"
+    title="IT Service Request (ขอรับบริการ IT)"
+  ></app-page-header>
+
+  <div class="service-form-card">
+    <div class="specific-card-header">
+      <div>
+        <h4 class="header-title">ขอใช้ระบบเฉพาะ</h4>
+        <p class="header-subtitle">
+          กรอกข้อมูลแยกตามคน เลือกระบบที่ต้องการ แล้วระบุสิทธิ์ของแต่ละระบบ
+        </p>
+      </div>
+      <span class="default-service-pill">
+        <i class="fas fa-server"></i>
+        ขอใช้ระบบ
+      </span>
+    </div>
+
+    <div class="form-section requester-strip">
+      <div class="form-group">
+        <label class="form-label">
+          <i class="fa-solid fa-circle-info"></i>
+          ข้อมูลผู้ขอสิทธิ์
+          <span class="info">
+            <span class="user-name-inline">
+              {{ authData.employee.NAMFIRSTT }} {{ authData.employee.NAMLASTT }} ({{
+                authData.employee.CODEMPID
+              }})
+            </span>
+            <span class="user-divider"> • </span>
+            <span class="user-email-inline">aduser : {{ authData.employee.AD_USER }}</span>
+            <span class="user-divider"> • </span>
+            <span class="user-email-inline">{{ authData.employee.EMAIL }}</span>
+          </span>
+        </label>
+      </div>
+    </div>
+
+    <div class="specific-people">
+      @for (person of specificPeople(); track person.id; let index = $index) {
+        <section class="person-card" [class.primary-person]="index === 0">
+          <div class="person-card-header">
+            <div>
+              <span class="person-index">คนที่ {{ index + 1 }}</span>
+              <h5 class="person-text">ข้อมูลผู้ขอใช้ระบบ</h5>
+            </div>
+            @if (specificPeople().length > 1) {
+              <button
+                class="btn-remove-person"
+                type="button"
+                title="ลบคนนี้"
+                (click)="removeSpecificPerson(person.id)"
+              >
+                <i class="fas fa-trash"></i>
+              </button>
+            }
+          </div>
+
+          <div class="form-section two-col highlight-blue" style="padding-bottom: 24px">
+            <div class="form-field" style="gap: 0.75rem">
+              <label class="form-label"
+                >ชื่อ / รหัสพนักงาน <span class="required-badge">*</span></label
+              >
+
+              <nz-select
+                nzShowSearch
+                nzAllowClear
+                nzPlaceHolder="เลือกพนักงาน"
+                class="form-input"
+                [ngModel]="person.openFor"
+                (ngModelChange)="onSpecificOpenForChange(person, $event)"
+                [name]="'openFor' + person.id"
+              >
+                @for (opt of openForOptions(); track opt.value) {
+                  <nz-option [nzLabel]="opt.label" [nzValue]="opt" />
+                }
+              </nz-select>
+            </div>
+
+            <div class="form-group" *ngIf="person.openFor?.value !== '__FREELANCE__'">
+              <label class="form-label">เบอร์ติดต่อ <span class="required-badge">*</span></label>
+              <input
+                class="form-control"
+                type="text"
+                placeholder="เบอร์ภายในหรือเบอร์มือถือ"
+                [(ngModel)]="person.phone"
+                (ngModelChange)="touchSpecificPeople()"
+                [name]="'phone' + person.id"
+              />
+            </div>
+          </div>
+          @if (person.openFor?.value === '__FREELANCE__') {
+            <div class="freelance-section">
+              <div class="form-section two-col">
+                <div class="form-field">
+                  <label>ชื่อ</label>
+
+                  <input
+                    nz-input
+                    class="form-input"
+                    [(ngModel)]="person.freelance.firstNameTh"
+                    [name]="'firstNameTh' + person.id"
+                  />
+                </div>
+
+                <div class="form-field">
+                  <label>นามสกุล</label>
+
+                  <input
+                    nz-input
+                    class="form-input"
+                    [(ngModel)]="person.freelance.lastNameTh"
+                    [name]="'lastNameTh' + person.id"
+                  />
+                </div>
+
+                <div class="form-field">
+                  <label>Name</label>
+
+                  <input
+                    nz-input
+                    class="form-input"
+                    [(ngModel)]="person.freelance.firstNameEn"
+                    [name]="'firstNameEn' + person.id"
+                  />
+                </div>
+
+                <div class="form-field">
+                  <label>SurName</label>
+
+                  <input
+                    nz-input
+                    class="form-input"
+                    [(ngModel)]="person.freelance.lastNameEn"
+                    [name]="'lastNameEn' + person.id"
+                  />
+                </div>
+
+                <!-- <div class="form-field">
+                  <label>รหัสพนักงาน</label>
+
+                  <input
+                    nz-input
+                    class="form-input"
+                    [(ngModel)]="person.freelance.employeeCode"
+                    [name]="'employeeCode' + person.id"
+                  />
+                </div> -->
+
+                <div class="form-field">
+                  <label>สังกัดบริษัท</label>
+                  <nz-select
+                    nzShowSearch
+                    nzAllowClear
+                    nzPlaceHolder="เลือกบริษัท"
+                    [(ngModel)]="person.freelance.company"
+                    [name]="'company' + person.id"
+                    class="form-input"
+                    (ngModelChange)="onCompanyChange(person, $event)"
+                  >
+                    <nz-option
+                      *ngFor="let company of companyList"
+                      [nzLabel]="company.COMPANY_NAME + ' (' + company.COMPANY_CODE + ')'"
+                      [nzValue]="company"
+                    />
+                  </nz-select>
+                </div>
+
+                <div class="form-field">
+                  <label>แผนก / ฝ่าย</label>
+
+                  <nz-select
+                    nzShowSearch
+                    nzAllowClear
+                    nzPlaceHolder="เลือกแผนก"
+                    [(ngModel)]="person.freelance.department"
+                    [name]="'department' + person.id"
+                    class="form-input"
+                  >
+                    <nz-option
+                      *ngFor="let department of person.freelance.filteredDepartments"
+                      [nzLabel]="department.COSTCENT + ' ' + department.NAMECOSTCENT"
+                      [nzValue]="department"
+                    />
+                  </nz-select>
+                </div>
+
+                <div class="form-field">
+                  <label>ตำแหน่ง</label>
+
+                  <input
+                    nz-input
+                    class="form-input"
+                    [(ngModel)]="person.freelance.position"
+                    [name]="'position' + person.id"
+                  />
+                </div>
+
+                <div class="form-field">
+                  <label>Email</label>
+
+                  <input
+                    nz-input
+                    class="form-input"
+                    [(ngModel)]="person.freelance.email"
+                    [name]="'email' + person.id"
+                  />
+                </div>
+
+                <div class="form-field">
+                  <label>เบอร์</label>
+
+                  <input
+                    nz-input
+                    class="form-input"
+                    [(ngModel)]="person.freelance.phone"
+                    [name]="'freelancePhone' + person.id"
+                  />
+                </div>
+              </div>
+            </div>
+          }
+
+          <div class="form-section" style="padding-bottom: 24px">
+            <div class="form-group">
+              <label class="form-label">เลือกระบบเฉพาะ <span class="required-badge">*</span></label>
+              <div class="specific-system-buttons">
+                @for (system of specificSystemChoices; track system.key) {
+                  <button
+                    type="button"
+                    class="system-choice"
+                    [class.active]="person.systems.includes(system.key)"
+                    (click)="togglePersonSystem(person, system.key)"
+                  >
+                    <i class="fas" [class]="system.icon"></i>
+                    {{ system.label }}
+                  </button>
+                }
+              </div>
+            </div>
+
+            @if (person.systems.length) {
+              <div class="system-detail-grid">
+                @if (person.systems.includes('oracle')) {
+                  <div
+                    class="system-detail-card"
+                    [class.oracle-full-width]="person.oracle.companies.length > 1"
+                  >
+                    <div class="oracle-top-bar">
+                      <h6 class="form-label">Oracle</h6>
+
+                      <button class="btn-add" type="button" (click)="addOracleCompany(person)">
+                        + เพิ่มบริษัท
+                      </button>
+                    </div>
+                    <div [class.oracle-company-grid]="person.oracle.companies.length > 1">
+                      @for (companyItem of person.oracle.companies; track $index) {
+                        <div class="oracle-company-box">
+                          <div class="oracle-company-header">
+                            <div class="form-field oracle-company-select">
+                              <label>บริษัท</label>
+
+                              <nz-select
+                                nzShowSearch
+                                nzAllowClear
+                                nzPlaceHolder="เลือกบริษัท"
+                                [(ngModel)]="companyItem.company"
+                                [name]="'company-' + $index"
+                                class="form-input"
+                                (ngModelChange)="touchSpecificPeople()"
+                              >
+                                <nz-option
+                                  *ngFor="let company of companyList"
+                                  [nzLabel]="
+                                    company.COMPANY_NAME + ' (' + company.COMPANY_CODE + ')'
+                                  "
+                                  [nzValue]="company"
+                                />
+                              </nz-select>
+                            </div>
+
+                            @if (person.oracle.companies.length > 1) {
+                              <button
+                                class="btn-delete"
+                                type="button"
+                                (click)="removeOracleCompany(person, $index)"
+                              >
+                                ลบ
+                              </button>
+                            }
+                          </div>
+
+                          <div class="module-permission-list">
+                            <div class="module-permission-row">
+                              <div class="form-field module-field">
+                                <label>module</label>
+                              </div>
+
+                              <div class="form-field permission-field">
+                                <label>สิทธิ์</label>
+                              </div>
+                            </div>
+
+                            @for (item of companyItem.modules; track item.module) {
+                              <div class="module-permission-row">
+                                <div class="form-field module-field">
+                                  <input
+                                    nz-input
+                                    class="form-input readonly"
+                                    [value]="item.module"
+                                    readonly
+                                  />
+                                </div>
+
+                                <div class="form-field permission-field">
+                                  <nz-select
+                                    nzPlaceHolder="เลือกสิทธิ์"
+                                    [(ngModel)]="item.permission"
+                                    [name]="'permission-' + item.module + '-' + $index"
+                                    class="form-input"
+                                    (ngModelChange)="touchSpecificPeople()"
+                                  >
+                                    @for (
+                                      permission of oraclePermissions;
+                                      track permission.RoleName
+                                    ) {
+                                      <nz-option
+                                        [nzValue]="permission.RoleName"
+                                        [nzLabel]="permission.RoleName"
+                                      />
+                                    }
+                                  </nz-select>
+                                </div>
+                              </div>
+                            }
+                          </div>
+                        </div>
+                      }
+                    </div>
+                  </div>
+                }
+
+                @if (person.systems.includes('bms')) {
+                  <div class="system-detail-card">
+                    <h6 class="form-label">BMS</h6>
+                    <div class="form-field">
+                      <nz-select
+                        nzShowSearch
+                        nzAllowClear
+                        nzMode="multiple"
+                        nzPlaceHolder="เลือกบริษัท"
+                        [(ngModel)]="person.bms.companies"
+                        name="company"
+                        class="form-input multiple"
+                        required
+                        #company="ngModel"
+                        [class.input-error]="company.invalid && company.touched"
+                        (ngModelChange)="touchSpecificPeople()"
+                      >
+                        <!-- <nz-option nzLabel="เลือกบริษัท" nzValue="" nzDisabled /> -->
+                        <nz-option
+                          *ngFor="let company of companyList"
+                          [nzLabel]="company.COMPANY_NAME + ' (' + company.COMPANY_CODE + ')'"
+                          [nzValue]="company"
+                        />
+                      </nz-select>
+                    </div>
+
+                    <div class="form-field">
+                      <input
+                        class="form-input"
+                        placeholder="สิทธิ์เหมือนใคร"
+                        [(ngModel)]="person.bms.detail"
+                        (ngModelChange)="touchSpecificPeople()"
+                        [name]="'bmsCompany' + person.id"
+                      />
+                    </div>
+                  </div>
+                }
+
+                @if (person.systems.includes('onee')) {
+                  <div class="system-detail-card">
+                    <h6 class="form-label">OneE</h6>
+                    <div class="form-field">
+                      <nz-select
+                        nzShowSearch
+                        nzAllowClear
+                        nzMode="multiple"
+                        nzPlaceHolder="เลือกบริษัท"
+                        [(ngModel)]="person.onee.companies"
+                        name="company"
+                        class="form-input multiple"
+                        required
+                        #company="ngModel"
+                        [class.input-error]="company.invalid && company.touched"
+                        (ngModelChange)="touchSpecificPeople()"
+                      >
+                        <nz-option
+                          *ngFor="let company of companyList"
+                          [nzLabel]="company.COMPANY_NAME + ' (' + company.COMPANY_CODE + ')'"
+                          [nzValue]="company"
+                        />
+                      </nz-select>
+                    </div>
+                    <div class="form-field">
+                      <label>สิทธิ์</label>
+
+                      <nz-select
+                        nzPlaceHolder="เลือกสิทธิ์"
+                        [(ngModel)]="person.onee.permission"
+                        name="onee_permission"
+                        class="form-input"
+                        (ngModelChange)="touchSpecificPeople()"
+                      >
+                        @for (item of oneePermissions; track item) {
+                          <nz-option
+                            [nzValue]="item.PermissionName"
+                            [nzLabel]="item.PermissionName"
+                          ></nz-option>
+                        }
+                      </nz-select>
+                    </div>
+
+                    <div class="form-field">
+                      <label>หัวหน้างาน</label>
+
+                      <input
+                        nz-input
+                        type="text"
+                        class="form-input"
+                        placeholder="กรอกชื่อหัวหน้างาน"
+                        [(ngModel)]="person.onee.supervisor"
+                        name="onee_supervisor"
+                        (ngModelChange)="touchSpecificPeople()"
+                      />
+                    </div>
+                  </div>
+                }
+
+                @if (person.systems.includes('onePortal')) {
+                  <div class="system-detail-card">
+                    <h6 class="form-label">One Portal</h6>
+                    <div class="form-field">
+                      <nz-select
+                        nzShowSearch
+                        nzAllowClear
+                        nzMode="multiple"
+                        nzPlaceHolder="เลือกบริษัท"
+                        [(ngModel)]="person.onePortal.companies"
+                        name="company"
+                        class="form-input multiple"
+                        required
+                        #company="ngModel"
+                        [class.input-error]="company.invalid && company.touched"
+                        (ngModelChange)="touchSpecificPeople()"
+                      >
+                        <nz-option
+                          *ngFor="let company of companyList"
+                          [nzLabel]="company.COMPANY_NAME + ' (' + company.COMPANY_CODE + ')'"
+                          [nzValue]="company"
+                        />
+                      </nz-select>
+                    </div>
+                    <div class="form-field">
+                      <label>ประเภทสิทธิ์</label>
+
+                      <nz-select
+                        nzPlaceHolder="เลือกประเภท"
+                        [(ngModel)]="person.onePortal.responseType"
+                        name="portal_response_type"
+                        class="form-input"
+                        (ngModelChange)="touchSpecificPeople()"
+                      >
+                        @for (item of onePortalResponseTypes; track item) {
+                          <nz-option
+                            [nzValue]="item.TypeName"
+                            [nzLabel]="item.TypeName"
+                          ></nz-option>
+                        }
+                      </nz-select>
+                    </div>
+                  </div>
+                }
+              </div>
+            }
+
+            <div class="form-group" style="margin-top: 14px">
+              <label class="form-label">หมายเหตุเพิ่มเติม</label>
+              <textarea
+                class="form-control note-control"
+                rows="3"
+                placeholder="รายละเอียดเพิ่มเติมของคนนี้..."
+                [(ngModel)]="person.note"
+                (ngModelChange)="touchSpecificPeople()"
+                [name]="'note' + person.id"
+              ></textarea>
+            </div>
+          </div>
+        </section>
+      }
+    </div>
+
+    <button class="btn-add-person" type="button" (click)="addSpecificPerson()">
+      <i class="fas fa-plus"></i>
+      เพิ่มคน
+    </button>
+
+    <div class="form-actions-row">
+      <span class="actions-hint">
+        <i class="fas fa-info-circle"></i> ตรวจสอบข้อมูลรายคนให้ครบก่อนส่ง
+      </span>
+      <button class="btn-secondary-action" type="button" (click)="clearForm()">
+        <i class="fas fa-eraser mr-2"></i> ล้างข้อมูล
+      </button>
+      <button
+        class="btn-primary-action"
+        type="button"
+        (click)="submit()"
+        [disabled]="!isFormValid()"
+        [class.disabled-btn]="!isFormValid()"
+      >
+        <i class="fas fa-paper-plane mr-2"></i> ส่งคำขอ
+      </button>
+    </div>
+  </div>
+
+  @if (showSummaryModal()) {
+    <div class="modal-overlay">
+      <div class="modal-container">
+        <div class="modal-header">
+          <h2>สรุปรายละเอียดคำขอ</h2>
+
+          <button class="btn-close-modal" type="button" (click)="closeSummaryModal()">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+
+        <div class="modal-body">
+          <div
+            class="summary-preview"
+            [innerHTML]="formatText.getFormatTextHTML(summaryText())"
+          ></div>
+        </div>
+
+        <div class="modal-footer">
+          <button class="btn-cancel" type="button" (click)="closeSummaryModal()">แก้ไข</button>
+
+          <button class="btn-confirm" type="button" (click)="confirmSubmission()">
+            ยืนยันการส่ง
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- @if (showSummaryModal()) {
+    <div class="modal-overlay">
+      <div class="modal-container">
+        <div class="modal-header">
+          <h2>สรุปรายละเอียดคำขอ</h2>
+          <button
+            class="btn-close-modal"
+            type="button"
+            (click)="closeSummaryModal()"
+            title="ปิด"
+            aria-label="Close summary modal"
+          >
+            <i class="fas fa-times" aria-hidden="true"></i>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="summary-section">
+            <h3><i class="fas fa-users mr-2 text-primary"></i> รายการผู้ขอใช้ระบบ</h3>
+            <div class="specific-summary-list">
+              @for (person of specificPeople(); track person.id; let index = $index) {
+                <div class="specific-summary-item">
+                  <strong>คนที่ {{ index + 1 }}: {{ getOpenForLabel(person.openFor) }}</strong>
+                  <span>เบอร์ติดต่อ: {{ person.phone }}</span>
+                  <span>ระบบ: {{ getPersonSystemLabels(person) }}</span>
+                </div>
+              }
+            </div>
+          </div>
+
+          @if (requestDetails()) {
+            <div class="summary-section">
+              <h3>รายละเอียดที่จะบันทึก</h3>
+              <div
+                class="detail-text p-3 bg-light rounded text-muted"
+                style="white-space: pre-wrap"
+              >
+                {{ requestDetails() }}
+              </div>
+            </div>
+          }
+        </div>
+        <div class="modal-footer">
+          <button class="btn-cancel" type="button" (click)="closeSummaryModal()">แก้ไข</button>
+          <button class="btn-confirm" type="button" (click)="confirmSubmission()">
+            ยืนยันการส่ง
+          </button>
+        </div>
+      </div>
+    </div>
+  } -->
+</div>
