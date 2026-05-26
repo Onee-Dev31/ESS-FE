@@ -706,10 +706,7 @@
 }
 
 .form-actions-footer {
-  display: flex;
-  justify-content: flex-end;
-  align-items: center;
-  gap: 12px;
+  display: block;
   padding: 16px 24px;
   background: var(--bg-table-head);
   border-top: 1px solid var(--border-table-head);
@@ -729,14 +726,22 @@
   }
 
   &.referred-back {
-    border-left: 4px solid var(--orange);
+    border-top: 4px solid var(--orange);
+  }
+
+  .confirm-inner {
+    display: block;
+    width: 100%;
+
+    > * + * {
+      margin-top: 0.75rem;
+    }
   }
 
   .action-title {
     font-size: 1rem;
     font-weight: 700;
     color: $text;
-    margin-bottom: 0.8rem;
     display: flex;
     align-items: center;
     gap: 8px;
@@ -754,8 +759,6 @@
   }
 
   .reason-section {
-    margin-bottom: 1rem;
-
     label {
       display: block;
       font-weight: 600;
@@ -785,10 +788,18 @@
   }
 
   .action-footer {
-    margin-top: 1rem;
     display: flex;
     gap: 8px;
     justify-content: flex-end;
+
+    @include mobile {
+      flex-direction: row;
+      width: 100%;
+
+      button {
+        flex: 1;
+      }
+    }
 
     button {
       padding: 0.5rem 1.2rem;
@@ -830,6 +841,7 @@
 
     @include mobile {
       display: flex;
+      flex-direction: row;
       width: 100%;
       gap: 8px;
     }

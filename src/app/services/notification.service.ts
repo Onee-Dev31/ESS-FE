@@ -537,7 +537,6 @@ export class NotificationService {
       typeStr2.includes('chat') ||
       titleStr2.includes('ข้อความ') ||
       titleStr2.includes('แชท');
-
     return {
       route: '/it-service-list',
       queryParams: {

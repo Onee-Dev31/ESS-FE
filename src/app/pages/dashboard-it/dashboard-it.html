@@ -88,7 +88,9 @@
         <div class="ticket-item-2">
           <div class="avatar">
             <img
-              [src]="getEmployeeImage(ticket.requesterEmpId)"
+              [src]="
+                'https://empimg.oneeclick.co:8048/employeeimage/' + ticket.requesterEmpId + '.jpg'
+              "
               alt="รูปโปรไฟล์ของ {{ ticket.requesterName || ticket.ticketNumber }}"
               title="รูปโปรไฟล์ของ {{ ticket.requesterName || ticket.ticketNumber }}"
               (error)="onImgError($event)"
@@ -212,7 +214,7 @@
     <div class="tk-hero__left">
       <div class="avatar">
         <img
-          [src]="getEmployeeImage(t.requesterCode)"
+          [src]="'https://empimg.oneeclick.co:8048/employeeimage/' + t.requesterCode + '.jpg'"
           alt="รูปโปรไฟล์ของผู้แจ้ง {{ t.requesterName }}"
           title="รูปโปรไฟล์ของผู้แจ้ง {{ t.requesterName }}"
           (error)="onImgError($event)"
@@ -284,16 +286,7 @@
     <div class="tk-card__head">
       <div class="tk-card__title">
         <i class="fa-solid fa-note-sticky"></i>Note for IT
-        <button
-          class="category-edit-btn"
-          type="button"
-          title="Change category"
-          aria-label="Change category"
-          (click)="openCategoryModal()"
-        >
-          <span class="category">[{{ t.ticketCategory || '-' }}]</span>
-          <i class="fa-solid fa-gear"></i>
-        </button>
+        <span class="category">[{{ t.ticketCategory }}]</span>
       </div>
       <div class="btn-edit" (click)="openNoteForItModal()">
         <i class="fa-solid fa-pen-to-square"></i>
@@ -301,9 +294,6 @@
     </div>
     <div class="tk-card__body">
       <div class="tk-text" [innerHTML]="formatText.getFormatTextHTML(t.noteForIt)"></div>
-      <div class="btn-expand-detail" (click)="openDetail(t.noteForIt)">
-        <i class="fa-solid fa-expand"></i>ดูรายละเอียดเพิ่มเติม
-      </div>
     </div>
   </section>
 
@@ -422,9 +412,6 @@
           <div class="floating-chat__title">
             <i class="fa-solid fa-comments"></i>
             <span>Chat</span>
-            @if (t.ticketNumber) {
-              <span class="floating-chat__ticket-no">#{{ t.ticketNumber }}</span>
-            }
             @if (getChatAttachmentCount(t) > 0) {
               <button
                 class="floating-chat__summary"
@@ -475,7 +462,11 @@
                 <div class="note__who">
                   <div class="avatar">
                     <app-avatar-preview-modal
-                      [src]="getEmployeeImage(n.createBy.empCode)"
+                      [src]="
+                        'https://empimg.oneeclick.co:8048/employeeimage/' +
+                        n.createBy.empCode +
+                        '.jpg'
+                      "
                       [name]="n.createBy.nickName"
                     />
                   </div>
@@ -483,35 +474,14 @@
                     <b>{{ n.createBy.nickName }}</b>
                   </div>
                 </div>
-                <div class="note__top-right">
-                  <div class="muted">
-                    @if (isToday(n.createdDate)) {
-                      {{ n.createdDate | date: 'HH:mm' }}
-                    } @else {
-                      {{ n.createdDate | date: 'EEE dd, HH:mm' : '' : 'en' }}
-                    }
-                  </div>
-                  @if (t.status !== 'Closed' && isAssigned()) {
-                    <button
-                      class="note__reply-btn"
-                      type="button"
-                      title="Reply"
-                      (click)="startReply(n)"
-                    >
-                      <i class="fa-solid fa-reply"></i>
-                    </button>
+                <div class="muted">
+                  @if (isToday(n.createdDate)) {
+                    {{ n.createdDate | date: 'HH:mm' }}
+                  } @else {
+                    {{ n.createdDate | date: 'EEE dd, HH:mm' : '' : 'en' }}
                   }
                 </div>
               </div>
-              @if (n.replyTo) {
-                <div class="note__quote">
-                  <span class="note__quote-name">{{ n.replyTo.nickName }}</span>
-                  <span class="note__quote-msg"
-                    >{{ n.replyTo.message | slice: 0 : 100
-                    }}{{ n.replyTo.message.length > 100 ? '...' : '' }}</span
-                  >
-                </div>
-              }
               <div class="note__msg">{{ n.message }}</div>
               <ul class="attachment-list" *ngIf="n.attachments?.length > 0">
                 <li
@@ -590,23 +560,6 @@
           </div>
         }
 
-        @if (replyingTo() && t.status !== 'Closed' && isAssigned()) {
-          <div class="chat-reply-bar">
-            <div class="chat-reply-bar__content">
-              <i class="fa-solid fa-reply"></i>
-              <div class="chat-reply-bar__text">
-                <span class="chat-reply-bar__name">{{ replyingTo().createBy.nickName }}</span>
-                <span class="chat-reply-bar__msg"
-                  >{{ replyingTo().message | slice: 0 : 80
-                  }}{{ replyingTo().message.length > 80 ? '...' : '' }}</span
-                >
-              </div>
-            </div>
-            <button class="chat-reply-bar__cancel" type="button" (click)="cancelReply()">
-              <i class="fas fa-times"></i>
-            </button>
-          </div>
-        }
         <div class="floating-chat__composer" *ngIf="t.status !== 'Closed' && isAssigned()">
           <input type="file" multiple hidden #chatFileInput (change)="onChatFileSelected($event)" />
           <button
@@ -619,41 +572,6 @@
           >
             <i class="fa-solid fa-paperclip"></i>
           </button>
-          <div class="floating-chat__emoji-wrap">
-            <button
-              class="floating-chat__emoji-btn"
-              type="button"
-              title="อิโมจิ"
-              aria-label="อิโมจิ"
-              (click)="emojiPickerOpen = !emojiPickerOpen; $event.stopPropagation()"
-            >
-              😊
-            </button>
-            @if (emojiPickerOpen) {
-              <div class="emoji-backdrop" (click)="emojiPickerOpen = false"></div>
-              <div class="emoji-picker" (click)="$event.stopPropagation()">
-                <div class="emoji-picker__tabs">
-                  @for (tab of EMOJI_TABS; track $index) {
-                    <button
-                      type="button"
-                      class="emoji-picker__tab"
-                      [class.active]="emojiPickerTab === $index"
-                      (click)="emojiPickerTab = $index"
-                    >
-                      {{ tab.label }}
-                    </button>
-                  }
-                </div>
-                <div class="emoji-picker__grid">
-                  @for (e of EMOJI_TABS[emojiPickerTab].emojis; track e) {
-                    <button type="button" class="emoji-picker__item" (click)="insertEmoji(e)">
-                      {{ e }}
-                    </button>
-                  }
-                </div>
-              </div>
-            }
-          </div>
           <textarea
             #chatTextareaRef
             [(ngModel)]="chatMessage"
@@ -661,7 +579,6 @@
             placeholder="พิมพ์ข้อความ... (@ เพื่อ mention)"
             aria-label="พิมพ์ข้อความ"
             (keydown)="handleChatKeydown($event, t)"
-            (click)="emojiPickerOpen = false"
           ></textarea>
           <button
             class="floating-chat__send"
@@ -714,7 +631,7 @@
     <div class="side-profile">
       <div class="side-avatar">
         <app-avatar-preview-modal
-          [src]="getEmployeeImage(requester.emp_code)"
+          [src]="'https://empimg.oneeclick.co:8048/employeeimage/' + requester.emp_code + '.jpg'"
           [name]="
             requester.nickname
               ? requester.fullname + ' (' + requester.nickname + ')'
@@ -801,7 +718,7 @@
             <div class="assignee-item" *ngFor="let a of step.Assignee" (click)="selectAssignee(a)">
               <div class="avatar">
                 <img
-                  [src]="getEmployeeImage(a.empCode)"
+                  [src]="'https://empimg.oneeclick.co:8048/employeeimage/' + a.empCode + '.jpg'"
                   alt="รูปโปรไฟล์ของ {{ a.nickName }}"
                   title="รูปโปรไฟล์ของ {{ a.nickName }}"
                   (error)="onImgError($event)"
@@ -828,7 +745,11 @@
                   <div class="assignee-avatar">
                     <div class="side-avatar">
                       <app-avatar-preview-modal
-                        [src]="getEmployeeImage(selectedAssignee().empCode)"
+                        [src]="
+                          'https://empimg.oneeclick.co:8048/employeeimage/' +
+                          selectedAssignee().empCode +
+                          '.jpg'
+                        "
                         [name]="
                           selectedAssignee().nickname
                             ? selectedAssignee().fullname + ' (' + selectedAssignee().nickname + ')'
@@ -973,59 +894,14 @@
   ></app-note-for-it-modal>
 }
 
-@if (IS_CATEGORY_TICKET()) {
-  <div class="modal-overlay categoryTicket" (click)="closeCategoryModal()">
-    <div class="modal-container" (click)="$event.stopPropagation()">
-      <header class="top-header-strip">
-        <h2>เปลี่ยนหมวดหมู่ปัญหา</h2>
-        <div class="header-right-meta">
-          <button type="button" class="btn-close-modal" (click)="closeCategoryModal()">
-            <i class="fas fa-times"></i>
-          </button>
-        </div>
-      </header>
-      <div class="content-card">
-        <div class="form-field" style="width: 100%">
-          <label>Category</label>
-          <nz-select
-            nzShowSearch
-            nzPlaceHolder="Select category"
-            [(ngModel)]="selectedSubCategoryId"
-            class="form-input"
-          >
-            @for (cat of subProblemOptions; track cat.id) {
-              <nz-option [nzLabel]="cat.sub_category_name" [nzValue]="cat.id"></nz-option>
-            }
-          </nz-select>
-        </div>
-      </div>
-      <div class="form-actions-footer">
-        <button class="btn-back-custom" type="button" (click)="closeCategoryModal()">
-          <i class="fas fa-times"></i> Cancel
-        </button>
-        <button
-          class="btn-save-custom"
-          type="button"
-          (click)="submitCategory()"
-          [disabled]="!selectedSubCategoryId"
-        >
-          <i class="fas fa-save"></i> Save
-        </button>
-      </div>
-    </div>
-  </div>
-}
-
 @if (isDetailModalOpen()) {
   <div class="modal-overlay expandDetail" (click)="isDetailModalOpen.set(false)">
-    <div class="modal-container" (click)="$event.stopPropagation()">
-      <div class="top-header-strip">
-        <h2>รายละเอียด</h2>
-        <div class="header-right-meta">
-          <button class="btn-close-modal" aria-label="ปิด" (click)="isDetailModalOpen.set(false)">
-            <i class="fas fa-times"></i>
-          </button>
-        </div>
+    <div class="modal" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2 class="request-title">รายละเอียด</h2>
+        <button class="btn-close-modal" aria-label="ปิด" (click)="isDetailModalOpen.set(false)">
+          <i class="fas fa-times"></i>
+        </button>
       </div>
       <div class="content-card">
         <div
