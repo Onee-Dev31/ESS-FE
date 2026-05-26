@@ -81,12 +81,12 @@
                 [name]="'openFor' + person.id"
               >
                 @for (opt of openForOptions(); track opt.value) {
-                  <nz-option [nzLabel]="opt.label" [nzValue]="opt.value" />
+                  <nz-option [nzLabel]="opt.label" [nzValue]="opt" />
                 }
               </nz-select>
             </div>
 
-            <div class="form-group">
+            <div class="form-group" *ngIf="person.openFor?.value !== '__FREELANCE__'">
               <label class="form-label">เบอร์ติดต่อ <span class="required-badge">*</span></label>
               <input
                 class="form-control"
@@ -98,6 +98,137 @@
               />
             </div>
           </div>
+          @if (person.openFor?.value === '__FREELANCE__') {
+            <div class="freelance-section">
+              <div class="form-section two-col">
+                <div class="form-field">
+                  <label>ชื่อ</label>
+
+                  <input
+                    nz-input
+                    class="form-input"
+                    [(ngModel)]="person.freelance.firstNameTh"
+                    [name]="'firstNameTh' + person.id"
+                  />
+                </div>
+
+                <div class="form-field">
+                  <label>นามสกุล</label>
+
+                  <input
+                    nz-input
+                    class="form-input"
+                    [(ngModel)]="person.freelance.lastNameTh"
+                    [name]="'lastNameTh' + person.id"
+                  />
+                </div>
+
+                <div class="form-field">
+                  <label>Name</label>
+
+                  <input
+                    nz-input
+                    class="form-input"
+                    [(ngModel)]="person.freelance.firstNameEn"
+                    [name]="'firstNameEn' + person.id"
+                  />
+                </div>
+
+                <div class="form-field">
+                  <label>SurName</label>
+
+                  <input
+                    nz-input
+                    class="form-input"
+                    [(ngModel)]="person.freelance.lastNameEn"
+                    [name]="'lastNameEn' + person.id"
+                  />
+                </div>
+
+                <div class="form-field">
+                  <label>รหัสพนักงาน</label>
+
+                  <input
+                    nz-input
+                    class="form-input"
+                    [(ngModel)]="person.freelance.employeeCode"
+                    [name]="'employeeCode' + person.id"
+                  />
+                </div>
+
+                <div class="form-field">
+                  <label>สังกัดบริษัท</label>
+                  <nz-select
+                    nzShowSearch
+                    nzAllowClear
+                    nzPlaceHolder="เลือกบริษัท"
+                    [(ngModel)]="person.freelance.company"
+                    [name]="'company' + person.id"
+                    class="form-input"
+                    (ngModelChange)="onCompanyChange(person, $event)"
+                  >
+                    <nz-option
+                      *ngFor="let company of companyList"
+                      [nzLabel]="company.COMPANY_NAME + ' (' + company.COMPANY_CODE + ')'"
+                      [nzValue]="company"
+                    />
+                  </nz-select>
+                </div>
+
+                <div class="form-field">
+                  <label>แผนก / ฝ่าย</label>
+
+                  <nz-select
+                    nzShowSearch
+                    nzAllowClear
+                    nzPlaceHolder="เลือกแผนก"
+                    [(ngModel)]="person.freelance.department"
+                    [name]="'department' + person.id"
+                    class="form-input"
+                  >
+                    <nz-option
+                      *ngFor="let department of person.freelance.filteredDepartments"
+                      [nzLabel]="department.COSTCENT + ' ' + department.NAMECOSTCENT"
+                      [nzValue]="department"
+                    />
+                  </nz-select>
+                </div>
+
+                <div class="form-field">
+                  <label>ตำแหน่ง</label>
+
+                  <input
+                    nz-input
+                    class="form-input"
+                    [(ngModel)]="person.freelance.position"
+                    [name]="'position' + person.id"
+                  />
+                </div>
+
+                <div class="form-field">
+                  <label>Email</label>
+
+                  <input
+                    nz-input
+                    class="form-input"
+                    [(ngModel)]="person.freelance.email"
+                    [name]="'email' + person.id"
+                  />
+                </div>
+
+                <div class="form-field">
+                  <label>เบอร์</label>
+
+                  <input
+                    nz-input
+                    class="form-input"
+                    [(ngModel)]="person.freelance.phone"
+                    [name]="'freelancePhone' + person.id"
+                  />
+                </div>
+              </div>
+            </div>
+          }
 
           <div class="form-section" style="padding-bottom: 24px">
             <div class="form-group">
@@ -208,8 +339,8 @@
                             >
                               @for (permission of oraclePermissions; track permission) {
                                 <nz-option
-                                  [nzValue]="permission"
-                                  [nzLabel]="permission"
+                                  [nzValue]="permission.RoleName"
+                                  [nzLabel]="permission.RoleName"
                                 ></nz-option>
                               }
                             </nz-select>
@@ -253,7 +384,10 @@
                         class="form-input"
                       >
                         @for (item of oneePermissions; track item) {
-                          <nz-option [nzValue]="item" [nzLabel]="item"></nz-option>
+                          <nz-option
+                            [nzValue]="item.PermissionName"
+                            [nzLabel]="item.PermissionName"
+                          ></nz-option>
                         }
                       </nz-select>
                     </div>
@@ -306,7 +440,10 @@
                         class="form-input"
                       >
                         @for (item of onePortalResponseTypes; track item) {
-                          <nz-option [nzValue]="item" [nzLabel]="item"></nz-option>
+                          <nz-option
+                            [nzValue]="item.TypeName"
+                            [nzLabel]="item.TypeName"
+                          ></nz-option>
                         }
                       </nz-select>
                     </div>
@@ -354,6 +491,35 @@
       </button>
     </div>
   </div>
+
+  @if (showSummaryModal()) {
+    <div class="modal-overlay">
+      <div class="modal-container">
+        <div class="modal-header">
+          <h2>สรุปรายละเอียดคำขอ</h2>
+
+          <button class="btn-close-modal" type="button" (click)="closeSummaryModal()">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+
+        <div class="modal-body">
+          <div
+            class="summary-preview"
+            [innerHTML]="formatText.getFormatTextHTML(summaryText())"
+          ></div>
+        </div>
+
+        <div class="modal-footer">
+          <button class="btn-cancel" type="button" (click)="closeSummaryModal()">แก้ไข</button>
+
+          <button class="btn-confirm" type="button" (click)="confirmSubmission()">
+            ยืนยันการส่ง
+          </button>
+        </div>
+      </div>
+    </div>
+  }
 
   <!-- @if (showSummaryModal()) {
     <div class="modal-overlay">

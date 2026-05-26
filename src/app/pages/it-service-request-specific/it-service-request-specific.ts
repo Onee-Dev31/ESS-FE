@@ -24,14 +24,29 @@ import { NzSelectModule } from 'ng-zorro-antd/select';
 import { decryptValue } from '../../utils/crypto.js ';
 import { SignalrService } from '../../services/signalr.service';
 import { MasterDataService } from '../../services/master-data.service';
+import { formatText } from '../../utils/formatText';
 
 type SpecificSystemKey = 'bms' | 'oracle' | 'onee' | 'onePortal';
 
 interface SpecificPersonRequest {
   id: number;
-  openFor: string;
+  openFor: any;
   phone: string;
   note: string;
+
+  freelance: {
+    firstNameTh: string;
+    lastNameTh: string;
+    firstNameEn: string;
+    lastNameEn: string;
+    employeeCode: string;
+    company: string;
+    department: string;
+    position: string;
+    email: string;
+    phone: string;
+    filteredDepartments: any[];
+  };
 
   systems: SpecificSystemKey[];
 
@@ -81,6 +96,8 @@ export class ITServiceRequestSpecificComponent implements OnInit {
   private router = inject(Router);
   private signalrService = inject(SignalrService);
 
+  formatText = formatText;
+
   @ViewChild('detailTextarea') detailTextarea!: ElementRef;
 
   authData = JSON.parse(localStorage.getItem('allData') || '{}');
@@ -123,18 +140,16 @@ export class ITServiceRequestSpecificComponent implements OnInit {
     { key: 'onee', label: 'OneE', icon: 'fa-layer-group' },
     { key: 'onePortal', label: 'One Portal', icon: 'fa-globe' },
   ];
-  oracleModules = ['AP', 'AR', 'CM', 'FA', 'IE', 'INV', 'PJC', 'GL', 'GL Secondary'];
-  oraclePermissions = ['-', 'Super User', 'User', 'Viewer'];
-  bmsTeams = ['Team เดียวกัน', 'สิทธิ์เหมือนคุณ xxx', 'อื่นๆ'];
-  bmsPermissions = ['-', 'ดูข้อมูล', 'เพิ่ม/แก้ไข', 'อนุมัติ', 'Admin'];
-  oneePermissions = ['Accounting', 'Admin', 'Co-Producer', 'Producer', 'Sale'];
-  onePortalResponseTypes = ['Customer', 'Supplier', 'All'];
+  oracleModules: any;
+  oraclePermissions: any;
+  oneePermissions: any;
+  onePortalResponseTypes: any;
 
   ngOnInit() {
-    // this.getServiceType();
     this.getOpenFor();
     this.getCompanies();
-    this.specificPeople.set([this.createSpecificPerson()]);
+    this.getDepartments();
+    this.getMasterPermission();
 
     const userData = this.authService.userData();
     if (userData?.TELOFF) {
@@ -340,26 +355,27 @@ export class ITServiceRequestSpecificComponent implements OnInit {
   }
 
   showSummaryModal = signal(false);
+  summaryText = signal('');
 
   submit() {
     const payload = this.specificPeople().map((person) => ({
       openFor: person.openFor,
       phone: person.phone,
       note: person.note,
-
+      freelance: person.freelance,
       systems: person.systems,
-
       bms: person.systems.includes('bms') ? person.bms : null,
-
       oracle: person.systems.includes('oracle') ? person.oracle : null,
-
       onee: person.systems.includes('onee') ? person.onee : null,
-
       onePortal: person.systems.includes('onePortal') ? person.onePortal : null,
     }));
+    const summary = this.buildRequestSummary(payload);
 
-    console.log('SUBMIT PAYLOAD:', payload);
+    this.summaryText.set(summary);
+
+    this.showSummaryModal.set(true);
   }
+
   closeSummaryModal() {
     this.showSummaryModal.set(false);
   }
@@ -394,10 +410,11 @@ export class ITServiceRequestSpecificComponent implements OnInit {
       formData.append('openForType', isSelf ? 'self' : 'other');
       formData.append('openForCodeempid', this.selectedOpenFor().value);
     }
-    formData.append(
-      'description',
-      this.IsOneeJob ? `[ONEE JOBS]\n ${this.requestDetails()}` : this.requestDetails(),
-    );
+    // formData.append(
+    //   'description',
+    //   this.IsOneeJob ? `[ONEE JOBS]\n ${this.requestDetails()}` : this.requestDetails(),
+    // );
+    formData.append('description', this.summaryText());
     formData.append('requesterAduser', this.authService.currentUser() || '-');
     formData.append('contactPhone', this.phoneNumber());
     formData.append(
@@ -533,69 +550,6 @@ export class ITServiceRequestSpecificComponent implements OnInit {
     this.selectedRequest.set(null);
   }
 
-  // GET MASTER
-  // getServiceType() {
-  //   this.itServiceService.getServiceType().subscribe({
-  //     next: (res) => {
-  //       console.log(res.data);
-  //       const mappedServices_main = res.data.mainServices.map((item: any) => ({
-  //         ...item,
-  //         checked: false,
-  //         disabled: false,
-  //       }));
-
-  //       this.serviceOptions.set(mappedServices_main);
-  //       this.setDefaultSpecificService();
-
-  //       const mappedServices_user = res.data.userSubOptions.map((item: any) => ({
-  //         ...item,
-  //         checked: false,
-  //       }));
-
-  //       this.userSubOptions.set(mappedServices_user);
-
-  //       const mappedServices_system = res.data.systemSubOptions.map((item: any) => ({
-  //         ...item,
-  //         checked: false,
-  //       }));
-
-  //       this.systemSubOptions.set(mappedServices_system);
-
-  //       // this.availableCategories = res.data
-  //       // this.cdr.detectChanges();
-  //     },
-  //     error: (error) => {
-  //       console.error('Error fetching data:', error);
-  //     },
-  //   });
-  // }
-  getOpenFor() {
-    this.itServiceService
-      .getOpenFor({ currentEmpId: this.authService.userData().CODEMPID })
-      .subscribe({
-        next: (res) => {
-          this.openForOptions.set(res.data);
-          const defaultOption = this.openForOptions().find(
-            (opt) => opt.value === this.authService.userData().CODEMPID,
-          );
-          if (defaultOption) {
-            this.selectedOpenFor.set({
-              value: defaultOption.value,
-              label: defaultOption.label,
-            });
-            this.specificPeople.update((people) =>
-              people.map((person, index) =>
-                index === 0 ? { ...person, openFor: defaultOption.value } : person,
-              ),
-            );
-          }
-        },
-        error: (error) => {
-          console.error('Error fetching data:', error);
-        },
-      });
-  }
-
   getDetailFromJobsByApplicantId(id: string) {
     this.itServiceService.getDetailFromJobsByApplicant(id).subscribe({
       next: (res) => {
@@ -620,11 +574,35 @@ export class ITServiceRequestSpecificComponent implements OnInit {
   }
 
   private createSpecificPerson(): SpecificPersonRequest {
+    const defaultOption = this.openForOptions().find(
+      (opt) => opt.value === this.authService.userData().CODEMPID,
+    );
+
     return {
       id: this.nextSpecificPersonId++,
-      openFor: this.authService.userData().CODEMPID ?? '',
+      openFor: defaultOption,
       phone: PhoneUtil.formatPhoneNumber(this.authService.userData()?.TELOFF ?? ''),
       note: '',
+      freelance: {
+        firstNameTh: '',
+        lastNameTh: '',
+
+        firstNameEn: '',
+        lastNameEn: '',
+
+        employeeCode: '',
+
+        company: '',
+        department: '',
+
+        position: '',
+
+        email: '',
+
+        phone: '',
+        filteredDepartments: [],
+      },
+
       systems: [],
 
       bms: {
@@ -634,8 +612,8 @@ export class ITServiceRequestSpecificComponent implements OnInit {
 
       oracle: {
         companies: [],
-        modules: this.oracleModules.map((module) => ({
-          module,
+        modules: this.oracleModules.map((module: any) => ({
+          module: module.ModuleCode,
           permission: '-',
         })),
       },
@@ -689,6 +667,18 @@ export class ITServiceRequestSpecificComponent implements OnInit {
   filteredDepartmentList: any[] = [];
 
   // function
+  onCompanyChange(person: SpecificPersonRequest, company: any) {
+    person.freelance.department = '';
+
+    if (!company) {
+      person.freelance.filteredDepartments = [];
+      return;
+    }
+
+    person.freelance.filteredDepartments = this.departmentList.filter(
+      (dept) => this.remapCompanyCode(dept.COMPANY_CODE) === company.COMPANY_CODE,
+    );
+  }
 
   private remapCompanyCode(code: string): string {
     if (code === 'OTD') return 'ONEE';
@@ -696,10 +686,139 @@ export class ITServiceRequestSpecificComponent implements OnInit {
     return code;
   }
 
+  buildRequestSummary(data: any[]): string {
+    return data
+      .map((person, index) => {
+        const sections: string[] = [];
+
+        // =========================
+        // HEADER
+        // =========================
+
+        if (person.openFor?.isFreelance) {
+          sections.push(
+            `${index + 1}. Freelance`,
+            `${person.freelance.firstNameTh} ${person.freelance.lastNameTh} (${person.freelance.employeeCode})`,
+            `${person.freelance.firstNameEn} ${person.freelance.lastNameEn}`,
+            `${person.freelance.company?.COMPANY_NAME} (${person.freelance.company?.COMPANY_CODE})`,
+            `${person.freelance.department?.COSTCENT}-${person.freelance.department?.NAMECOSTCENT}`,
+            `${person.freelance.position}`,
+            `${person.freelance.email} (${person.freelance.phone})`,
+          );
+        } else {
+          sections.push(`${index + 1}. ${person.openFor?.label}`);
+        }
+
+        sections.push('');
+
+        // =========================
+        // ORACLE
+        // =========================
+
+        if (person.systems.includes('oracle') && person.oracle) {
+          sections.push('ระบบ : Oracle');
+
+          const selectedModules = person.oracle.modules.filter(
+            (m: any) => m.permission && m.permission.trim() !== '-',
+          );
+
+          selectedModules.forEach((m: any) => {
+            sections.push(`${m.module.trim()} - ${m.permission.trim()}`);
+          });
+
+          sections.push('');
+        }
+
+        // =========================
+        // BMS
+        // =========================
+
+        if (person.systems.includes('bms') && person.bms) {
+          sections.push('ระบบ : BMS');
+
+          person.bms.companies.forEach((company: any) => {
+            sections.push(`${company.COMPANY_NAME} (${company.COMPANY_CODE})`);
+          });
+
+          if (person.bms.detail) {
+            sections.push(`สิทธิ์เหมือน : ${person.bms.detail}`);
+          }
+
+          sections.push('');
+        }
+
+        // =========================
+        // ONE PORTAL
+        // =========================
+
+        if (person.systems.includes('onePortal') && person.onePortal) {
+          sections.push('ระบบ : One Portal');
+
+          person.onePortal.companies.forEach((company: any) => {
+            sections.push(`${company.COMPANY_NAME} (${company.COMPANY_CODE})`);
+          });
+
+          if (person.onePortal.responseType) {
+            sections.push(`ประเภทสิทธิ์ : ${person.onePortal.responseType}`);
+          }
+
+          sections.push('');
+        }
+
+        // =========================
+        // ONEE
+        // =========================
+
+        if (person.systems.includes('onee') && person.onee) {
+          sections.push('ระบบ : OneE');
+
+          person.onee.companies.forEach((company: any) => {
+            sections.push(`${company.COMPANY_NAME} (${company.COMPANY_CODE})`);
+          });
+
+          if (person.onee.permission) {
+            sections.push(`สิทธิ์ : ${person.onee.permission}`);
+          }
+
+          if (person.onee.supervisor) {
+            sections.push(`หัวหน้างาน : ${person.onee.supervisor}`);
+          }
+
+          sections.push('');
+        }
+
+        // =========================
+        // NOTE
+        // =========================
+
+        if (person.note) {
+          sections.push(`หมายเหตุ : ${person.note}`);
+        }
+
+        return sections.join('\n');
+      })
+      .join('\n==============================\n\n');
+  }
+
+  // MASTER
+  getMasterPermission() {
+    this.masterService.MasterPermission().subscribe({
+      next: (data) => {
+        this.oracleModules = data.Modules;
+        this.oraclePermissions = [{ ID: 0, RoleName: '-' }, ...data.Roles];
+        this.oneePermissions = data.Permissions;
+        this.onePortalResponseTypes = data.ResponseTypes;
+        this.specificPeople.set([this.createSpecificPerson()]);
+      },
+      error: (error) => {
+        console.error('Error fetching data:', error);
+      },
+    });
+  }
+
   getCompanies() {
     this.masterService.getCompanyMaster().subscribe({
       next: (data) => {
-        console.log(data);
         this.companyList = data.map((item: any) => ({
           ...item,
           COMPANY_CODE: this.remapCompanyCode(item.COMPANY_CODE),
@@ -714,12 +833,43 @@ export class ITServiceRequestSpecificComponent implements OnInit {
   getDepartments() {
     this.masterService.getDepartmentMaster().subscribe({
       next: (data) => {
-        // console.log(data);
         this.departmentList = data;
       },
       error: (error) => {
         console.error('Error fetching data:', error);
       },
     });
+  }
+
+  getOpenFor() {
+    this.itServiceService
+      .getOpenFor({ currentEmpId: this.authService.userData().CODEMPID })
+      .subscribe({
+        next: (res) => {
+          this.openForOptions.set(res.data);
+
+          const defaultOption = this.openForOptions().find(
+            (opt) => opt.value === this.authService.userData().CODEMPID,
+          );
+
+          if (defaultOption) {
+            this.selectedOpenFor.set(defaultOption);
+
+            this.specificPeople.update((people) =>
+              people.map((person, index) =>
+                index === 0
+                  ? {
+                      ...person,
+                      openFor: defaultOption,
+                    }
+                  : person,
+              ),
+            );
+          }
+        },
+        error: (error) => {
+          console.error('Error fetching data:', error);
+        },
+      });
   }
 }
