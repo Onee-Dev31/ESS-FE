@@ -706,9 +706,7 @@
 }
 
 .form-actions-footer {
-  display: flex;
-  flex-direction: column;
-  gap: 0;
+  display: block;
   padding: 16px 24px;
   background: var(--bg-table-head);
   border-top: 1px solid var(--border-table-head);
@@ -732,10 +730,12 @@
   }
 
   .confirm-inner {
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
+    display: block;
     width: 100%;
+
+    > * + * {
+      margin-top: 0.75rem;
+    }
   }
 
   .action-title {
