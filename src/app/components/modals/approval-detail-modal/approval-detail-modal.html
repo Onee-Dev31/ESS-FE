@@ -188,36 +188,51 @@
             <div class="content-header">
               <h3>รายการเบิก ({{ allowanceDetail()?.details?.length }} รายการ)</h3>
             </div>
-            <table class="modern-table">
-              <thead>
-                <tr>
-                  <th>วันที่</th>
-                  <th>กะ</th>
-                  <th class="text-center">ประเภทวัน</th>
-                  <th>เวลาเข้า - ออก</th>
-                  <th class="text-center">ชั่วโมง OT</th>
-                  <th class="text-right">ยอดเงิน</th>
-                  <th>หมายเหตุ</th>
-                </tr>
-              </thead>
-              <tbody>
-                @for (d of allowanceDetail()?.details; track d.detail_id) {
+            <div class="table-scroll">
+              <table class="modern-table">
+                <thead>
                   <tr>
-                    <td>{{ dateUtil.formatDateToBE(d.work_date, 'DD/MM/YYYY') }}</td>
-                    <td>{{ d.shift_code }}</td>
-                    <td class="text-center">
-                      <span class="ot-day-type" [class.holiday]="d.day_type === 'H'">
-                        {{ d.day_type === 'H' ? 'วันหยุด' : 'วันทำงาน' }}
-                      </span>
-                    </td>
-                    <td>{{ d.actual_checkin }} – {{ d.actual_checkout }}</td>
-                    <td class="text-center">{{ d.extra_hours }} ชม.</td>
-                    <td class="text-right">฿{{ d.rate_amount | number: '1.2-2' }}</td>
-                    <td>{{ d.description || '-' }}</td>
+                    <th>วันที่</th>
+                    <th>กะ</th>
+                    <th class="text-center">ประเภทวัน</th>
+                    <th>เวลาเข้า - ออก</th>
+                    <th class="text-center">ชั่วโมง OT</th>
+                    <th class="text-right">ยอดเงิน</th>
+                    <th>หมายเหตุ</th>
                   </tr>
-                }
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  @for (d of allowanceDetail()?.details; track d.detail_id) {
+                    <tr>
+                      <td data-label="วันที่">
+                        {{ dateUtil.formatDateToBE(d.work_date, 'DD/MM/YYYY') }}
+                      </td>
+                      <td data-label="กะ">
+                        {{ d.shift_code }}
+                        @if (d.scheduled_start && d.scheduled_end) {
+                          <div class="shift-time-range">
+                            {{ d.scheduled_start }} – {{ d.scheduled_end }}
+                          </div>
+                        }
+                      </td>
+                      <td data-label="ประเภทวัน" class="text-center">
+                        <span class="ot-day-type" [class.holiday]="d.day_type === 'H'">
+                          {{ d.day_type === 'H' ? 'วันหยุด' : 'วันทำงาน' }}
+                        </span>
+                      </td>
+                      <td data-label="เวลาเข้า - ออก">
+                        {{ d.actual_checkin }} – {{ d.actual_checkout }}
+                      </td>
+                      <td data-label="ชั่วโมง OT" class="text-center">{{ d.extra_hours }} ชม.</td>
+                      <td data-label="ยอดเงิน" class="text-right">
+                        ฿{{ d.rate_amount | number: '1.2-2' }}
+                      </td>
+                      <td data-label="หมายเหตุ">{{ d.description || '-' }}</td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
           }
         }
 
@@ -258,57 +273,86 @@
             <div class="content-header">
               <h3>รายการเบิก ({{ vehicleDetail()?.details?.length }} รายการ)</h3>
             </div>
-            <table class="modern-table">
-              <thead>
-                <tr>
-                  <th>วันที่</th>
-                  <th>กะ</th>
-                  <th class="text-center">ประเภทวัน</th>
-                  <th>เวลาเข้า - ออก</th>
-                  <th class="text-center">ชั่วโมง OT</th>
-                  <th class="text-right">ยอดเงิน</th>
-                  <th>หมายเหตุ</th>
-                </tr>
-              </thead>
-              <tbody>
-                @for (d of vehicleDetail()?.details; track d.detail_id) {
+            <div class="table-scroll">
+              <table class="modern-table">
+                <thead>
                   <tr>
-                    <td>{{ dateUtil.formatDateToBE(d.work_date, 'DD/MM/YYYY') }}</td>
-                    <td>{{ d.shift_code }}</td>
-                    <td class="text-center">
-                      <span class="ot-day-type" [class.holiday]="d.day_type === 'H'">
-                        {{ d.day_type === 'H' ? 'วันหยุด' : 'วันทำงาน' }}
-                      </span>
-                    </td>
-                    <td>{{ d.actual_checkin }} – {{ d.actual_checkout }}</td>
-                    <td class="text-center">{{ d.extra_hours }} ชม.</td>
-                    <td class="text-right">฿{{ d.rate_amount | number: '1.2-2' }}</td>
-                    <td>{{ d.description || '-' }}</td>
+                    <th>วันที่</th>
+                    <th>กะ</th>
+                    <th class="text-center">ประเภทวัน</th>
+                    <th>เวลาเข้า - ออก</th>
+                    <th class="text-center">ชั่วโมง OT</th>
+                    <th class="text-right">ยอดเงิน</th>
+                    <th>หมายเหตุ</th>
                   </tr>
-                }
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  @for (d of vehicleDetail()?.details; track d.detail_id) {
+                    <tr>
+                      <td data-label="วันที่">
+                        {{ dateUtil.formatDateToBE(d.work_date, 'DD/MM/YYYY') }}
+                      </td>
+                      <td data-label="กะ">
+                        {{ d.shift_code }}
+                        @if (d.scheduled_start && d.scheduled_end) {
+                          <div class="shift-time-range">
+                            {{ d.scheduled_start }} – {{ d.scheduled_end }}
+                          </div>
+                        }
+                      </td>
+                      <td data-label="ประเภทวัน" class="text-center">
+                        <span class="ot-day-type" [class.holiday]="d.day_type === 'H'">
+                          {{ d.day_type === 'H' ? 'วันหยุด' : 'วันทำงาน' }}
+                        </span>
+                      </td>
+                      <td data-label="เวลาเข้า - ออก">
+                        {{ d.actual_checkin }} – {{ d.actual_checkout }}
+                      </td>
+                      <td data-label="ชั่วโมง OT" class="text-center">{{ d.extra_hours }} ชม.</td>
+                      <td data-label="ยอดเงิน" class="text-right">
+                        ฿{{ d.rate_amount | number: '1.2-2' }}
+                      </td>
+                      <td data-label="หมายเหตุ">{{ d.description || '-' }}</td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
           }
         }
       </div>
 
       <div class="side-panel">
         <h3 class="side-title">Requester Info</h3>
-        <div class="side-group">
-          <label>Name</label>
-          <div class="side-val">{{ approvalItem.requestBy.name }}</div>
-        </div>
-        <div class="side-group">
-          <label>Employee ID</label>
-          <div class="side-val">{{ approvalItem.requestBy.employeeId }}</div>
-        </div>
-        <div class="side-group">
-          <label>Department</label>
-          <div class="side-val">{{ approvalItem.requestBy.department }}</div>
-        </div>
-        <div class="side-group">
-          <label>Company</label>
-          <div class="side-val">{{ approvalItem.requestBy.company }}</div>
+        <div class="side-groups-row">
+          <div class="side-group">
+            <label>Name</label>
+            <div class="side-val">{{ approvalItem.requestBy.name }}</div>
+          </div>
+          <div class="side-group">
+            <label>Employee ID</label>
+            <div class="side-val">{{ approvalItem.requestBy.employeeId }}</div>
+          </div>
+          <div class="side-group">
+            <label>Department</label>
+            <div class="side-val">
+              {{
+                allowanceDetail()?.departmentName ||
+                  vehicleDetail()?.departmentName ||
+                  approvalItem.requestBy.department
+              }}
+            </div>
+          </div>
+          <div class="side-group">
+            <label>Company</label>
+            <div class="side-val">
+              {{
+                allowanceDetail()?.companyName ||
+                  vehicleDetail()?.companyName ||
+                  approvalItem.requestBy.company
+              }}
+            </div>
+          </div>
         </div>
 
         <div class="side-divider"></div>
