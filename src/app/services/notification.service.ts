@@ -134,12 +134,7 @@ export class NotificationService {
                   ticketNumber: this.toText(data?.ticketNumber ?? data?.ticket_number) ?? null,
                   title: msg,
                 });
-                this.toastService.info(
-                  msg,
-                  undefined,
-                  routeInfo.route ?? undefined,
-                  routeInfo.queryParams ?? undefined,
-                );
+                this.toastService.info(msg, undefined, routeInfo.route ?? undefined, routeInfo.queryParams ?? undefined);
               }
             }
           });
@@ -357,21 +352,17 @@ export class NotificationService {
       this.refreshAll();
 
       const record = this.extractRealtimeRecord(payload) as any;
-      const title = this.toText(record?.title ?? record?.notification_title) ?? 'แจ้งเตือนใหม่';
+      const title =
+        this.toText(record?.title ?? record?.notification_title) ?? 'แจ้งเตือนใหม่';
 
       const payloadData = this.parsePayload(record?.payload_json ?? record?.payloadJson);
       const ticketId = this.toNumber(
-        record?.ticket_id ??
-          record?.ticketId ??
-          payloadData?.['ticketId'] ??
-          payloadData?.['ticket_id'],
+        record?.ticket_id ?? record?.ticketId ?? payloadData?.['ticketId'] ?? payloadData?.['ticket_id'],
       );
       const ticketNumber =
         this.toText(
-          record?.ticket_number ??
-            record?.ticketNumber ??
-            payloadData?.['ticketNumber'] ??
-            payloadData?.['ticket_number'],
+          record?.ticket_number ?? record?.ticketNumber ??
+          payloadData?.['ticketNumber'] ?? payloadData?.['ticket_number'],
         ) ?? null;
 
       const routeInfo = this.resolveRoute({
@@ -385,12 +376,7 @@ export class NotificationService {
 
       this.lastToastTime = Date.now();
       if (!document.hidden)
-        this.toastService.info(
-          title,
-          undefined,
-          routeInfo.route ?? undefined,
-          routeInfo.queryParams ?? undefined,
-        );
+        this.toastService.info(title, undefined, routeInfo.route ?? undefined, routeInfo.queryParams ?? undefined);
     });
   }
 
@@ -537,7 +523,6 @@ export class NotificationService {
       typeStr2.includes('chat') ||
       titleStr2.includes('ข้อความ') ||
       titleStr2.includes('แชท');
-
     return {
       route: '/it-service-list',
       queryParams: {
@@ -648,17 +633,12 @@ export class NotificationService {
   }
 
   private isChatNotifForApprover(item: NotificationApiRecord): boolean {
-    const typeStr = (
-      this.toText(item.notification_type ?? item.notificationType) ?? ''
-    ).toLowerCase();
+    const typeStr = (this.toText(item.notification_type ?? item.notificationType) ?? '').toLowerCase();
     const titleStr = (this.toText(item.title) ?? '').toLowerCase();
     const isChatType =
-      typeStr.includes('note') ||
-      typeStr.includes('reply') ||
-      typeStr.includes('message') ||
-      typeStr.includes('chat') ||
-      titleStr.includes('ข้อความ') ||
-      titleStr.includes('แชท');
+      typeStr.includes('note') || typeStr.includes('reply') ||
+      typeStr.includes('message') || typeStr.includes('chat') ||
+      titleStr.includes('ข้อความ') || titleStr.includes('แชท');
 
     if (!isChatType) return false;
 
