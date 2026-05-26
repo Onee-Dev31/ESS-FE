@@ -90,7 +90,10 @@ export class AllowanceService {
    * แก้ไขใบเบิกเบี้ยเลี้ยง
    * PUT api/meal-allowance/claim/:id
    */
-  updateClaim(claimId: number, body: { details: MealAllowanceClaimDetail[]; resubmit?: boolean }): Observable<any> {
+  updateClaim(
+    claimId: number,
+    body: { details: MealAllowanceClaimDetail[]; resubmit?: boolean },
+  ): Observable<any> {
     return this._http.put(`${this.baseUrl}/meal-allowance/claim/${claimId}`, body);
   }
 
