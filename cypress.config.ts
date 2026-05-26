@@ -1,10 +1,6 @@
 import { defineConfig } from 'cypress';
 require('dotenv').config();
-const {
-  setupSheet,
-  uploadSpecResults,
-  finalizeSheet,
-} = require('./scripts/upload-cypress-results');
+const { setupSheet, uploadSpecResults, finalizeSheet } = require('./scripts/upload-cypress-results');
 
 export default defineConfig({
   e2e: {

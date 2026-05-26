@@ -2,21 +2,7 @@
   <!-- LEFT -->
   <aside class="tk-left">
     <div class="tk-left__top">
-      <div class="tk-left__heading">
-        <div class="tk-left__title">Tickets</div>
-        @if (canViewTeamTicketsButton()) {
-          <button
-            class="team-ticket-btn"
-            type="button"
-            [disabled]="isTeamTicketsExporting"
-            nz-tooltip
-            nzTooltipTitle="Team tickets"
-            (click)="onTeamTicketsClick()"
-          >
-            Team
-          </button>
-        }
-      </div>
+      <div class="tk-left__title">Tickets</div>
       <nz-select
         class="tk-left__select"
         [(ngModel)]="filterStatus"
@@ -167,44 +153,6 @@
     </app-file-preview-modal>
   }
 </div>
-
-<nz-modal
-  [(nzVisible)]="isHeadPickerOpen"
-  nzTitle="Team"
-  nzClassName="team-ticket-modal"
-  (nzOnCancel)="closeHeadPicker()"
-  [nzFooter]="teamTicketFooter"
->
-  <ng-container *nzModalContent>
-    <div class="team-head-field">
-      <label>Approver</label>
-      <nz-select
-        class="team-head-select filter-select"
-        nzShowSearch
-        nzAllowClear
-        nzPlaceHolder="Select approver"
-        [(ngModel)]="selectedTeamHeadCode"
-      >
-        @for (head of teamHeadOptions; track head.code) {
-          <nz-option [nzValue]="head.code" [nzLabel]="head.label"></nz-option>
-        }
-      </nz-select>
-    </div>
-  </ng-container>
-</nz-modal>
-
-<ng-template #teamTicketFooter>
-  <button nz-button type="button" (click)="closeHeadPicker()">Cancel</button>
-  <button
-    nz-button
-    nzType="primary"
-    type="button"
-    [disabled]="!selectedTeamHeadCode || isTeamTicketsExporting"
-    (click)="confirmTeamHead()"
-  >
-    OK
-  </button>
-</ng-template>
 
 <!-- DESKTOP: replace-tk-right (1200px) -->
 @if (!isMobile) {
@@ -417,7 +365,9 @@
             <div class="note__who">
               <div class="avatar">
                 <app-avatar-preview-modal
-                  [src]="getEmployeeImage(n.createBy.empCode)"
+                  [src]="
+                    'https://empimg.oneeclick.co:8048/employeeimage/' + n.createBy.empCode + '.jpg'
+                  "
                   [name]="n.createBy.nickName"
                 />
               </div>
@@ -486,298 +436,207 @@
 @if ((!isMobile || isTicketDetailOpen()) && selectedTicket(); as t) {
   <div class="floating-chat" [class.is-open]="IS_CHAT_OPEN()" #floatingChatRef>
     @if (canAccessChat()) {
-      @if (IS_CHAT_OPEN()) {
-        <section class="floating-chat__panel" aria-label="Ticket chat">
-          <div class="floating-chat__header">
-            <div class="floating-chat__title">
-              <i class="fa-solid fa-comments"></i>
-              <span>{{ t.status_user === 'Referred_Back' ? 'ข้อความจาก Approver' : 'Chat' }}</span>
-              @if (t.ticketNumber) {
-                <span class="floating-chat__ticket-no">#{{ t.ticketNumber }}</span>
-              }
-            </div>
-            <button
-              class="floating-chat__close"
-              type="button"
-              title="ปิดแชท"
-              aria-label="ปิดแชท"
-              (click)="closeChat()"
+    @if (IS_CHAT_OPEN()) {
+      <section class="floating-chat__panel" aria-label="Ticket chat">
+        <div class="floating-chat__header">
+          <div class="floating-chat__title">
+            <i class="fa-solid fa-comments"></i>
+            <span>{{ t.status_user === 'Referred_Back' ? 'ข้อความจาก Approver' : 'Chat' }}</span>
+          </div>
+          <button
+            class="floating-chat__close"
+            type="button"
+            title="ปิดแชท"
+            aria-label="ปิดแชท"
+            (click)="closeChat()"
+          >
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+
+        <div class="floating-chat__body" #cardBody>
+          <div class="note-list" *ngIf="t.itNotes.length; else noNoteFloating">
+            <div
+              class="note"
+              *ngFor="let n of t.itNotes.slice(); let i = index; let last = last"
+              [class.note--me]="n.createBy.empCode === currentUserEmpCode"
+              [class.note--requester]="n.createBy.senderRole === 'requester'"
+              [class.note--it-staff]="n.createBy.senderRole === 'it-staff'"
+              [class.note--new-highlight]="i === 0 && highlightedNoteTicketId() === t.ticketId"
             >
-              <i class="fas fa-times"></i>
-            </button>
-          </div>
-
-          <div class="floating-chat__body" #cardBody>
-            <div class="note-list" *ngIf="t.itNotes.length; else noNoteFloating">
-              <div
-                class="note"
-                *ngFor="let n of t.itNotes.slice(); let i = index; let last = last"
-                [class.note--me]="n.createBy.empCode === currentUserEmpCode"
-                [class.note--requester]="n.createBy.senderRole === 'requester'"
-                [class.note--it-staff]="n.createBy.senderRole === 'it-staff'"
-                [class.note--new-highlight]="i === 0 && highlightedNoteTicketId() === t.ticketId"
-              >
-                <div class="note__top">
-                  <div class="note__who">
-                    <div class="avatar">
-                      <app-avatar-preview-modal
-                        [src]="getEmployeeImage(n.createBy.empCode)"
-                        [name]="n.createBy.nickName"
-                      />
-                    </div>
-                    <div>
-                      <b>{{ n.createBy.nickName }}</b>
-                    </div>
-                  </div>
-                  <div class="note__top-right">
-                    <div class="muted">
-                      @if (isToday(n.createdDate)) {
-                        {{ n.createdDate | date: 'HH:mm' }}
-                      } @else {
-                        {{ n.createdDate | date: 'EEE dd, HH:mm' : '' : 'en' }}
-                      }
-                    </div>
-                    @if (canSendChat(t)) {
-                      <button
-                        class="note__reply-btn"
-                        type="button"
-                        title="Reply"
-                        (click)="startReply(n)"
-                      >
-                        <i class="fa-solid fa-reply"></i>
-                      </button>
-                    }
-                  </div>
-                </div>
-                @if (n.replyTo) {
-                  <div class="note__quote">
-                    <span class="note__quote-name">{{ n.replyTo.nickName }}</span>
-                    <span class="note__quote-msg"
-                      >{{ n.replyTo.message | slice: 0 : 100
-                      }}{{ n.replyTo.message.length > 100 ? '...' : '' }}</span
-                    >
-                  </div>
-                }
-                <div class="note__msg">
-                  <span
-                    *ngIf="n.referred_title === '[REFERRED]'"
-                    class="refer_tag"
-                    [class.last]="!n.isReferred"
-                  >
-                    {{ n.referred_title }}
-                  </span>
-                  <span *ngIf="n.referred_title === '[REJECTED]'" class="refer_tag last">
-                    {{ n.referred_title }}
-                  </span>
-                  {{ n.message }}
-                </div>
-                <ul class="attachment-list" *ngIf="n.attachments?.length > 0">
-                  <li
-                    *ngFor="let file of n.attachments"
-                    class="attachment-item"
-                    (click)="viewFile(file)"
-                  >
-                    <div class="file-icon-box"><i class="far fa-file-alt"></i></div>
-                    <span class="file-name">{{ file.name }}</span>
-                    <i class="fas fa-download download-small"></i>
-                  </li>
-                </ul>
-                <div
-                  class="read-receipt"
-                  *ngIf="last && readersForNote(n.id).length > 0"
-                  [class.read-receipt--me]="n.createBy.empCode === currentUserEmpCode"
-                >
-                  <span class="read-receipt__label">Seen</span>
-                  <div class="read-receipt__avatars">
-                    <div
-                      class="read-receipt__avatar"
-                      *ngFor="let r of readersForNote(n.id)"
-                      [title]="r.nickName"
-                    >
-                      <img
-                        [src]="
-                          'https://empimg.oneeclick.co:8048/employeeimage/' +
-                          r.userCodeempid +
-                          '.jpg'
-                        "
-                        [alt]="r.nickName"
-                        (error)="onImgError($event)"
-                      />
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            @if (t.status_user !== 'Referred_Back') {
-              <div class="floating-chat__service-hours">
-                เวลาให้บริการวันจันทร์ – ศุกร์ 09:00 – 18:00 น. หยุดเสาร์ อาทิตย์ และนักขัตฤกษ์
-              </div>
-            }
-            <ng-template #noNoteFloating>
-              <div class="tk-empty">ยังไม่มีข้อความ</div>
-            </ng-template>
-          </div>
-
-          @if (mentionVisible() && canSendChat(t)) {
-            <div class="floating-chat__mention-list" role="listbox">
-              @for (emp of mentionResults(); track emp.CODEEMPID; let i = $index) {
-                <button
-                  class="floating-chat__mention-item"
-                  [class.is-active]="i === mentionActiveIndex"
-                  [class.is-all]="emp.CODEEMPID === '__all__'"
-                  type="button"
-                  role="option"
-                  (mousedown)="$event.preventDefault()"
-                  (click)="selectMention(emp)"
-                >
-                  @if (emp.CODEEMPID === '__all__') {
-                    <div class="mention-avatar mention-avatar--all">
-                      <i class="fas fa-users"></i>
-                    </div>
-                  } @else {
-                    <img
-                      class="mention-avatar"
+              <div class="note__top">
+                <div class="note__who">
+                  <div class="avatar">
+                    <app-avatar-preview-modal
                       [src]="
                         'https://empimg.oneeclick.co:8048/employeeimage/' +
-                        (emp.CODEEMPID || emp.codeempid) +
+                        n.createBy.empCode +
                         '.jpg'
                       "
-                      [alt]="emp.Nickname || emp.FullNameThai"
-                      (error)="onImgError($event)"
+                      [name]="n.createBy.nickName"
                     />
-                  }
-                  <div class="mention-info">
-                    <span class="mention-name">{{ emp.Nickname || emp.FullNameThai }}</span>
-                    @if (emp.FullNameThai && emp.CODEEMPID !== '__all__') {
-                      <span class="mention-sub">{{ emp.FullNameThai }}</span>
-                    }
                   </div>
-                </button>
-              }
-            </div>
-          }
-
-          @if (replyingTo() && canSendChat(t)) {
-            <div class="chat-reply-bar">
-              <div class="chat-reply-bar__content">
-                <i class="fa-solid fa-reply"></i>
-                <div class="chat-reply-bar__text">
-                  <span class="chat-reply-bar__name">{{ replyingTo().createBy.nickName }}</span>
-                  <span class="chat-reply-bar__msg"
-                    >{{ replyingTo().message | slice: 0 : 80
-                    }}{{ replyingTo().message.length > 80 ? '...' : '' }}</span
-                  >
+                  <div>
+                    <b>{{ n.createBy.nickName }}</b>
+                  </div>
+                </div>
+                <div class="muted">
+                  @if (isToday(n.createdDate)) {
+                    {{ n.createdDate | date: 'HH:mm' }}
+                  } @else {
+                    {{ n.createdDate | date: 'EEE dd, HH:mm' : '' : 'en' }}
+                  }
                 </div>
               </div>
-              <button class="chat-reply-bar__cancel" type="button" (click)="cancelReply()">
-                <i class="fas fa-times"></i>
-              </button>
-            </div>
-          }
-          @if (canSendChat(t)) {
-            <div class="floating-chat__composer">
-              <input
-                type="file"
-                multiple
-                hidden
-                #chatFileInput
-                (change)="onChatFileSelected($event)"
-              />
-              <button
-                class="floating-chat__attach"
-                type="button"
-                title="แนบไฟล์"
-                aria-label="แนบไฟล์"
-                (click)="chatFileInput.click()"
-                [disabled]="chatAttachments.length >= CHAT_FILE_CONFIG.maxFiles"
-              >
-                <i class="fa-solid fa-paperclip"></i>
-              </button>
-              <div class="floating-chat__emoji-wrap">
-                <button
-                  class="floating-chat__emoji-btn"
-                  type="button"
-                  title="อิโมจิ"
-                  aria-label="อิโมจิ"
-                  (click)="emojiPickerOpen = !emojiPickerOpen; $event.stopPropagation()"
+              <div class="note__msg">
+                <span
+                  *ngIf="n.referred_title === '[REFERRED]'"
+                  class="refer_tag"
+                  [class.last]="!n.isReferred"
                 >
-                  😊
-                </button>
-                @if (emojiPickerOpen) {
-                  <div class="emoji-backdrop" (click)="emojiPickerOpen = false"></div>
-                  <div class="emoji-picker" (click)="$event.stopPropagation()">
-                    <div class="emoji-picker__tabs">
-                      @for (tab of EMOJI_TABS; track $index) {
-                        <button
-                          type="button"
-                          class="emoji-picker__tab"
-                          [class.active]="emojiPickerTab === $index"
-                          (click)="emojiPickerTab = $index"
-                        >
-                          {{ tab.label }}
-                        </button>
-                      }
-                    </div>
-                    <div class="emoji-picker__grid">
-                      @for (e of EMOJI_TABS[emojiPickerTab].emojis; track e) {
-                        <button type="button" class="emoji-picker__item" (click)="insertEmoji(e)">
-                          {{ e }}
-                        </button>
-                      }
-                    </div>
-                  </div>
-                }
+                  {{ n.referred_title }}
+                </span>
+                <span *ngIf="n.referred_title === '[REJECTED]'" class="refer_tag last">
+                  {{ n.referred_title }}
+                </span>
+                {{ n.message }}
               </div>
-              <textarea
-                #chatTextareaRef
-                [(ngModel)]="chatMessage"
-                rows="1"
-                placeholder="พิมพ์ข้อความ... (พิมพ์ @ เพื่อ mention)"
-                aria-label="พิมพ์ข้อความ"
-                (keydown)="handleChatKeydown($event, t)"
-                (click)="emojiPickerOpen = false"
-              ></textarea>
-              <button
-                class="floating-chat__send"
-                type="button"
-                title="ส่งข้อความ"
-                aria-label="ส่งข้อความ"
-                [disabled]="!chatMessage.trim()"
-                (click)="sendChatMessage(t)"
-              >
-                <i class="fa-solid fa-paper-plane"></i>
-              </button>
+              <ul class="attachment-list" *ngIf="n.attachments?.length > 0">
+                <li
+                  *ngFor="let file of n.attachments"
+                  class="attachment-item"
+                  (click)="viewFile(file)"
+                >
+                  <div class="file-icon-box"><i class="far fa-file-alt"></i></div>
+                  <span class="file-name">{{ file.name }}</span>
+                  <i class="fas fa-download download-small"></i>
+                </li>
+              </ul>
+              <div class="read-receipt" *ngIf="last && readersForNote(n.id).length > 0"
+                [class.read-receipt--me]="n.createBy.empCode === currentUserEmpCode">
+                <span class="read-receipt__label">Seen</span>
+                <div class="read-receipt__avatars">
+                  <div class="read-receipt__avatar" *ngFor="let r of readersForNote(n.id)" [title]="r.nickName">
+                    <img [src]="'https://empimg.oneeclick.co:8048/employeeimage/' + r.userCodeempid + '.jpg'"
+                      [alt]="r.nickName" (error)="onImgError($event)" />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          @if (t.status_user !== 'Referred_Back') {
+            <div class="floating-chat__service-hours">
+              เวลาให้บริการวันจันทร์ – ศุกร์ 09:00 – 18:00 น. หยุดเสาร์ อาทิตย์ และนักขัตฤกษ์
             </div>
           }
-          @if (chatAttachments.length > 0 && canSendChat(t)) {
-            <div class="floating-chat__files">
-              @for (file of chatAttachments; track file.name; let i = $index) {
-                <button class="floating-chat__file" type="button" (click)="viewFile(file)">
-                  <i [class]="getFileIcon(file.name)"></i>
-                  <span>{{ file.name }}</span>
-                  <i
-                    class="fas fa-times"
-                    (click)="removeChatAttachment(i); $event.stopPropagation()"
-                  ></i>
-                </button>
-              }
-            </div>
-          }
-        </section>
-      }
+          <ng-template #noNoteFloating>
+            <div class="tk-empty">ยังไม่มีข้อความ</div>
+          </ng-template>
+        </div>
 
-      <button
-        class="floating-chat__button"
-        type="button"
-        title="เปิดแชท"
-        aria-label="เปิดแชท"
-        (click)="toggleChat()"
-      >
-        <i class="fa-solid" [ngClass]="IS_CHAT_OPEN() ? 'fa-times' : 'fa-comments'"></i>
-        @if (!IS_CHAT_OPEN() && unreadChatCount() > 0) {
-          <span class="floating-chat__badge">{{ unreadChatCount() }}</span>
+        @if (mentionVisible() && canSendChat(t)) {
+          <div class="floating-chat__mention-list" role="listbox">
+            @for (emp of mentionResults(); track emp.CODEEMPID; let i = $index) {
+              <button
+                class="floating-chat__mention-item"
+                [class.is-active]="i === mentionActiveIndex"
+                [class.is-all]="emp.CODEEMPID === '__all__'"
+                type="button"
+                role="option"
+                (mousedown)="$event.preventDefault()"
+                (click)="selectMention(emp)"
+              >
+                @if (emp.CODEEMPID === '__all__') {
+                  <div class="mention-avatar mention-avatar--all">
+                    <i class="fas fa-users"></i>
+                  </div>
+                } @else {
+                  <img
+                    class="mention-avatar"
+                    [src]="'https://empimg.oneeclick.co:8048/employeeimage/' + (emp.CODEEMPID || emp.codeempid) + '.jpg'"
+                    [alt]="emp.Nickname || emp.FullNameThai"
+                    (error)="onImgError($event)"
+                  />
+                }
+                <div class="mention-info">
+                  <span class="mention-name">{{ emp.Nickname || emp.FullNameThai }}</span>
+                  @if (emp.FullNameThai && emp.CODEEMPID !== '__all__') {
+                    <span class="mention-sub">{{ emp.FullNameThai }}</span>
+                  }
+                </div>
+              </button>
+            }
+          </div>
         }
-      </button>
+
+        @if (canSendChat(t)) {
+          <div class="floating-chat__composer">
+            <input
+              type="file"
+              multiple
+              hidden
+              #chatFileInput
+              (change)="onChatFileSelected($event)"
+            />
+            <button
+              class="floating-chat__attach"
+              type="button"
+              title="แนบไฟล์"
+              aria-label="แนบไฟล์"
+              (click)="chatFileInput.click()"
+              [disabled]="chatAttachments.length >= CHAT_FILE_CONFIG.maxFiles"
+            >
+              <i class="fa-solid fa-paperclip"></i>
+            </button>
+            <textarea
+              #chatTextareaRef
+              [(ngModel)]="chatMessage"
+              rows="1"
+              placeholder="พิมพ์ข้อความ... (พิมพ์ @ เพื่อ mention)"
+              aria-label="พิมพ์ข้อความ"
+              (keydown)="handleChatKeydown($event, t)"
+            ></textarea>
+            <button
+              class="floating-chat__send"
+              type="button"
+              title="ส่งข้อความ"
+              aria-label="ส่งข้อความ"
+              [disabled]="!chatMessage.trim()"
+              (click)="sendChatMessage(t)"
+            >
+              <i class="fa-solid fa-paper-plane"></i>
+            </button>
+          </div>
+        }
+        @if (chatAttachments.length > 0 && canSendChat(t)) {
+          <div class="floating-chat__files">
+            @for (file of chatAttachments; track file.name; let i = $index) {
+              <button class="floating-chat__file" type="button" (click)="viewFile(file)">
+                <i [class]="getFileIcon(file.name)"></i>
+                <span>{{ file.name }}</span>
+                <i
+                  class="fas fa-times"
+                  (click)="removeChatAttachment(i); $event.stopPropagation()"
+                ></i>
+              </button>
+            }
+          </div>
+        }
+      </section>
+    }
+
+    <button
+      class="floating-chat__button"
+      type="button"
+      title="เปิดแชท"
+      aria-label="เปิดแชท"
+      (click)="toggleChat()"
+    >
+      <i class="fa-solid" [ngClass]="IS_CHAT_OPEN() ? 'fa-times' : 'fa-comments'"></i>
+      @if (!IS_CHAT_OPEN() && unreadChatCount() > 0) {
+        <span class="floating-chat__badge">{{ unreadChatCount() }}</span>
+      }
+    </button>
     }
   </div>
 }
@@ -790,7 +649,7 @@
     <div class="side-profile">
       <div class="side-avatar">
         <app-avatar-preview-modal
-          [src]="getEmployeeImage(requester.emp_code)"
+          [src]="'https://empimg.oneeclick.co:8048/employeeimage/' + requester.emp_code + '.jpg'"
           [name]="
             requester.nickname
               ? requester.fullname + ' (' + requester.nickname + ')'
@@ -877,7 +736,7 @@
             <div class="assignee-item" *ngFor="let a of step.Assignee" (click)="selectAssignee(a)">
               <div class="avatar">
                 <img
-                  [src]="getEmployeeImage(a.empCode)"
+                  [src]="'https://empimg.oneeclick.co:8048/employeeimage/' + a.empCode + '.jpg'"
                   alt="รูปโปรไฟล์ของ {{ a.nickName || 'ผู้รับผิดชอบ' }}"
                   title="รูปโปรไฟล์ของ {{ a.nickName || 'ผู้รับผิดชอบ' }}"
                   (error)="onImgError($event)"
@@ -896,7 +755,11 @@
                   <div class="assignee-avatar">
                     <div class="side-avatar">
                       <app-avatar-preview-modal
-                        [src]="getEmployeeImage(selectedAssignee().empCode)"
+                        [src]="
+                          'https://empimg.oneeclick.co:8048/employeeimage/' +
+                          selectedAssignee().empCode +
+                          '.jpg'
+                        "
                         [name]="
                           selectedAssignee().nickname
                             ? selectedAssignee().fullname + ' (' + selectedAssignee().nickname + ')'

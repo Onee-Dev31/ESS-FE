@@ -16,7 +16,6 @@ import { ThemeService } from '../../services/theme.service';
 import { NotificationService } from '../../services/notification.service';
 import { NotificationInboxItem } from '../../interfaces/notification.interface';
 import { EmptyStateComponent } from '../shared/empty-state/empty-state';
-import { environment } from '../../../environments/environment';
 
 interface SearchMenuItem {
   label: string;
@@ -35,9 +34,6 @@ interface SearchMenuItem {
   styleUrl: './navbar.scss',
 })
 export class NavbarComponent {
-  getEmployeeImage(empCode: string): string {
-    return `${environment.employeeImageUrl}/${empCode}.jpg`;
-  }
   private sidebarService = inject(SidebarService);
   private authService = inject(AuthService);
   private router = inject(Router);
@@ -93,10 +89,7 @@ export class NavbarComponent {
 
     // Prime audio on first user interaction to satisfy browser autoplay policy
     const primeAudio = () => {
-      this.notifyAudio
-        .play()
-        .then(() => this.notifyAudio.pause())
-        .catch(() => {});
+      this.notifyAudio.play().then(() => this.notifyAudio.pause()).catch(() => {});
       document.removeEventListener('click', primeAudio);
     };
     document.addEventListener('click', primeAudio, { once: true });

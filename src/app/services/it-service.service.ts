@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { environment } from '../../environments/environment';
-import { HttpClient, HttpParams, HttpResponse } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { delay, Observable, of } from 'rxjs';
 import { AuthService } from './auth.service';
 
@@ -438,11 +438,7 @@ export class ItServiceService {
     return this._http.post(`${this.baseUrl}/tickets/${ticketId}/read`, { readerCodeempid });
   }
 
-  markReplyRead(
-    ticketId: string | number,
-    userCodeempid: string,
-    lastReadReplyId: number,
-  ): Observable<any> {
+  markReplyRead(ticketId: string | number, userCodeempid: string, lastReadReplyId: number): Observable<any> {
     return this._http.post(`${this.baseUrl}/tickets/${ticketId}/replies/read`, {
       userCodeempid,
       lastReadReplyId,
@@ -475,10 +471,6 @@ export class ItServiceService {
 
   updateNoteForIt(ticketId: string, payload: any): Observable<any> {
     return this._http.put<any>(`${this.baseUrl}/tickets/${ticketId}/note-for-it `, payload);
-  }
-
-  updateTicketSubCategory(ticketId: string, payload: any): Observable<any> {
-    return this._http.put<any>(`${this.baseUrl}/tickets/${ticketId}/sub-category`, payload);
   }
 
   re_open(formData: FormData): Observable<any> {
@@ -515,16 +507,6 @@ export class ItServiceService {
     return this._http.get(`${this.baseUrl}/tickets/export`, {
       params: queryParams,
       responseType: 'blob',
-    });
-  }
-
-  exportSubordinateTickets(codeEmpId: string): Observable<HttpResponse<Blob>> {
-    const params = new HttpParams().set('codeEmpId', codeEmpId);
-
-    return this._http.get(`${this.baseUrl}/tickets/subordinate/export`, {
-      params,
-      responseType: 'blob',
-      observe: 'response',
     });
   }
 
