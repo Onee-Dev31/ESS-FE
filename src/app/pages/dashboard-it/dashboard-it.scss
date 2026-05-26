@@ -1834,6 +1834,123 @@
   }
 }
 
+.note__top-right {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  align-self: flex-start;
+}
+
+.note__reply-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.15s, background 0.15s, color 0.15s;
+  font-size: 0.75rem;
+
+  &:hover {
+    background: color-mix(in srgb, var(--primary) 12%, transparent);
+    color: var(--primary);
+  }
+}
+
+.note:hover .note__reply-btn {
+  opacity: 1;
+}
+
+.note__quote {
+  margin-top: 8px;
+  padding: 6px 10px;
+  border-left: 3px solid var(--primary);
+  border-radius: 4px;
+  background: color-mix(in srgb, var(--primary) 8%, transparent);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  cursor: default;
+}
+
+.note__quote-name {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--primary);
+}
+
+.note__quote-msg {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.chat-reply-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 14px;
+  border-top: 1px solid var(--border-color);
+  background: color-mix(in srgb, var(--primary) 6%, var(--bg-card));
+}
+
+.chat-reply-bar__content {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  min-width: 0;
+  color: var(--primary);
+  font-size: 0.85rem;
+}
+
+.chat-reply-bar__text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.chat-reply-bar__name {
+  font-weight: 600;
+  font-size: 0.8rem;
+  color: var(--primary);
+}
+
+.chat-reply-bar__msg {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.chat-reply-bar__cancel {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background 0.15s, color 0.15s;
+
+  &:hover {
+    background: color-mix(in srgb, var(--danger, #ef4444) 12%, transparent);
+    color: var(--danger, #ef4444);
+  }
+}
+
 .floating-chat__composer {
   min-height: 70px;
   padding: 12px 14px;
