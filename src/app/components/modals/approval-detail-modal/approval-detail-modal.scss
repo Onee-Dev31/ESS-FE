@@ -865,6 +865,12 @@
 }
 
 // ── Day type badge ───────────────────────────────────────────
+.shift-time-range {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
 .ot-day-type {
   display: inline-block;
   font-size: 0.72rem;

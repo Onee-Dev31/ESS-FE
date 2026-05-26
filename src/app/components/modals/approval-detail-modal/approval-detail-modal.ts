@@ -230,8 +230,12 @@ export class ApprovalDetailModalComponent implements OnInit {
 
     this.approvalAllowanceService.getClaimById(item.requestId).subscribe((res) => {
       if (!res) return;
-      // console.log(res);
-      this.allowanceDetail.set(res.data);
+      const data = res.data ?? res;
+      this.allowanceDetail.set({
+        ...data,
+        departmentName: data.departmentName ?? data.department_name ?? null,
+        companyName: data.companyName ?? data.company_name ?? null,
+      });
     });
 
     this.detailedStatus.set((item.claimStatus || item.rawStatus).toLowerCase());
@@ -247,8 +251,12 @@ export class ApprovalDetailModalComponent implements OnInit {
 
     this.vehicleService.getClaimById(item.requestId).subscribe((res) => {
       if (!res) return;
-      // console.log(res.data);
-      this.vehicleDetail.set(res.data);
+      const data = res.data ?? res;
+      this.vehicleDetail.set({
+        ...data,
+        departmentName: data.departmentName ?? data.department_name ?? null,
+        companyName: data.companyName ?? data.company_name ?? null,
+      });
     });
 
     this.detailedStatus.set((item.claimStatus || item.rawStatus).toLowerCase());

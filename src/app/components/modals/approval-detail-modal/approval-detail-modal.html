@@ -204,7 +204,12 @@
                 @for (d of allowanceDetail()?.details; track d.detail_id) {
                   <tr>
                     <td>{{ dateUtil.formatDateToBE(d.work_date, 'DD/MM/YYYY') }}</td>
-                    <td>{{ d.shift_code }}</td>
+                    <td>
+                      {{ d.shift_code }}
+                      @if (d.scheduled_start && d.scheduled_end) {
+                        <div class="shift-time-range">{{ d.scheduled_start }} – {{ d.scheduled_end }}</div>
+                      }
+                    </td>
                     <td class="text-center">
                       <span class="ot-day-type" [class.holiday]="d.day_type === 'H'">
                         {{ d.day_type === 'H' ? 'วันหยุด' : 'วันทำงาน' }}
@@ -274,7 +279,12 @@
                 @for (d of vehicleDetail()?.details; track d.detail_id) {
                   <tr>
                     <td>{{ dateUtil.formatDateToBE(d.work_date, 'DD/MM/YYYY') }}</td>
-                    <td>{{ d.shift_code }}</td>
+                    <td>
+                      {{ d.shift_code }}
+                      @if (d.scheduled_start && d.scheduled_end) {
+                        <div class="shift-time-range">{{ d.scheduled_start }} – {{ d.scheduled_end }}</div>
+                      }
+                    </td>
                     <td class="text-center">
                       <span class="ot-day-type" [class.holiday]="d.day_type === 'H'">
                         {{ d.day_type === 'H' ? 'วันหยุด' : 'วันทำงาน' }}
@@ -304,11 +314,23 @@
         </div>
         <div class="side-group">
           <label>Department</label>
-          <div class="side-val">{{ approvalItem.requestBy.department }}</div>
+          <div class="side-val">
+            {{
+              allowanceDetail()?.departmentName ||
+                vehicleDetail()?.departmentName ||
+                approvalItem.requestBy.department
+            }}
+          </div>
         </div>
         <div class="side-group">
           <label>Company</label>
-          <div class="side-val">{{ approvalItem.requestBy.company }}</div>
+          <div class="side-val">
+            {{
+              allowanceDetail()?.companyName ||
+                vehicleDetail()?.companyName ||
+                approvalItem.requestBy.company
+            }}
+          </div>
         </div>
 
         <div class="side-divider"></div>
