@@ -438,7 +438,11 @@ export class ItServiceService {
     return this._http.post(`${this.baseUrl}/tickets/${ticketId}/read`, { readerCodeempid });
   }
 
-  markReplyRead(ticketId: string | number, userCodeempid: string, lastReadReplyId: number): Observable<any> {
+  markReplyRead(
+    ticketId: string | number,
+    userCodeempid: string,
+    lastReadReplyId: number,
+  ): Observable<any> {
     return this._http.post(`${this.baseUrl}/tickets/${ticketId}/replies/read`, {
       userCodeempid,
       lastReadReplyId,
