@@ -1224,6 +1224,252 @@ export class ITServiceRequestSpecificComponent implements OnInit {
     });
   }
 
+  // Validate
+  validateRequiredField(event: Event, person: any, field: string, label: string) {
+    const input = event.target as HTMLInputElement;
+
+    const value = input.value.trim();
+
+    person.freelance[field] = value;
+
+    person.errors ??= {};
+
+    if (!value) {
+      person.errors[field] = `กรุณากรอก${label}`;
+    } else {
+      delete person.errors[field];
+    }
+
+    this.touchSpecificPeople();
+  }
+  validateSelectField(value: any, person: any, field: string, label: string) {
+    person.errors ??= {};
+
+    if (!value) {
+      person.errors[field] = `กรุณาเลือก${label}`;
+    } else {
+      delete person.errors[field];
+    }
+
+    this.touchSpecificPeople();
+  }
+  validateThaiField(event: Event, person: any, field: string, label: string) {
+    const input = event.target as HTMLInputElement;
+
+    const thaiOnly = input.value.replace(/[^ก-๙\s]/g, '');
+
+    input.value = thaiOnly;
+
+    person.freelance[field] = thaiOnly;
+
+    person.errors ??= {};
+
+    if (!thaiOnly.trim()) {
+      person.errors[field] = `กรุณากรอก${label}`;
+    } else {
+      delete person.errors[field];
+    }
+
+    this.touchSpecificPeople();
+  }
+  validateEnglishField(event: Event, person: any, field: string, label: string) {
+    const input = event.target as HTMLInputElement;
+
+    const englishOnly = input.value.replace(/[^a-zA-Z\s]/g, '');
+
+    input.value = englishOnly;
+
+    person.freelance[field] = englishOnly;
+
+    person.errors ??= {};
+
+    if (!englishOnly.trim()) {
+      person.errors[field] = `กรุณากรอก${label}`;
+    } else {
+      delete person.errors[field];
+    }
+
+    this.touchSpecificPeople();
+  }
+
+  validateEmail(event: Event, person: any) {
+    const input = event.target as HTMLInputElement;
+
+    const value = input.value.trim();
+
+    person.freelance.email = value;
+
+    person.errors ??= {};
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    if (!value) {
+      person.errors['email'] = 'กรุณากรอกอีเมล';
+    } else if (!emailRegex.test(value)) {
+      person.errors['email'] = 'รูปแบบอีเมลไม่ถูกต้อง';
+    } else {
+      delete person.errors['email'];
+    }
+
+    this.touchSpecificPeople();
+  }
+  clearFreelanceErrors(person: any) {
+    if (!person.errors) {
+      return;
+    }
+
+    const freelanceFields = [
+      'firstNameTh',
+      'lastNameTh',
+      'firstNameEn',
+      'lastNameEn',
+      'company',
+      'department',
+      'position',
+      'email',
+    ];
+
+    freelanceFields.forEach((field) => {
+      delete person.errors[field];
+    });
+  }
+
+  // ระบบเฉพาะ
+  validateOracleCompany(companyItem: any, person: any, index: number) {
+    person.errors ??= {};
+
+    const key = 'oracle_company_' + index;
+
+    if (!companyItem.company) {
+      person.errors[key] = 'กรุณาเลือกบริษัท';
+    } else {
+      delete person.errors[key];
+    }
+
+    this.touchSpecificPeople();
+  }
+  validateAllOraclePermissions(person: any) {
+    person.errors ??= {};
+
+    person.oracle.companies.forEach((companyItem: any, index: number) => {
+      const key = 'oracle_permission_' + index;
+
+      const hasPermission = companyItem.modules?.some((m: any) => {
+        const permission = (m.permission ?? '').trim();
+
+        return permission !== '' && permission !== '-';
+      });
+
+      if (!hasPermission) {
+        person.errors[key] = 'กรุณาเลือกสิทธิ์อย่างน้อย 1 รายการ';
+      } else {
+        delete person.errors[key];
+      }
+    });
+
+    this.touchSpecificPeople();
+  }
+  validateBmsCompanies(person: any) {
+    person.errors ??= {};
+
+    if (!person.bms.companies?.length) {
+      person.errors['bms_companies'] = 'กรุณาเลือกบริษัท';
+    } else {
+      delete person.errors['bms_companies'];
+    }
+
+    this.touchSpecificPeople();
+  }
+  validateBmsDetail(event: Event, person: any) {
+    const input = event.target as HTMLInputElement;
+
+    const value = input.value.trim();
+
+    person.bms.detail = value;
+
+    person.errors ??= {};
+
+    if (!value) {
+      person.errors['bms_detail'] = 'กรุณากรอกสิทธิ์';
+    } else {
+      delete person.errors['bms_detail'];
+    }
+
+    this.touchSpecificPeople();
+  }
+  validateOneeCompanies(person: any) {
+    person.errors ??= {};
+
+    if (!person.onee.companies?.length) {
+      person.errors['onee_companies'] = 'กรุณาเลือกบริษัท';
+    } else {
+      delete person.errors['onee_companies'];
+    }
+
+    this.touchSpecificPeople();
+  }
+  validateOneePermission(value: any, person: any) {
+    person.errors ??= {};
+
+    if (!value) {
+      person.errors['onee_permission'] = 'กรุณาเลือกสิทธิ์';
+    } else {
+      delete person.errors['onee_permission'];
+    }
+
+    this.touchSpecificPeople();
+  }
+  validateOneeSupervisor(event: Event, person: any) {
+    const input = event.target as HTMLInputElement;
+
+    const value = input.value.trim();
+
+    person.onee.supervisor = value;
+
+    person.errors ??= {};
+
+    if (!value) {
+      person.errors['onee_supervisor'] = 'กรุณากรอกหัวหน้างาน';
+    } else {
+      delete person.errors['onee_supervisor'];
+    }
+
+    this.touchSpecificPeople();
+  }
+  validateOnePortalCompanies(person: any) {
+    person.errors ??= {};
+
+    if (!person.onePortal.companies?.length) {
+      person.errors['oneportal_companies'] = 'กรุณาเลือกบริษัท';
+    } else {
+      delete person.errors['oneportal_companies'];
+    }
+
+    this.touchSpecificPeople();
+  }
+  validateOnePortalResponseType(value: any, person: any) {
+    person.errors ??= {};
+
+    if (!value) {
+      person.errors['oneportal_response_type'] = 'กรุณาเลือกประเภทสิทธิ์';
+    } else {
+      delete person.errors['oneportal_response_type'];
+    }
+
+    this.touchSpecificPeople();
+  }
+  clearSystemErrors(person: any, system: string) {
+    if (!person.errors) {
+      return;
+    }
+
+    Object.keys(person.errors).forEach((key) => {
+      if (key.startsWith(system)) {
+        delete person.errors[key];
+      }
+    });
+  }
+
   // MASTER
   getMasterPermission() {
     this.masterService.MasterPermission().subscribe({
