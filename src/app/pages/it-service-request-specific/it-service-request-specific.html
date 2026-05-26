@@ -250,6 +250,105 @@
 
             @if (person.systems.length) {
               <div class="system-detail-grid">
+                @if (person.systems.includes('oracle')) {
+                  <div
+                    class="system-detail-card"
+                    [class.oracle-full-width]="person.oracle.companies.length > 1"
+                  >
+                    <div class="oracle-top-bar">
+                      <h6 class="form-label">Oracle</h6>
+
+                      <button class="btn-add" type="button" (click)="addOracleCompany(person)">
+                        + เพิ่มบริษัท
+                      </button>
+                    </div>
+                    <div [class.oracle-company-grid]="person.oracle.companies.length > 1">
+                      @for (companyItem of person.oracle.companies; track $index) {
+                        <div class="oracle-company-box">
+                          <div class="oracle-company-header">
+                            <div class="form-field oracle-company-select">
+                              <label>บริษัท</label>
+
+                              <nz-select
+                                nzShowSearch
+                                nzAllowClear
+                                nzPlaceHolder="เลือกบริษัท"
+                                [(ngModel)]="companyItem.company"
+                                [name]="'company-' + $index"
+                                class="form-input"
+                                (ngModelChange)="touchSpecificPeople()"
+                              >
+                                <nz-option
+                                  *ngFor="let company of companyList"
+                                  [nzLabel]="
+                                    company.COMPANY_NAME + ' (' + company.COMPANY_CODE + ')'
+                                  "
+                                  [nzValue]="company"
+                                />
+                              </nz-select>
+                            </div>
+
+                            @if (person.oracle.companies.length > 1) {
+                              <button
+                                class="btn-delete"
+                                type="button"
+                                (click)="removeOracleCompany(person, $index)"
+                              >
+                                ลบ
+                              </button>
+                            }
+                          </div>
+
+                          <div class="module-permission-list">
+                            <div class="module-permission-row">
+                              <div class="form-field module-field">
+                                <label>module</label>
+                              </div>
+
+                              <div class="form-field permission-field">
+                                <label>สิทธิ์</label>
+                              </div>
+                            </div>
+
+                            @for (item of companyItem.modules; track item.module) {
+                              <div class="module-permission-row">
+                                <div class="form-field module-field">
+                                  <input
+                                    nz-input
+                                    class="form-input readonly"
+                                    [value]="item.module"
+                                    readonly
+                                  />
+                                </div>
+
+                                <div class="form-field permission-field">
+                                  <nz-select
+                                    nzPlaceHolder="เลือกสิทธิ์"
+                                    [(ngModel)]="item.permission"
+                                    [name]="'permission-' + item.module + '-' + $index"
+                                    class="form-input"
+                                    (ngModelChange)="touchSpecificPeople()"
+                                  >
+                                    @for (
+                                      permission of oraclePermissions;
+                                      track permission.RoleName
+                                    ) {
+                                      <nz-option
+                                        [nzValue]="permission.RoleName"
+                                        [nzLabel]="permission.RoleName"
+                                      />
+                                    }
+                                  </nz-select>
+                                </div>
+                              </div>
+                            }
+                          </div>
+                        </div>
+                      }
+                    </div>
+                  </div>
+                }
+
                 @if (person.systems.includes('bms')) {
                   <div class="system-detail-card">
                     <h6 class="form-label">BMS</h6>
@@ -287,70 +386,6 @@
                   </div>
                 }
 
-                @if (person.systems.includes('oracle')) {
-                  <div class="system-detail-card">
-                    <h6 class="form-label">Oracle</h6>
-                    <div class="form-field">
-                      <nz-select
-                        nzShowSearch
-                        nzAllowClear
-                        nzMode="multiple"
-                        nzPlaceHolder="เลือกบริษัท"
-                        [(ngModel)]="person.oracle.companies"
-                        name="company"
-                        class="form-input multiple"
-                        required
-                        #company="ngModel"
-                        [class.input-error]="company.invalid && company.touched"
-                      >
-                        <nz-option
-                          *ngFor="let company of companyList"
-                          [nzLabel]="company.COMPANY_NAME + ' (' + company.COMPANY_CODE + ')'"
-                          [nzValue]="company"
-                        />
-                      </nz-select>
-                    </div>
-
-                    <div class="module-permission-list">
-                      <div class="module-permission-row">
-                        <div class="form-field module-field">
-                          <label>module</label>
-                        </div>
-                        <div class="form-field permission-field">
-                          <label>สิทธิ์</label>
-                        </div>
-                      </div>
-                      @for (item of person.oracle.modules; track item.module) {
-                        <div class="module-permission-row">
-                          <div class="form-field module-field">
-                            <input
-                              nz-input
-                              class="form-input readonly"
-                              [value]="item.module"
-                              readonly
-                            />
-                          </div>
-                          <div class="form-field permission-field">
-                            <nz-select
-                              nzPlaceHolder="เลือกสิทธิ์"
-                              [(ngModel)]="item.permission"
-                              [name]="'permission-' + item.module"
-                              class="form-input"
-                            >
-                              @for (permission of oraclePermissions; track permission) {
-                                <nz-option
-                                  [nzValue]="permission.RoleName"
-                                  [nzLabel]="permission.RoleName"
-                                ></nz-option>
-                              }
-                            </nz-select>
-                          </div>
-                        </div>
-                      }
-                    </div>
-                  </div>
-                }
-
                 @if (person.systems.includes('onee')) {
                   <div class="system-detail-card">
                     <h6 class="form-label">OneE</h6>
@@ -366,6 +401,7 @@
                         required
                         #company="ngModel"
                         [class.input-error]="company.invalid && company.touched"
+                        (ngModelChange)="touchSpecificPeople()"
                       >
                         <nz-option
                           *ngFor="let company of companyList"
@@ -382,6 +418,7 @@
                         [(ngModel)]="person.onee.permission"
                         name="onee_permission"
                         class="form-input"
+                        (ngModelChange)="touchSpecificPeople()"
                       >
                         @for (item of oneePermissions; track item) {
                           <nz-option
@@ -402,6 +439,7 @@
                         placeholder="กรอกชื่อหัวหน้างาน"
                         [(ngModel)]="person.onee.supervisor"
                         name="onee_supervisor"
+                        (ngModelChange)="touchSpecificPeople()"
                       />
                     </div>
                   </div>
@@ -422,6 +460,7 @@
                         required
                         #company="ngModel"
                         [class.input-error]="company.invalid && company.touched"
+                        (ngModelChange)="touchSpecificPeople()"
                       >
                         <nz-option
                           *ngFor="let company of companyList"
@@ -438,6 +477,7 @@
                         [(ngModel)]="person.onePortal.responseType"
                         name="portal_response_type"
                         class="form-input"
+                        (ngModelChange)="touchSpecificPeople()"
                       >
                         @for (item of onePortalResponseTypes; track item) {
                           <nz-option

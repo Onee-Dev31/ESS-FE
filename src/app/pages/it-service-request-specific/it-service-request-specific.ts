@@ -28,6 +28,17 @@ import { formatText } from '../../utils/formatText';
 
 type SpecificSystemKey = 'bms' | 'oracle' | 'onee' | 'onePortal';
 
+interface OracleCompany {
+  company: any;
+
+  modules: OracleModulePermission[];
+}
+
+interface OracleModulePermission {
+  module: string;
+  permission: string;
+}
+
 interface SpecificPersonRequest {
   id: number;
   openFor: any;
@@ -56,11 +67,7 @@ interface SpecificPersonRequest {
   };
 
   oracle: {
-    companies: any[];
-    modules: {
-      module: string;
-      permission: string;
-    }[];
+    companies: OracleCompany[];
   };
 
   onee: {
@@ -213,10 +220,26 @@ export class ITServiceRequestSpecificComponent implements OnInit {
     this.specificPeople.update((people) => people.filter((person) => person.id !== personId));
   }
 
+  // togglePersonSystem(person: SpecificPersonRequest, system: SpecificSystemKey) {
+  //   person.systems = person.systems.includes(system)
+  //     ? person.systems.filter((item) => item !== system)
+  //     : [...person.systems, system];
+  //   this.touchSpecificPeople();
+  // }
   togglePersonSystem(person: SpecificPersonRequest, system: SpecificSystemKey) {
-    person.systems = person.systems.includes(system)
-      ? person.systems.filter((item) => item !== system)
-      : [...person.systems, system];
+    const exists = person.systems.includes(system);
+
+    if (exists) {
+      person.systems = person.systems.filter((item) => item !== system);
+    } else {
+      person.systems = [...person.systems, system];
+
+      // auto create first oracle company
+      if (system === 'oracle' && person.oracle.companies.length === 0) {
+        this.addOracleCompany(person);
+      }
+    }
+
     this.touchSpecificPeople();
   }
 
@@ -369,6 +392,7 @@ export class ITServiceRequestSpecificComponent implements OnInit {
       onee: person.systems.includes('onee') ? person.onee : null,
       onePortal: person.systems.includes('onePortal') ? person.onePortal : null,
     }));
+    console.log(payload);
     const summary = this.buildRequestSummary(payload);
 
     this.summaryText.set(summary);
@@ -612,10 +636,6 @@ export class ITServiceRequestSpecificComponent implements OnInit {
 
       oracle: {
         companies: [],
-        modules: this.oracleModules.map((module: any) => ({
-          module: module.ModuleCode,
-          permission: '-',
-        })),
       },
 
       onee: {
@@ -632,13 +652,133 @@ export class ITServiceRequestSpecificComponent implements OnInit {
     };
   }
 
+  addOracleCompany(person: any) {
+    console.log(this.oracleModules);
+    person.oracle.companies.push({
+      company: null,
+
+      modules: this.oracleModules.map((item: any) => ({
+        module: item.ModuleCode,
+        permission: '-',
+      })),
+    });
+
+    this.touchSpecificPeople();
+  }
+
+  removeOracleCompany(person: any, index: number) {
+    person.oracle.companies.splice(index, 1);
+  }
+
+  // private isSpecificPersonValid(person: SpecificPersonRequest): boolean {
+  //   const isFreelance = person?.openFor?.value === '__FREELANCE__';
+
+  //   // validation พื้นฐาน
+  //   if (!person.openFor || person.systems.length === 0) {
+  //     return false;
+  //   }
+
+  //   // ข้ามเฉพาะ phone validation ถ้าเป็น freelance
+  //   if (!isFreelance) {
+  //     const phoneDigits = (person.phone ?? '').replace(/\D/g, '');
+
+  //     const phoneValid = phoneDigits.length === 4 || phoneDigits.length === 10;
+
+  //     if (!phoneValid) {
+  //       return false;
+  //     }
+  //   }
+
+  //   return true;
+  // }
+
   private isSpecificPersonValid(person: SpecificPersonRequest): boolean {
-    const phoneDigits = (person.phone ?? '').replace(/\D/g, '');
+    console.log(person);
+    const isFreelance = person?.openFor?.value === '__FREELANCE__';
 
-    const phoneValid = phoneDigits.length === 4 || phoneDigits.length === 10;
+    // =========================
+    // BASIC
+    // =========================
 
-    if (!person.openFor || !phoneValid || person.systems.length === 0) {
+    if (!person.openFor || person.systems.length === 0) {
       return false;
+    }
+
+    // =========================
+    // PHONE
+    // =========================
+
+    // freelance ข้าม phone validation
+    if (!isFreelance) {
+      const phoneDigits = (person.phone ?? '').replace(/\D/g, '');
+
+      const phoneValid = phoneDigits.length === 4 || phoneDigits.length === 10;
+
+      if (!phoneValid) {
+        return false;
+      }
+    }
+
+    // =========================
+    // ONE PORTAL
+    // =========================
+
+    if (person.systems.includes('onePortal')) {
+      if (!person.onePortal.companies?.length || !person.onePortal.responseType?.trim()) {
+        return false;
+      }
+    }
+
+    // =========================
+    // ONEE
+    // =========================
+
+    if (person.systems.includes('onee')) {
+      if (
+        !person.onee.companies?.length ||
+        !person.onee.permission?.trim() ||
+        !person.onee.supervisor?.trim()
+      ) {
+        return false;
+      }
+    }
+
+    // =========================
+    // BMS
+    // =========================
+
+    if (person.systems.includes('bms')) {
+      if (!person.bms.companies?.length || !person.bms.detail?.trim()) {
+        return false;
+      }
+    }
+
+    // =========================
+    // ORACLE
+    // =========================
+
+    if (person.systems.includes('oracle')) {
+      console.log(person.oracle.companies.some((item: any) => !item.company));
+      if (person.oracle.companies.some((item: any) => !item.company?.COMPANY_CODE)) {
+        return false;
+      }
+      // ต้องมี company จริง
+      const validCompanies = person.oracle.companies.filter((item: any) => item.company);
+
+      console.log(person.oracle.companies, validCompanies);
+
+      if (!validCompanies.length) {
+        return false;
+      }
+
+      // ทุก company ต้องมี permission อย่างน้อย 1 ตัว
+      const allCompaniesValid = validCompanies.every((item: any) =>
+        item.modules?.some((m: any) => m.permission && m.permission.trim() !== '-'),
+      );
+
+      if (!allCompaniesValid) {
+        return false;
+      }
     }
 
     return true;
@@ -716,17 +856,27 @@ export class ITServiceRequestSpecificComponent implements OnInit {
         // =========================
 
         if (person.systems.includes('oracle') && person.oracle) {
-          sections.push('ระบบ : Oracle');
+          sections.push('<strong>ระบบ : Oracle</strong>');
 
-          const selectedModules = person.oracle.modules.filter(
-            (m: any) => m.permission && m.permission.trim() !== '-',
-          );
+          person.oracle.companies.forEach((companyItem: any) => {
+            if (companyItem.company) {
+              sections.push(
+                `บริษัท : ${companyItem.company.COMPANY_NAME} (${companyItem.company.COMPANY_CODE})`,
+              );
+            }
 
-          selectedModules.forEach((m: any) => {
-            sections.push(`${m.module.trim()} - ${m.permission.trim()}`);
+            const selectedModules = companyItem.modules.filter(
+              (m: any) => m.permission && m.permission.trim() !== '-',
+            );
+
+            selectedModules.forEach((m: any) => {
+              sections.push(`${m.module.trim()} - ${m.permission.trim()}`);
+            });
+
+            sections.push('');
           });
 
-          sections.push('');
+          sections.push('<hr>');
         }
 
         // =========================
@@ -734,7 +884,7 @@ export class ITServiceRequestSpecificComponent implements OnInit {
         // =========================
 
         if (person.systems.includes('bms') && person.bms) {
-          sections.push('ระบบ : BMS');
+          sections.push('<strong>ระบบ : BMS</strong>');
 
           person.bms.companies.forEach((company: any) => {
             sections.push(`${company.COMPANY_NAME} (${company.COMPANY_CODE})`);
@@ -744,7 +894,7 @@ export class ITServiceRequestSpecificComponent implements OnInit {
             sections.push(`สิทธิ์เหมือน : ${person.bms.detail}`);
           }
 
-          sections.push('');
+          sections.push('<hr>');
         }
 
         // =========================
@@ -752,7 +902,7 @@ export class ITServiceRequestSpecificComponent implements OnInit {
         // =========================
 
         if (person.systems.includes('onePortal') && person.onePortal) {
-          sections.push('ระบบ : One Portal');
+          sections.push('<strong>ระบบ : One Portal</strong>');
 
           person.onePortal.companies.forEach((company: any) => {
             sections.push(`${company.COMPANY_NAME} (${company.COMPANY_CODE})`);
@@ -762,7 +912,7 @@ export class ITServiceRequestSpecificComponent implements OnInit {
             sections.push(`ประเภทสิทธิ์ : ${person.onePortal.responseType}`);
           }
 
-          sections.push('');
+          sections.push('<hr>');
         }
 
         // =========================
@@ -770,21 +920,21 @@ export class ITServiceRequestSpecificComponent implements OnInit {
         // =========================
 
         if (person.systems.includes('onee') && person.onee) {
-          sections.push('ระบบ : OneE');
+          sections.push('<strong>ระบบ : OneE</strong>');
 
           person.onee.companies.forEach((company: any) => {
             sections.push(`${company.COMPANY_NAME} (${company.COMPANY_CODE})`);
           });
 
           if (person.onee.permission) {
-            sections.push(`สิทธิ์ : ${person.onee.permission}`);
+            sections.push(`สิทธิ์ : ${person.onee.permission.trim()}`);
           }
 
           if (person.onee.supervisor) {
-            sections.push(`หัวหน้างาน : ${person.onee.supervisor}`);
+            sections.push(`หัวหน้างาน : ${person.onee.supervisor.trim()}`);
           }
 
-          sections.push('');
+          sections.push('<hr>');
         }
 
         // =========================
