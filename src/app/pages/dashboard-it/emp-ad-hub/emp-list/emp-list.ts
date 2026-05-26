@@ -61,14 +61,19 @@ export class EmpList {
       next: (res: any[]) => {
         const list = Array.isArray(res) ? res : ((res as any)?.data ?? []);
         const seen = new Set<string>();
-        this.companyList = list
+        const companyList = list
           .filter(
             (c: any) => c.COMPANY_CODE && !seen.has(c.COMPANY_CODE) && seen.add(c.COMPANY_CODE),
           )
           .map((c: any) => ({
-            code: c.COMPANY_CODE,
+            code: String(c.COMPANY_CODE),
             label: `${c.COMPANY_CODE} - ${c.COMPANY_NAME}`,
           }));
+
+        queueMicrotask(() => {
+          this.companyList = companyList;
+          this.cdr.markForCheck();
+        });
       },
       error: () => {},
     });
@@ -83,11 +88,11 @@ export class EmpList {
         this.buildOptions();
         this.applyFilter();
         this.isLoading = false;
-        this.cdr.detectChanges();
+        this.cdr.markForCheck();
       },
       error: () => {
         this.isLoading = false;
-        this.cdr.detectChanges();
+        this.cdr.markForCheck();
       },
     });
   }
@@ -129,7 +134,7 @@ export class EmpList {
   }
 
   onCompanyChange(code: string) {
-    this.filterCompany = code;
+    this.filterCompany = code ?? '';
     this.filterDepartment = '';
     this.filteredDepartmentOptions = code
       ? [

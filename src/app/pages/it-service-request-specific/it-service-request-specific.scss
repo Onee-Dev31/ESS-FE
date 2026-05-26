@@ -134,7 +134,7 @@ $table-label-bg: var(--border-toolbar);
   .form-group {
     display: flex;
     flex-direction: column;
-    gap: 0.75rem;
+    gap: 0.5rem;
     width: 100%;
 
     label,
@@ -1755,8 +1755,9 @@ $table-label-bg: var(--border-toolbar);
   }
 
   .error {
-    color: rgb(255, 166, 166);
+    color: rgb(255, 133, 133);
     text-align: center;
+    font-size: $font-size-hint;
   }
 
   ::ng-deep .select-status.ant-select {
@@ -1835,6 +1836,12 @@ $table-label-bg: var(--border-toolbar);
   display: flex;
   flex-direction: column;
   gap: 16px;
+
+  .error {
+    color: rgb(255, 133, 133);
+    text-align: center;
+    font-size: $font-size-hint;
+  }
 }
 
 .module-permission-row {

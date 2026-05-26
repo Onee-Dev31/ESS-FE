@@ -66,7 +66,7 @@
           </div>
 
           <div class="form-section two-col highlight-blue" style="padding-bottom: 24px">
-            <div class="form-field" style="gap: 0.75rem">
+            <div class="form-field" style="gap: 0.5rem">
               <label class="form-label"
                 >ชื่อ / รหัสพนักงาน <span class="required-badge">*</span></label
               >
@@ -86,63 +86,101 @@
               </nz-select>
             </div>
 
-            <div class="form-group" *ngIf="person.openFor?.value !== '__FREELANCE__'">
+            <div class="form-group">
               <label class="form-label">เบอร์ติดต่อ <span class="required-badge">*</span></label>
               <input
                 class="form-control"
                 type="text"
                 placeholder="เบอร์ภายในหรือเบอร์มือถือ"
                 [(ngModel)]="person.phone"
+                (input)="onSpecificPhoneInput($event, person)"
                 (ngModelChange)="touchSpecificPeople()"
                 [name]="'phone' + person.id"
               />
+              @if (person.phoneError) {
+                <span class="error-text">
+                  {{ person.phoneError }}
+                </span>
+              }
             </div>
           </div>
           @if (person.openFor?.value === '__FREELANCE__') {
             <div class="freelance-section">
               <div class="form-section two-col">
                 <div class="form-field">
-                  <label>ชื่อ</label>
+                  <label>ชื่อภาษาไทย</label>
 
                   <input
                     nz-input
                     class="form-input"
                     [(ngModel)]="person.freelance.firstNameTh"
                     [name]="'firstNameTh' + person.id"
+                    (input)="validateThaiField($event, person, 'firstNameTh', 'ชื่อภาษาไทย')"
+                    (focus)="validateThaiField($event, person, 'firstNameTh', 'ชื่อภาษาไทย')"
                   />
+                  @if (person.errors?.['firstNameTh']) {
+                    <span class="error">
+                      {{ person.errors?.['firstNameTh'] }}
+                    </span>
+                  }
                 </div>
 
                 <div class="form-field">
-                  <label>นามสกุล</label>
+                  <label>นามสกุลภาษาไทย</label>
 
                   <input
                     nz-input
                     class="form-input"
                     [(ngModel)]="person.freelance.lastNameTh"
                     [name]="'lastNameTh' + person.id"
+                    (input)="validateThaiField($event, person, 'lastNameTh', 'นามสกุลภาษาไทย')"
+                    (focus)="validateThaiField($event, person, 'lastNameTh', 'นามสกุลภาษาไทย')"
                   />
+                  @if (person.errors?.['lastNameTh']) {
+                    <span class="error">
+                      {{ person.errors?.['lastNameTh'] }}
+                    </span>
+                  }
                 </div>
 
                 <div class="form-field">
-                  <label>Name</label>
+                  <label>ชื่อภาษาอังกฤษ</label>
 
                   <input
                     nz-input
                     class="form-input"
                     [(ngModel)]="person.freelance.firstNameEn"
                     [name]="'firstNameEn' + person.id"
+                    (input)="validateEnglishField($event, person, 'firstNameEn', 'ชื่อภาษาอังกฤษ')"
+                    (focus)="validateEnglishField($event, person, 'firstNameEn', 'ชื่อภาษาอังกฤษ')"
                   />
+                  @if (person.errors?.['firstNameEn']) {
+                    <span class="error">
+                      {{ person.errors?.['firstNameEn'] }}
+                    </span>
+                  }
                 </div>
 
                 <div class="form-field">
-                  <label>SurName</label>
+                  <label>นามสกุลภาษาอังกฤษ</label>
 
                   <input
                     nz-input
                     class="form-input"
                     [(ngModel)]="person.freelance.lastNameEn"
                     [name]="'lastNameEn' + person.id"
+                    (input)="
+                      validateEnglishField($event, person, 'lastNameEn', 'นามสกุลภาษาอังกฤษ')
+                    "
+                    (focus)="
+                      validateEnglishField($event, person, 'lastNameEn', 'นามสกุลภาษาอังกฤษ')
+                    "
                   />
+                  @if (person.errors?.['lastNameEn']) {
+                    <span class="error">
+                      {{ person.errors?.['lastNameEn'] }}
+                    </span>
+                  }
                 </div>
 
                 <!-- <div class="form-field">
@@ -157,7 +195,7 @@
                 </div> -->
 
                 <div class="form-field">
-                  <label>สังกัดบริษัท</label>
+                  <label>บริษัท</label>
                   <nz-select
                     nzShowSearch
                     nzAllowClear
@@ -165,7 +203,13 @@
                     [(ngModel)]="person.freelance.company"
                     [name]="'company' + person.id"
                     class="form-input"
-                    (ngModelChange)="onCompanyChange(person, $event)"
+                    (ngModelChange)="
+                      validateSelectField($event, person, 'company', 'บริษัท');
+                      onCompanyChange(person, $event)
+                    "
+                    (nzBlur)="
+                      validateSelectField(person.freelance.company, person, 'company', 'บริษัท')
+                    "
                   >
                     <nz-option
                       *ngFor="let company of companyList"
@@ -173,10 +217,15 @@
                       [nzValue]="company"
                     />
                   </nz-select>
+                  @if (person.errors?.['company']) {
+                    <span class="error">
+                      {{ person.errors?.['company'] }}
+                    </span>
+                  }
                 </div>
 
                 <div class="form-field">
-                  <label>แผนก / ฝ่าย</label>
+                  <label>แผนก</label>
 
                   <nz-select
                     nzShowSearch
@@ -185,6 +234,10 @@
                     [(ngModel)]="person.freelance.department"
                     [name]="'department' + person.id"
                     class="form-input"
+                    (ngModelChange)="validateSelectField($event, person, 'department', 'แผนก')"
+                    (nzBlur)="
+                      validateSelectField(person.freelance.department, person, 'department', 'แผนก')
+                    "
                   >
                     <nz-option
                       *ngFor="let department of person.freelance.filteredDepartments"
@@ -192,6 +245,11 @@
                       [nzValue]="department"
                     />
                   </nz-select>
+                  @if (person.errors?.['department']) {
+                    <span class="error">
+                      {{ person.errors?.['department'] }}
+                    </span>
+                  }
                 </div>
 
                 <div class="form-field">
@@ -202,21 +260,35 @@
                     class="form-input"
                     [(ngModel)]="person.freelance.position"
                     [name]="'position' + person.id"
+                    (input)="validateRequiredField($event, person, 'position', 'ตำแหน่ง')"
+                    (focus)="validateRequiredField($event, person, 'position', 'ตำแหน่ง')"
                   />
+                  @if (person.errors?.['position']) {
+                    <span class="error">
+                      {{ person.errors?.['position'] }}
+                    </span>
+                  }
                 </div>
 
                 <div class="form-field">
-                  <label>Email</label>
+                  <label>อีเมล</label>
 
                   <input
                     nz-input
                     class="form-input"
                     [(ngModel)]="person.freelance.email"
                     [name]="'email' + person.id"
+                    (input)="validateEmail($event, person)"
+                    (focus)="validateEmail($event, person)"
                   />
+                  @if (person.errors?.['email']) {
+                    <span class="error">
+                      {{ person.errors?.['email'] }}
+                    </span>
+                  }
                 </div>
 
-                <div class="form-field">
+                <!-- <div class="form-field">
                   <label>เบอร์</label>
 
                   <input
@@ -225,7 +297,7 @@
                     [(ngModel)]="person.freelance.phone"
                     [name]="'freelancePhone' + person.id"
                   />
-                </div>
+                </div> -->
               </div>
             </div>
           }
@@ -276,7 +348,8 @@
                                 [(ngModel)]="companyItem.company"
                                 [name]="'company-' + $index"
                                 class="form-input"
-                                (ngModelChange)="touchSpecificPeople()"
+                                (ngModelChange)="validateOracleCompany(companyItem, person, $index)"
+                                (nzBlur)="validateOracleCompany(companyItem, person, $index)"
                               >
                                 <nz-option
                                   *ngFor="let company of companyList"
@@ -286,6 +359,11 @@
                                   [nzValue]="company"
                                 />
                               </nz-select>
+                              @if (person.errors?.['oracle_company_' + $index]) {
+                                <span class="error">
+                                  {{ person.errors?.['oracle_company_' + $index] }}
+                                </span>
+                              }
                             </div>
 
                             @if (person.oracle.companies.length > 1) {
@@ -327,7 +405,7 @@
                                     [(ngModel)]="item.permission"
                                     [name]="'permission-' + item.module + '-' + $index"
                                     class="form-input"
-                                    (ngModelChange)="touchSpecificPeople()"
+                                    (ngModelChange)="validateAllOraclePermissions(person)"
                                   >
                                     @for (
                                       permission of oraclePermissions;
@@ -341,6 +419,11 @@
                                   </nz-select>
                                 </div>
                               </div>
+                            }
+                            @if (person.errors?.['oracle_permission_' + $index]) {
+                              <span class="error">
+                                {{ person.errors?.['oracle_permission_' + $index] }}
+                              </span>
                             }
                           </div>
                         </div>
@@ -363,8 +446,8 @@
                         class="form-input multiple"
                         required
                         #company="ngModel"
-                        [class.input-error]="company.invalid && company.touched"
-                        (ngModelChange)="touchSpecificPeople()"
+                        (ngModelChange)="validateBmsCompanies(person)"
+                        (nzBlur)="validateBmsCompanies(person)"
                       >
                         <!-- <nz-option nzLabel="เลือกบริษัท" nzValue="" nzDisabled /> -->
                         <nz-option
@@ -373,6 +456,11 @@
                           [nzValue]="company"
                         />
                       </nz-select>
+                      @if (person.errors?.['bms_companies']) {
+                        <span class="error">
+                          {{ person.errors?.['bms_companies'] }}
+                        </span>
+                      }
                     </div>
 
                     <div class="form-field">
@@ -382,7 +470,14 @@
                         [(ngModel)]="person.bms.detail"
                         (ngModelChange)="touchSpecificPeople()"
                         [name]="'bmsCompany' + person.id"
+                        (input)="validateBmsDetail($event, person)"
+                        (focus)="validateBmsDetail($event, person)"
                       />
+                      @if (person.errors?.['bms_detail']) {
+                        <span class="error">
+                          {{ person.errors?.['bms_detail'] }}
+                        </span>
+                      }
                     </div>
                   </div>
                 }
@@ -401,8 +496,8 @@
                         class="form-input multiple"
                         required
                         #company="ngModel"
-                        [class.input-error]="company.invalid && company.touched"
-                        (ngModelChange)="touchSpecificPeople()"
+                        (ngModelChange)="validateOneeCompanies(person)"
+                        (nzBlur)="validateOneeCompanies(person)"
                       >
                         <nz-option
                           *ngFor="let company of companyList"
@@ -410,6 +505,11 @@
                           [nzValue]="company"
                         />
                       </nz-select>
+                      @if (person.errors?.['onee_companies']) {
+                        <span class="error">
+                          {{ person.errors?.['onee_companies'] }}
+                        </span>
+                      }
                     </div>
                     <div class="form-field">
                       <label>สิทธิ์</label>
@@ -419,7 +519,8 @@
                         [(ngModel)]="person.onee.permission"
                         name="onee_permission"
                         class="form-input"
-                        (ngModelChange)="touchSpecificPeople()"
+                        (ngModelChange)="validateOneePermission($event, person)"
+                        (nzBlur)="validateOneePermission(person.onee.permission, person)"
                       >
                         @for (item of oneePermissions; track item) {
                           <nz-option
@@ -428,6 +529,12 @@
                           ></nz-option>
                         }
                       </nz-select>
+
+                      @if (person.errors?.['onee_permission']) {
+                        <span class="error">
+                          {{ person.errors?.['onee_permission'] }}
+                        </span>
+                      }
                     </div>
 
                     <div class="form-field">
@@ -440,8 +547,14 @@
                         placeholder="กรอกชื่อหัวหน้างาน"
                         [(ngModel)]="person.onee.supervisor"
                         name="onee_supervisor"
-                        (ngModelChange)="touchSpecificPeople()"
+                        (input)="validateOneeSupervisor($event, person)"
+                        (focus)="validateOneeSupervisor($event, person)"
                       />
+                      @if (person.errors?.['onee_supervisor']) {
+                        <span class="error">
+                          {{ person.errors?.['onee_supervisor'] }}
+                        </span>
+                      }
                     </div>
                   </div>
                 }
@@ -460,8 +573,8 @@
                         class="form-input multiple"
                         required
                         #company="ngModel"
-                        [class.input-error]="company.invalid && company.touched"
-                        (ngModelChange)="touchSpecificPeople()"
+                        (ngModelChange)="validateOnePortalCompanies(person)"
+                        (nzBlur)="validateOnePortalCompanies(person)"
                       >
                         <nz-option
                           *ngFor="let company of companyList"
@@ -469,6 +582,12 @@
                           [nzValue]="company"
                         />
                       </nz-select>
+
+                      @if (person.errors?.['oneportal_companies']) {
+                        <span class="error">
+                          {{ person.errors?.['oneportal_companies'] }}
+                        </span>
+                      }
                     </div>
                     <div class="form-field">
                       <label>ประเภทสิทธิ์</label>
@@ -478,7 +597,10 @@
                         [(ngModel)]="person.onePortal.responseType"
                         name="portal_response_type"
                         class="form-input"
-                        (ngModelChange)="touchSpecificPeople()"
+                        (ngModelChange)="validateOnePortalResponseType($event, person)"
+                        (nzBlur)="
+                          validateOnePortalResponseType(person.onePortal.responseType, person)
+                        "
                       >
                         @for (item of onePortalResponseTypes; track item) {
                           <nz-option
@@ -487,6 +609,11 @@
                           ></nz-option>
                         }
                       </nz-select>
+                      @if (person.errors?.['oneportal_response_type']) {
+                        <span class="error">
+                          {{ person.errors?.['oneportal_response_type'] }}
+                        </span>
+                      }
                     </div>
                   </div>
                 }
@@ -561,55 +688,4 @@
       </div>
     </div>
   }
-
-  <!-- @if (showSummaryModal()) {
-    <div class="modal-overlay">
-      <div class="modal-container">
-        <div class="modal-header">
-          <h2>สรุปรายละเอียดคำขอ</h2>
-          <button
-            class="btn-close-modal"
-            type="button"
-            (click)="closeSummaryModal()"
-            title="ปิด"
-            aria-label="Close summary modal"
-          >
-            <i class="fas fa-times" aria-hidden="true"></i>
-          </button>
-        </div>
-        <div class="modal-body">
-          <div class="summary-section">
-            <h3><i class="fas fa-users mr-2 text-primary"></i> รายการผู้ขอใช้ระบบ</h3>
-            <div class="specific-summary-list">
-              @for (person of specificPeople(); track person.id; let index = $index) {
-                <div class="specific-summary-item">
-                  <strong>คนที่ {{ index + 1 }}: {{ getOpenForLabel(person.openFor) }}</strong>
-                  <span>เบอร์ติดต่อ: {{ person.phone }}</span>
-                  <span>ระบบ: {{ getPersonSystemLabels(person) }}</span>
-                </div>
-              }
-            </div>
-          </div>
-
-          @if (requestDetails()) {
-            <div class="summary-section">
-              <h3>รายละเอียดที่จะบันทึก</h3>
-              <div
-                class="detail-text p-3 bg-light rounded text-muted"
-                style="white-space: pre-wrap"
-              >
-                {{ requestDetails() }}
-              </div>
-            </div>
-          }
-        </div>
-        <div class="modal-footer">
-          <button class="btn-cancel" type="button" (click)="closeSummaryModal()">แก้ไข</button>
-          <button class="btn-confirm" type="button" (click)="confirmSubmission()">
-            ยืนยันการส่ง
-          </button>
-        </div>
-      </div>
-    </div>
-  } -->
 </div>
