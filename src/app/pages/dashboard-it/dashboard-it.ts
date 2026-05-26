@@ -1,4 +1,3 @@
-import 'emoji-picker-element';
 import { CommonModule } from '@angular/common';
 import {
   Component,
@@ -12,7 +11,6 @@ import {
   DestroyRef,
   ViewChild,
   ElementRef,
-  CUSTOM_ELEMENTS_SCHEMA,
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { EMPTY, interval, firstValueFrom } from 'rxjs';
@@ -97,7 +95,6 @@ interface ReplyReader {
     AvatarPreviewModal,
     NzDatePickerModule,
   ],
-  schemas: [CUSTOM_ELEMENTS_SCHEMA],
   templateUrl: './dashboard-it.html',
   styleUrl: './dashboard-it.scss',
 })
@@ -312,7 +309,14 @@ export class DashboardIT implements OnInit {
     return Math.max(0, total - read);
   });
 
-  emojiPickerVisible = signal(false);
+  emojiPickerOpen = false;
+  emojiPickerTab = 0;
+  readonly EMOJI_TABS = [
+    { label: '😊', emojis: ['😀','😃','😄','😁','😆','😅','🤣','😂','🙂','😊','😇','🥰','😍','🤩','😘','😋','😛','😜','🤪','😝','😏','🙄','😬','😌','😔','😴','😷','🤒','🥵','🥶','😵','🥳','😎','🤓','😕','🥺','😢','😭','😱','😤','😡','😠','🤬','😈','👿','💀','👻','👽','🤖','💩'] },
+    { label: '👍', emojis: ['👍','👎','👌','✌️','🤞','🤟','🤘','🤙','👈','👉','👆','👇','☝️','👋','🤚','🖐️','✋','🖖','💪','✍️','🙏','🤲','👐','🫶','🤝','👏','✊','👊','🤜','🤛'] },
+    { label: '❤️', emojis: ['❤️','🧡','💛','💚','💙','💜','🖤','🤍','🤎','❤️‍🔥','💔','💕','💞','💓','💗','💖','💘','💝','💟','♥️','😻','💌','💋','👄'] },
+    { label: '🎉', emojis: ['🎉','🎊','🎈','🎁','🏆','🥇','⭐','🌟','💫','✨','🔥','💯','✅','❌','⚡','💡','🔔','📢','🎵','🎶','🚀','💎','🌈','👑','🎯','🌸','🌺','☀️','🌙','❄️','🌊','⚽','🏀','🍕','🍔','☕','🍺','🥂','🍰','🎂'] },
+  ];
 
   mentionResults = signal<any[]>([]);
   mentionVisible = signal(false);
@@ -843,21 +847,12 @@ export class DashboardIT implements OnInit {
     this.replyingTo.set(null);
   }
 
-  toggleEmojiPicker() {
-    this.emojiPickerVisible.update((v) => !v);
-  }
-
-  onEmojiSelect(event: any) {
-    const emoji = event.detail?.unicode ?? '';
-    const textarea = this.chatTextareaRef?.nativeElement;
-    if (!textarea) return;
-    const start = textarea.selectionStart ?? this._chatMessage.length;
-    const end = textarea.selectionEnd ?? start;
-    this._chatMessage = this._chatMessage.slice(0, start) + emoji + this._chatMessage.slice(end);
-    this.emojiPickerVisible.set(false);
+  insertEmoji(emoji: string) {
+    this.chatMessage = this.chatMessage + emoji;
+    this.emojiPickerOpen = false;
     setTimeout(() => {
-      textarea.focus();
-      textarea.setSelectionRange(start + emoji.length, start + emoji.length);
+      const ta = this.chatTextareaRef?.nativeElement;
+      if (ta) { ta.focus(); ta.setSelectionRange(ta.value.length, ta.value.length); }
     }, 0);
   }
 
