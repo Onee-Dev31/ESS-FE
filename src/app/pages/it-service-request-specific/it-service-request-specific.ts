@@ -658,7 +658,7 @@ export class ITServiceRequestSpecificComponent implements OnInit {
   }
 
   addOracleCompany(person: any) {
-    console.log(this.oracleModules);
+    // console.log(this.oracleModules);
     person.oracle.companies.push({
       company: null,
 
@@ -678,7 +678,7 @@ export class ITServiceRequestSpecificComponent implements OnInit {
   }
 
   private isSpecificPersonValid(person: SpecificPersonRequest): boolean {
-    console.log(person);
+    // console.log(person);
     const isFreelance = person?.openFor?.value === '__FREELANCE__';
 
     // =========================
@@ -764,14 +764,11 @@ export class ITServiceRequestSpecificComponent implements OnInit {
     // =========================
 
     if (person.systems.includes('oracle')) {
-      console.log(person.oracle.companies.some((item: any) => !item.company));
       if (person.oracle.companies.some((item: any) => !item.company?.COMPANY_CODE)) {
         return false;
       }
       // ต้องมี company จริง
       const validCompanies = person.oracle.companies.filter((item: any) => item.company);
-
-      console.log(person.oracle.companies, validCompanies);
 
       if (!validCompanies.length) {
         return false;
