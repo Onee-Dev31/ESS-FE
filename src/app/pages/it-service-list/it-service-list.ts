@@ -450,7 +450,7 @@ export class ItService implements OnInit {
       const isOpenForSelf =
         res.requestFor?.emp_code && res.requestFor.emp_code === res.requester?.emp_code;
 
-      const hasOpenFor = !!res.requestFor?.emp_code;
+      const hasOpenFor = !!(res.requestFor?.emp_code || res.requestFor?.fullname);
 
       const openFor = isOpenForSelf
         ? { fullname: 'เปิดให้ตนเอง' }
@@ -458,9 +458,7 @@ export class ItService implements OnInit {
           ? res.requestFor
           : null;
 
-      this.showRequesterContact = !hasOpenFor || isOpenForSelf;
-
-      console.log(openFor);
+      this.showRequesterContact = !hasOpenFor || !!isOpenForSelf;
 
       const objectData = {
         ticketId: ticket.id,
@@ -491,7 +489,6 @@ export class ItService implements OnInit {
         services: services,
         requester: res.requester,
         openFor: openFor,
-        // openFor: res.requestFor.fullname ? res.requestFor : null,
         rejection_reason: ticket.rejection_reason,
         ccList: ccList,
       };
