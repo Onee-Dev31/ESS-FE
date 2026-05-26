@@ -374,28 +374,29 @@
 
   @if (isActionConfirm()) {
     <div class="form-actions-footer" [ngClass]="actionType()?.toLowerCase()?.replace(' ', '-')">
-      <div class="action-title">
-        Confirm Action: <span class="action-name">{{ actionType() }}</span>
-      </div>
-
-      @if (actionType() === 'Rejected' || actionType() === 'Referred Back') {
-        <div class="reason-section">
-          <label for="reason">ระบุเหตุผล (Reason):</label>
-          <textarea
-            id="reason"
-            class="reason-input"
-            [(ngModel)]="reasonText"
-            placeholder="ระบุเหตุผลที่นี่..."
-          ></textarea>
+      <div class="confirm-inner">
+        <div class="action-title">
+          Confirm Action: <span class="action-name">{{ actionType() }}</span>
         </div>
-      }
 
-      <div class="action-footer">
-        <button class="btn-confirm" (click)="confirmAction()">ยืนยัน (Confirm)</button>
-        <button class="btn-cancel" (click)="closeActionConfirm()">ยกเลิก (Cancel)</button>
+        @if (actionType() === 'Rejected' || actionType() === 'Referred Back') {
+          <div class="reason-section">
+            <label for="reason">ระบุเหตุผล (Reason):</label>
+            <textarea
+              id="reason"
+              class="reason-input"
+              [(ngModel)]="reasonText"
+              placeholder="ระบุเหตุผลที่นี่..."
+            ></textarea>
+          </div>
+        }
+
+        <div class="action-footer">
+          <button class="btn-confirm" (click)="confirmAction()">ยืนยัน (Confirm)</button>
+          <button class="btn-cancel" (click)="closeActionConfirm()">ยกเลิก (Cancel)</button>
+        </div>
       </div>
     </div>
-    <!-- </div> -->
   }
 </div>
 
