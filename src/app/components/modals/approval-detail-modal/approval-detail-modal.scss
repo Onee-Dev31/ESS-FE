@@ -707,9 +707,8 @@
 
 .form-actions-footer {
   display: flex;
-  justify-content: flex-end;
-  align-items: center;
-  gap: 12px;
+  flex-direction: column;
+  gap: 0;
   padding: 16px 24px;
   background: var(--bg-table-head);
   border-top: 1px solid var(--border-table-head);
@@ -736,7 +735,7 @@
     font-size: 1rem;
     font-weight: 700;
     color: $text;
-    margin-bottom: 0.8rem;
+    margin-bottom: 0.75rem;
     display: flex;
     align-items: center;
     gap: 8px;
@@ -785,7 +784,7 @@
   }
 
   .action-footer {
-    margin-top: 1rem;
+    margin-top: 0.75rem;
     display: flex;
     gap: 8px;
     justify-content: flex-end;
@@ -830,6 +829,7 @@
 
     @include mobile {
       display: flex;
+      flex-direction: row;
       width: 100%;
       gap: 8px;
     }
