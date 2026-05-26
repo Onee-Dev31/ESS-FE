@@ -120,6 +120,7 @@ export class ItService implements OnInit {
   private chatReadCounts = signal<Map<number, number>>(new Map());
 
   replyReaders = signal<ReplyReader[]>([]);
+  replyingTo = signal<any>(null);
 
   unreadChatCount = computed(() => {
     const ticket = this.selectedTicket();
@@ -591,13 +592,24 @@ export class ItService implements OnInit {
 
     const attachments = [...this.chatAttachments];
     const mentionedAdUsers = [...this.pendingMentionAdUsers];
+    const replyToId = this.replyingTo()?.id ?? null;
     this.chatMessage = '';
     this.chatAttachments = [];
     this.pendingMentionAdUsers.clear();
+    this.replyingTo.set(null);
     this.submitNote(
-      { id: ticket.ticketId, message, attachments, mentionedAdUsers },
+      { id: ticket.ticketId, message, attachments, mentionedAdUsers, replyToId },
       { silent: true },
     );
+  }
+
+  startReply(note: any) {
+    this.replyingTo.set(note);
+    setTimeout(() => this.chatTextareaRef?.nativeElement.focus(), 0);
+  }
+
+  cancelReply() {
+    this.replyingTo.set(null);
   }
 
   handleChatKeydown(event: KeyboardEvent, ticket: any) {
@@ -873,6 +885,10 @@ export class ItService implements OnInit {
     formData.append('Message', data.message);
     formData.append('ExecutedBy', this.authService.userData().CODEMPID);
 
+    if (data.replyToId) {
+      formData.append('ParentReplyId', String(data.replyToId));
+    }
+
     (data.attachments ?? []).forEach((item: any) => {
       if (item?.file instanceof File) {
         formData.append('Files', item.file);
@@ -1113,6 +1129,15 @@ export class ItService implements OnInit {
   }
 
   async buildItNotes(replies: any[], attachments: any[], requesterAduser?: string) {
+    console.log(
+      '[DEBUG reply]',
+      replies.map((r) => ({
+        id: r.id,
+        msg: r.message,
+        parent_reply_id: r.parent_reply_id,
+        parent_message: r.parent_message,
+      })),
+    );
     const notes = await Promise.all(
       replies.map(async (r) => {
         const files = attachments.filter((a) => a.reply_id === r.id);
@@ -1122,11 +1147,28 @@ export class ItService implements OnInit {
             ? 'requester'
             : 'it-staff';
 
+        let replyTo: { message: string; nickName: string } | null = null;
+        if (r.parent_reply_id) {
+          const parent = replies.find((p) => Number(p.id) === Number(r.parent_reply_id));
+          if (parent) {
+            replyTo = {
+              message: parent.message,
+              nickName: this.extractNickName(parent.sender_name),
+            };
+          } else if (r.parent_message != null) {
+            replyTo = {
+              message: r.parent_message,
+              nickName: r.parent_sender_name ? this.extractNickName(r.parent_sender_name) : '',
+            };
+          }
+        }
+
         return {
           id: r.id,
           message: r.message,
           attachments: convertedFiles,
           createdDate: r.created_at,
+          replyTo,
           createBy: {
             fullName: r.sender_name,
             nickName: this.extractNickName(r.sender_name),
