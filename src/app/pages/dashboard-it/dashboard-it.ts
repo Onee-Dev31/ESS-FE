@@ -805,12 +805,12 @@ export class DashboardIT implements OnInit {
   }
 
   onTicketClick(ticketId: any) {
+    const hasNewNote = this.newNoteTicketIds().has(Number(ticketId));
     this.newNoteTicketIds.update((s) => {
       s.delete(Number(ticketId));
       return new Set(s);
     });
-    this.selectTicket(String(ticketId));
-    this.IS_CHAT_OPEN.set(true);
+    this.selectTicket(String(ticketId), hasNewNote ? { openChat: true } : undefined);
   }
 
   selectTicket(ticketId: string, options?: { openChat?: boolean }) {
@@ -934,6 +934,10 @@ export class DashboardIT implements OnInit {
   private markChatAsRead() {
     const ticket = this.selectedTicket();
     if (!ticket) return;
+    this.newNoteTicketIds.update((s) => {
+      s.delete(ticket.ticketId);
+      return new Set(s);
+    });
     const total = (ticket.itNotes ?? []).length;
     this.chatReadCounts.update((m) => {
       const next = new Map(m);
