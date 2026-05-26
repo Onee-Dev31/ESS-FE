@@ -179,6 +179,14 @@ export const routes: Routes = [
         data: { animation: 'Dashboard' },
       },
       {
+        path: 'notification-setting',
+        loadComponent: () =>
+          import('./pages/setting-notification/setting-notification').then(
+            (m) => m.SettingNotification,
+          ),
+        data: { animation: 'Dashboard' },
+      },
+      {
         path: 'approval-it-request',
         loadComponent: () =>
           import('./pages/approval-it-request/approval-it-request').then(
