@@ -422,6 +422,9 @@
           <div class="floating-chat__title">
             <i class="fa-solid fa-comments"></i>
             <span>Chat</span>
+            @if (t.ticketNumber) {
+              <span class="floating-chat__ticket-no">#{{ t.ticketNumber }}</span>
+            }
             @if (getChatAttachmentCount(t) > 0) {
               <button
                 class="floating-chat__summary"
