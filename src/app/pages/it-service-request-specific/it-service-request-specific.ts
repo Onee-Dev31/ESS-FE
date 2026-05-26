@@ -975,7 +975,7 @@ export class ITServiceRequestSpecificComponent implements OnInit {
 
         return sections.join('\n');
       })
-      .join('\n<hr>\n\n');
+      .join('\n\n<hr>\n');
   }
 
   // Validate
@@ -1045,7 +1045,6 @@ export class ITServiceRequestSpecificComponent implements OnInit {
 
     this.touchSpecificPeople();
   }
-
   validateEmail(event: Event, person: any) {
     const input = event.target as HTMLInputElement;
 
