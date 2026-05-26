@@ -1522,8 +1522,12 @@ $table-label-bg: var(--border-toolbar);
 
 .person-index {
   color: var(--primary);
-  font-size: 0.8rem;
+  font-size: $font-size-hint;
   font-weight: 800;
+}
+
+.person-text {
+  font-size: $font-size-header;
 }
 
 .btn-remove-person {
@@ -1825,4 +1829,26 @@ $table-label-bg: var(--border-toolbar);
     border-color: #a78bfa !important;
     box-shadow: 0 0 0 4px rgba(167, 139, 250, 0.1) !important;
   }
+}
+
+.module-permission-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.module-permission-row {
+  display: flex;
+  gap: 16px;
+  align-items: flex-end;
+
+  @include mobile {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+
+.module-field,
+.permission-field {
+  flex: 1;
 }

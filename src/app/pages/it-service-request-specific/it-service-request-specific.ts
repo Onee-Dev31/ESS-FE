@@ -31,17 +31,34 @@ interface SpecificPersonRequest {
   id: number;
   openFor: string;
   phone: string;
-  systems: SpecificSystemKey[];
-  bmsCompany: string;
-  bmsTeam: string;
-  bmsRight: string;
-  oracleCompany: string;
-  oracleModule: string;
-  oracleRight: string;
-  oneePermission: string;
-  onePortalCompany: string;
-  onePortalResponseType: string;
   note: string;
+
+  systems: SpecificSystemKey[];
+
+  bms: {
+    companies: any[];
+    detail: string;
+  };
+
+  oracle: {
+    companies: any[];
+    modules: {
+      module: string;
+      permission: string;
+    }[];
+  };
+
+  onee: {
+    companies: any[];
+    permission: string;
+    supervisor: string;
+  };
+
+  onePortal: {
+    companies: any[];
+    responseType: string;
+    supervisor: string;
+  };
 }
 
 @Component({
@@ -99,7 +116,7 @@ export class ITServiceRequestSpecificComponent implements OnInit {
   });
 
   private nextSpecificPersonId = 1;
-  specificPeople = signal<SpecificPersonRequest[]>([this.createSpecificPerson()]);
+  specificPeople = signal<SpecificPersonRequest[]>([]);
   specificSystemChoices: { key: SpecificSystemKey; label: string; icon: string }[] = [
     { key: 'oracle', label: 'Oracle', icon: 'fa-database' },
     { key: 'bms', label: 'BMS', icon: 'fa-briefcase' },
@@ -107,16 +124,17 @@ export class ITServiceRequestSpecificComponent implements OnInit {
     { key: 'onePortal', label: 'One Portal', icon: 'fa-globe' },
   ];
   oracleModules = ['AP', 'AR', 'CM', 'FA', 'IE', 'INV', 'PJC', 'GL', 'GL Secondary'];
-  oracleRights = ['Super User', 'User', 'Viewer'];
+  oraclePermissions = ['-', 'Super User', 'User', 'Viewer'];
   bmsTeams = ['Team เดียวกัน', 'สิทธิ์เหมือนคุณ xxx', 'อื่นๆ'];
-  bmsRights = ['ดูข้อมูล', 'เพิ่ม/แก้ไข', 'อนุมัติ', 'Admin'];
+  bmsPermissions = ['-', 'ดูข้อมูล', 'เพิ่ม/แก้ไข', 'อนุมัติ', 'Admin'];
   oneePermissions = ['Accounting', 'Admin', 'Co-Producer', 'Producer', 'Sale'];
   onePortalResponseTypes = ['Customer', 'Supplier', 'All'];
 
   ngOnInit() {
-    this.getServiceType();
+    // this.getServiceType();
     this.getOpenFor();
     this.getCompanies();
+    this.specificPeople.set([this.createSpecificPerson()]);
 
     const userData = this.authService.userData();
     if (userData?.TELOFF) {
@@ -324,46 +342,24 @@ export class ITServiceRequestSpecificComponent implements OnInit {
   showSummaryModal = signal(false);
 
   submit() {
-    this.syncSpecificFormToLegacyFields();
-    const selectedServices = this.serviceOptions().filter((s) => s.checked);
+    const payload = this.specificPeople().map((person) => ({
+      openFor: person.openFor,
+      phone: person.phone,
+      note: person.note,
 
-    if (selectedServices.length === 0) {
-      this.swalService.warning('แจ้งเตือน', 'กรุณาเลือกบริการอย่างน้อย 1 รายการ');
-      return;
-    }
+      systems: person.systems,
 
-    const isRequestSystem = selectedServices.some((s) => s.value === 'request_system');
-    if (isRequestSystem) {
-      if (this.selectedSystemTypes().length === 0) {
-        this.swalService.warning('แจ้งเตือน', 'กรุณาเลือกประเภทระบบ (Basic หรือ Specific)');
-        return;
-      }
+      bms: person.systems.includes('bms') ? person.bms : null,
 
-      const hasUserType = this.selectedSystemTypes().includes('user');
-      const hasSystemType = this.selectedSystemTypes().includes('system');
+      oracle: person.systems.includes('oracle') ? person.oracle : null,
 
-      const userSubSelected = this.userSubOptions().some((o) => o.checked);
-      const systemSubSelected = this.systemSubOptions().some((o) => o.checked);
+      onee: person.systems.includes('onee') ? person.onee : null,
 
-      if (hasUserType && !userSubSelected) {
-        this.swalService.warning('แจ้งเตือน', 'กรุณาระบุระบบพื้นฐาน (Basic System) ที่ต้องการ');
-        return;
-      }
+      onePortal: person.systems.includes('onePortal') ? person.onePortal : null,
+    }));
 
-      if (hasSystemType && !systemSubSelected) {
-        this.swalService.warning('แจ้งเตือน', 'กรุณาระบุระบบเฉพาะ (Specific System) ที่ต้องการ');
-        return;
-      }
-    }
-
-    if (!this.requestDetails().trim()) {
-      this.swalService.warning('แจ้งเตือน', 'กรุณากรอกรายละเอียด (Details)');
-      return;
-    }
-
-    this.showSummaryModal.set(true);
+    console.log('SUBMIT PAYLOAD:', payload);
   }
-
   closeSummaryModal() {
     this.showSummaryModal.set(false);
   }
@@ -538,41 +534,41 @@ export class ITServiceRequestSpecificComponent implements OnInit {
   }
 
   // GET MASTER
-  getServiceType() {
-    this.itServiceService.getServiceType().subscribe({
-      next: (res) => {
-        // console.log(res.data);
-        const mappedServices_main = res.data.mainServices.map((item: any) => ({
-          ...item,
-          checked: false,
-          disabled: false,
-        }));
+  // getServiceType() {
+  //   this.itServiceService.getServiceType().subscribe({
+  //     next: (res) => {
+  //       console.log(res.data);
+  //       const mappedServices_main = res.data.mainServices.map((item: any) => ({
+  //         ...item,
+  //         checked: false,
+  //         disabled: false,
+  //       }));
 
-        this.serviceOptions.set(mappedServices_main);
-        this.setDefaultSpecificService();
+  //       this.serviceOptions.set(mappedServices_main);
+  //       this.setDefaultSpecificService();
 
-        const mappedServices_user = res.data.userSubOptions.map((item: any) => ({
-          ...item,
-          checked: false,
-        }));
+  //       const mappedServices_user = res.data.userSubOptions.map((item: any) => ({
+  //         ...item,
+  //         checked: false,
+  //       }));
 
-        this.userSubOptions.set(mappedServices_user);
+  //       this.userSubOptions.set(mappedServices_user);
 
-        const mappedServices_system = res.data.systemSubOptions.map((item: any) => ({
-          ...item,
-          checked: false,
-        }));
+  //       const mappedServices_system = res.data.systemSubOptions.map((item: any) => ({
+  //         ...item,
+  //         checked: false,
+  //       }));
 
-        this.systemSubOptions.set(mappedServices_system);
+  //       this.systemSubOptions.set(mappedServices_system);
 
-        // this.availableCategories = res.data
-        // this.cdr.detectChanges();
-      },
-      error: (error) => {
-        console.error('Error fetching data:', error);
-      },
-    });
-  }
+  //       // this.availableCategories = res.data
+  //       // this.cdr.detectChanges();
+  //     },
+  //     error: (error) => {
+  //       console.error('Error fetching data:', error);
+  //     },
+  //   });
+  // }
   getOpenFor() {
     this.itServiceService
       .getOpenFor({ currentEmpId: this.authService.userData().CODEMPID })
@@ -624,42 +620,50 @@ export class ITServiceRequestSpecificComponent implements OnInit {
   }
 
   private createSpecificPerson(): SpecificPersonRequest {
-    const defaultOpenFor = this.authService.userData().CODEMPID ?? '';
-    const defaultPhone = PhoneUtil.formatPhoneNumber(this.authService.userData()?.TELOFF ?? '');
     return {
       id: this.nextSpecificPersonId++,
-      openFor: defaultOpenFor,
-      phone: defaultPhone,
-      systems: [],
-      bmsCompany: '',
-      bmsTeam: '',
-      bmsRight: '',
-      oracleCompany: '',
-      oracleModule: '',
-      oracleRight: '',
-      oneePermission: '',
-      onePortalCompany: '',
-      onePortalResponseType: '',
+      openFor: this.authService.userData().CODEMPID ?? '',
+      phone: PhoneUtil.formatPhoneNumber(this.authService.userData()?.TELOFF ?? ''),
       note: '',
+      systems: [],
+
+      bms: {
+        companies: [],
+        detail: '',
+      },
+
+      oracle: {
+        companies: [],
+        modules: this.oracleModules.map((module) => ({
+          module,
+          permission: '-',
+        })),
+      },
+
+      onee: {
+        companies: [],
+        permission: '',
+        supervisor: '',
+      },
+
+      onePortal: {
+        companies: [],
+        responseType: '',
+        supervisor: '',
+      },
     };
   }
 
   private isSpecificPersonValid(person: SpecificPersonRequest): boolean {
     const phoneDigits = (person.phone ?? '').replace(/\D/g, '');
-    const phoneValid = phoneDigits.length === 4 || phoneDigits.length === 10;
-    if (!person.openFor || !phoneValid || person.systems.length === 0) return false;
 
-    return person.systems.every((system) => {
-      if (system === 'bms') return !!person.bmsCompany && !!person.bmsTeam && !!person.bmsRight;
-      if (system === 'oracle') {
-        return !!person.oracleCompany && !!person.oracleModule && !!person.oracleRight;
-      }
-      if (system === 'onee') return !!person.oneePermission;
-      if (system === 'onePortal') {
-        return !!person.onePortalCompany && !!person.onePortalResponseType;
-      }
-      return true;
-    });
+    const phoneValid = phoneDigits.length === 4 || phoneDigits.length === 10;
+
+    if (!person.openFor || !phoneValid || person.systems.length === 0) {
+      return false;
+    }
+
+    return true;
   }
 
   private setDefaultSpecificService() {
@@ -675,109 +679,16 @@ export class ITServiceRequestSpecificComponent implements OnInit {
     this.userSubOptions.update((items) => items.map((item) => ({ ...item, checked: false })));
   }
 
-  private syncSpecificFormToLegacyFields() {
-    const people = this.specificPeople();
-    const firstPerson = people[0];
-    if (firstPerson) {
-      const firstOption = this.openForOptions().find((opt) => opt.value === firstPerson.openFor);
-      this.selectedOpenFor.set({
-        value: firstPerson.openFor,
-        label: firstOption?.label ?? firstPerson.openFor,
-      });
-      this.phoneNumber.set(firstPerson.phone);
-      this.phoneModel = firstPerson.phone;
-    }
-
-    this.setDefaultSpecificService();
-    const selectedLabels = new Set(
-      people.flatMap((person) =>
-        person.systems.flatMap((system) => this.getSpecificSystemAliases(system)),
-      ),
-    );
-
-    this.systemSubOptions.update((items) =>
-      items.map((item) => ({
-        ...item,
-        checked: selectedLabels.has(`${item.label ?? item.value}`.toLowerCase()),
-      })),
-    );
-    this.requestDetails.set(this.buildSpecificDescription());
-  }
-
-  private buildSpecificDescription(): string {
-    return this.specificPeople()
-      .map((person, index) => {
-        const lines = [
-          `คนที่ ${index + 1}: ${this.getOpenForLabel(person.openFor)}`,
-          `เบอร์ติดต่อ: ${person.phone}`,
-          `ระบบที่ขอ: ${person.systems.map((system) => this.getSpecificSystemLabel(system)).join(', ')}`,
-        ];
-
-        if (person.systems.includes('bms')) {
-          lines.push(
-            `BMS - บริษัทที่รับผิดชอบ: ${person.bmsCompany}, Team/สิทธิ์: ${person.bmsTeam}, สิทธิ์: ${person.bmsRight}`,
-          );
-        }
-        if (person.systems.includes('oracle')) {
-          lines.push(
-            `Oracle - บริษัทที่รับผิดชอบ: ${person.oracleCompany}, Module: ${person.oracleModule}, สิทธิ์: ${person.oracleRight}`,
-          );
-        }
-        if (person.systems.includes('onee')) {
-          lines.push(`OneE - Permission ที่ต้องการ: ${person.oneePermission}`);
-        }
-        if (person.systems.includes('onePortal')) {
-          lines.push(
-            `One Portal - บริษัทที่รับผิดชอบ: ${person.onePortalCompany}, Response Type: ${person.onePortalResponseType}`,
-          );
-        }
-        if (person.note?.trim()) lines.push(`หมายเหตุ: ${person.note.trim()}`);
-
-        return lines.join('\n');
-      })
-      .join('\n\n');
-  }
-
   getSpecificSystemLabel(system: SpecificSystemKey): string {
     return this.specificSystemChoices.find((item) => item.key === system)?.label ?? system;
   }
 
-  private getSpecificSystemAliases(system: SpecificSystemKey): string[] {
-    const aliases: Record<SpecificSystemKey, string[]> = {
-      bms: ['bms'],
-      oracle: ['oracle'],
-      onee: ['onee', 'onee apps', 'one apps'],
-      onePortal: ['one portal', 'oneportal'],
-    };
-    return aliases[system];
-  }
-
   // NEW!
-
-  formData: any = {
-    bms_company: [],
-    bms_detail: '',
-  };
-
   companyList: any[] = [];
   departmentList: any[] = [];
   filteredDepartmentList: any[] = [];
 
   // function
-  onCompanyChange(company: any, isUserChange = true) {
-    if (isUserChange) {
-      this.formData.department = '';
-    }
-
-    if (!company) {
-      this.filteredDepartmentList = [];
-      return;
-    }
-
-    this.filteredDepartmentList = this.departmentList.filter(
-      (dept) => dept.COMPANY_CODE === company.COMPANY_CODE,
-    );
-  }
 
   private remapCompanyCode(code: string): string {
     if (code === 'OTD') return 'ONEE';

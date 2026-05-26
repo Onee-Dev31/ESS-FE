@@ -51,7 +51,7 @@
           <div class="person-card-header">
             <div>
               <span class="person-index">คนที่ {{ index + 1 }}</span>
-              <h5>ข้อมูลผู้ขอใช้ระบบ</h5>
+              <h5 class="person-text">ข้อมูลผู้ขอใช้ระบบ</h5>
             </div>
             @if (specificPeople().length > 1) {
               <button
@@ -70,7 +70,7 @@
               <label class="form-label"
                 >ชื่อ / รหัสพนักงาน <span class="required-badge">*</span></label
               >
-              <!-- <div class="input-pair-row"> -->
+
               <nz-select
                 nzShowSearch
                 nzAllowClear
@@ -84,7 +84,6 @@
                   <nz-option [nzLabel]="opt.label" [nzValue]="opt.value" />
                 }
               </nz-select>
-              <!-- </div> -->
             </div>
 
             <div class="form-group">
@@ -129,10 +128,9 @@
                         nzAllowClear
                         nzMode="multiple"
                         nzPlaceHolder="เลือกบริษัท"
-                        [(ngModel)]="formData.bms_company"
+                        [(ngModel)]="person.bms.companies"
                         name="company"
                         class="form-input multiple"
-                        (ngModelChange)="onCompanyChange($event, true)"
                         required
                         #company="ngModel"
                         [class.input-error]="company.invalid && company.touched"
@@ -150,7 +148,7 @@
                       <input
                         class="form-input"
                         placeholder="สิทธิ์เหมือนใคร"
-                        [(ngModel)]="formData.bms_detail"
+                        [(ngModel)]="person.bms.detail"
                         (ngModelChange)="touchSpecificPeople()"
                         [name]="'bmsCompany' + person.id"
                       />
@@ -162,39 +160,62 @@
                   <div class="system-detail-card">
                     <h6 class="form-label">Oracle</h6>
                     <div class="form-field">
-                      <input
-                        class="form-input"
-                        placeholder="บริษัทที่รับผิดชอบ"
-                        [(ngModel)]="person.oracleCompany"
-                        (ngModelChange)="touchSpecificPeople()"
-                        [name]="'oracleCompany' + person.id"
-                      />
-                    </div>
-                    <div class="form-field">
                       <nz-select
-                        class="w-full form-input"
-                        nzPlaceHolder="Module"
-                        [(ngModel)]="person.oracleModule"
-                        (ngModelChange)="touchSpecificPeople()"
-                        [name]="'oracleModule' + person.id"
+                        nzShowSearch
+                        nzAllowClear
+                        nzMode="multiple"
+                        nzPlaceHolder="เลือกบริษัท"
+                        [(ngModel)]="person.oracle.companies"
+                        name="company"
+                        class="form-input multiple"
+                        required
+                        #company="ngModel"
+                        [class.input-error]="company.invalid && company.touched"
                       >
-                        @for (item of oracleModules; track item) {
-                          <nz-option [nzValue]="item" [nzLabel]="item"></nz-option>
-                        }
+                        <nz-option
+                          *ngFor="let company of companyList"
+                          [nzLabel]="company.COMPANY_NAME + ' (' + company.COMPANY_CODE + ')'"
+                          [nzValue]="company"
+                        />
                       </nz-select>
                     </div>
-                    <div class="form-field">
-                      <nz-select
-                        class="w-full form-input"
-                        nzPlaceHolder="สิทธิ์"
-                        [(ngModel)]="person.bmsRight"
-                        (ngModelChange)="touchSpecificPeople()"
-                        [name]="'bmsRight' + person.id"
-                      >
-                        @for (item of bmsRights; track item) {
-                          <nz-option [nzValue]="item" [nzLabel]="item"></nz-option>
-                        }
-                      </nz-select>
+
+                    <div class="module-permission-list">
+                      <div class="module-permission-row">
+                        <div class="form-field module-field">
+                          <label>module</label>
+                        </div>
+                        <div class="form-field permission-field">
+                          <label>สิทธิ์</label>
+                        </div>
+                      </div>
+                      @for (item of person.oracle.modules; track item.module) {
+                        <div class="module-permission-row">
+                          <div class="form-field module-field">
+                            <input
+                              nz-input
+                              class="form-input readonly"
+                              [value]="item.module"
+                              readonly
+                            />
+                          </div>
+                          <div class="form-field permission-field">
+                            <nz-select
+                              nzPlaceHolder="เลือกสิทธิ์"
+                              [(ngModel)]="item.permission"
+                              [name]="'permission-' + item.module"
+                              class="form-input"
+                            >
+                              @for (permission of oraclePermissions; track permission) {
+                                <nz-option
+                                  [nzValue]="permission"
+                                  [nzLabel]="permission"
+                                ></nz-option>
+                              }
+                            </nz-select>
+                          </div>
+                        </div>
+                      }
                     </div>
                   </div>
                 }
@@ -204,16 +225,50 @@
                     <h6 class="form-label">OneE</h6>
                     <div class="form-field">
                       <nz-select
-                        class="w-full form-input"
-                        nzPlaceHolder="Permission ที่ต้องการ"
-                        [(ngModel)]="person.oneePermission"
-                        (ngModelChange)="touchSpecificPeople()"
-                        [name]="'oneePermission' + person.id"
+                        nzShowSearch
+                        nzAllowClear
+                        nzMode="multiple"
+                        nzPlaceHolder="เลือกบริษัท"
+                        [(ngModel)]="person.onee.companies"
+                        name="company"
+                        class="form-input multiple"
+                        required
+                        #company="ngModel"
+                        [class.input-error]="company.invalid && company.touched"
+                      >
+                        <nz-option
+                          *ngFor="let company of companyList"
+                          [nzLabel]="company.COMPANY_NAME + ' (' + company.COMPANY_CODE + ')'"
+                          [nzValue]="company"
+                        />
+                      </nz-select>
+                    </div>
+                    <div class="form-field">
+                      <label>สิทธิ์</label>
+
+                      <nz-select
+                        nzPlaceHolder="เลือกสิทธิ์"
+                        [(ngModel)]="person.onee.permission"
+                        name="onee_permission"
+                        class="form-input"
                       >
                         @for (item of oneePermissions; track item) {
                           <nz-option [nzValue]="item" [nzLabel]="item"></nz-option>
                         }
                       </nz-select>
+                    </div>
+
+                    <div class="form-field">
+                      <label>หัวหน้างาน</label>
+
+                      <input
+                        nz-input
+                        type="text"
+                        class="form-input"
+                        placeholder="กรอกชื่อหัวหน้างาน"
+                        [(ngModel)]="person.onee.supervisor"
+                        name="onee_supervisor"
+                      />
                     </div>
                   </div>
                 }
@@ -222,26 +277,38 @@
                   <div class="system-detail-card">
                     <h6 class="form-label">One Portal</h6>
                     <div class="form-field">
-                      <input
-                        class="form-input"
-                        placeholder="บริษัทที่รับผิดชอบ"
-                        [(ngModel)]="person.onePortalCompany"
-                        (ngModelChange)="touchSpecificPeople()"
-                        [name]="'onePortalCompany' + person.id"
-                      />
+                      <nz-select
+                        nzShowSearch
+                        nzAllowClear
+                        nzMode="multiple"
+                        nzPlaceHolder="เลือกบริษัท"
+                        [(ngModel)]="person.onePortal.companies"
+                        name="company"
+                        class="form-input multiple"
+                        required
+                        #company="ngModel"
+                        [class.input-error]="company.invalid && company.touched"
+                      >
+                        <nz-option
+                          *ngFor="let company of companyList"
+                          [nzLabel]="company.COMPANY_NAME + ' (' + company.COMPANY_CODE + ')'"
+                          [nzValue]="company"
+                        />
+                      </nz-select>
                     </div>
                     <div class="form-field">
-                      <select
+                      <label>ประเภทสิทธิ์</label>
+
+                      <nz-select
+                        nzPlaceHolder="เลือกประเภท"
+                        [(ngModel)]="person.onePortal.responseType"
+                        name="portal_response_type"
                         class="form-input"
-                        [(ngModel)]="person.onePortalResponseType"
-                        (ngModelChange)="touchSpecificPeople()"
-                        [name]="'onePortalResponseType' + person.id"
                       >
-                        <option value="">Response Type</option>
                         @for (item of onePortalResponseTypes; track item) {
-                          <option [value]="item">{{ item }}</option>
+                          <nz-option [nzValue]="item" [nzLabel]="item"></nz-option>
                         }
-                      </select>
+                      </nz-select>
                     </div>
                   </div>
                 }
@@ -288,7 +355,7 @@
     </div>
   </div>
 
-  @if (showSummaryModal()) {
+  <!-- @if (showSummaryModal()) {
     <div class="modal-overlay">
       <div class="modal-container">
         <div class="modal-header">
@@ -337,5 +404,5 @@
         </div>
       </div>
     </div>
-  }
+  } -->
 </div>
