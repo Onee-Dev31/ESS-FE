@@ -614,18 +614,29 @@
               title="อิโมจิ"
               aria-label="อิโมจิ"
               (click)="emojiPickerOpen = !emojiPickerOpen; $event.stopPropagation()"
-            >😊</button>
+            >
+              😊
+            </button>
             @if (emojiPickerOpen) {
               <div class="emoji-backdrop" (click)="emojiPickerOpen = false"></div>
               <div class="emoji-picker" (click)="$event.stopPropagation()">
                 <div class="emoji-picker__tabs">
                   @for (tab of EMOJI_TABS; track $index) {
-                    <button type="button" class="emoji-picker__tab" [class.active]="emojiPickerTab === $index" (click)="emojiPickerTab = $index">{{ tab.label }}</button>
+                    <button
+                      type="button"
+                      class="emoji-picker__tab"
+                      [class.active]="emojiPickerTab === $index"
+                      (click)="emojiPickerTab = $index"
+                    >
+                      {{ tab.label }}
+                    </button>
                   }
                 </div>
                 <div class="emoji-picker__grid">
                   @for (e of EMOJI_TABS[emojiPickerTab].emojis; track e) {
-                    <button type="button" class="emoji-picker__item" (click)="insertEmoji(e)">{{ e }}</button>
+                    <button type="button" class="emoji-picker__item" (click)="insertEmoji(e)">
+                      {{ e }}
+                    </button>
                   }
                 </div>
               </div>

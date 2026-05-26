@@ -2248,7 +2248,9 @@ textarea.form-input {
     box-shadow: none !important;
     padding: 0 !important;
     color: inherit !important;
-    transition: transform 0.1s, background 0.1s !important;
+    transition:
+      transform 0.1s,
+      background 0.1s !important;
 
     &:hover:not(:disabled) {
       background: var(--bg-page) !important;
