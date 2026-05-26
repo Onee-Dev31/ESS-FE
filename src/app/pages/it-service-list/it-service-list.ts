@@ -447,6 +447,20 @@ export class ItService implements OnInit {
       const itNotes = await this.buildItNotes(replies, replyAttachments, ticket.requester_aduser);
       const result = this.buildTimeline(res.timeline, res.timelineAssignees);
       let status = this.getTicketStatus(ticket);
+      const isOpenForSelf =
+        res.requestFor?.emp_code && res.requestFor.emp_code === res.requester?.emp_code;
+
+      const hasOpenFor = !!res.requestFor?.emp_code;
+
+      const openFor = isOpenForSelf
+        ? { fullname: 'เปิดให้ตนเอง' }
+        : hasOpenFor
+          ? res.requestFor
+          : null;
+
+      this.showRequesterContact = !hasOpenFor || isOpenForSelf;
+
+      console.log(openFor);
 
       const objectData = {
         ticketId: ticket.id,
@@ -476,7 +490,8 @@ export class ItService implements OnInit {
         assignTimeline: result,
         services: services,
         requester: res.requester,
-        openFor: res.requestFor.fullname ? res.requestFor : null,
+        openFor: openFor,
+        // openFor: res.requestFor.fullname ? res.requestFor : null,
         rejection_reason: ticket.rejection_reason,
         ccList: ccList,
       };
