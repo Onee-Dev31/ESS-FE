@@ -693,6 +693,22 @@
               >
                 <i class="fa-solid fa-paperclip"></i>
               </button>
+              <div class="floating-chat__emoji-wrap">
+                <button
+                  class="floating-chat__emoji-btn"
+                  type="button"
+                  title="เลือก Emoji"
+                  aria-label="เลือก Emoji"
+                  (click)="toggleEmojiPicker()"
+                >
+                  <i class="fa-regular fa-face-smile"></i>
+                </button>
+                @if (emojiPickerVisible()) {
+                  <div class="floating-chat__emoji-picker" (click)="$event.stopPropagation()">
+                    <emoji-picker (emoji-click)="onEmojiSelect($event)"></emoji-picker>
+                  </div>
+                }
+              </div>
               <textarea
                 #chatTextareaRef
                 [(ngModel)]="chatMessage"
@@ -700,6 +716,7 @@
                 placeholder="พิมพ์ข้อความ... (พิมพ์ @ เพื่อ mention)"
                 aria-label="พิมพ์ข้อความ"
                 (keydown)="handleChatKeydown($event, t)"
+                (click)="emojiPickerVisible.set(false)"
               ></textarea>
               <button
                 class="floating-chat__send"

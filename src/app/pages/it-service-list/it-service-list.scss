@@ -2143,6 +2143,51 @@ textarea.form-input {
   }
 }
 
+.floating-chat__emoji-wrap {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.floating-chat__emoji-btn {
+  width: 36px;
+  height: 36px;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+  transition:
+    color 0.15s,
+    background 0.15s;
+
+  &:hover {
+    background: color-mix(in srgb, var(--primary) 10%, transparent);
+    color: var(--primary);
+  }
+}
+
+.floating-chat__emoji-picker {
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10040;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.18);
+
+  emoji-picker {
+    --border-radius: 12px;
+    --emoji-size: 1.4rem;
+    height: 320px;
+    width: 300px;
+  }
+}
+
 .floating-chat__composer {
   min-height: 70px;
   padding: 12px 14px;
