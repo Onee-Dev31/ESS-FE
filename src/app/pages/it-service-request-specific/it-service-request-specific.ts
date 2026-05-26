@@ -43,6 +43,7 @@ interface SpecificPersonRequest {
   id: number;
   openFor: any;
   phone: string;
+  phoneError?: string;
   note: string;
 
   freelance: {
@@ -55,7 +56,6 @@ interface SpecificPersonRequest {
     department: string;
     position: string;
     email: string;
-    phone: string;
     filteredDepartments: any[];
   };
 
@@ -80,6 +80,10 @@ interface SpecificPersonRequest {
     companies: any[];
     responseType: string;
     supervisor: string;
+  };
+
+  errors?: {
+    [key: string]: string;
   };
 }
 
@@ -203,8 +207,16 @@ export class ITServiceRequestSpecificComponent implements OnInit {
     }
   }
 
-  onSpecificOpenForChange(person: SpecificPersonRequest, value: string) {
+  onSpecificOpenForChange(person: any, value: any) {
     person.openFor = value;
+
+    const isFreelance = value?.value === '__FREELANCE__';
+
+    // ถ้าเปลี่ยนออกจาก freelance
+    if (!isFreelance) {
+      this.clearFreelanceErrors(person);
+    }
+
     this.touchSpecificPeople();
   }
 
@@ -220,17 +232,12 @@ export class ITServiceRequestSpecificComponent implements OnInit {
     this.specificPeople.update((people) => people.filter((person) => person.id !== personId));
   }
 
-  // togglePersonSystem(person: SpecificPersonRequest, system: SpecificSystemKey) {
-  //   person.systems = person.systems.includes(system)
-  //     ? person.systems.filter((item) => item !== system)
-  //     : [...person.systems, system];
-  //   this.touchSpecificPeople();
-  // }
   togglePersonSystem(person: SpecificPersonRequest, system: SpecificSystemKey) {
     const exists = person.systems.includes(system);
 
     if (exists) {
       person.systems = person.systems.filter((item) => item !== system);
+      this.clearSystemErrors(person, system);
     } else {
       person.systems = [...person.systems, system];
 
@@ -622,8 +629,6 @@ export class ITServiceRequestSpecificComponent implements OnInit {
         position: '',
 
         email: '',
-
-        phone: '',
         filteredDepartments: [],
       },
 
@@ -663,34 +668,14 @@ export class ITServiceRequestSpecificComponent implements OnInit {
       })),
     });
 
+    this.validateAllOraclePermissions(person);
     this.touchSpecificPeople();
   }
 
   removeOracleCompany(person: any, index: number) {
     person.oracle.companies.splice(index, 1);
+    this.validateAllOraclePermissions(person);
   }
-
-  // private isSpecificPersonValid(person: SpecificPersonRequest): boolean {
-  //   const isFreelance = person?.openFor?.value === '__FREELANCE__';
-
-  //   // validation พื้นฐาน
-  //   if (!person.openFor || person.systems.length === 0) {
-  //     return false;
-  //   }
-
-  //   // ข้ามเฉพาะ phone validation ถ้าเป็น freelance
-  //   if (!isFreelance) {
-  //     const phoneDigits = (person.phone ?? '').replace(/\D/g, '');
-
-  //     const phoneValid = phoneDigits.length === 4 || phoneDigits.length === 10;
-
-  //     if (!phoneValid) {
-  //       return false;
-  //     }
-  //   }
-
-  //   return true;
-  // }
 
   private isSpecificPersonValid(person: SpecificPersonRequest): boolean {
     console.log(person);
@@ -705,18 +690,39 @@ export class ITServiceRequestSpecificComponent implements OnInit {
     }
 
     // =========================
+    // FREELANCE
+    // =========================
+
+    if (isFreelance) {
+      const freelance = person.freelance;
+
+      const emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(freelance.email ?? '');
+
+      if (
+        !freelance.firstNameTh?.trim() ||
+        !freelance.lastNameTh?.trim() ||
+        !freelance.firstNameEn?.trim() ||
+        !freelance.lastNameEn?.trim() ||
+        !freelance.company ||
+        !freelance.department ||
+        !freelance.position?.trim() ||
+        !freelance.email?.trim() ||
+        !emailValid
+      ) {
+        return false;
+      }
+    }
+
+    // =========================
     // PHONE
     // =========================
 
-    // freelance ข้าม phone validation
-    if (!isFreelance) {
-      const phoneDigits = (person.phone ?? '').replace(/\D/g, '');
+    const phoneDigits = (person.phone ?? '').replace(/\D/g, '');
 
-      const phoneValid = phoneDigits.length === 4 || phoneDigits.length === 10;
+    const phoneValid = phoneDigits.length === 4 || phoneDigits.length === 10;
 
-      if (!phoneValid) {
-        return false;
-      }
+    if (!phoneValid) {
+      return false;
     }
 
     // =========================
@@ -824,6 +830,32 @@ export class ITServiceRequestSpecificComponent implements OnInit {
     if (code === 'OTD') return 'ONEE';
     if (code === 'OTV') return 'ONE31';
     return code;
+  }
+
+  onSpecificPhoneInput(event: Event, person: any) {
+    const input = event.target as HTMLInputElement;
+
+    let digitsOnly = input.value.replace(/\D/g, '');
+
+    digitsOnly = digitsOnly.slice(0, 10);
+
+    const formatted = PhoneUtil.formatPhoneNumber(digitsOnly);
+
+    input.value = formatted;
+
+    person.phone = formatted;
+
+    const len = digitsOnly.length;
+
+    if (len === 0) {
+      person.phoneError = '';
+    } else if (len !== 4 && len !== 10) {
+      person.phoneError = 'เบอร์โทรศัพท์ต้องมี 4 หรือ 10 หลักเท่านั้น';
+    } else {
+      person.phoneError = '';
+    }
+
+    this.touchSpecificPeople();
   }
 
   buildRequestSummary(data: any[]): string {
@@ -947,6 +979,252 @@ export class ITServiceRequestSpecificComponent implements OnInit {
         return sections.join('\n');
       })
       .join('\n<hr>\n\n');
+  }
+
+  // Validate
+  validateRequiredField(event: Event, person: any, field: string, label: string) {
+    const input = event.target as HTMLInputElement;
+
+    const value = input.value.trim();
+
+    person.freelance[field] = value;
+
+    person.errors ??= {};
+
+    if (!value) {
+      person.errors[field] = `กรุณากรอก${label}`;
+    } else {
+      delete person.errors[field];
+    }
+
+    this.touchSpecificPeople();
+  }
+  validateSelectField(value: any, person: any, field: string, label: string) {
+    person.errors ??= {};
+
+    if (!value) {
+      person.errors[field] = `กรุณาเลือก${label}`;
+    } else {
+      delete person.errors[field];
+    }
+
+    this.touchSpecificPeople();
+  }
+  validateThaiField(event: Event, person: any, field: string, label: string) {
+    const input = event.target as HTMLInputElement;
+
+    const thaiOnly = input.value.replace(/[^ก-๙\s]/g, '');
+
+    input.value = thaiOnly;
+
+    person.freelance[field] = thaiOnly;
+
+    person.errors ??= {};
+
+    if (!thaiOnly.trim()) {
+      person.errors[field] = `กรุณากรอก${label}`;
+    } else {
+      delete person.errors[field];
+    }
+
+    this.touchSpecificPeople();
+  }
+  validateEnglishField(event: Event, person: any, field: string, label: string) {
+    const input = event.target as HTMLInputElement;
+
+    const englishOnly = input.value.replace(/[^a-zA-Z\s]/g, '');
+
+    input.value = englishOnly;
+
+    person.freelance[field] = englishOnly;
+
+    person.errors ??= {};
+
+    if (!englishOnly.trim()) {
+      person.errors[field] = `กรุณากรอก${label}`;
+    } else {
+      delete person.errors[field];
+    }
+
+    this.touchSpecificPeople();
+  }
+
+  validateEmail(event: Event, person: any) {
+    const input = event.target as HTMLInputElement;
+
+    const value = input.value.trim();
+
+    person.freelance.email = value;
+
+    person.errors ??= {};
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    if (!value) {
+      person.errors['email'] = 'กรุณากรอกอีเมล';
+    } else if (!emailRegex.test(value)) {
+      person.errors['email'] = 'รูปแบบอีเมลไม่ถูกต้อง';
+    } else {
+      delete person.errors['email'];
+    }
+
+    this.touchSpecificPeople();
+  }
+  clearFreelanceErrors(person: any) {
+    if (!person.errors) {
+      return;
+    }
+
+    const freelanceFields = [
+      'firstNameTh',
+      'lastNameTh',
+      'firstNameEn',
+      'lastNameEn',
+      'company',
+      'department',
+      'position',
+      'email',
+    ];
+
+    freelanceFields.forEach((field) => {
+      delete person.errors[field];
+    });
+  }
+
+  // ระบบเฉพาะ
+  validateOracleCompany(companyItem: any, person: any, index: number) {
+    person.errors ??= {};
+
+    const key = 'oracle_company_' + index;
+
+    if (!companyItem.company) {
+      person.errors[key] = 'กรุณาเลือกบริษัท';
+    } else {
+      delete person.errors[key];
+    }
+
+    this.touchSpecificPeople();
+  }
+  validateAllOraclePermissions(person: any) {
+    person.errors ??= {};
+
+    person.oracle.companies.forEach((companyItem: any, index: number) => {
+      const key = 'oracle_permission_' + index;
+
+      const hasPermission = companyItem.modules?.some((m: any) => {
+        const permission = (m.permission ?? '').trim();
+
+        return permission !== '' && permission !== '-';
+      });
+
+      if (!hasPermission) {
+        person.errors[key] = 'กรุณาเลือกสิทธิ์อย่างน้อย 1 รายการ';
+      } else {
+        delete person.errors[key];
+      }
+    });
+
+    this.touchSpecificPeople();
+  }
+  validateBmsCompanies(person: any) {
+    person.errors ??= {};
+
+    if (!person.bms.companies?.length) {
+      person.errors['bms_companies'] = 'กรุณาเลือกบริษัท';
+    } else {
+      delete person.errors['bms_companies'];
+    }
+
+    this.touchSpecificPeople();
+  }
+  validateBmsDetail(event: Event, person: any) {
+    const input = event.target as HTMLInputElement;
+
+    const value = input.value.trim();
+
+    person.bms.detail = value;
+
+    person.errors ??= {};
+
+    if (!value) {
+      person.errors['bms_detail'] = 'กรุณากรอกสิทธิ์';
+    } else {
+      delete person.errors['bms_detail'];
+    }
+
+    this.touchSpecificPeople();
+  }
+  validateOneeCompanies(person: any) {
+    person.errors ??= {};
+
+    if (!person.onee.companies?.length) {
+      person.errors['onee_companies'] = 'กรุณาเลือกบริษัท';
+    } else {
+      delete person.errors['onee_companies'];
+    }
+
+    this.touchSpecificPeople();
+  }
+  validateOneePermission(value: any, person: any) {
+    person.errors ??= {};
+
+    if (!value) {
+      person.errors['onee_permission'] = 'กรุณาเลือกสิทธิ์';
+    } else {
+      delete person.errors['onee_permission'];
+    }
+
+    this.touchSpecificPeople();
+  }
+  validateOneeSupervisor(event: Event, person: any) {
+    const input = event.target as HTMLInputElement;
+
+    const value = input.value.trim();
+
+    person.onee.supervisor = value;
+
+    person.errors ??= {};
+
+    if (!value) {
+      person.errors['onee_supervisor'] = 'กรุณากรอกหัวหน้างาน';
+    } else {
+      delete person.errors['onee_supervisor'];
+    }
+
+    this.touchSpecificPeople();
+  }
+  validateOnePortalCompanies(person: any) {
+    person.errors ??= {};
+
+    if (!person.onePortal.companies?.length) {
+      person.errors['oneportal_companies'] = 'กรุณาเลือกบริษัท';
+    } else {
+      delete person.errors['oneportal_companies'];
+    }
+
+    this.touchSpecificPeople();
+  }
+  validateOnePortalResponseType(value: any, person: any) {
+    person.errors ??= {};
+
+    if (!value) {
+      person.errors['oneportal_response_type'] = 'กรุณาเลือกประเภทสิทธิ์';
+    } else {
+      delete person.errors['oneportal_response_type'];
+    }
+
+    this.touchSpecificPeople();
+  }
+  clearSystemErrors(person: any, system: string) {
+    if (!person.errors) {
+      return;
+    }
+
+    Object.keys(person.errors).forEach((key) => {
+      if (key.startsWith(system)) {
+        delete person.errors[key];
+      }
+    });
   }
 
   // MASTER
