@@ -21,6 +21,7 @@ import { APPROVAL_STATUS_TABS } from '../../config/approval.config';
 import { StatusUtil } from '../../utils/status.util';
 import { AuthService } from '../../services/auth.service';
 import { VehicleService } from '../../services/vehicle.service';
+import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-approval-vehicle',
@@ -275,7 +276,7 @@ export class ApprovalVehicleComponent {
       type: 'vehicle',
       originalData: {
         ...claim,
-        employeeImageUrl: `https://empimg.oneeclick.co:8048/employeeimage/${claim.employeeCode}.jpg`,
+        employeeImageUrl: `${environment.employeeImageUrl}/${claim.employeeCode}.jpg`,
         expenseTypeName: 'เบิกค่ารถ',
       },
     };

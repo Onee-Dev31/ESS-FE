@@ -12,10 +12,7 @@
           <div class="cc-item" *ngFor="let cc of ticket.ccList">
             <!-- avatar -->
             <div class="cc-avatar">
-              <img
-                [src]="'https://empimg.oneeclick.co:8048/employeeimage/' + cc.codeempid + '.jpg'"
-                (error)="onImgError($event)"
-              />
+              <img [src]="getEmployeeImage(cc.codeempid)" (error)="onImgError($event)" />
             </div>
 
             <!-- info -->

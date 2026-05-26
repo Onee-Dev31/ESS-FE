@@ -79,11 +79,7 @@
                   <div class="approver-item">
                     <div class="approver-avatar">
                       <img
-                        [src]="
-                          'https://empimg.oneeclick.co:8048/employeeimage/' +
-                          row.approve1EmpNo +
-                          '.jpg'
-                        "
+                        [src]="getEmployeeImage(row.approve1EmpNo)"
                         (error)="$any($event.target).src = 'user.png'"
                       />
                     </div>
@@ -107,11 +103,7 @@
                   <div class="approver-item">
                     <div class="approver-avatar">
                       <img
-                        [src]="
-                          'https://empimg.oneeclick.co:8048/employeeimage/' +
-                          row.approve2EmpNo +
-                          '.jpg'
-                        "
+                        [src]="getEmployeeImage(row.approve2EmpNo)"
                         (error)="$any($event.target).src = 'user.png'"
                       />
                     </div>
@@ -131,9 +123,7 @@
                     <div class="approver-item">
                       <div class="approver-avatar">
                         <img
-                          [src]="
-                            'https://empimg.oneeclick.co:8048/employeeimage/' + emp.empNo + '.jpg'
-                          "
+                          [src]="getEmployeeImage(emp.empNo)"
                           (error)="$any($event.target).src = 'user.png'"
                         />
                       </div>
@@ -153,11 +143,7 @@
                   <div class="approver-item">
                     <div class="approver-avatar">
                       <img
-                        [src]="
-                          'https://empimg.oneeclick.co:8048/employeeimage/' +
-                          row.approve4EmpNo +
-                          '.jpg'
-                        "
+                        [src]="getEmployeeImage(row.approve4EmpNo)"
                         (error)="onImgError($event)"
                       />
                     </div>
@@ -310,7 +296,7 @@
           >
             <div class="emp-avatar">
               <img
-                [src]="'https://empimg.oneeclick.co:8048/employeeimage/' + emp.empNo + '.jpg'"
+                [src]="getEmployeeImage(emp.empNo)"
                 (error)="$any($event.target).src = 'user.png'"
               />
             </div>
@@ -325,11 +311,7 @@
         <div class="selected-emp" *ngIf="selectedApprove1()">
           <div class="selected-emp__avatar">
             <img
-              [src]="
-                'https://empimg.oneeclick.co:8048/employeeimage/' +
-                selectedApprove1()?.empNo +
-                '.jpg'
-              "
+              [src]="getEmployeeImage(selectedApprove1()?.empNo)"
               (error)="$any($event.target).src = 'user.png'"
             />
           </div>

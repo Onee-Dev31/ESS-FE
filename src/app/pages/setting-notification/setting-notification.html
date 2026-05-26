@@ -1,0 +1,121 @@
+<div class="page">
+  <app-page-header title="ตั้งค่า Notification Templates"></app-page-header>
+
+  <div class="content-card">
+    @if (loading()) {
+      <app-skeleton type="table" [rows]="6"></app-skeleton>
+    } @else if (templates().length === 0) {
+      <app-empty-state
+        title="ไม่พบข้อมูล"
+        description="ไม่พบ Notification Templates"
+        icon="fas fa-bell-slash"
+      ></app-empty-state>
+    } @else {
+      <div class="table-responsive">
+        <table class="modern-table">
+          <thead>
+            <tr>
+              <th class="col-event">Event</th>
+              <th class="col-title">Title Template</th>
+              <th class="col-message">Message Template</th>
+              <th class="col-vars">Variables</th>
+              <th class="col-active">Active</th>
+              <th class="col-actions">จัดการ</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (t of templates(); track t.id) {
+              <tr [class.row--editing]="isEditing(t.id)">
+                <td class="col-event">
+                  <code class="event-code">{{ t.event_code }}</code>
+                </td>
+
+                <td class="col-title">
+                  @if (isEditing(t.id)) {
+                    <textarea
+                      class="inline-input"
+                      [(ngModel)]="draft.title_template"
+                      rows="2"
+                      placeholder="Title template..."
+                    ></textarea>
+                  } @else {
+                    <span class="field-value">{{ t.title_template }}</span>
+                  }
+                </td>
+
+                <td class="col-message">
+                  @if (isEditing(t.id)) {
+                    <textarea
+                      class="inline-input"
+                      [(ngModel)]="draft.message_template"
+                      rows="3"
+                      placeholder="Message template..."
+                    ></textarea>
+                  } @else {
+                    <span class="field-value field-value--muted">{{ t.message_template }}</span>
+                  }
+                </td>
+
+                <td class="col-vars">
+                  <div class="var-chips">
+                    @for (
+                      v of extractVars(
+                        isEditing(t.id) ? draft.message_template : t.message_template
+                      );
+                      track v
+                    ) {
+                      <span class="var-chip">{{ v }}</span>
+                    }
+                  </div>
+                </td>
+
+                <td class="col-active">
+                  @if (isEditing(t.id)) {
+                    <label class="toggle">
+                      <input type="checkbox" [(ngModel)]="draft.active_flag" />
+                      <span class="toggle__slider"></span>
+                    </label>
+                  } @else {
+                    <span class="status-dot" [class.status-dot--on]="t.active_flag">
+                      {{ t.active_flag ? 'เปิด' : 'ปิด' }}
+                    </span>
+                  }
+                </td>
+
+                <td class="col-actions">
+                  @if (isEditing(t.id)) {
+                    <button
+                      class="btn-save"
+                      (click)="save(t)"
+                      [disabled]="isSaving(t.id)"
+                      type="button"
+                    >
+                      @if (isSaving(t.id)) {
+                        <i class="fas fa-spinner fa-spin"></i>
+                      } @else {
+                        <i class="fas fa-check"></i>
+                      }
+                      บันทึก
+                    </button>
+                    <button class="btn-cancel" (click)="cancelEdit()" type="button">
+                      <i class="fas fa-times"></i>
+                    </button>
+                  } @else {
+                    <button
+                      class="btn-edit"
+                      (click)="startEdit(t)"
+                      [disabled]="editingId() !== null"
+                      type="button"
+                    >
+                      <i class="fas fa-pen"></i> แก้ไข
+                    </button>
+                  }
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </div>
+</div>

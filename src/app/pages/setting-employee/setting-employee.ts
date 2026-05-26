@@ -19,6 +19,7 @@ import { Employee } from '../resign-management/employeeData.interface';
 import { SkeletonComponent } from '../../components/shared/skeleton/skeleton';
 import { SettingEmployeePermissionRoleForm } from '../../components/features/setting-employee-permission-role-form/setting-employee-permission-role-form';
 import { SettingService } from '../../services/setting.service';
+import { environment } from '../../../environments/environment';
 @Component({
   selector: 'app-setting-employee',
   imports: [
@@ -37,6 +38,9 @@ import { SettingService } from '../../services/setting.service';
   styleUrl: './setting-employee.scss',
 })
 export class SettingEmployee {
+  getEmployeeImage(empCode: string): string {
+    return `${environment.employeeImageUrl}/${empCode}.jpg`;
+  }
   pageTitle = signal<string>('กำหนดสิทธิ์พนักงาน');
 
   private loadingService = inject(LoadingService);

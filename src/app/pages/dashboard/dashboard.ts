@@ -41,6 +41,7 @@ import { DateUtilityService } from '../../services/date-utility.service';
 import { ItAssetService } from '../../services/it-asset.service';
 import { ThemeService } from '../../services/theme.service';
 import { AllowanceService } from '../../services/allowance.service';
+import { environment } from '../../../environments/environment';
 
 interface ProfileItem {
   label: string;
@@ -76,6 +77,10 @@ dayjs.locale('th');
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class DashboardComponent implements OnInit {
+  getEmployeeImage(empCode: string): string {
+    return `${environment.employeeImageUrl}/${empCode}.jpg`;
+  }
+
   [x: string]: any;
   private router = inject(Router);
   private userService = inject(UserService);
@@ -265,7 +270,7 @@ export class DashboardComponent implements OnInit {
     const user = this.authService.userData();
     if (!user?.CODEMPID) return;
     this.profileLightbox.set({
-      url: `https://empimg.oneeclick.co:8048/employeeimage/${user.CODEMPID}.jpg`,
+      url: `${environment.employeeImageUrl}/${user.CODEMPID}.jpg`,
       name: `${user.USR_FNAME ?? ''} ${user.USR_LNAME ?? ''}`.trim(),
     });
   }

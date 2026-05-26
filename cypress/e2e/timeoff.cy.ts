@@ -147,4 +147,139 @@ describe('Timeoff', () => {
       .trigger('change')
       .should('have.value', '2025-12-31');
   });
+
+  it('filter ตามสถานะ NEW แล้วแสดงเฉพาะรายการใหม่', () => {
+    cy.get('.select-status').select('NEW');
+    cy.wait(500);
+    cy.get('body').then(($body) => {
+      if ($body.find('.status-badge').length > 0) {
+        cy.get('.status-badge').each(($badge) => {
+          cy.wrap($badge).invoke('text').invoke('trim').should('match', /คำขอใหม่|New/);
+        });
+      } else {
+        cy.get('app-empty-state').should('be.visible');
+      }
+    });
+  });
+
+  it('filter ตามสถานะ PENDING_APPROVAL แล้วแสดงเฉพาะรายการที่รออนุมัติ', () => {
+    cy.get('.select-status').select('PENDING_APPROVAL');
+    cy.wait(500);
+    cy.get('body').then(($body) => {
+      if ($body.find('.status-badge').length > 0) {
+        cy.get('.status-badge').each(($badge) => {
+          cy.wrap($badge).invoke('text').invoke('trim').should('match', /อยู่ระหว่างการอนุมัติ|Pending/);
+        });
+      } else {
+        cy.get('app-empty-state').should('be.visible');
+      }
+    });
+  });
+
+  it('ลบรายการสถานะ New แล้ว confirm dialog ปรากฏ', () => {
+    cy.get('.modern-table tbody tr').each(($row): false | void => {
+      const statusText = $row.find('.status-badge').text().trim();
+      if (statusText === 'คำขอใหม่' || statusText === 'New') {
+        cy.wrap($row).find('.btn-icon.delete').click({ force: true });
+        cy.get('.dialog-overlay').should('be.visible');
+        cy.get('.btn-cancel').click();
+        return false;
+      }
+    });
+  });
+
+  it('mobile viewport ยังแสดง btn-create', () => {
+    cy.viewport('iphone-6');
+    cy.get('.btn-create').should('exist');
+  });
+
+  it('ค้นหาแล้วกด clear แล้วค้นหาใหม่ได้', () => {
+    cy.get('.search-input-group .form-control').type('ไม่พบ_xyz');
+    cy.get('app-empty-state').should('be.visible');
+    cy.get('.btn-clear').click();
+    cy.get('.search-input-group .form-control').should('have.value', '');
+    cy.get('.search-input-group .form-control').type('ไม่พบอีกครั้ง_abc');
+    cy.get('app-empty-state').should('be.visible');
+  });
+
+  it('timeoff page ไม่แสดง app-error-state เมื่อโหลดหน้าปกติ', () => {
+    cy.get('app-error-state').should('not.exist');
+  });
+
+  it('form มี section heading อย่างน้อย 2 รายการ เมื่อเลือกประเภทการลาแล้ว', () => {
+    cy.get('.btn-create').click();
+    cy.get('app-time-off-form').should('be.visible');
+    cy.get('app-time-off-form .leave-type-card').first().click();
+    cy.get('app-time-off-form .section-heading').should('have.length.at.least', 2);
+  });
+
+  it('form header แสดงชื่อ "บันทึกข้อมูลการลา (Time Off)"', () => {
+    cy.get('.btn-create').click();
+    cy.get('app-time-off-form h2').should('contain', 'บันทึกข้อมูลการลา');
+  });
+
+  it('form header มีข้อมูล meta วันที่ขอ / ลำดับที่ / รหัสพนักงาน', () => {
+    cy.get('.btn-create').click();
+    cy.get('app-time-off-form .meta-label').should('contain', 'วันที่ขอ');
+    cy.get('app-time-off-form .meta-label').should('contain', 'ลำดับที่');
+    cy.get('app-time-off-form .meta-label').should('contain', 'รหัสพนักงาน');
+  });
+
+  it('leave-type-card มีอย่างน้อย 1 ประเภทให้เลือก', () => {
+    cy.get('.btn-create').click();
+    cy.get('app-time-off-form .leave-type-card').should('have.length.at.least', 1);
+  });
+
+  it('leave-type-card แสดงข้อมูล "คงเหลือ" วันลา', () => {
+    cy.get('.btn-create').click();
+    cy.get('app-time-off-form .leave-remaining').first().should('contain', 'คงเหลือ');
+  });
+
+  it('คลิก leave-type-card แล้ว card มี class active', () => {
+    cy.get('.btn-create').click();
+    cy.get('app-time-off-form .leave-type-card').first().click();
+    cy.get('app-time-off-form .leave-type-card').first().should('have.class', 'active');
+  });
+
+  it('form แสดง placeholder เมื่อยังไม่เลือกประเภทการลา', () => {
+    cy.get('.btn-create').click();
+    cy.get('app-time-off-form .selection-placeholder').should('be.visible');
+  });
+
+  it('section รายละเอียดการลา ปรากฏหลังเลือกประเภทการลา', () => {
+    cy.get('.btn-create').click();
+    cy.get('app-time-off-form .leave-type-card').first().click();
+    cy.get('app-time-off-form').should('contain', '2. รายละเอียดการลา');
+  });
+
+  it('form มี option ประเภทการลา 4 ตัวเลือก (เช้า/บ่าย/เต็มวัน/กำหนดเอง)', () => {
+    cy.get('.btn-create').click();
+    cy.get('app-time-off-form .leave-type-card').first().click();
+    cy.get('app-time-off-form .period-option').should('have.length', 4);
+  });
+
+  it('จำนวนวันลา เป็น readonly field', () => {
+    cy.get('.btn-create').click();
+    cy.get('app-time-off-form .leave-type-card').first().click();
+    cy.get('app-time-off-form .readonly-highlight').should('have.attr', 'readonly');
+  });
+
+  it('กรอกเหตุผลการลาใน textarea ได้', () => {
+    cy.get('.btn-create').click();
+    cy.get('app-time-off-form .leave-type-card').first().click();
+    cy.get('app-time-off-form textarea.custom-form-control').type('ลาพักผ่อน');
+    cy.get('app-time-off-form textarea.custom-form-control').should('have.value', 'ลาพักผ่อน');
+  });
+
+  it('section แนบเอกสาร มีปุ่ม Upload file หลังเลือกประเภทการลา', () => {
+    cy.get('.btn-create').click();
+    cy.get('app-time-off-form .leave-type-card').first().click();
+    cy.get('app-time-off-form .btn-upload-file').scrollIntoView().should('be.visible');
+  });
+
+  it('form มี section heading "แนบเอกสาร" หลังเลือกประเภทการลา', () => {
+    cy.get('.btn-create').click();
+    cy.get('app-time-off-form .leave-type-card').first().click();
+    cy.get('app-time-off-form .section-heading').should('contain', '3. แนบเอกสาร');
+  });
 });

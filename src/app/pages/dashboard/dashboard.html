@@ -12,11 +12,7 @@
           </button>
           <div class="avatar-frame">
             <img
-              [src]="
-                'https://empimg.oneeclick.co:8048/employeeimage/' +
-                authService.userData()?.CODEMPID +
-                '.jpg'
-              "
+              [src]="getEmployeeImage(authService.userData()?.CODEMPID)"
               (error)="onAvatarError($event)"
               (click)="openProfileLightbox()"
               alt="Profile Avatar"

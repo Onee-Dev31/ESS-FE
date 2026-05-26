@@ -15,6 +15,7 @@ import { NzSelectModule } from 'ng-zorro-antd/select';
 import { SwalService } from '../../../../services/swal.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { environment } from '../../../../../environments/environment';
 
 @Component({
   selector: 'app-assign-modal',
@@ -23,6 +24,9 @@ import { FormsModule } from '@angular/forms';
   styleUrl: './assign-modal.scss',
 })
 export class AssignModal {
+  getEmployeeImage(empCode: string): string {
+    return `${environment.employeeImageUrl}/${empCode}.jpg`;
+  }
   private swalService = inject(SwalService);
 
   @Input() ticket: any;
