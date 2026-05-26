@@ -878,7 +878,10 @@
         </div>
       </div>
       <div class="content-card">
-        <div [innerHTML]="formatText.getFormatTextHTML(selectedDetail())"></div>
+        <div
+          [innerHTML]="formatText.getFormatTextHTML(selectedDetail())"
+          style="overflow: auto !important; width: 100%"
+        ></div>
       </div>
     </div>
   </div>
