@@ -48,16 +48,6 @@ import { CcModal } from '../dashboard-it/modal/cc-modal/cc-modal';
 import { ReOpenModal } from '../dashboard-it/modal/re-open-modal/re-open-modal';
 import { AvatarPreviewModal } from '../../components/modals/avatar-preview-modal/avatar-preview-modal';
 import { NzDatePickerModule } from 'ng-zorro-antd/date-picker';
-import { environment } from '../../../environments/environment';
-import { SettingService } from '../../services/setting.service';
-import { LoadingService } from '../../services/loading';
-
-type HeadOption = {
-  code: string;
-  name: string;
-  nickname: string;
-  label: string;
-};
 
 interface ReplyReader {
   userCodeempid: string;
@@ -91,10 +81,6 @@ interface ReplyReader {
   styleUrl: './it-service-list.scss',
 })
 export class ItService implements OnInit {
-  getEmployeeImage(empCode: string): string {
-    return `${environment.employeeImageUrl}/${empCode}.jpg`;
-  }
-
   isLaptop = false;
   isMobile = false;
   isSmallMobile = false;
@@ -120,175 +106,6 @@ export class ItService implements OnInit {
   private chatReadCounts = signal<Map<number, number>>(new Map());
 
   replyReaders = signal<ReplyReader[]>([]);
-  replyingTo = signal<any>(null);
-  emojiPickerOpen = false;
-  emojiPickerTab = 0;
-  readonly EMOJI_TABS = [
-    {
-      label: '😊',
-      emojis: [
-        '😀',
-        '😃',
-        '😄',
-        '😁',
-        '😆',
-        '😅',
-        '🤣',
-        '😂',
-        '🙂',
-        '😊',
-        '😇',
-        '🥰',
-        '😍',
-        '🤩',
-        '😘',
-        '😋',
-        '😛',
-        '😜',
-        '🤪',
-        '😝',
-        '😏',
-        '🙄',
-        '😬',
-        '😌',
-        '😔',
-        '😴',
-        '😷',
-        '🤒',
-        '🥵',
-        '🥶',
-        '😵',
-        '🥳',
-        '😎',
-        '🤓',
-        '😕',
-        '🥺',
-        '😢',
-        '😭',
-        '😱',
-        '😤',
-        '😡',
-        '😠',
-        '🤬',
-        '😈',
-        '👿',
-        '💀',
-        '👻',
-        '👽',
-        '🤖',
-        '💩',
-      ],
-    },
-    {
-      label: '👍',
-      emojis: [
-        '👍',
-        '👎',
-        '👌',
-        '✌️',
-        '🤞',
-        '🤟',
-        '🤘',
-        '🤙',
-        '👈',
-        '👉',
-        '👆',
-        '👇',
-        '☝️',
-        '👋',
-        '🤚',
-        '🖐️',
-        '✋',
-        '🖖',
-        '💪',
-        '✍️',
-        '🙏',
-        '🤲',
-        '👐',
-        '🫶',
-        '🤝',
-        '👏',
-        '✊',
-        '👊',
-        '🤜',
-        '🤛',
-      ],
-    },
-    {
-      label: '❤️',
-      emojis: [
-        '❤️',
-        '🧡',
-        '💛',
-        '💚',
-        '💙',
-        '💜',
-        '🖤',
-        '🤍',
-        '🤎',
-        '❤️‍🔥',
-        '💔',
-        '💕',
-        '💞',
-        '💓',
-        '💗',
-        '💖',
-        '💘',
-        '💝',
-        '💟',
-        '♥️',
-        '😻',
-        '💌',
-        '💋',
-        '👄',
-      ],
-    },
-    {
-      label: '🎉',
-      emojis: [
-        '🎉',
-        '🎊',
-        '🎈',
-        '🎁',
-        '🏆',
-        '🥇',
-        '⭐',
-        '🌟',
-        '💫',
-        '✨',
-        '🔥',
-        '💯',
-        '✅',
-        '❌',
-        '⚡',
-        '💡',
-        '🔔',
-        '📢',
-        '🎵',
-        '🎶',
-        '🚀',
-        '💎',
-        '🌈',
-        '👑',
-        '🎯',
-        '🌸',
-        '🌺',
-        '☀️',
-        '🌙',
-        '❄️',
-        '🌊',
-        '⚽',
-        '🏀',
-        '🍕',
-        '🍔',
-        '☕',
-        '🍺',
-        '🥂',
-        '🍰',
-        '🎂',
-      ],
-    },
-  ];
 
   unreadChatCount = computed(() => {
     const ticket = this.selectedTicket();
@@ -420,16 +237,8 @@ export class ItService implements OnInit {
   showFilter = false;
 
   pendingTicketId = '';
-  isApprover = false;
-  isSystemAdmin = false;
-  isHeadPickerOpen = false;
-  isTeamTicketsExporting = false;
-  selectedTeamHeadCode: string | null = null;
-  teamHeadOptions: HeadOption[] = [];
-  constructor(
-    private settingService: SettingService,
-    private loadingService: LoadingService,
-  ) {
+
+  constructor() {
     this.route.queryParamMap.subscribe((params) => {
       const ticketId = params.get('ticket') || '';
       if (ticketId) this.pendingTicketId = ticketId;
@@ -441,14 +250,7 @@ export class ItService implements OnInit {
     this.getMyTicket();
     this.checkScreen();
     this.checkMobile();
-    this.loadEmpHead();
-    console.log('User Data:', this.userData);
-    const userRole = localStorage.getItem('userRole');
-    console.log('userRole:', userRole);
-    const normalizedUserRole = userRole?.toLowerCase() ?? '';
-    this.isApprover = normalizedUserRole.includes('approver');
-    this.isSystemAdmin = normalizedUserRole.includes('system-admin');
-    console.log('isApprover:', this.isApprover);
+
     (this.route.queryParams ?? EMPTY)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((params) => {
@@ -760,36 +562,13 @@ export class ItService implements OnInit {
 
     const attachments = [...this.chatAttachments];
     const mentionedAdUsers = [...this.pendingMentionAdUsers];
-    const replyToId = this.replyingTo()?.id ?? null;
     this.chatMessage = '';
     this.chatAttachments = [];
     this.pendingMentionAdUsers.clear();
-    this.replyingTo.set(null);
     this.submitNote(
-      { id: ticket.ticketId, message, attachments, mentionedAdUsers, replyToId },
+      { id: ticket.ticketId, message, attachments, mentionedAdUsers },
       { silent: true },
     );
-  }
-
-  startReply(note: any) {
-    this.replyingTo.set(note);
-    setTimeout(() => this.chatTextareaRef?.nativeElement.focus(), 0);
-  }
-
-  cancelReply() {
-    this.replyingTo.set(null);
-  }
-
-  insertEmoji(emoji: string) {
-    this.chatMessage = this.chatMessage + emoji;
-    this.emojiPickerOpen = false;
-    setTimeout(() => {
-      const ta = this.chatTextareaRef?.nativeElement;
-      if (ta) {
-        ta.focus();
-        ta.setSelectionRange(ta.value.length, ta.value.length);
-      }
-    }, 0);
   }
 
   handleChatKeydown(event: KeyboardEvent, ticket: any) {
@@ -1065,10 +844,6 @@ export class ItService implements OnInit {
     formData.append('Message', data.message);
     formData.append('ExecutedBy', this.authService.userData().CODEMPID);
 
-    if (data.replyToId) {
-      formData.append('ParentReplyId', String(data.replyToId));
-    }
-
     (data.attachments ?? []).forEach((item: any) => {
       if (item?.file instanceof File) {
         formData.append('Files', item.file);
@@ -1309,15 +1084,6 @@ export class ItService implements OnInit {
   }
 
   async buildItNotes(replies: any[], attachments: any[], requesterAduser?: string) {
-    console.log(
-      '[DEBUG reply]',
-      replies.map((r) => ({
-        id: r.id,
-        msg: r.message,
-        parent_reply_id: r.parent_reply_id,
-        parent_message: r.parent_message,
-      })),
-    );
     const notes = await Promise.all(
       replies.map(async (r) => {
         const files = attachments.filter((a) => a.reply_id === r.id);
@@ -1327,28 +1093,11 @@ export class ItService implements OnInit {
             ? 'requester'
             : 'it-staff';
 
-        let replyTo: { message: string; nickName: string } | null = null;
-        if (r.parent_reply_id) {
-          const parent = replies.find((p) => Number(p.id) === Number(r.parent_reply_id));
-          if (parent) {
-            replyTo = {
-              message: parent.message,
-              nickName: this.extractNickName(parent.sender_name),
-            };
-          } else if (r.parent_message != null) {
-            replyTo = {
-              message: r.parent_message,
-              nickName: r.parent_sender_name ? this.extractNickName(r.parent_sender_name) : '',
-            };
-          }
-        }
-
         return {
           id: r.id,
           message: r.message,
           attachments: convertedFiles,
           createdDate: r.created_at,
-          replyTo,
           createBy: {
             fullName: r.sender_name,
             nickName: this.extractNickName(r.sender_name),
@@ -1680,127 +1429,5 @@ export class ItService implements OnInit {
 
   handleCancel(): void {
     this.isCcModalVisible = false;
-  }
-
-  loadEmpHead() {
-    this.loadingService.start('dept-heads');
-    this.settingService.getDeptHeads().subscribe({
-      next: (res) => {
-        console.log(res);
-        this.teamHeadOptions = this.buildUniqueHeadOptions(res);
-        this.loadingService.stop('dept-heads');
-      },
-      error: () => this.loadingService.stop('dept-heads'),
-    });
-  }
-
-  canViewTeamTicketsButton(): boolean {
-    return this.isSystemAdmin || this.isApprover;
-  }
-
-  onTeamTicketsClick(): void {
-    if (this.isSystemAdmin) {
-      this.isHeadPickerOpen = true;
-      return;
-    }
-
-    if (this.isApprover) {
-      this.loadTeamTickets(this.currentUserEmpCode);
-    }
-  }
-
-  closeHeadPicker(): void {
-    this.isHeadPickerOpen = false;
-    this.selectedTeamHeadCode = null;
-  }
-
-  confirmTeamHead(): void {
-    if (!this.selectedTeamHeadCode) return;
-
-    this.loadTeamTickets(this.selectedTeamHeadCode);
-    this.closeHeadPicker();
-  }
-
-  loadTeamTickets(empCode: string): void {
-    console.log('team tickets empCode:', empCode);
-    this.isTeamTicketsExporting = true;
-    this.swalService.loading('กำลังโหลดไฟล์...');
-
-    this.itServiceService.exportSubordinateTickets(empCode).subscribe({
-      next: (res) => {
-        const blob = res.body;
-        if (!blob) {
-          this.swalService.error('ไม่พบไฟล์', 'ไม่สามารถโหลดไฟล์ได้');
-          return;
-        }
-
-        this.downloadBlob(blob, this.getExportFileName(res, empCode));
-        this.swalService.close();
-      },
-      error: (error) => {
-        console.error('Error export subordinate tickets:', error);
-        this.finishTeamTicketsExport();
-        this.swalService.error('เกิดข้อผิดพลาด', 'ไม่สามารถโหลดไฟล์ได้');
-      },
-      complete: () => {
-        this.finishTeamTicketsExport();
-      },
-    });
-  }
-
-  private finishTeamTicketsExport(): void {
-    setTimeout(() => {
-      this.isTeamTicketsExporting = false;
-      this.cdr.detectChanges();
-    });
-  }
-
-  private downloadBlob(blob: Blob, fileName: string): void {
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = fileName;
-    a.click();
-    URL.revokeObjectURL(url);
-  }
-
-  private getExportFileName(res: any, empCode: string): string {
-    const disposition = res.headers?.get('content-disposition') ?? '';
-    const utf8FileName = disposition.match(/filename\*=UTF-8''([^;]+)/i)?.[1];
-    const quotedFileName = disposition.match(/filename="?([^"]+)"?/i)?.[1];
-    const fileName = utf8FileName || quotedFileName;
-
-    if (fileName) {
-      return decodeURIComponent(fileName);
-    }
-
-    return `subordinate_tickets_${empCode}_${dayjs().format('YYYY-MM-DD')}.xlsx`;
-  }
-
-  private buildUniqueHeadOptions(res: any): HeadOption[] {
-    const rows = Array.isArray(res) ? res : Array.isArray(res?.data) ? res.data : [];
-    const headMap = new Map<string, HeadOption>();
-
-    rows.forEach((row: any) => {
-      const heads = Array.isArray(row?.heads) ? row.heads : [];
-
-      heads.forEach((head: any) => {
-        const code = `${head?.code ?? head?.CODEMPID ?? head?.codeempid ?? ''}`.trim();
-        if (!code || headMap.has(code)) return;
-
-        const name = `${head?.name ?? head?.empName ?? head?.NAMFULL ?? ''}`.trim();
-        const nickname = `${head?.nickname ?? head?.nickName ?? head?.NICKNAME ?? ''}`.trim();
-        const nicknameText = nickname ? ` (${nickname})` : '';
-
-        headMap.set(code, {
-          code,
-          name,
-          nickname,
-          label: `${code} ${name}${nicknameText}`.trim(),
-        });
-      });
-    });
-
-    return [...headMap.values()];
   }
 }

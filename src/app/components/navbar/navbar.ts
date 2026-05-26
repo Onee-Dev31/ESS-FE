@@ -38,6 +38,7 @@ export class NavbarComponent {
   getEmployeeImage(empCode: string): string {
     return `${environment.employeeImageUrl}/${empCode}.jpg`;
   }
+
   private sidebarService = inject(SidebarService);
   private authService = inject(AuthService);
   private router = inject(Router);

@@ -688,4 +688,57 @@
       </div>
     </div>
   }
+  <<<<<<< HEAD =======
+
+  <!-- @if (showSummaryModal()) {
+    <div class="modal-overlay">
+      <div class="modal-container">
+        <div class="modal-header">
+          <h2>สรุปรายละเอียดคำขอ</h2>
+          <button
+            class="btn-close-modal"
+            type="button"
+            (click)="closeSummaryModal()"
+            title="ปิด"
+            aria-label="Close summary modal"
+          >
+            <i class="fas fa-times" aria-hidden="true"></i>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="summary-section">
+            <h3><i class="fas fa-users mr-2 text-primary"></i> รายการผู้ขอใช้ระบบ</h3>
+            <div class="specific-summary-list">
+              @for (person of specificPeople(); track person.id; let index = $index) {
+                <div class="specific-summary-item">
+                  <strong>คนที่ {{ index + 1 }}: {{ getOpenForLabel(person.openFor) }}</strong>
+                  <span>เบอร์ติดต่อ: {{ person.phone }}</span>
+                  <span>ระบบ: {{ getPersonSystemLabels(person) }}</span>
+                </div>
+              }
+            </div>
+          </div>
+
+          @if (requestDetails()) {
+            <div class="summary-section">
+              <h3>รายละเอียดที่จะบันทึก</h3>
+              <div
+                class="detail-text p-3 bg-light rounded text-muted"
+                style="white-space: pre-wrap"
+              >
+                {{ requestDetails() }}
+              </div>
+            </div>
+          }
+        </div>
+        <div class="modal-footer">
+          <button class="btn-cancel" type="button" (click)="closeSummaryModal()">แก้ไข</button>
+          <button class="btn-confirm" type="button" (click)="confirmSubmission()">
+            ยืนยันการส่ง
+          </button>
+        </div>
+      </div>
+    </div>
+  } -->
+  >>>>>>> master
 </div>

@@ -122,13 +122,8 @@ async function setupSheet() {
             fields: 'pixelSize',
           },
         },
-        {
-          updateDimensionProperties: {
-            range: { sheetId: tabId, dimension: 'COLUMNS', startIndex: 2, endIndex: 3 },
-            properties: { pixelSize: 400 },
-            fields: 'pixelSize',
-          },
-        },
+        // Column C (Test Name) — auto-sized after run via finalizeSheet()
+
         {
           updateDimensionProperties: {
             range: { sheetId: tabId, dimension: 'COLUMNS', startIndex: 3, endIndex: 4 },

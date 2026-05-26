@@ -119,13 +119,13 @@ export class NotificationService {
         .subscribe((data: any) => {
           if (!this.activeUserKey) return;
           this.zone.run(() => {
+            this.lastToastTime = Date.now();
             this.realtimeTick.update((tick) => tick + 1);
             this.refreshAll();
             // แสดง toast เฉพาะเมื่อ NotificationCreated ไม่ได้ส่ง toast ภายใน 800ms ที่ผ่านมา
-            if (Date.now() - this.lastToastTime > 800 && !document.hidden) {
+            if (!document.hidden) {
               const msg = buildMsg(data);
               if (msg) {
-                this.lastToastTime = Date.now();
                 const routeInfo = this.resolveRoute({
                   notificationType: event,
                   recipientRole: '',
@@ -174,8 +174,8 @@ export class NotificationService {
         this.unreadCount.set(safeCount);
         this.isCountLoading.set(false);
 
-        // Trigger sound when polling detects a new notification (no toast — SignalR handles that with actual title)
-        if (safeCount > prevCount) {
+        // Trigger sound only if SignalR hasn't already fired within 2s (prevents double-fire)
+        if (safeCount > prevCount && Date.now() - this.lastToastTime > 2000) {
           this.realtimeTick.update((t) => t + 1);
         }
       },
@@ -537,7 +537,6 @@ export class NotificationService {
       typeStr2.includes('chat') ||
       titleStr2.includes('ข้อความ') ||
       titleStr2.includes('แชท');
-
     return {
       route: '/it-service-list',
       queryParams: {
