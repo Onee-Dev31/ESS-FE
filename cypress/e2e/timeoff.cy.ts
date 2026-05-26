@@ -206,9 +206,10 @@ describe('Timeoff', () => {
     cy.get('app-error-state').should('not.exist');
   });
 
-  it('form มี section heading อย่างน้อย 2 รายการ เมื่อเปิด modal', () => {
+  it('form มี section heading อย่างน้อย 2 รายการ เมื่อเลือกประเภทการลาแล้ว', () => {
     cy.get('.btn-create').click();
     cy.get('app-time-off-form').should('be.visible');
+    cy.get('app-time-off-form .leave-type-card').first().click();
     cy.get('app-time-off-form .section-heading').should('have.length.at.least', 2);
   });
 });
