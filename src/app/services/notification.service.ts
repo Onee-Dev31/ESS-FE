@@ -1,6 +1,7 @@
 import { Injectable, NgZone, computed, effect, inject, signal } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { interval } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
 import { AuthService } from './auth.service';
@@ -125,12 +126,32 @@ export class NotificationService {
               const msg = buildMsg(data);
               if (msg) {
                 this.lastToastTime = Date.now();
-                this.toastService.info(msg);
+                const routeInfo = this.resolveRoute({
+                  notificationType: event,
+                  recipientRole: '',
+                  targetType: '',
+                  ticketId: this.toNumber(data?.ticketId ?? data?.ticket_id),
+                  ticketNumber: this.toText(data?.ticketNumber ?? data?.ticket_number) ?? null,
+                  title: msg,
+                });
+                this.toastService.info(
+                  msg,
+                  undefined,
+                  routeInfo.route ?? undefined,
+                  routeInfo.queryParams ?? undefined,
+                );
               }
             }
           });
         });
     }
+
+    // Polling fallback: refresh every 10s in case SignalR events are missed
+    interval(10000)
+      .pipe(takeUntilDestroyed())
+      .subscribe(() => {
+        if (this.activeUserKey) this.refreshAll();
+      });
   }
 
   refreshAll() {
@@ -147,9 +168,16 @@ export class NotificationService {
     const params = new HttpParams().set('recipientAduser', this.activeUserKey);
     this.http.get<any>(`${this.baseUrl}/unread-count`, { params }).subscribe({
       next: (response) => {
-        const unreadCount = Number(response?.unreadCount ?? response?.count ?? response ?? 0);
-        this.unreadCount.set(Number.isFinite(unreadCount) ? unreadCount : 0);
+        const newCount = Number(response?.unreadCount ?? response?.count ?? response ?? 0);
+        const prevCount = this.unreadCount();
+        const safeCount = Number.isFinite(newCount) ? newCount : 0;
+        this.unreadCount.set(safeCount);
         this.isCountLoading.set(false);
+
+        // Trigger sound when polling detects a new notification (no toast — SignalR handles that with actual title)
+        if (safeCount > prevCount) {
+          this.realtimeTick.update((t) => t + 1);
+        }
       },
       error: () => {
         this.countError.set('ไม่สามารถโหลดจำนวนแจ้งเตือนใหม่ได้');
@@ -171,8 +199,14 @@ export class NotificationService {
       unreadOnly: this.unreadOnly(),
     }).subscribe({
       next: ({ items, total }) => {
-        // console.log(items);
-        const mapped = items.map((item) => this.mapNotification(item));
+        const visible = items.filter((item) => !this.isChatNotifForApprover(item));
+        const hiddenUnread = items.filter(
+          (item) => this.isChatNotifForApprover(item) && !(item.is_read ?? item.isRead),
+        ).length;
+        if (hiddenUnread > 0) {
+          this.unreadCount.update((c) => Math.max(0, c - hiddenUnread));
+        }
+        const mapped = visible.map((item) => this.mapNotification(item));
         this.items.set(mapped);
         this.hasMore.set(this.computeHasMore(mapped.length, total));
         this.isListLoading.set(false);
@@ -198,7 +232,8 @@ export class NotificationService {
       unreadOnly: this.unreadOnly(),
     }).subscribe({
       next: ({ items, total }) => {
-        const merged = [...this.items(), ...items.map((item) => this.mapNotification(item))];
+        const visible = items.filter((item) => !this.isChatNotifForApprover(item));
+        const merged = [...this.items(), ...visible.map((item) => this.mapNotification(item))];
         const deduped = this.deduplicate(merged);
 
         this.page = nextPage;
@@ -317,14 +352,46 @@ export class NotificationService {
   private handleRealtimeNotification(payload: unknown) {
     if (!this.activeUserKey) return;
 
-    this.realtimeTick.update((tick) => tick + 1);
-    this.refreshAll();
+    this.zone.run(() => {
+      this.realtimeTick.update((tick) => tick + 1);
+      this.refreshAll();
 
-    const record = this.extractRealtimeRecord(payload);
-    const title =
-      this.toText((record as any)?.title ?? (record as any)?.notification_title) ?? 'แจ้งเตือนใหม่';
-    this.lastToastTime = Date.now();
-    if (!document.hidden) this.toastService.info(title);
+      const record = this.extractRealtimeRecord(payload) as any;
+      const title = this.toText(record?.title ?? record?.notification_title) ?? 'แจ้งเตือนใหม่';
+
+      const payloadData = this.parsePayload(record?.payload_json ?? record?.payloadJson);
+      const ticketId = this.toNumber(
+        record?.ticket_id ??
+          record?.ticketId ??
+          payloadData?.['ticketId'] ??
+          payloadData?.['ticket_id'],
+      );
+      const ticketNumber =
+        this.toText(
+          record?.ticket_number ??
+            record?.ticketNumber ??
+            payloadData?.['ticketNumber'] ??
+            payloadData?.['ticket_number'],
+        ) ?? null;
+
+      const routeInfo = this.resolveRoute({
+        notificationType: this.toText(record?.notification_type ?? record?.notificationType) ?? '',
+        recipientRole: this.toText(record?.recipient_role ?? record?.recipientRole) ?? '',
+        targetType: this.toText(record?.target_type ?? record?.targetType) ?? '',
+        ticketId,
+        ticketNumber,
+        title,
+      });
+
+      this.lastToastTime = Date.now();
+      if (!document.hidden)
+        this.toastService.info(
+          title,
+          undefined,
+          routeInfo.route ?? undefined,
+          routeInfo.queryParams ?? undefined,
+        );
+    });
   }
 
   private extractRealtimeRecord(payload: unknown): NotificationApiRecord | null {
@@ -365,6 +432,7 @@ export class NotificationService {
       targetType: this.toText(item.target_type ?? item.targetType) ?? '',
       ticketId,
       ticketNumber,
+      title: this.toText(item.title) ?? '',
     });
 
     return {
@@ -401,6 +469,7 @@ export class NotificationService {
     targetType: string;
     ticketId: number | null;
     ticketNumber: string | null;
+    title?: string;
   }) {
     const roleText = `${this.authService.userRole() ?? ''},${input.recipientRole}`.toLowerCase();
     const typeText = `${input.notificationType} ${input.targetType}`.toLowerCase();
@@ -439,20 +508,41 @@ export class NotificationService {
     }
 
     if (isItRole) {
+      const typeStr = input.notificationType.toLowerCase();
+      const titleStr = (input.title ?? '').toLowerCase();
+      const isNoteNotification =
+        typeStr.includes('note') ||
+        typeStr.includes('message') ||
+        typeStr.includes('reply') ||
+        typeStr.includes('chat') ||
+        titleStr.includes('ข้อความ') ||
+        titleStr.includes('แชท');
       return {
         route: '/it-dashboard',
         queryParams: {
           ticketId: input.ticketId ?? undefined,
           focusZone: 'tickets',
+          ...(isNoteNotification && { openChat: 'true' }),
           _t: Date.now(),
         },
       };
     }
 
+    const typeStr2 = input.notificationType.toLowerCase();
+    const titleStr2 = (input.title ?? '').toLowerCase();
+    const isNoteForUser =
+      typeStr2.includes('note') ||
+      typeStr2.includes('message') ||
+      typeStr2.includes('reply') ||
+      typeStr2.includes('chat') ||
+      titleStr2.includes('ข้อความ') ||
+      titleStr2.includes('แชท');
+
     return {
       route: '/it-service-list',
       queryParams: {
         ticketId: input.ticketId ?? undefined,
+        ...(isNoteForUser && { openChat: 'true' }),
         _t: Date.now(),
       },
     };
@@ -555,6 +645,27 @@ export class NotificationService {
     if (value == null || value === '') return null;
     const number = Number(value);
     return Number.isFinite(number) ? number : null;
+  }
+
+  private isChatNotifForApprover(item: NotificationApiRecord): boolean {
+    const typeStr = (
+      this.toText(item.notification_type ?? item.notificationType) ?? ''
+    ).toLowerCase();
+    const titleStr = (this.toText(item.title) ?? '').toLowerCase();
+    const isChatType =
+      typeStr.includes('note') ||
+      typeStr.includes('reply') ||
+      typeStr.includes('message') ||
+      typeStr.includes('chat') ||
+      titleStr.includes('ข้อความ') ||
+      titleStr.includes('แชท');
+
+    if (!isChatType) return false;
+
+    const userRole = (this.authService.userRole() ?? '').toLowerCase();
+    const isItRole = [...this.itRoles].some((r) => userRole.includes(r));
+    const isApproverRole = [...this.approverRoles].some((r) => userRole.includes(r));
+    return isApproverRole && !isItRole;
   }
 
   private reset() {

@@ -104,6 +104,18 @@ $text: var(--text);
   align-items: center;
   gap: 12px;
   flex: 1;
+
+  &.toast-clickable {
+    cursor: pointer;
+    border-radius: 8px;
+    margin: -4px;
+    padding: 4px;
+    transition: background 0.15s;
+
+    &:hover {
+      background: rgba(0, 0, 0, 0.05);
+    }
+  }
 }
 
 .toast-icon {
@@ -120,6 +132,12 @@ $text: var(--text);
   color: #1c1c1e;
   line-height: 1.4;
   letter-spacing: -0.01em;
+}
+
+.toast-arrow {
+  font-size: 0.75rem;
+  opacity: 0.5;
+  flex-shrink: 0;
 }
 
 .toast-close {

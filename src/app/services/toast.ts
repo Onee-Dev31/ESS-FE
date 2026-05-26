@@ -6,6 +6,8 @@ export interface Toast {
   type: 'success' | 'error' | 'warning' | 'info';
   message: string;
   duration?: number;
+  route?: string;
+  queryParams?: Record<string, any>;
 }
 
 @Injectable({
@@ -15,9 +17,15 @@ export class ToastService {
   toasts = signal<Toast[]>([]);
   private idCounter = 0;
 
-  private show(type: Toast['type'], message: string, duration: number = 3000) {
+  private show(
+    type: Toast['type'],
+    message: string,
+    duration: number = 3000,
+    route?: string,
+    queryParams?: Record<string, any>,
+  ) {
     const id = `toast-${++this.idCounter}`;
-    const toast: Toast = { id, type, message, duration };
+    const toast: Toast = { id, type, message, duration, route, queryParams };
 
     this.toasts.update((toasts) => [...toasts, toast]);
 
@@ -38,8 +46,8 @@ export class ToastService {
     this.show('warning', message, duration);
   }
 
-  info(message: string, duration?: number) {
-    this.show('info', message, duration);
+  info(message: string, duration?: number, route?: string, queryParams?: Record<string, any>) {
+    this.show('info', message, duration, route, queryParams);
   }
 
   remove(id: string) {

@@ -438,6 +438,21 @@ export class ItServiceService {
     return this._http.post(`${this.baseUrl}/tickets/${ticketId}/read`, { readerCodeempid });
   }
 
+  markReplyRead(
+    ticketId: string | number,
+    userCodeempid: string,
+    lastReadReplyId: number,
+  ): Observable<any> {
+    return this._http.post(`${this.baseUrl}/tickets/${ticketId}/replies/read`, {
+      userCodeempid,
+      lastReadReplyId,
+    });
+  }
+
+  getReplyReadStatus(ticketId: string | number): Observable<any> {
+    return this._http.get(`${this.baseUrl}/tickets/${ticketId}/replies/read-status`);
+  }
+
   getUnreadCount(readerCodeempid: string, role?: string): Observable<any> {
     return this._http.get(`${this.baseUrl}/tickets/unread-count`, {
       params: role ? { readerCodeempid, role } : { readerCodeempid },
