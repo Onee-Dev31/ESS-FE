@@ -434,6 +434,18 @@
                 {{ getChatAttachmentCount(t) }} ไฟล์
               </button>
             }
+            @if (t.itNotes.length > 0) {
+              <button
+                class="floating-chat__summary floating-chat__export"
+                type="button"
+                title="Export chat history"
+                aria-label="Export chat history"
+                (click)="exportChatHistory(t)"
+              >
+                <i class='fas fa-file-export'></i>
+                Export
+              </button>
+            }
           </div>
           <button
             class="floating-chat__close"
