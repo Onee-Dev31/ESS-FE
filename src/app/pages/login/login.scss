@@ -1,626 +1,1017 @@
-// ============================================
-// ตัวแปรสีและสไตล์พื้นฐาน (Color & Style Variables)
-// ============================================
+@use 'sass:color';
+@use '../../../styles/variables' as *;
+@use '../../../styles/mixins' as *;
 
-// สีหลักและสีพื้นฐาน (Brand Colors)
-$primary: var(--primary);
-$primary-dark: #1557b0;
+/* =========================================================
+   PAGE
+========================================================= */
 
-// สีตัวอักษรและระดับความสำคัญ (Text Colors)
-$text: var(--text);
-$text-sub: var(--text-sub);
-$text-muted: var(--text-muted);
-$text-header: var(--text-sub);
-
-// สีพื้นหลัง (Background Colors)
-$bg-slate: var(--bg-slate);
-
-// เส้นขอบ (Border Colors)
-$border: var(--border);
-
-// Mixin สำหรับ Glassmorphism Effect
-@mixin glass-card($blur: 10px, $bg: color-mix(in srgb, var(--bg-card), transparent 5%)) {
-  background: $bg;
-  backdrop-filter: blur($blur);
-  -webkit-backdrop-filter: blur($blur);
-}
-
-// ============================================
-
-$primary-color: $primary;
-$primary-hover: $primary-dark;
-$text-dark: $text;
-$text-muted-local: $text-sub;
-$text-label-local: $text-header;
-$text-header-local: $text-header;
-$bg-light-local: $bg-slate;
-
-// ==================== ANIMATIONS ====================
-@keyframes rotation {
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-@keyframes gradientBG {
-  0% {
-    background-position: 0% 50%;
-  }
-
-  50% {
-    background-position: 100% 50%;
-  }
-
-  100% {
-    background-position: 0% 50%;
-  }
-}
-
-// ==================== BASE LAYOUT ====================
-:host {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  width: 100%;
-  min-height: 100vh;
-  min-height: 100dvh;
+.ess-login-page {
   position: relative;
-  background: linear-gradient(-45deg, #7179e1, $primary-color, #1f277d, #1666a3);
-  background-size: 400% 400%;
-  animation: gradientBG 10s ease infinite;
-  box-sizing: border-box;
-  overflow-x: hidden;
-  padding: 20px;
-}
 
-.main-container {
-  display: flex;
   width: 100%;
-  max-width: 1200px;
-  min-height: 680px;
-  height: 88vh;
-  max-height: 900px;
-  border-radius: 24px;
+  height: 100vh;
+
   overflow: hidden;
-  box-shadow: 0 40px 100px rgba(0, 0, 0, 0.2);
-  @include glass-card(10px);
-  transition: all 0.3s ease;
+
+  display: flex;
+  align-items: center;
+
+  padding: clamp(14px, 2vw, 32px);
+
+  background:
+    linear-gradient(
+      90deg,
+      rgba(4, 15, 52, 0.9) 0%,
+      rgba(5, 20, 70, 0.58) 38%,
+      rgba(4, 15, 52, 0.92) 100%
+    ),
+    url('/logo/grammy_building_night.png');
+
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+
+  color: white;
+
+  font-family: 'Inter', sans-serif;
+
+  @include mobile {
+    justify-content: center;
+  }
 }
 
-// ==================== PANELS ====================
-.login-panel {
-  flex: 1;
-  padding: 3.5rem;
+/* =========================================================
+   OVERLAY
+========================================================= */
+
+.ess-overlay {
+  position: absolute;
+  inset: 0;
+
+  background:
+    radial-gradient(circle at top left, rgba(85, 145, 255, 0.18), transparent 30%),
+    radial-gradient(circle at bottom right, rgba(0, 119, 255, 0.16), transparent 35%);
+
+  backdrop-filter: blur(1px);
+}
+
+/* =========================================================
+   GLOW
+========================================================= */
+
+.ess-glow {
+  position: absolute;
+
+  border-radius: 999px;
+
+  filter: blur(90px);
+
+  pointer-events: none;
+}
+
+.glow-1 {
+  top: -120px;
+  left: -120px;
+
+  width: 360px;
+  height: 360px;
+
+  background: rgba(61, 128, 255, 0.24);
+}
+
+.glow-2 {
+  right: -180px;
+  bottom: -180px;
+
+  width: 520px;
+  height: 520px;
+
+  background: rgba(0, 119, 255, 0.18);
+}
+
+/* =========================================================
+   LEFT
+========================================================= */
+
+.ess-left {
+  position: relative;
+  z-index: 3;
+
+  width: 50%;
+
   display: flex;
   flex-direction: column;
   justify-content: center;
-  z-index: 2;
-  overflow-y: auto;
 
-  .brand-header {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    width: 100%;
-    margin-bottom: 2rem;
+  padding-left: clamp(10px, 3vw, 60px);
 
-    .logoEss-img {
-      max-width: 120px;
-      width: 100%;
-      height: auto;
-      object-fit: contain;
-      margin-bottom: 0.8rem;
-    }
+  @include large-tablet {
+    width: 46%;
+  }
 
-    h1 {
-      margin: 0;
-      font-size: 2.5rem;
-      font-weight: 700;
-      line-height: 1.2;
-      color: $text-dark;
-      text-align: center;
-    }
-
-    p {
-      margin: 5px 0 0 0;
-      color: $text-muted;
-      font-size: 0.95rem;
-      font-weight: 400;
-      text-align: center;
-    }
+  @include tablet {
+    display: none;
   }
 }
 
-.welcome-panel {
-  flex: 1.3;
-  background-color: $bg-light-local;
+/* =========================================================
+   BRAND
+========================================================= */
+
+.ess-brand {
+  margin-bottom: clamp(42px, 5vw, 70px);
+
+  img {
+    width: clamp(120px, 10vw, 165px);
+
+    margin-bottom: 18px;
+
+    object-fit: contain;
+
+    filter: drop-shadow(0 10px 24px rgba(0, 0, 0, 0.28));
+  }
+}
+
+.ess-brand-text {
+  h2 {
+    margin: 0;
+
+    color: #fff;
+
+    font-size: clamp(1.55rem, 2vw, $font-size-title);
+
+    font-weight: 700;
+
+    line-height: 1.08;
+
+    letter-spacing: -0.8px;
+
+    text-shadow: 0 4px 18px rgba(0, 0, 0, 0.22);
+  }
+
+  p {
+    margin: 8px 0 0;
+
+    color: #d8e6ff;
+
+    font-size: clamp(0.92rem, 1vw, 1rem);
+
+    font-weight: 400;
+
+    letter-spacing: 0.2px;
+  }
+}
+
+/* =========================================================
+   FEATURES
+========================================================= */
+
+.ess-features {
+  display: flex;
+  flex-direction: column;
+
+  gap: clamp(18px, 2vw, 28px);
+}
+
+.feature-item {
   position: relative;
-  padding: 0;
+
+  display: flex;
+  align-items: center;
+
+  gap: 18px;
+
+  span {
+    font-size: clamp(1rem, 1.45vw, 1.45rem);
+
+    font-weight: 500;
+
+    color: rgba(255, 255, 255, 0.96);
+
+    letter-spacing: -0.3px;
+
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.22);
+  }
+}
+
+/* =========================================================
+   FEATURE ICON
+========================================================= */
+
+.feature-icon {
+  position: relative;
+
+  width: clamp(64px, 6vw, 82px);
+  height: clamp(64px, 6vw, 82px);
+
+  border-radius: 50%;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0.04));
+
+  border: 1px solid rgba(137, 197, 255, 0.38);
+
+  backdrop-filter: blur(14px);
+
+  box-shadow:
+    0 10px 35px rgba(73, 146, 255, 0.12),
+    inset 0 2px 3px rgba(255, 255, 255, 0.65),
+    inset 0 -6px 12px rgba(0, 0, 0, 0.18);
+
+  i {
+    font-size: clamp(1.4rem, 2vw, 2rem);
+
+    color: #7dc3ff;
+  }
+}
+
+/* =========================================================
+   FEATURE LINE
+========================================================= */
+
+.feature-line {
+  position: absolute;
+
+  left: 40px;
+  top: 92%;
+
+  width: 2px;
+  height: 50px;
+
+  background: linear-gradient(to bottom, rgba(122, 196, 255, 0.75), transparent);
+}
+
+/* =========================================================
+   RIGHT
+========================================================= */
+
+.ess-right {
+  position: relative;
+  z-index: 5;
+
+  width: 50%;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  @include large-tablet {
+    width: 54%;
+  }
+
+  @include tablet {
+    width: 100%;
+  }
+}
+
+/* =========================================================
+   LOGIN CARD
+========================================================= */
+
+.login-card {
+  position: relative;
+
+  width: min(500px, 100%);
+
+  padding: clamp(30px, 4vw, 48px) clamp(22px, 4vw, 42px) clamp(24px, 3vw, 34px);
+
+  border-radius: clamp(24px, 3vw, 34px);
+
   overflow: hidden;
 
-  .people-img {
-    position: absolute;
-    inset: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+
+  background: linear-gradient(145deg, rgba(7, 25, 80, 0.82), rgba(4, 16, 58, 0.72));
+
+  border: 1px solid rgba(255, 255, 255, 0.08);
+
+  backdrop-filter: blur(20px);
+
+  box-shadow:
+    0 30px 70px rgba(0, 0, 0, 0.34),
+    inset 0 2px 3px rgba(255, 255, 255, 0.35),
+    inset 0 -8px 14px rgba(0, 0, 0, 0.2);
+
+  @include mobile {
     width: 100%;
-    height: 100%;
-    object-fit: cover;
-    object-position: center;
-    display: block;
   }
 }
 
-// ==================== FORM ELEMENTS ====================
-.login-panel {
-  .input-group {
-    margin-bottom: 1.2rem;
+/* =========================================================
+   DOTS
+========================================================= */
 
-    label {
-      display: block;
-      margin-bottom: 6px;
-      color: $text-header;
-      font-size: 0.9rem;
-      font-weight: 500;
-    }
+.card-dots {
+  position: absolute;
 
-    .input-wrapper {
-      position: relative;
-    }
+  top: 40px;
+  right: -24px;
 
-    input {
-      width: 100%;
-      border: none;
-      border-bottom: 2px solid var(--border);
-      padding: 12px 0 8px 0;
-      font-size: 1rem;
-      outline: none;
-      background: transparent !important;
-      transition: all 0.3s ease;
-      color: var(--text);
-      color-scheme: dark light;
+  width: 150px;
+  height: 150px;
 
-      &:-webkit-autofill,
-      &:-webkit-autofill:hover,
-      &:-webkit-autofill:focus {
-        -webkit-text-fill-color: var(--text) !important;
-        -webkit-box-shadow: 0 0 0px 1000px transparent inset !important;
-        box-shadow: 0 0 0px 1000px transparent inset !important;
-        background-color: transparent !important;
-        transition: background-color 5000s ease-in-out 0s;
-      }
+  opacity: 0.14;
 
-      &::-ms-reveal {
-        display: none;
-      }
+  background-image: radial-gradient(#69b7ff 1px, transparent 1px);
 
-      &:focus {
-        border-color: var(--primary);
-        background: rgba(var(--primary), 0.02) !important;
-      }
+  background-size: 12px 12px;
+}
 
-      &::placeholder {
-        color: var(--text-muted);
-        opacity: 0.7;
-      }
-    }
-  }
+/* =========================================================
+   TOP ICON
+========================================================= */
 
-  .password-toggle {
-    position: absolute;
-    right: 0;
-    top: 50%;
-    transform: translateY(-50%);
-    cursor: pointer;
-    color: $text-muted;
-    padding: 8px;
-    transition: color 0.2s;
+.login-top-icon {
+  display: flex;
+  justify-content: center;
 
-    &:hover {
-      color: $primary-color;
-    }
-  }
+  margin-bottom: 12px;
 
-  .action-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-top: 1rem;
-    font-size: 0.85rem;
+  i {
+    font-size: clamp(2.3rem, 3vw, 3rem);
 
-    .remember-me {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      cursor: pointer;
-      color: $text-muted;
-      -webkit-user-select: none;
-      user-select: none;
+    color: #84beff;
 
-      input {
-        cursor: pointer;
-        width: 14px;
-        height: 14px;
-      }
-
-      span {
-        font-weight: 400;
-      }
-    }
-
-    .forgot-password {
-      color: $primary-color;
-      text-decoration: none;
-      font-weight: 500;
-      transition: color 0.2s;
-
-      &:hover {
-        color: $primary-hover;
-      }
-    }
-  }
-
-  .login-button {
-    width: 100%;
-    padding: 16px;
-    background: $primary-color;
-    color: #ffffff;
-    border: none;
-    border-radius: 8px;
-    font-weight: 600;
-    cursor: pointer;
-    margin-top: 1.5rem;
-    box-shadow: 0 4px 12px rgba($primary-color, 0.2);
-    transition: all 0.3s ease;
-    font-size: 1rem;
-    letter-spacing: 0.5px;
-
-    &:hover:not(:disabled) {
-      background: $primary-hover;
-      transform: translateY(-2px);
-      box-shadow: 0 6px 16px rgba($primary-color, 0.3);
-    }
-
-    &:active:not(:disabled) {
-      transform: translateY(0);
-    }
-
-    &:disabled {
-      background: #a5aaf0;
-      cursor: not-allowed;
-      box-shadow: none;
-      transform: none;
-    }
-  }
-
-  .signup-section {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    margin-top: 1.5rem;
-    flex-wrap: wrap;
-
-    p {
-      margin: 0;
-      color: $text-muted;
-      font-size: 0.85rem;
-    }
-
-    .signup-button {
-      background: transparent;
-      border: 1px solid transparent;
-      padding: 6px 10px;
-      border-radius: 8px;
-      font-weight: 600;
-      color: $primary-color;
-      cursor: pointer;
-      transition: all 0.2s;
-      font-size: 0.85rem;
-
-      &:hover {
-        background: rgba($primary-color, 0.05);
-        color: $primary-hover;
-      }
-    }
+    text-shadow: 0 0 20px rgba(132, 190, 255, 0.3);
   }
 }
 
-// ==================== ALERTS & LOADERS ====================
-.alert {
-  padding: 10px 14px;
-  border-radius: 8px;
-  margin-bottom: 1.2rem;
-  font-size: 0.9rem;
+/* =========================================================
+   TITLE
+========================================================= */
+
+.login-title {
+  margin: 0;
+
   text-align: center;
-  line-height: 1.4;
-  font-weight: 500;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  width: 100%;
-  box-sizing: border-box;
 
-  &.error-msg {
-    background-color: var(--status-danger-bg);
-    color: var(--status-danger-text);
-    border: 1px solid var(--status-danger-border, var(--status-danger-bg));
-  }
+  font-size: clamp(2.5rem, 4vw, $font-size-display);
 
-  &.success-msg {
-    background-color: var(--status-success-bg);
-    color: var(--status-success-text);
-    border: 1px solid var(--status-success-border, var(--status-success-bg));
+  color: #fff;
+
+  font-weight: 700;
+
+  letter-spacing: -1.4px;
+
+  line-height: 1;
+}
+
+.login-subtitle {
+  margin: 10px 0 28px;
+
+  text-align: center;
+
+  font-size: clamp(1rem, 1.6vw, $font-size-title);
+
+  font-weight: 400;
+
+  color: #8db7ff;
+
+  letter-spacing: -0.2px;
+}
+
+/* =========================================================
+   DIVIDER
+========================================================= */
+
+.login-divider {
+  position: relative;
+
+  height: 1px;
+
+  margin-bottom: 28px;
+
+  background: rgba(255, 255, 255, 0.08);
+
+  span {
+    position: absolute;
+
+    left: 50%;
+    top: 50%;
+
+    width: 10px;
+    height: 10px;
+
+    border-radius: 999px;
+
+    background: #69b8ff;
+
+    transform: translate(-50%, -50%);
+
+    box-shadow: 0 0 16px #69b8ff;
   }
 }
 
-.loader {
-  width: 20px;
-  height: 20px;
-  border: 2px solid var(--bg-card);
-  border-bottom-color: transparent;
-  border-radius: 50%;
-  display: inline-block;
-  animation: rotation 1s linear infinite;
-}
+/* =========================================================
+   INPUT
+========================================================= */
 
-// ==================== QR LOGIN ====================
-.qr-divider {
+.input-group {
+  height: clamp(52px, 5vw, 58px);
+
   display: flex;
   align-items: center;
-  margin: 1.5rem 0 1rem;
-  color: $text-muted;
-  font-size: 0.85rem;
-  gap: 10px;
 
-  &::before,
-  &::after {
-    content: '';
+  gap: 14px;
+
+  padding: 0 18px;
+
+  margin-bottom: 18px;
+
+  border-radius: 16px;
+
+  background: rgba(255, 255, 255, 0.045);
+
+  border: 1px solid rgba(255, 255, 255, 0.06);
+
+  transition: all 0.22s ease;
+
+  &:focus-within {
+    border-color: rgba(122, 197, 255, 0.55);
+
+    background: rgba(255, 255, 255, 0.065);
+
+    box-shadow: 0 0 20px rgba(90, 170, 255, 0.16);
+  }
+
+  i {
+    font-size: 1rem;
+
+    color: #92beff;
+  }
+
+  input {
     flex: 1;
-    height: 1px;
-    background: var(--border);
+
+    border: none;
+    outline: none;
+
+    background: transparent;
+
+    color: white;
+
+    font-size: clamp(0.92rem, 1vw, 0.98rem);
+
+    &::placeholder {
+      color: rgba(220, 230, 255, 0.55);
+    }
+  }
+
+  button {
+    border: none;
+    background: transparent;
+
+    cursor: pointer;
+
+    i {
+      color: #aac8ff;
+    }
   }
 }
 
-.qr-toggle-button {
+/* =========================================================
+   BUTTON
+========================================================= */
+
+.login-btn {
   width: 100%;
-  padding: 12px;
-  background: transparent;
-  border: 1.5px solid var(--border);
-  border-radius: 8px;
-  color: $text-dark;
-  font-size: 0.95rem;
-  font-weight: 500;
+
+  height: clamp(54px, 5vw, 62px);
+
+  margin-top: 8px;
+
+  border: none;
+  border-radius: 18px;
+
   cursor: pointer;
+
+  color: white;
+
+  font-size: clamp(1.1rem, 1.5vw, 1.45rem);
+
+  font-weight: 700;
+
+  letter-spacing: -0.3px;
+
+  background: linear-gradient(135deg, #2e79ff, #1357d7);
+
+  box-shadow:
+    0 14px 30px rgba(41, 112, 255, 0.34),
+    inset 0 2px 3px rgba(255, 255, 255, 0.35);
+
+  transition:
+    transform 0.2s,
+    box-shadow 0.2s;
+
+  &:hover {
+    transform: translateY(-2px);
+
+    box-shadow:
+      0 18px 36px rgba(41, 112, 255, 0.44),
+      inset 0 2px 3px rgba(255, 255, 255, 0.42);
+  }
+}
+
+// QR CODE
+/* =========================================================
+   QR DIVIDER
+========================================================= */
+
+.qr-divider {
+  position: relative;
+
+  margin: 26px 0 18px;
+
+  text-align: center;
+
+  &::before {
+    content: '';
+
+    position: absolute;
+
+    left: 0;
+    top: 50%;
+
+    width: 100%;
+    height: 1px;
+
+    background: rgba(255, 255, 255, 0.08);
+  }
+
+  span {
+    position: relative;
+    z-index: 2;
+
+    padding: 0 14px;
+
+    background: rgba(8, 22, 70, 0.92);
+
+    color: rgba(180, 210, 255, 0.75);
+
+    font-size: 0.82rem;
+    font-weight: 600;
+
+    letter-spacing: 1px;
+  }
+}
+
+/* =========================================================
+   QR LOGIN BUTTON
+========================================================= */
+
+.qr-login-btn {
+  width: 100%;
+  height: 56px;
+
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-  transition: all 0.2s ease;
+
+  gap: 12px;
+
+  border: 1px solid rgba(120, 185, 255, 0.18);
+  border-radius: 18px;
+
+  cursor: pointer;
+
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.03));
+
+  color: #d9e8ff;
+
+  font-size: 1rem;
+  font-weight: 600;
+
+  backdrop-filter: blur(12px);
+
+  transition:
+    transform 0.22s ease,
+    background 0.22s ease,
+    border-color 0.22s ease,
+    box-shadow 0.22s ease;
+
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.22);
 
   i {
     font-size: 1.1rem;
+
+    color: #7fc1ff;
   }
 
   &:hover {
-    border-color: $primary-color;
-    color: $primary-color;
-    background: rgba(var(--primary-rgb, 27, 100, 200), 0.05);
+    transform: translateY(-2px);
+
+    border-color: rgba(120, 185, 255, 0.38);
+
+    background: linear-gradient(145deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.04));
+
+    box-shadow:
+      0 12px 26px rgba(54, 125, 255, 0.14),
+      inset 0 1px 1px rgba(255, 255, 255, 0.28);
   }
 }
+
+/* =========================================================
+   QR SECTION
+========================================================= */
 
 .qr-section {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 1rem;
 
-  .qr-instruction {
-    margin: 0;
-    font-size: 0.9rem;
-    color: $text-muted;
-    text-align: center;
+  padding-top: 6px;
+}
+
+/* =========================================================
+   QR TITLE
+========================================================= */
+
+.qr-title {
+  font-size: 1.45rem;
+  font-weight: 700;
+
+  color: white;
+
+  letter-spacing: -0.4px;
+
+  margin-bottom: 8px;
+}
+
+/* =========================================================
+   QR DESCRIPTION
+========================================================= */
+
+.qr-description {
+  margin: 0 0 28px;
+
+  text-align: center;
+
+  color: rgba(210, 225, 255, 0.72);
+
+  font-size: 0.96rem;
+
+  line-height: 1.7;
+}
+
+/* =========================================================
+   QR BOX
+========================================================= */
+
+.qr-box {
+  position: relative;
+
+  width: 270px;
+  height: 270px;
+
+  padding: 16px;
+
+  border-radius: 28px;
+
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.04));
+
+  border: 1px solid rgba(255, 255, 255, 0.08);
+
+  backdrop-filter: blur(20px);
+
+  box-shadow:
+    0 18px 40px rgba(0, 0, 0, 0.24),
+    inset 0 2px 3px rgba(255, 255, 255, 0.35),
+    inset 0 -8px 12px rgba(0, 0, 0, 0.12);
+
+  overflow: hidden;
+
+  animation: qrFloat 5s ease-in-out infinite;
+
+  img {
+    width: 100%;
+    height: 100%;
+
+    object-fit: contain;
+
+    border-radius: 18px;
+
+    background: white;
+  }
+
+  &::before {
+    content: '';
+
+    position: absolute;
+
+    inset: 0;
+
+    border-radius: inherit;
+
+    padding: 1px;
+
+    background: linear-gradient(
+      145deg,
+      rgba(255, 255, 255, 0.5),
+      transparent,
+      rgba(120, 185, 255, 0.28)
+    );
+
+    -webkit-mask:
+      linear-gradient(#fff 0 0) content-box,
+      linear-gradient(#fff 0 0);
+
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+
+    pointer-events: none;
   }
 }
 
-.qr-image-wrapper {
-  width: 200px;
-  height: 200px;
+/* =========================================================
+   QR WAITING
+========================================================= */
+
+.qr-waiting {
+  margin-top: 22px;
+
+  display: flex;
+  align-items: center;
+
+  gap: 10px;
+
+  color: #b8d4ff;
+
+  font-size: 0.94rem;
+}
+
+/* =========================================================
+   PULSE DOT
+========================================================= */
+
+.pulse-dot {
+  width: 10px;
+  height: 10px;
+
+  border-radius: 999px;
+
+  background: #61b4ff;
+
+  box-shadow: 0 0 14px #61b4ff;
+
+  animation: pulseDot 1.4s infinite;
+}
+
+/* =========================================================
+   QR BACK BUTTON
+========================================================= */
+
+.qr-back-btn {
+  margin-top: 28px;
+
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 2px solid var(--border);
-  border-radius: 12px;
-  overflow: hidden;
-  background: #fff;
 
-  .qr-image {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
+  gap: 10px;
+
+  height: 52px;
+
+  padding: 0 22px;
+
+  border: none;
+  border-radius: 16px;
+
+  cursor: pointer;
+
+  background: rgba(255, 255, 255, 0.06);
+
+  color: #dbe8ff;
+
+  font-size: 0.95rem;
+  font-weight: 600;
+
+  transition: all 0.22s ease;
+
+  i {
+    font-size: 0.9rem;
   }
 
-  .qr-placeholder {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 100%;
-    height: 100%;
-  }
+  &:hover {
+    background: rgba(255, 255, 255, 0.12);
 
-  .qr-expired {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    color: $text-muted;
-    font-size: 0.85rem;
-
-    i {
-      font-size: 2rem;
-      color: var(--status-warning-text, #d97706);
-    }
-
-    p {
-      margin: 0;
-    }
+    transform: translateY(-2px);
   }
 }
 
-.qr-refresh-button {
-  padding: 6px 16px;
-  background: $primary-color;
-  color: #fff;
+/* =========================================================
+   QR EXPIRED
+========================================================= */
+
+.qr-expired {
+  width: 100%;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  gap: 14px;
+
+  padding: 42px 20px;
+
+  border-radius: 24px;
+
+  background: rgba(255, 255, 255, 0.05);
+
+  border: 1px solid rgba(255, 255, 255, 0.08);
+
+  i {
+    font-size: 2rem;
+
+    color: #ffb86a;
+  }
+
+  span {
+    color: white;
+
+    font-size: 1rem;
+    font-weight: 600;
+  }
+}
+
+/* =========================================================
+   QR REFRESH
+========================================================= */
+
+.qr-refresh-btn {
+  height: 44px;
+
+  padding: 0 18px;
+
   border: none;
-  border-radius: 6px;
+  border-radius: 14px;
+
   cursor: pointer;
-  font-size: 0.85rem;
+
+  background: linear-gradient(135deg, #ffb347, #ff9830);
+
+  color: white;
+
+  font-weight: 700;
+
+  box-shadow: 0 10px 24px rgba(255, 153, 0, 0.22);
+
+  transition: transform 0.2s ease;
+
+  &:hover {
+    transform: translateY(-2px);
+  }
+}
+
+/* =========================================================
+   QR LOADING
+========================================================= */
+
+.qr-loading {
+  width: 270px;
+  height: 270px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 28px;
+
+  background: rgba(255, 255, 255, 0.04);
+
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+/* =========================================================
+   ALERT
+========================================================= */
+
+.login-alert {
+  margin-bottom: 20px;
+
+  padding: 14px 16px;
+
+  border-radius: 16px;
+
+  text-align: center;
+
+  font-size: 0.92rem;
   font-weight: 500;
-  transition: background 0.2s;
 
-  &:hover {
-    background: $primary-hover;
+  backdrop-filter: blur(10px);
+}
+
+.error-alert {
+  background: rgba(255, 80, 80, 0.12);
+
+  border: 1px solid rgba(255, 80, 80, 0.18);
+
+  color: #ffb4b4;
+}
+
+.success-alert {
+  background: rgba(76, 175, 80, 0.12);
+
+  border: 1px solid rgba(76, 175, 80, 0.18);
+
+  color: #b8ffbd;
+}
+
+/* =========================================================
+   BUTTON LOADER
+========================================================= */
+
+.btn-loader {
+  width: 22px;
+  height: 22px;
+
+  border-radius: 999px;
+
+  border: 3px solid rgba(255, 255, 255, 0.28);
+  border-top-color: white;
+
+  animation: spinLoader 0.8s linear infinite;
+}
+
+/* =========================================================
+   ANIMATION
+========================================================= */
+
+@keyframes spinLoader {
+  to {
+    transform: rotate(360deg);
   }
 }
 
-.qr-waiting {
-  margin: 0;
-  font-size: 0.85rem;
-  color: $text-muted;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-@keyframes dotPulse {
-  0%,
-  100% {
-    opacity: 0.3;
-    transform: scale(0.8);
-  }
-  50% {
-    opacity: 1;
+@keyframes pulseDot {
+  0% {
     transform: scale(1);
+    opacity: 1;
+  }
+
+  50% {
+    transform: scale(1.35);
+    opacity: 0.6;
+  }
+
+  100% {
+    transform: scale(1);
+    opacity: 1;
   }
 }
 
-.dot-pulse {
-  display: inline-block;
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: $primary-color;
-  animation: dotPulse 1.2s ease-in-out infinite;
-}
+@keyframes qrFloat {
+  0% {
+    transform: translateY(0px);
+  }
 
-.qr-back-button {
-  background: transparent;
-  border: none;
-  color: $text-muted;
-  font-size: 0.85rem;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: 4px 8px;
-  border-radius: 6px;
-  transition: color 0.2s;
+  50% {
+    transform: translateY(-6px);
+  }
 
-  &:hover {
-    color: $primary-color;
+  100% {
+    transform: translateY(0px);
   }
 }
 
-// ==================== RESPONSIVE STYLES ====================
-@media (max-width: 1366px) {
-  .login-panel {
-    padding: 3rem 2.5rem;
-  }
+.input-group input:-webkit-autofill,
+.input-group input:-webkit-autofill:hover,
+.input-group input:-webkit-autofill:focus,
+.input-group input:-webkit-autofill:active {
+  -webkit-text-fill-color: #ffffff !important;
+
+  caret-color: #ffffff !important;
+
+  border: none !important;
+
+  -webkit-box-shadow: 0 0 0 1000px transparent inset !important;
+
+  box-shadow: 0 0 0 1000px transparent inset !important;
+
+  background-color: transparent !important;
+
+  background-image: none !important;
+
+  transition: background-color 9999s ease-in-out 0s;
+}
+.input-group input {
+  color: #ffffff !important;
 }
 
-@media (max-width: 1024px) {
-  :host {
-    padding: 16px !important;
-    height: auto;
-    min-height: 100dvh;
-    align-items: center;
-  }
-
-  .main-container {
-    flex-direction: column;
-    width: 100%;
-    max-width: 440px;
-    height: auto;
-    min-height: 0;
-    max-height: 90vh;
-    margin: 0 auto;
-    border-radius: 20px;
-  }
-
-  .welcome-panel {
-    display: none;
-  }
-
-  .login-panel {
-    flex: initial;
-    width: 100%;
-    padding: 2.5rem 2rem;
-    box-sizing: border-box;
-
-    .brand-header {
-      margin-bottom: 1.5rem;
-
-      .logoEss-img {
-        max-width: 90px;
-      }
-
-      h1 {
-        font-size: 2rem;
-      }
-    }
-  }
+.input-group input::placeholder {
+  color: rgba(255, 255, 255, 0.45);
 }
 
-@media (max-width: 380px) {
-  :host {
-    padding: 10px !important;
-  }
-
-  .login-panel {
-    padding: 2rem 1.25rem;
-
-    .brand-header h1 {
-      font-size: 1.6rem;
-    }
-
-    .login-button {
-      padding: 14px;
-      font-size: 0.95rem;
-    }
-  }
+input:-webkit-autofill {
+  -webkit-text-fill-color: #fff !important;
 }
 
-@media (max-height: 600px) and (orientation: landscape) {
-  :host {
-    padding: 10px;
-    height: auto;
-    min-height: 100vh;
-    align-items: center;
-  }
-
-  .main-container {
-    flex-direction: row;
-    max-width: 700px;
-    height: auto;
-    max-height: none;
-  }
-
-  .welcome-panel {
-    display: none;
-  }
-
-  .login-panel {
-    padding: 1.5rem 2rem;
-  }
+input:-webkit-autofill::first-line {
+  color: #fff !important;
 }
