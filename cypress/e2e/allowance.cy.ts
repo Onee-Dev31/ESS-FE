@@ -254,4 +254,60 @@ describe('Allowance', () => {
   it('allowance page ไม่แสดง app-error-state เมื่อโหลดหน้าปกติ', () => {
     cy.get('app-error-state').should('not.exist');
   });
+
+  it('search input มี placeholder "Order No, Description"', () => {
+    cy.get('input[placeholder="Order No, Description"]').should('be.visible');
+  });
+
+  it('status dropdown มี option "ส่งกลับแก้ไข"', () => {
+    cy.get('nz-select').first().click();
+    cy.get('nz-option-item').should('contain', 'ส่งกลับแก้ไข');
+    cy.get('nz-select').first().click();
+  });
+
+  it('filter ตามสถานะ "ส่งกลับแก้ไข" แล้วแสดงผลถูกต้อง', () => {
+    cy.get('nz-select').first().click();
+    cy.get('nz-option-item').contains('ส่งกลับแก้ไข').click();
+    cy.get('.btn-search').click();
+    cy.wait(1000);
+    cy.get('body').then(($body) => {
+      if ($body.find('.status-badge').length > 0) {
+        cy.get('.status-badge').each(($badge) => {
+          cy.wrap($badge).invoke('text').invoke('trim').should('match', /ส่งกลับ|Referred Back/);
+        });
+      } else {
+        cy.get('app-empty-state').should('be.visible');
+      }
+    });
+  });
+
+  it('tablet viewport แสดงหน้า allowance ถูกต้อง', () => {
+    cy.viewport('ipad-2');
+    cy.contains('รายการเบิกเบี้ยเลี้ยง').should('be.visible');
+    cy.get('.btn-create').should('exist');
+  });
+
+  it('claim card แสดงจำนวนรายการ', () => {
+    cy.get('body').then(($body) => {
+      if ($body.find('.claim-card').length > 0) {
+        cy.get('.claim-card').first().find('.claim-card__main').invoke('text').should('match', /\d+\s*รายการ/);
+      } else {
+        cy.get('app-empty-state, .modern-table').should('exist');
+      }
+    });
+  });
+
+  it('claim card แสดงยอดเงิน', () => {
+    cy.get('body').then(($body) => {
+      if ($body.find('.claim-card').length > 0) {
+        cy.get('.claim-card').first().find('.amount-value').invoke('text').should('match', /฿[\d,.]+/);
+      } else {
+        cy.get('app-empty-state, .modern-table').should('exist');
+      }
+    });
+  });
+
+  it('label ตัวกรองวันที่ "วันที่เริ่มต้น-วันที่สิ้นสุด" แสดงขึ้น', () => {
+    cy.contains('label', 'วันที่เริ่มต้น-วันที่สิ้นสุด').should('be.visible');
+  });
 });

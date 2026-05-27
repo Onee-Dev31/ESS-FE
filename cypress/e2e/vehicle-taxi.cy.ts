@@ -255,4 +255,20 @@ describe('Vehicle Taxi', () => {
   it('vehicle-taxi page ไม่แสดง app-error-state เมื่อโหลดหน้าปกติ', () => {
     cy.get('app-error-state').should('not.exist');
   });
+
+  it('tablet viewport แสดงหน้า vehicle-taxi ถูกต้อง', () => {
+    cy.viewport('ipad-2');
+    cy.contains('รายการเบิกค่าพาหนะ (Taxi)').should('be.visible');
+    cy.get('.btn-create').should('exist');
+  });
+
+  it('claim card แสดงยอดเงิน', () => {
+    cy.get('body').then(($body) => {
+      if ($body.find('.claim-card').length > 0) {
+        cy.get('.claim-card').first().find('.amount-value').invoke('text').should('match', /฿[\d,.]+/);
+      } else {
+        cy.get('app-empty-state, .modern-table').should('exist');
+      }
+    });
+  });
 });
