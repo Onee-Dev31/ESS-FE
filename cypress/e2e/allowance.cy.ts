@@ -21,10 +21,10 @@ describe('Allowance', () => {
     cy.get('app-allowance-form').should('not.exist');
   });
 
-  it('item สถานะ New มีปุ่ม edit และ delete', () => {
+  it('item สถานะ Referred Back มีปุ่ม edit และ delete', () => {
     cy.get('.modern-table tbody tr').each(($row) => {
       const statusText = $row.find('.status-badge').text().trim();
-      if (statusText === 'คำขอใหม่' || statusText === 'New') {
+      if (statusText === 'Referred Back') {
         cy.wrap($row).find('.btn-icon.edit').should('exist');
         cy.wrap($row).find('.btn-icon.delete').should('exist');
       }
@@ -44,7 +44,7 @@ describe('Allowance', () => {
   it('กด edit เปิด modal พร้อมข้อมูลเดิม', () => {
     cy.get('.modern-table tbody tr').each(($row): false | void => {
       const statusText = $row.find('.status-badge').text().trim();
-      if (statusText === 'คำขอใหม่' || statusText === 'New') {
+      if (statusText === 'Referred Back') {
         cy.wrap($row).find('.btn-icon.edit').click();
         cy.get('app-allowance-form').should('be.visible');
         return false;
@@ -113,16 +113,16 @@ describe('Allowance', () => {
     cy.get('app-allowance-form').should('be.visible');
   });
 
-  it('เปิด modal แก้ไขจากรายการสถานะ New ได้ต่อเนื่องหลัง filter แล้ว clear', () => {
+  it('เปิด modal แก้ไขจากรายการสถานะ Referred Back ได้ต่อเนื่องหลัง filter แล้ว clear', () => {
     cy.get('nz-select').first().click();
-    cy.get('nz-option-item').contains('คำขอใหม่').click();
+    cy.get('nz-option-item').contains('Pending').click();
     cy.get('.btn-search').click();
 
     cy.get('.btn-clear').click();
 
     cy.get('.modern-table tbody tr').each(($row): false | void => {
       const statusText = $row.find('.status-badge').text().trim();
-      if (statusText === 'คำขอใหม่' || statusText === 'New') {
+      if (statusText === 'Referred Back') {
         cy.wrap($row).find('.btn-icon.edit').click({ force: true });
         cy.get('app-allowance-form').should('be.visible');
         return false;
@@ -169,10 +169,10 @@ describe('Allowance', () => {
     });
   });
 
-  it('status nz-select dropdown มี option "ทั้งหมด", "คำขอใหม่", "อนุมัติแล้ว"', () => {
+  it('status nz-select dropdown มี option "ทั้งหมด", "Pending", "อนุมัติแล้ว"', () => {
     cy.get('nz-select').first().click();
     cy.get('nz-option-item').should('contain', 'ทั้งหมด');
-    cy.get('nz-option-item').should('contain', 'คำขอใหม่');
+    cy.get('nz-option-item').should('contain', 'Pending');
     cy.get('nz-option-item').should('contain', 'อนุมัติแล้ว');
     cy.get('nz-select').first().click();
   });
@@ -190,15 +190,15 @@ describe('Allowance', () => {
     cy.contains('app-allowance-form', 'จำนวนเงิน').should('be.visible');
   });
 
-  it('filter ตามสถานะ "คำขอใหม่" แล้วแสดงเฉพาะรายการใหม่', () => {
+  it('filter ตามสถานะ "Pending" แล้วแสดงเฉพาะรายการ Pending', () => {
     cy.get('nz-select').first().click();
-    cy.get('nz-option-item').contains('คำขอใหม่').click();
+    cy.get('nz-option-item').contains('Pending').click();
     cy.get('.btn-search').click();
     cy.wait(1000);
     cy.get('body').then(($body) => {
       if ($body.find('.status-badge').length > 0) {
         cy.get('.status-badge').each(($badge) => {
-          cy.wrap($badge).invoke('text').invoke('trim').should('match', /คำขอใหม่|New/);
+          cy.wrap($badge).invoke('text').invoke('trim').should('match', /Pending/);
         });
       } else {
         cy.get('app-empty-state').should('be.visible');
@@ -206,15 +206,52 @@ describe('Allowance', () => {
     });
   });
 
-  it('ลบรายการสถานะ New แล้ว confirm dialog ปรากฏ', () => {
+  it('ลบรายการสถานะ Referred Back แล้ว confirm dialog ปรากฏ', () => {
     cy.get('.modern-table tbody tr').each(($row): false | void => {
       const statusText = $row.find('.status-badge').text().trim();
-      if (statusText === 'คำขอใหม่' || statusText === 'New') {
+      if (statusText === 'Referred Back') {
         cy.wrap($row).find('.btn-icon.delete').click();
         cy.get('.swal2-container').should('be.visible');
         cy.get('.swal2-cancel').click();
         return false;
       }
     });
+  });
+
+  it('กดที่ row ใน table แล้วเปิด modal รายละเอียดได้', () => {
+    cy.get('body').then(($body) => {
+      if ($body.find('.modern-table tbody tr').length > 0) {
+        cy.get('.modern-table tbody tr').first().click();
+        cy.get('app-allowance-form').should('be.visible');
+      } else {
+        cy.get('app-empty-state').should('be.visible');
+      }
+    });
+  });
+
+  it('claim card แสดง type badge ประเภทเบิกเบี้ยเลี้ยง', () => {
+    cy.get('body').then(($body) => {
+      if ($body.find('.claim-card').length > 0) {
+        cy.get('.claim-card').first().find('.claim-card__type-badge').invoke('text').should('match', /เบี้ยเลี้ยง|Allowance/);
+      } else {
+        cy.get('app-empty-state, .modern-table').should('exist');
+      }
+    });
+  });
+
+  it('modal form มีปุ่ม btn-close-modal เพื่อปิด modal', () => {
+    cy.get('.btn-create').click();
+    cy.get('app-allowance-form').should('be.visible');
+    cy.get('app-allowance-form .btn-close-modal').should('exist');
+  });
+
+  it('mobile viewport แสดงหน้า allowance ถูกต้อง', () => {
+    cy.viewport('iphone-6');
+    cy.contains('รายการเบิกเบี้ยเลี้ยง').should('be.visible');
+    cy.get('.btn-create').should('exist');
+  });
+
+  it('allowance page ไม่แสดง app-error-state เมื่อโหลดหน้าปกติ', () => {
+    cy.get('app-error-state').should('not.exist');
   });
 });
