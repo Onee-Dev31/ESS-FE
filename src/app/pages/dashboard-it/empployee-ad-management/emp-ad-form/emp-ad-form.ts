@@ -22,7 +22,8 @@ import { SwalService } from '../../../../services/swal.service';
 export class EmpAdForm implements OnChanges {
   @Input() mode: 'view' | 'add' = 'view';
   @Input() employeeId: string = '';
-  @Output() onSaveSuccess = new EventEmitter<void>();
+  @Output() onSaveSuccess = new EventEmitter<any>();
+  @Input() isRequestUser = false;
 
   isLoading = false;
   isSaving = false;
@@ -195,7 +196,12 @@ export class EmpAdForm implements OnChanges {
 
   saveEmployee() {
     this.submitted = true;
-    const hasError = this.requiredFields.some((f) => !this.addForm[f]);
+    // const hasError = this.requiredFields.some((f) => !this.addForm[f]);
+    const requiredFields = this.isRequestUser
+      ? this.requiredFields.filter((f) => f !== 'employeeCode')
+      : this.requiredFields;
+
+    const hasError = requiredFields.some((f) => !this.addForm[f]);
     if (hasError) return;
 
     const selectedJob = this.jobPositionList.find(
@@ -240,6 +246,11 @@ export class EmpAdForm implements OnChanges {
       HEAD_NAME: selectedHead?.NAMETHAI ?? '',
       AD_USER: this.addForm.adUser,
     };
+
+    if (this.isRequestUser) {
+      this.onSaveSuccess.emit(payload);
+      return;
+    }
 
     this.isSaving = true;
     this.onSaveSuccess.emit(); // ปิด modal ก่อน

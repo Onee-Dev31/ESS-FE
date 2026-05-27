@@ -29,6 +29,9 @@ import {
   FilePreviewModalComponent,
 } from '../../components/modals/file-preview-modal/file-preview-modal';
 import dayjs from 'dayjs';
+import { MasterDataService } from '../../services/master-data.service';
+import { NzModalModule } from 'ng-zorro-antd/modal';
+import { EmpAdForm } from '../dashboard-it/empployee-ad-management/emp-ad-form/emp-ad-form';
 
 @Component({
   selector: 'app-it-service-request',
@@ -40,6 +43,8 @@ import dayjs from 'dayjs';
     NzSelectModule,
     ExampleServiceRequestModal,
     FilePreviewModalComponent,
+    NzModalModule,
+    EmpAdForm,
   ],
   templateUrl: './it-service-request.html',
   styleUrl: './it-service-request.scss',
@@ -55,6 +60,7 @@ export class ITServiceRequestComponent implements OnInit {
   private cdr = inject(ChangeDetectorRef);
   private router = inject(Router);
   private signalrService = inject(SignalrService);
+  private masterService = inject(MasterDataService);
 
   @ViewChild('detailTextarea') detailTextarea!: ElementRef;
 
@@ -691,6 +697,67 @@ export class ITServiceRequestComponent implements OnInit {
     this.selectedRequest.set(null);
   }
 
+  isShowSpecialForm(): boolean {
+    return this.serviceOptions().some((s) => s.id === 22 && s.checked);
+  }
+
+  showEmpAdForm = false;
+  requestUserData: any = null;
+  onServiceChange(index: number, service: any) {
+    this.toggleService(index);
+
+    if (service.id === 22 && service.checked) {
+      this.showEmpAdForm = true;
+    }
+  }
+
+  closeEmpAdForm() {
+    this.showEmpAdForm = false;
+
+    const service = this.serviceOptions().find((s) => s.id === 22);
+
+    // ถ้าไม่มีข้อมูลที่ save กลับมา
+    if (!this.requestUserData && service?.checked) {
+      const index = this.serviceOptions().findIndex((s) => s.id === 22);
+
+      if (index !== -1) {
+        this.toggleService(index);
+      }
+    }
+  }
+
+  onEmployeeFormSave(data: any) {
+    console.log(data);
+    this.requestUserData = data;
+
+    const requestUserDetail = `
+        ชื่อ-นามสกุลภาษาไทย : ${data.NAMETHAI}
+
+        ชื่อ-นามสกุลภาษาอังกฤษ : ${data.TITLEENG ?? ''} ${data.NAMEENG}
+
+        ชื่อเล่น : ${data.NICKNAME}
+
+        ตำแหน่ง : ${data.POST}
+
+        บริษัท : ${data.COMPANY_NAME}
+
+        แผนก : ${data.DEPARTMENT}
+
+        เบอร์โทรศัพท์ : ${data.USR_MOBILE}
+
+        อีเมล : ${data.EMAIL}
+
+        ชั้น : ${data.FLOOR}
+
+        หัวหน้า : ${data.HEAD_NAME}
+
+        AD User หัวหน้า : ${data.AD_USER}
+        `.trim();
+
+    this.requestDetails.set(requestUserDetail);
+    this.showEmpAdForm = false;
+  }
+
   // GET MASTER
   getServiceType() {
     this.itServiceService.getServiceType().subscribe({
@@ -733,7 +800,12 @@ export class ITServiceRequestComponent implements OnInit {
       .getOpenFor({ currentEmpId: this.authService.userData().CODEMPID })
       .subscribe({
         next: (res) => {
-          this.openForOptions.set(res.data);
+          const mapped = res.data.map((item: any) => ({
+            ...item,
+            label: item.value === '__FREELANCE__' ? 'Freelance หรือ บุคคลอื่น' : item.label,
+          }));
+
+          this.openForOptions.set(mapped);
           const defaultOption = this.openForOptions().find(
             (opt) => opt.value === this.authService.userData().CODEMPID,
           );
@@ -766,6 +838,41 @@ export class ITServiceRequestComponent implements OnInit {
             `ตำแหน่ง: ${data.JobTitle}\n` +
             `บริษัท: ${data.Location}`,
         );
+      },
+      error: (error) => {
+        console.error('Error fetching data:', error);
+      },
+    });
+  }
+
+  companyList: any[] = [];
+  departmentList: any[] = [];
+  filteredDepartmentList: any[] = [];
+
+  private remapCompanyCode(code: string): string {
+    if (code === 'OTD') return 'ONEE';
+    if (code === 'OTV') return 'ONE31';
+    return code;
+  }
+
+  getCompanies() {
+    this.masterService.getCompanyMaster().subscribe({
+      next: (data) => {
+        this.companyList = data.map((item: any) => ({
+          ...item,
+          COMPANY_CODE: this.remapCompanyCode(item.COMPANY_CODE),
+        }));
+      },
+      error: (error) => {
+        console.error('Error fetching data:', error);
+      },
+    });
+  }
+
+  getDepartments() {
+    this.masterService.getDepartmentMaster().subscribe({
+      next: (data) => {
+        this.departmentList = data;
       },
       error: (error) => {
         console.error('Error fetching data:', error);

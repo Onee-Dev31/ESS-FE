@@ -86,13 +86,14 @@
       <div class="section-title">Basic Information</div>
       <div class="form-grid">
         <div class="field-group">
-          <label>Employee Code <span class="req">*</span></label>
+          <label>Employee Code <span class="req" *ngIf="!isRequestUser">*</span></label>
           <input
             type="text"
             [(ngModel)]="addForm.employeeCode"
             name="employeeCode"
             placeholder="Enter Employee Code"
-            [class.invalid]="isInvalid('employeeCode')"
+            [class.invalid]="isInvalid('employeeCode') && !isRequestUser"
+            [readonly]="isRequestUser"
           />
         </div>
         <div class="field-group">
