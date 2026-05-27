@@ -102,7 +102,7 @@
                 type="checkbox"
                 [checked]="service.checked"
                 [disabled]="service.disabled"
-                (change)="toggleService(i)"
+                (change)="onServiceChange(i, service)"
               />
               <span class="checkmark"></span>
               <span class="label-text">{{ service.label }}</span>
@@ -552,3 +552,18 @@
   <app-file-preview-modal [files]="previewFiles()" (onClose)="closePreview()">
   </app-file-preview-modal>
 }
+
+<nz-modal
+  [(nzVisible)]="showEmpAdForm"
+  nzTitle="Add Employee"
+  [nzWidth]="1200"
+  nzCentered
+  [nzMaskClosable]="false"
+  (nzOnCancel)="closeEmpAdForm()"
+  [nzFooter]="null"
+>
+  <ng-container *nzModalContent>
+    <app-emp-ad-form mode="add" (onSaveSuccess)="onEmployeeFormSave($event)" [isRequestUser]="true">
+    </app-emp-ad-form>
+  </ng-container>
+</nz-modal>
