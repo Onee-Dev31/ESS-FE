@@ -1,9 +1,4 @@
-<div
-  class="it-request-page"
-  [style]="
-    openBy === 'IT' ? 'padding: 0; height: fit-content;' : 'padding: 40px; min-height: 100vh;'
-  "
->
+<div class="it-request-page" [class.it-request-page--it]="openBy === 'IT'">
   <app-page-header
     *ngIf="openBy !== 'IT'"
     title="IT Problem Report (แจ้งปัญหาการใช้งาน)"

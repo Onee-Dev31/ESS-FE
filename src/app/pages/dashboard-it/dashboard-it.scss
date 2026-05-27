@@ -94,7 +94,7 @@
 
     h2 {
       margin: 0;
-      font-size: 1.25rem;
+      font-size: $font-size-body;
       font-weight: 700;
       display: flex;
       align-items: center;
@@ -215,6 +215,11 @@
           display: block;
         }
       }
+    }
+
+    @include mobile {
+      padding: 6px 10px;
+      max-height: 100vh;
     }
   }
 

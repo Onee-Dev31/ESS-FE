@@ -1,11 +1,4 @@
-<div
-  class="it-request-page"
-  [style]="
-    openBy === 'IT'
-      ? 'padding: 0; height: fit-content; background-color: transparent;'
-      : 'padding: 40px; min-height: 100vh;'
-  "
->
+<div class="it-request-page" [class.it-request-page--it]="openBy === 'IT'">
   <app-page-header
     *ngIf="openBy !== 'IT'"
     title="IT Service Request (ขอรับบริการ IT)"
