@@ -307,12 +307,11 @@ describe('Timeoff', () => {
   it('form มีปุ่มปิด modal', () => {
     cy.get('.btn-create').click();
     cy.get('app-time-off-form').should('be.visible');
-    cy.get('app-time-off-form .btn-close, app-time-off-form [title="ปิด"], app-time-off-form .close-btn')
-      .first()
-      .should('exist');
+    cy.get('app-time-off-form .btn-close-modal').should('exist');
   });
 
-  it('label date filter แสดง "วันที่เริ่มต้น" และ "วันที่สิ้นสุด"', () => {
-    cy.contains('label', /วันที่เริ่มต้น|ช่วงวันที่/).should('be.visible');
+  it('filter-label "วันที่สร้างรายการ" และ "ถึง" แสดงขึ้นในส่วน filter', () => {
+    cy.get('.filter-label').should('contain', 'วันที่สร้างรายการ');
+    cy.get('.filter-label').should('contain', 'ถึง');
   });
 });
