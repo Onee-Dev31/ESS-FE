@@ -828,8 +828,6 @@ export class DashboardIT implements OnInit {
 
       this.showRequesterContact = !hasOpenFor || isOpenForSelf;
 
-      console.log(openFor);
-
       const objectData = {
         ticketId: ticket.id,
         ticketNumber: ticket.ticket_number,
