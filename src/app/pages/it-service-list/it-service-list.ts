@@ -106,6 +106,7 @@ export class ItService implements OnInit {
   private chatReadCounts = signal<Map<number, number>>(new Map());
 
   replyReaders = signal<ReplyReader[]>([]);
+  replyingTo = signal<any>(null);
 
   unreadChatCount = computed(() => {
     const ticket = this.selectedTicket();
@@ -114,6 +115,174 @@ export class ItService implements OnInit {
     const read = this.chatReadCounts().get(ticket.ticketId) ?? 0;
     return Math.max(0, total - read);
   });
+  emojiPickerOpen = false;
+  emojiPickerTab = 0;
+  readonly EMOJI_TABS = [
+    {
+      label: '😊',
+      emojis: [
+        '😀',
+        '😃',
+        '😄',
+        '😁',
+        '😆',
+        '😅',
+        '🤣',
+        '😂',
+        '🙂',
+        '😊',
+        '😇',
+        '🥰',
+        '😍',
+        '🤩',
+        '😘',
+        '😋',
+        '😛',
+        '😜',
+        '🤪',
+        '😝',
+        '😏',
+        '🙄',
+        '😬',
+        '😌',
+        '😔',
+        '😴',
+        '😷',
+        '🤒',
+        '🥵',
+        '🥶',
+        '😵',
+        '🥳',
+        '😎',
+        '🤓',
+        '😕',
+        '🥺',
+        '😢',
+        '😭',
+        '😱',
+        '😤',
+        '😡',
+        '😠',
+        '🤬',
+        '😈',
+        '👿',
+        '💀',
+        '👻',
+        '👽',
+        '🤖',
+        '💩',
+      ],
+    },
+    {
+      label: '👍',
+      emojis: [
+        '👍',
+        '👎',
+        '👌',
+        '✌️',
+        '🤞',
+        '🤟',
+        '🤘',
+        '🤙',
+        '👈',
+        '👉',
+        '👆',
+        '👇',
+        '☝️',
+        '👋',
+        '🤚',
+        '🖐️',
+        '✋',
+        '🖖',
+        '💪',
+        '✍️',
+        '🙏',
+        '🤲',
+        '👐',
+        '🫶',
+        '🤝',
+        '👏',
+        '✊',
+        '👊',
+        '🤜',
+        '🤛',
+      ],
+    },
+    {
+      label: '❤️',
+      emojis: [
+        '❤️',
+        '🧡',
+        '💛',
+        '💚',
+        '💙',
+        '💜',
+        '🖤',
+        '🤍',
+        '🤎',
+        '❤️‍🔥',
+        '💔',
+        '💕',
+        '💞',
+        '💓',
+        '💗',
+        '💖',
+        '💘',
+        '💝',
+        '💟',
+        '♥️',
+        '😻',
+        '💌',
+        '💋',
+        '👄',
+      ],
+    },
+    {
+      label: '🎉',
+      emojis: [
+        '🎉',
+        '🎊',
+        '🎈',
+        '🎁',
+        '🏆',
+        '🥇',
+        '⭐',
+        '🌟',
+        '💫',
+        '✨',
+        '🔥',
+        '💯',
+        '✅',
+        '❌',
+        '⚡',
+        '💡',
+        '🔔',
+        '📢',
+        '🎵',
+        '🎶',
+        '🚀',
+        '💎',
+        '🌈',
+        '👑',
+        '🎯',
+        '🌸',
+        '🌺',
+        '☀️',
+        '🌙',
+        '❄️',
+        '🌊',
+        '⚽',
+        '🏀',
+        '🍕',
+        '🍔',
+        '☕',
+        '🍺',
+        '🥂',
+        '🍰',
+        '🎂',
+      ],
+    },
+  ];
 
   canAccessChat = computed(() => {
     const ticket = this.selectedTicket();
@@ -583,6 +752,27 @@ export class ItService implements OnInit {
     );
   }
 
+  startReply(note: any) {
+    this.replyingTo.set(note);
+    setTimeout(() => this.chatTextareaRef?.nativeElement.focus(), 0);
+  }
+
+  cancelReply() {
+    this.replyingTo.set(null);
+  }
+
+  insertEmoji(emoji: string) {
+    this.chatMessage = this.chatMessage + emoji;
+    this.emojiPickerOpen = false;
+    setTimeout(() => {
+      const ta = this.chatTextareaRef?.nativeElement;
+      if (ta) {
+        ta.focus();
+        ta.setSelectionRange(ta.value.length, ta.value.length);
+      }
+    }, 0);
+  }
+
   handleChatKeydown(event: KeyboardEvent, ticket: any) {
     if (this.mentionVisible()) {
       if (event.key === 'ArrowDown') {
@@ -1034,6 +1224,44 @@ export class ItService implements OnInit {
   viewFile(file: any) {
     this.previewFiles.set([this.fileConverter.buildPreviewFile(file)]);
     this.isPreviewModalOpen.set(true);
+  }
+
+  viewFileChat(file: any) {
+    console.log(file);
+    let url = '';
+
+    if (file.file) {
+      // ไฟล์ที่ user upload
+      url = URL.createObjectURL(file.file);
+    } else if (file.filePath) {
+      // ไฟล์จาก server
+      url = file.filePath;
+    }
+
+    this.previewFiles.set([
+      {
+        fileName: file.name || file.fileName,
+        date: dayjs().format('DD/MM/YYYY HH:mm'),
+        url: url,
+        type: file.file?.type || file.type || 'application/octet-stream',
+      },
+    ]);
+
+    this.isPreviewModalOpen.set(true);
+  }
+
+  getChatAttachments(ticket: any): any[] {
+    return (ticket?.itNotes ?? []).flatMap((note: any) => note.attachments ?? []);
+  }
+
+  getChatAttachmentCount(ticket: any): number {
+    return this.getChatAttachments(ticket).length;
+  }
+
+  openChatAttachments(ticket: any) {
+    const files = this.getChatAttachments(ticket);
+    if (files.length === 0) return;
+    this.openAllAttachments(files);
   }
 
   getFileIcon(fileName: string): string {

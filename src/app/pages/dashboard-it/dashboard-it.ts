@@ -296,6 +296,7 @@ export class DashboardIT implements OnInit {
   private chatReadCounts = signal<Map<number, number>>(new Map());
 
   replyReaders = signal<ReplyReader[]>([]);
+  replyingTo = signal<any>(null);
 
   unreadChatCount = computed(() => {
     const ticket = this.selectedTicket();
@@ -304,6 +305,175 @@ export class DashboardIT implements OnInit {
     const read = this.chatReadCounts().get(ticket.ticketId) ?? 0;
     return Math.max(0, total - read);
   });
+
+  emojiPickerOpen = false;
+  emojiPickerTab = 0;
+  readonly EMOJI_TABS = [
+    {
+      label: '😊',
+      emojis: [
+        '😀',
+        '😃',
+        '😄',
+        '😁',
+        '😆',
+        '😅',
+        '🤣',
+        '😂',
+        '🙂',
+        '😊',
+        '😇',
+        '🥰',
+        '😍',
+        '🤩',
+        '😘',
+        '😋',
+        '😛',
+        '😜',
+        '🤪',
+        '😝',
+        '😏',
+        '🙄',
+        '😬',
+        '😌',
+        '😔',
+        '😴',
+        '😷',
+        '🤒',
+        '🥵',
+        '🥶',
+        '😵',
+        '🥳',
+        '😎',
+        '🤓',
+        '😕',
+        '🥺',
+        '😢',
+        '😭',
+        '😱',
+        '😤',
+        '😡',
+        '😠',
+        '🤬',
+        '😈',
+        '👿',
+        '💀',
+        '👻',
+        '👽',
+        '🤖',
+        '💩',
+      ],
+    },
+    {
+      label: '👍',
+      emojis: [
+        '👍',
+        '👎',
+        '👌',
+        '✌️',
+        '🤞',
+        '🤟',
+        '🤘',
+        '🤙',
+        '👈',
+        '👉',
+        '👆',
+        '👇',
+        '☝️',
+        '👋',
+        '🤚',
+        '🖐️',
+        '✋',
+        '🖖',
+        '💪',
+        '✍️',
+        '🙏',
+        '🤲',
+        '👐',
+        '🫶',
+        '🤝',
+        '👏',
+        '✊',
+        '👊',
+        '🤜',
+        '🤛',
+      ],
+    },
+    {
+      label: '❤️',
+      emojis: [
+        '❤️',
+        '🧡',
+        '💛',
+        '💚',
+        '💙',
+        '💜',
+        '🖤',
+        '🤍',
+        '🤎',
+        '❤️‍🔥',
+        '💔',
+        '💕',
+        '💞',
+        '💓',
+        '💗',
+        '💖',
+        '💘',
+        '💝',
+        '💟',
+        '♥️',
+        '😻',
+        '💌',
+        '💋',
+        '👄',
+      ],
+    },
+    {
+      label: '🎉',
+      emojis: [
+        '🎉',
+        '🎊',
+        '🎈',
+        '🎁',
+        '🏆',
+        '🥇',
+        '⭐',
+        '🌟',
+        '💫',
+        '✨',
+        '🔥',
+        '💯',
+        '✅',
+        '❌',
+        '⚡',
+        '💡',
+        '🔔',
+        '📢',
+        '🎵',
+        '🎶',
+        '🚀',
+        '💎',
+        '🌈',
+        '👑',
+        '🎯',
+        '🌸',
+        '🌺',
+        '☀️',
+        '🌙',
+        '❄️',
+        '🌊',
+        '⚽',
+        '🏀',
+        '🍕',
+        '🍔',
+        '☕',
+        '🍺',
+        '🥂',
+        '🍰',
+        '🎂',
+      ],
+    },
+  ];
 
   mentionResults = signal<any[]>([]);
   mentionVisible = signal(false);
@@ -874,6 +1044,27 @@ export class DashboardIT implements OnInit {
       },
       { silent: true },
     );
+  }
+
+  startReply(note: any) {
+    this.replyingTo.set(note);
+    setTimeout(() => this.chatTextareaRef?.nativeElement.focus(), 0);
+  }
+
+  cancelReply() {
+    this.replyingTo.set(null);
+  }
+
+  insertEmoji(emoji: string) {
+    this.chatMessage = this.chatMessage + emoji;
+    this.emojiPickerOpen = false;
+    setTimeout(() => {
+      const ta = this.chatTextareaRef?.nativeElement;
+      if (ta) {
+        ta.focus();
+        ta.setSelectionRange(ta.value.length, ta.value.length);
+      }
+    }, 0);
   }
 
   handleChatKeydown(event: KeyboardEvent, ticket: any) {

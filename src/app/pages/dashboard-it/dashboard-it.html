@@ -415,6 +415,9 @@
           <div class="floating-chat__title">
             <i class="fa-solid fa-comments"></i>
             <span>Chat</span>
+            @if (t.ticketNumber) {
+              <span class="floating-chat__ticket-no">#{{ t.ticketNumber }}</span>
+            }
             @if (getChatAttachmentCount(t) > 0) {
               <button
                 class="floating-chat__summary"
@@ -575,13 +578,49 @@
           >
             <i class="fa-solid fa-paperclip"></i>
           </button>
+          <div class="floating-chat__emoji-wrap">
+            <button
+              class="floating-chat__emoji-btn"
+              type="button"
+              title="อิโมจิ"
+              aria-label="อิโมจิ"
+              (click)="emojiPickerOpen = !emojiPickerOpen; $event.stopPropagation()"
+            >
+              😊
+            </button>
+            @if (emojiPickerOpen) {
+              <div class="emoji-backdrop" (click)="emojiPickerOpen = false"></div>
+              <div class="emoji-picker" (click)="$event.stopPropagation()">
+                <div class="emoji-picker__tabs">
+                  @for (tab of EMOJI_TABS; track $index) {
+                    <button
+                      type="button"
+                      class="emoji-picker__tab"
+                      [class.active]="emojiPickerTab === $index"
+                      (click)="emojiPickerTab = $index"
+                    >
+                      {{ tab.label }}
+                    </button>
+                  }
+                </div>
+                <div class="emoji-picker__grid">
+                  @for (e of EMOJI_TABS[emojiPickerTab].emojis; track e) {
+                    <button type="button" class="emoji-picker__item" (click)="insertEmoji(e)">
+                      {{ e }}
+                    </button>
+                  }
+                </div>
+              </div>
+            }
+          </div>
           <textarea
             #chatTextareaRef
             [(ngModel)]="chatMessage"
             rows="1"
-            placeholder="พิมพ์ข้อความ... (@ เพื่อ mention)"
+            placeholder="(พิมพ์ @ เพื่อ mention)"
             aria-label="พิมพ์ข้อความ"
             (keydown)="handleChatKeydown($event, t)"
+            (click)="emojiPickerOpen = false"
           ></textarea>
           <button
             class="floating-chat__send"
