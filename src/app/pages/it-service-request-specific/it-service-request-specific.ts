@@ -126,13 +126,13 @@ export class ITServiceRequestSpecificComponent implements OnInit {
   userSubOptions = signal<any[]>([]);
   systemSubOptions = signal<any[]>([]);
   openForOptions = signal<any[]>([]);
-  selectedOpenFor = signal<{ value: string; label: string }>({
-    value: this.authService.userData().CODEMPID,
-    label: '',
-  });
+  // selectedOpenFor = signal<{ value: string; label: string }>({
+  //   value: this.authService.userData().CODEMPID,
+  //   label: '',
+  // });
   openforOneejob: string = '';
   isAnnounceChooseFreelance = signal<boolean>(false);
-  isFreelanceSelected = computed(() => this.selectedOpenFor().value === '__FREELANCE__');
+  // isFreelanceSelected = computed(() => this.selectedOpenFor().value === '__FREELANCE__');
   IS_EXAMPLE = signal<boolean>(false);
 
   isSystemCategorySelected = signal(false);
@@ -193,19 +193,19 @@ export class ITServiceRequestSpecificComponent implements OnInit {
     });
   }
 
-  onOpenForChange(value: string) {
-    const option = this.openForOptions().find((opt) => opt.value === value);
-    this.selectedOpenFor.set({ value, label: option?.label ?? '' });
-    if (value === '__FREELANCE__') {
-      this.isAnnounceChooseFreelance.set(true);
-      setTimeout(() => {
-        this.detailTextarea.nativeElement.focus();
-        this.detailTextarea.nativeElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      }, 100);
-    } else {
-      this.isAnnounceChooseFreelance.set(false);
-    }
-  }
+  // onOpenForChange(value: string) {
+  //   const option = this.openForOptions().find((opt) => opt.value === value);
+  //   this.selectedOpenFor.set({ value, label: option?.label ?? '' });
+  //   if (value === '__FREELANCE__') {
+  //     this.isAnnounceChooseFreelance.set(true);
+  //     setTimeout(() => {
+  //       this.detailTextarea.nativeElement.focus();
+  //       this.detailTextarea.nativeElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  //     }, 100);
+  //   } else {
+  //     this.isAnnounceChooseFreelance.set(false);
+  //   }
+  // }
 
   onSpecificOpenForChange(person: any, value: any) {
     person.openFor = value;
@@ -431,20 +431,17 @@ export class ITServiceRequestSpecificComponent implements OnInit {
 
     const formData = new FormData();
     formData.append('ticketTypeId', '3');
-    if (this.IsOneeJob) {
-      formData.append('openForType', 'ONEEJOB');
-      formData.append('openForCodeempid', this.openforOneejob);
-    } else if (this.isFreelanceSelected()) {
-      formData.append('openForType', 'freelance');
-    } else {
-      const isSelf = this.selectedOpenFor().value === this.authService.userData().CODEMPID;
+
+    if (this.specificPeople().length === 1) {
+      const isSelf =
+        this.specificPeople()[0].openFor.value === this.authService.userData().CODEMPID;
+
       formData.append('openForType', isSelf ? 'self' : 'other');
-      formData.append('openForCodeempid', this.selectedOpenFor().value);
+      formData.append('openForCodeempid', this.specificPeople()[0].openFor.value);
+    } else if (this.specificPeople().length > 1) {
+      formData.append('openForType', 'freelance');
     }
-    // formData.append(
-    //   'description',
-    //   this.IsOneeJob ? `[ONEE JOBS]\n ${this.requestDetails()}` : this.requestDetails(),
-    // );
+
     formData.append('description', this.summaryText());
     formData.append('requesterAduser', this.authService.currentUser() || '-');
     formData.append('contactPhone', this.phoneNumber());
@@ -605,9 +602,13 @@ export class ITServiceRequestSpecificComponent implements OnInit {
   }
 
   private createSpecificPerson(): SpecificPersonRequest {
-    const defaultOption = this.openForOptions().find(
-      (opt) => opt.value === this.authService.userData().CODEMPID,
-    );
+    const currentUserCode = this.authService.userData().CODEMPID;
+
+    const alreadyUsed = this.specificPeople().some((p) => p.openFor?.value === currentUserCode);
+
+    const defaultOption = alreadyUsed
+      ? null
+      : this.openForOptions().find((opt) => opt.value === currentUserCode);
 
     return {
       id: this.nextSpecificPersonId++,
@@ -810,6 +811,24 @@ export class ITServiceRequestSpecificComponent implements OnInit {
   filteredDepartmentList: any[] = [];
 
   // function
+  getAvailableOracleCompanies(person: any, currentItem: any) {
+    const selectedCodes = person.oracle.companies
+      .filter((x: any) => x !== currentItem && x.company)
+      .map((x: any) => x.company.COMPANY_CODE);
+
+    return this.companyList.filter((company: any) => !selectedCodes.includes(company.COMPANY_CODE));
+  }
+
+  getAvailableOpenForOptions(currentPerson: any) {
+    const selectedValues = this.specificPeople()
+      .filter((p: any) => p !== currentPerson && p.openFor && p.openFor.value !== '__FREELANCE__')
+      .map((p: any) => p.openFor.value);
+
+    return this.openForOptions().filter(
+      (opt: any) => opt.value === '__FREELANCE__' || !selectedValues.includes(opt.value),
+    );
+  }
+
   onCompanyChange(person: SpecificPersonRequest, company: any) {
     person.freelance.department = '';
 
@@ -1276,7 +1295,7 @@ export class ITServiceRequestSpecificComponent implements OnInit {
           );
 
           if (defaultOption) {
-            this.selectedOpenFor.set(defaultOption);
+            // this.selectedOpenFor.set(defaultOption);
 
             this.specificPeople.update((people) =>
               people.map((person, index) =>

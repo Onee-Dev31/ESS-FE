@@ -218,10 +218,10 @@ $table-label-bg: var(--border-toolbar);
     }
 
     .error-text {
-      color: #ff4d4f;
-      font-size: 12px;
-      margin-top: 4px;
+      color: rgb(255, 133, 133) !important;
+      font-size: $font-size-hint;
       display: block;
+      text-align: center;
     }
   }
 
@@ -1755,7 +1755,7 @@ $table-label-bg: var(--border-toolbar);
   }
 
   .error {
-    color: rgb(255, 133, 133);
+    color: rgb(255, 133, 133) !important;
     text-align: center;
     font-size: $font-size-hint;
   }
@@ -1838,7 +1838,7 @@ $table-label-bg: var(--border-toolbar);
   gap: 16px;
 
   .error {
-    color: rgb(255, 133, 133);
+    color: rgb(255, 133, 133) !important;
     text-align: center;
     font-size: $font-size-hint;
   }
