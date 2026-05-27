@@ -286,7 +286,7 @@
     <div class="tk-card__head">
       <div class="tk-card__title">
         <i class="fa-solid fa-note-sticky"></i>Note for IT
-        <span class="category">[{{ t.ticketCategory }}]</span>
+        <span class="category">{{ t.ticketCategory ? `[${t.ticketCategory}]` : '' }}</span>
       </div>
       <div class="btn-edit" (click)="openNoteForItModal()">
         <i class="fa-solid fa-pen-to-square"></i>
@@ -294,6 +294,9 @@
     </div>
     <div class="tk-card__body">
       <div class="tk-text" [innerHTML]="formatText.getFormatTextHTML(t.noteForIt)"></div>
+      <div class="btn-expand-detail" (click)="openDetail(t.noteForIt)">
+        <i class="fa-solid fa-expand"></i>ดูรายละเอียดเพิ่มเติม
+      </div>
     </div>
   </section>
 
@@ -904,10 +907,8 @@
         </button>
       </div>
       <div class="content-card">
-        <div
-          [innerHTML]="formatText.getFormatTextHTML(selectedDetail())"
-          style="overflow: auto !important; width: 100%"
-        ></div>
+        <div [innerHTML]="formatText.getFormatTextHTML(selectedDetail())"></div>
+        <!-- style="overflow: auto !important; width: 100%" -->
       </div>
     </div>
   </div>
