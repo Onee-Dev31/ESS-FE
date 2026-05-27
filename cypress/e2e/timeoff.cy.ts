@@ -282,4 +282,36 @@ describe('Timeoff', () => {
     cy.get('app-time-off-form .leave-type-card').first().click();
     cy.get('app-time-off-form .section-heading').should('contain', '3. แนบเอกสาร');
   });
+
+  it('tablet viewport แสดงหน้า timeoff ถูกต้อง', () => {
+    cy.viewport('ipad-2');
+    cy.contains('รายการลาของฉัน').should('be.visible');
+    cy.get('.btn-create').should('exist');
+  });
+
+  it('ลบรายการสถานะ New แล้วกด cancel → item ยังคงอยู่', () => {
+    cy.get('.modern-table tbody tr').each(($row): false | void => {
+      const statusText = $row.find('.status-badge').text().trim();
+      if (statusText === 'คำขอใหม่' || statusText === 'New') {
+        const rowText = $row.find('td').first().text().trim();
+        cy.wrap($row).find('.btn-icon.delete').click({ force: true });
+        cy.get('.dialog-overlay').should('be.visible');
+        cy.get('.btn-cancel').click();
+        cy.get('.dialog-overlay').should('not.exist');
+        cy.get('.modern-table tbody').should('contain', rowText.slice(0, 5));
+        return false;
+      }
+    });
+  });
+
+  it('form มีปุ่มปิด modal', () => {
+    cy.get('.btn-create').click();
+    cy.get('app-time-off-form').should('be.visible');
+    cy.get('app-time-off-form .btn-close-modal').should('exist');
+  });
+
+  it('filter-label "วันที่สร้างรายการ" และ "ถึง" แสดงขึ้นในส่วน filter', () => {
+    cy.get('.filter-label').should('contain', 'วันที่สร้างรายการ');
+    cy.get('.filter-label').should('contain', 'ถึง');
+  });
 });

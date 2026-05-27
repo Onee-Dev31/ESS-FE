@@ -200,4 +200,40 @@ describe('Medical Expenses', () => {
   it('search field แสดง placeholder "ค้นหา..." ในส่วน filter', () => {
     cy.get('input[placeholder="ค้นหา..."]').should('be.visible');
   });
+
+  it('table header มี column "โรค"', () => {
+    cy.get('thead').should('contain', 'โรค');
+  });
+
+  it('claim card มี attribute data-type สำหรับประเภทการเบิก', () => {
+    cy.get('body').then(($body) => {
+      if ($body.find('.claim-card').length > 0) {
+        cy.get('.claim-card').first().should('have.attr', 'data-type');
+      } else {
+        cy.get('app-empty-state, .modern-table').should('exist');
+      }
+    });
+  });
+
+  it('modal form มี section heading "เลือกประเภทการเบิก"', () => {
+    cy.get('.btn-create').click();
+    cy.get('app-medicalexpenses-form').should('be.visible');
+    cy.contains('app-medicalexpenses-form', 'เลือกประเภทการเบิก').should('be.visible');
+  });
+
+  it('tablet viewport แสดงหน้า medicalexpenses ถูกต้อง', () => {
+    cy.viewport('ipad-2');
+    cy.contains('รายการเบิกค่ารักษาพยาบาล').should('be.visible');
+    cy.get('.btn-create').should('exist');
+  });
+
+  it('medicalexpenses form มีปุ่ม btn-close-modal', () => {
+    cy.get('.btn-create').click();
+    cy.get('app-medicalexpenses-form').should('be.visible');
+    cy.get('app-medicalexpenses-form .btn-close-modal').should('exist');
+  });
+
+  it('label ตัวกรอง "เดือนเริ่มต้น-เดือนสิ้นสุด" แสดงขึ้น', () => {
+    cy.contains('label', 'เดือนเริ่มต้น-เดือนสิ้นสุด').should('be.visible');
+  });
 });
