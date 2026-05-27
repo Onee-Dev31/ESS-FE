@@ -1,11 +1,4 @@
-<div
-  class="it-request-page"
-  [style]="
-    openBy === 'IT'
-      ? 'padding: 0; height: fit-content; background-color: transparent;'
-      : 'padding: 40px; min-height: 100vh;'
-  "
->
+<div class="it-request-page" [class.it-request-page--it]="openBy === 'IT'">
   <app-page-header
     *ngIf="openBy !== 'IT'"
     title="IT Service Request (ขอรับบริการ IT)"
@@ -47,8 +40,8 @@
 
     <div class="form-section two-col">
       <!-- Open For -->
-      <div class="form-group" *ngIf="!IsOneeJob">
-        <label class="form-label">
+      <div class="form-field" *ngIf="!IsOneeJob">
+        <label class="label">
           <i class="fa-solid fa-book-open-reader"></i>
           เปิดสิทธิ์ให้ (Open For)
           <span class="required-badge">*</span>
@@ -56,39 +49,38 @@
             >กรุณากรอกรายละเอียดเพิ่มเติมด้านล่าง</span
           >
         </label>
-        <div class="input-pair-row">
-          <nz-select
-            nzShowSearch
-            nzAllowClear
-            nzPlaceHolder=""
-            [ngModel]="selectedOpenFor().value"
-            (ngModelChange)="onOpenForChange($event)"
-            name="openFor"
-            class="form-control-select"
-          >
-            @for (opt of openForOptions(); track opt.value) {
-              <nz-option [nzLabel]="opt.label" [nzValue]="opt.value" />
-            }
-          </nz-select>
-        </div>
+
+        <nz-select
+          nzShowSearch
+          nzAllowClear
+          nzPlaceHolder=""
+          [ngModel]="selectedOpenFor().value"
+          (ngModelChange)="onOpenForChange($event)"
+          name="openFor"
+          class="form-input"
+        >
+          @for (opt of openForOptions(); track opt.value) {
+            <nz-option [nzLabel]="opt.label" [nzValue]="opt.value" />
+          }
+        </nz-select>
       </div>
 
       <!-- Phone -->
-      <div class="form-group">
-        <label class="form-label">
+      <div class="form-field">
+        <label class="label">
           <i class="fas fa-phone-alt field-icon"></i>
           เบอร์โทรติดต่อ (Phone Number)
           <span class="required-badge">*</span>
         </label>
         <input
           type="text"
-          class="form-control"
+          class="form-input"
           [value]="phoneModel"
           (input)="onPhoneInput($event)"
           placeholder="ระบุเบอร์โทรศัพท์ที่สามารถติดต่อได้..."
         />
         @if (phoneError) {
-          <span class="error-text">{{ phoneError }}</span>
+          <span class="error">{{ phoneError }}</span>
         }
       </div>
     </div>

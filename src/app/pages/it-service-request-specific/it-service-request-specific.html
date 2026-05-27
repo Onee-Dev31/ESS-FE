@@ -1,11 +1,4 @@
-<div
-  class="it-request-page"
-  [style]="
-    openBy === 'IT'
-      ? 'padding: 0; height: fit-content; background-color: transparent;'
-      : 'padding: 40px; min-height: 100vh;'
-  "
->
+<div class="it-request-page" [class.it-request-page--it]="openBy === 'IT'">
   <app-page-header
     *ngIf="openBy !== 'IT'"
     title="IT Service Request (ขอรับบริการ IT)"
@@ -80,10 +73,13 @@
                 (ngModelChange)="onSpecificOpenForChange(person, $event)"
                 [name]="'openFor' + person.id"
               >
-                @for (opt of openForOptions(); track opt.value) {
+                @for (opt of getAvailableOpenForOptions(person); track opt.value) {
                   <nz-option [nzLabel]="opt.label" [nzValue]="opt" />
                 }
               </nz-select>
+              @if (!person.openFor) {
+                <span class="error"> กรุณาเลือกพนักงาน </span>
+              }
             </div>
 
             <div class="form-group">
@@ -97,9 +93,9 @@
                 (ngModelChange)="touchSpecificPeople()"
                 [name]="'phone' + person.id"
               />
-              @if (person.phoneError) {
+              @if (!person.phone || person.phoneError) {
                 <span class="error-text">
-                  {{ person.phoneError }}
+                  {{ person.phoneError || 'กรุณากรอกเบอร์โทรศัพท์' }}
                 </span>
               }
             </div>
@@ -352,7 +348,9 @@
                                 (nzBlur)="validateOracleCompany(companyItem, person, $index)"
                               >
                                 <nz-option
-                                  *ngFor="let company of companyList"
+                                  *ngFor="
+                                    let company of getAvailableOracleCompanies(person, companyItem)
+                                  "
                                   [nzLabel]="
                                     company.COMPANY_NAME + ' (' + company.COMPANY_CODE + ')'
                                   "

@@ -122,13 +122,24 @@ $table-label-bg: var(--border-toolbar);
    ========================================================================== */
 
 .it-request-page {
-  // padding: 40px;
-  // min-height: 100vh;
+  padding: 40px;
+  min-height: 100vh;
   background-color: $bg-page;
   font-family: $font-main;
 
-  @media (max-width: 768px) {
+  @include tablet {
+    padding: 20px;
+  }
+
+  @include mobile {
     padding: 10px;
+  }
+
+  &.it-request-page--it {
+    padding: 0;
+    min-height: auto;
+    height: fit-content;
+    background-color: transparent;
   }
 
   .form-group {
@@ -218,10 +229,10 @@ $table-label-bg: var(--border-toolbar);
     }
 
     .error-text {
-      color: #ff4d4f;
-      font-size: 12px;
-      margin-top: 4px;
+      color: rgb(255, 133, 133) !important;
+      font-size: $font-size-hint;
       display: block;
+      text-align: center;
     }
   }
 
@@ -1372,6 +1383,7 @@ $table-label-bg: var(--border-toolbar);
       transition: all 0.15s ease;
       display: inline-flex;
       align-items: center;
+      justify-content: center;
 
       &:hover {
         background: var(--border-toolbar);
@@ -1453,7 +1465,7 @@ $table-label-bg: var(--border-toolbar);
 
   .header-title {
     margin: 0;
-    font-size: 1.25rem;
+    font-size: $font-size-header;
     font-weight: 800;
     color: var(--text-header);
   }
@@ -1461,7 +1473,7 @@ $table-label-bg: var(--border-toolbar);
   .header-subtitle {
     margin: 4px 0 0;
     color: var(--text-sub);
-    font-size: 0.9rem;
+    font-size: $font-size-label;
   }
 }
 
@@ -1474,7 +1486,7 @@ $table-label-bg: var(--border-toolbar);
   border: 1px solid color-mix(in srgb, var(--primary), transparent 60%);
   background: var(--primary);
   color: #fff;
-  font-size: 0.9rem;
+  font-size: $font-size-label;
   font-weight: 700;
   white-space: nowrap;
 }
@@ -1515,7 +1527,7 @@ $table-label-bg: var(--border-toolbar);
   h5 {
     margin: 3px 0 0;
     color: var(--text-header);
-    font-size: 1rem;
+    font-size: $font-size-body;
     font-weight: 800;
   }
 }
@@ -1575,6 +1587,7 @@ $table-label-bg: var(--border-toolbar);
   cursor: pointer;
   font-weight: 700;
   transition: 0.2s;
+  font-size: $font-size-label;
 
   &:hover,
   &.active {
@@ -1631,6 +1644,7 @@ $table-label-bg: var(--border-toolbar);
   color: var(--primary);
   cursor: pointer;
   font-weight: 800;
+  font-size: $font-size-label;
 
   &:hover {
     background: var(--primary);
@@ -1685,7 +1699,7 @@ $table-label-bg: var(--border-toolbar);
   }
 
   label {
-    font-size: 0.9rem;
+    font-size: $font-size-label;
     font-weight: 400;
     color: var(--text) !important;
     margin-left: 4px;
@@ -1709,8 +1723,8 @@ $table-label-bg: var(--border-toolbar);
 
     &:focus {
       outline: none;
-      border-color: #a78bfa !important;
-      box-shadow: 0 0 0 4px rgba(167, 139, 250, 0.1) !important;
+      // border-color: #a78bfa !important;
+      // box-shadow: 0 0 0 4px rgba(167, 139, 250, 0.1) !important;
     }
 
     &.readonly,
@@ -1755,7 +1769,7 @@ $table-label-bg: var(--border-toolbar);
   }
 
   .error {
-    color: rgb(255, 133, 133);
+    color: rgb(255, 133, 133) !important;
     text-align: center;
     font-size: $font-size-hint;
   }
@@ -1838,7 +1852,7 @@ $table-label-bg: var(--border-toolbar);
   gap: 16px;
 
   .error {
-    color: rgb(255, 133, 133);
+    color: rgb(255, 133, 133) !important;
     text-align: center;
     font-size: $font-size-hint;
   }

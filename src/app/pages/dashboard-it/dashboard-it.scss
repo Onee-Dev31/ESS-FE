@@ -94,7 +94,7 @@
 
     h2 {
       margin: 0;
-      font-size: 1.25rem;
+      font-size: $font-size-body;
       font-weight: 700;
       display: flex;
       align-items: center;
@@ -216,6 +216,11 @@
         }
       }
     }
+
+    @include mobile {
+      padding: 6px 10px;
+      max-height: 100vh;
+    }
   }
 
   .form-actions-footer {
@@ -280,7 +285,7 @@
     justify-content: space-between;
     align-items: center;
     padding: 16px 20px;
-    background-color: var(--primary);
+    background-color: color-mix(in srgb, var(--primary), black 20%);
     border-bottom: 1px solid var(--border-color);
     color: var(--text-reverse);
 
@@ -316,7 +321,7 @@
   .modal-body {
     flex: 1;
     padding: 30px;
-    max-height: 70vh;
+    max-height: 50vh;
     overflow-y: auto;
     background-color: var(--bg-card);
     &::-webkit-scrollbar {
@@ -1430,12 +1435,6 @@
     h2::before {
       display: none;
     }
-  }
-
-  .content-card {
-    padding: 22px 24px;
-    box-shadow: none;
-    max-height: none;
   }
 }
 
