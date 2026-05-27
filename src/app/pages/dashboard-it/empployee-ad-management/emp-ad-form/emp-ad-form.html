@@ -85,15 +85,14 @@
     <form class="form-body" (ngSubmit)="saveEmployee()">
       <div class="section-title">Basic Information</div>
       <div class="form-grid">
-        <div class="field-group">
-          <label>Employee Code <span class="req" *ngIf="!isRequestUser">*</span></label>
+        <div class="field-group" *ngIf="!isRequestUser">
+          <label>Employee Code <span class="req">*</span></label>
           <input
             type="text"
             [(ngModel)]="addForm.employeeCode"
             name="employeeCode"
             placeholder="Enter Employee Code"
-            [class.invalid]="isInvalid('employeeCode') && !isRequestUser"
-            [readonly]="isRequestUser"
+            [class.invalid]="isInvalid('employeeCode')"
           />
         </div>
         <div class="field-group">
@@ -132,6 +131,16 @@
             [class.invalid]="isInvalid('surNameThai')"
           />
         </div>
+        <div class="field-group" *ngIf="isRequestUser">
+          <label>Nickname <span class="req">*</span></label>
+          <input
+            type="text"
+            [(ngModel)]="addForm.nickname"
+            name="nickname"
+            placeholder="Enter Nickname"
+            [class.invalid]="isInvalid('nickname')"
+          />
+        </div>
         <div class="field-group">
           <label>TitleName (English) <span class="req">*</span></label>
           <nz-select
@@ -168,7 +177,7 @@
             [class.invalid]="isInvalid('surNameEng')"
           />
         </div>
-        <div class="field-group">
+        <div class="field-group" *ngIf="!isRequestUser">
           <label>Nickname <span class="req">*</span></label>
           <input
             type="text"
@@ -180,8 +189,8 @@
         </div>
       </div>
 
-      <div class="section-title">Job Information</div>
-      <div class="form-grid">
+      <div class="section-title" *ngIf="!isRequestUser">Job Information</div>
+      <div class="form-grid" *ngIf="!isRequestUser">
         <div class="field-group span-2">
           <label>Job Position <span class="req">*</span></label>
           <nz-select
@@ -314,7 +323,7 @@
             }
           </nz-select>
         </div>
-        <div class="field-group span-2">
+        <div class="field-group span-2" *ngIf="!isRequestUser">
           <label>AD User <span class="req">*</span></label>
           <input
             type="text"
