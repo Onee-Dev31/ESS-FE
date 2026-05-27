@@ -737,8 +737,6 @@ export class ITServiceRequestComponent implements OnInit {
 
         ชื่อเล่น : ${data.NICKNAME}
 
-        ตำแหน่ง : ${data.POST}
-
         บริษัท : ${data.COMPANY_NAME}
 
         แผนก : ${data.DEPARTMENT}
@@ -747,11 +745,8 @@ export class ITServiceRequestComponent implements OnInit {
 
         อีเมล : ${data.EMAIL}
 
-        ชั้น : ${data.FLOOR}
-
         หัวหน้า : ${data.HEAD_NAME}
 
-        AD User หัวหน้า : ${data.AD_USER}
         `.trim();
 
     this.requestDetails.set(requestUserDetail);

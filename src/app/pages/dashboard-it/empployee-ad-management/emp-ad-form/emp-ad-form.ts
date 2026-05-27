@@ -197,11 +197,14 @@ export class EmpAdForm implements OnChanges {
   saveEmployee() {
     this.submitted = true;
     // const hasError = this.requiredFields.some((f) => !this.addForm[f]);
-    const requiredFields = this.isRequestUser
-      ? this.requiredFields.filter((f) => f !== 'employeeCode')
-      : this.requiredFields;
+    const excludedFields = this.isRequestUser
+      ? ['employeeCode', 'jobPosition', 'statusEmployee', 'floor', 'adUser']
+      : [];
+
+    const requiredFields = this.requiredFields.filter((f) => !excludedFields.includes(f));
 
     const hasError = requiredFields.some((f) => !this.addForm[f]);
+
     if (hasError) return;
 
     const selectedJob = this.jobPositionList.find(
