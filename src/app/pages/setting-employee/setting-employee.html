@@ -103,9 +103,20 @@
                 <td class="col-department">{{ emp.department }}</td>
                 <td class="col-company">{{ emp.company }}</td>
                 <td class="col-action">
-                  <button class="btn-ghost" (click)="openRoleModal(emp)">
+                  <!-- <button class="btn-ghost" (click)="openRoleModal(emp)">
                     <i class="fa-solid fa-shield-halved"></i>กำหนดสิทธิ์
-                  </button>
+                  </button> -->
+                  <div class="action-buttons">
+                    <button class="btn-ghost" (click)="openRoleModal(emp)">
+                      <i class="fa-solid fa-shield-halved"></i>
+                      กำหนดสิทธิ์
+                    </button>
+
+                    <button class="btn-signature" (click)="openSignatureModal(emp)">
+                      <i class="fas fa-signature"></i>
+                      ลายเซ็น
+                    </button>
+                  </div>
                 </td>
               </tr>
             </tbody>
@@ -148,9 +159,13 @@
                 <span class="value">{{ emp.company }} </span>
               </div>
 
-              <div class="card-footer-actions" style="grid-template-columns: 1fr">
+              <div class="card-footer-actions">
                 <button class="btn-edit-sm" title="กำหนดสิทธิ์" (click)="openRoleModal(emp)">
                   <i class="fa-solid fa-shield-halved"></i> กำหนดสิทธิ์
+                </button>
+                <button class="btn-signature-sm" title="ลายเซ็น" (click)="openSignatureModal(emp)">
+                  <i class="fas fa-signature"></i>
+                  ลายเซ็น
                 </button>
               </div>
             </div>
@@ -183,4 +198,11 @@
     (onSubmit)="onConfirmModal($event)"
   >
   </app-setting-employee-permission-role-form>
+  <!-- ===================================================== -->
+  <!-- SIGNATURE MODAL -->
+  <!-- ===================================================== -->
+
+  @if (isSignatureModalOpen()) {
+    <app-signature-modal [employee]="selectedSignatureEmp()" (closed)="closeSignatureModal()" />
+  }
 </div>
