@@ -8,9 +8,8 @@ describe('LoginVersion2', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [LoginVersion2]
-    })
-    .compileComponents();
+      imports: [LoginVersion2],
+    }).compileComponents();
 
     fixture = TestBed.createComponent(LoginVersion2);
     component = fixture.componentInstance;
