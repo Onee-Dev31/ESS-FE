@@ -442,6 +442,7 @@ export class ITServiceRequestSpecificComponent implements OnInit {
       formData.append('openForType', 'freelance');
     }
 
+    formData.append('subject', 'ขอใช้ระบบเฉพาะ');
     formData.append('description', this.summaryText());
     formData.append('requesterAduser', this.authService.currentUser() || '-');
     formData.append('contactPhone', this.phoneNumber());
