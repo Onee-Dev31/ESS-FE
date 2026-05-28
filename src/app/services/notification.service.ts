@@ -500,7 +500,11 @@ export class NotificationService {
       input.notificationType === 'ticket_created' &&
       [...this.approverRoles].some((role) => roleText.includes(role));
 
-    if (isApprovalRoute || isNewTicketForApprover || input.notificationType === 'ticket_resubmited') {
+    if (
+      isApprovalRoute ||
+      isNewTicketForApprover ||
+      input.notificationType === 'ticket_resubmited'
+    ) {
       return {
         route: '/approval-it-request',
         queryParams: {
