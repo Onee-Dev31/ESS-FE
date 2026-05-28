@@ -9,9 +9,9 @@ import { Router } from '@angular/router';
   imports: [CommonModule],
   template: `
     <div class="top-header-strip">
-      <button class="btn-back" (click)="onBack()">
+      <!-- <button class="btn-back" (click)="onBack()">
         <i class="fas fa-chevron-left"></i>
-      </button>
+      </button> -->
       <h2>{{ title }}</h2>
       <div class="header-actions">
         <ng-content></ng-content>

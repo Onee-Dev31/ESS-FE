@@ -1,98 +1,191 @@
-<div class="main-container">
-  <div class="login-panel">
-    <div class="brand-header">
-      <img src="./02.png" alt="logo-Ess" class="logoEss-img" />
-      <h1>ESS</h1>
-      <p>Employee Self-Service System</p>
+<div class="ess-login-page">
+  <!-- overlay -->
+  <div class="ess-overlay"></div>
+
+  <!-- glow -->
+  <div class="ess-glow glow-1"></div>
+  <div class="ess-glow glow-2"></div>
+
+  <!-- left -->
+  <div class="ess-left">
+    <!-- logo -->
+    <div class="ess-brand">
+      <img src="/logo/logo_ONE.png" alt="ONEE" />
+
+      <div class="ess-brand-text">
+        <h2>The ONE Enterprise</h2>
+        <p>Public Company Limited</p>
+      </div>
     </div>
 
-    <div
-      *ngIf="loginMessage"
-      [ngClass]="{ 'error-msg': isError, 'success-msg': !isError }"
-      class="alert"
-    >
-      {{ loginMessage }}
-    </div>
-
-    <!-- Username/Password Form -->
-    <ng-container *ngIf="!showQr">
-      <form [formGroup]="loginForm" (ngSubmit)="onLogin()">
-        <div class="input-group">
-          <label for="username">Username</label>
-          <input
-            type="text"
-            id="username"
-            formControlName="username"
-            placeholder="Enter your username"
-          />
+    <!-- features -->
+    <div class="ess-features">
+      <div class="feature-item">
+        <div class="feature-icon">
+          <i class="fas fa-headset"></i>
         </div>
 
-        <div class="input-group password-group">
-          <label for="password">Password</label>
-          <div class="input-wrapper">
+        <div class="feature-line"></div>
+
+        <span>IT Ticketing</span>
+      </div>
+
+      <div class="feature-item">
+        <div class="feature-icon">
+          <i class="fas fa-hand-holding-heart"></i>
+        </div>
+
+        <div class="feature-line"></div>
+
+        <span>Welfare</span>
+      </div>
+
+      <div class="feature-item">
+        <div class="feature-icon">
+          <i class="fas fa-calendar-check"></i>
+        </div>
+
+        <div class="feature-line"></div>
+
+        <span>Leave</span>
+      </div>
+
+      <div class="feature-item">
+        <div class="feature-icon">
+          <i class="fas fa-file-signature"></i>
+        </div>
+
+        <span>Approval</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- right -->
+  <div class="ess-right">
+    <div class="login-card">
+      <!-- dots -->
+      <div class="card-dots"></div>
+
+      <!-- icon -->
+      <div class="login-top-icon">
+        <i class="fas fa-users"></i>
+      </div>
+
+      <!-- title -->
+      <h1 class="login-title">Employee</h1>
+
+      <h2 class="login-subtitle">Self-Services System</h2>
+
+      <!-- alert -->
+      <div
+        *ngIf="loginMessage"
+        class="login-alert"
+        [ngClass]="{
+          'error-alert': isError,
+          'success-alert': !isError,
+        }"
+      >
+        {{ loginMessage }}
+      </div>
+
+      <div class="login-divider">
+        <span></span>
+      </div>
+
+      <!-- ===================================================== -->
+      <!-- NORMAL LOGIN -->
+      <!-- ===================================================== -->
+
+      <ng-container *ngIf="!showQr">
+        <form [formGroup]="loginForm" (ngSubmit)="onLogin()">
+          <!-- username -->
+          <div class="input-group">
+            <i class="far fa-user"></i>
+
+            <input type="text" id="username" formControlName="username" placeholder="Username" />
+          </div>
+
+          <!-- password -->
+          <div class="input-group">
+            <i class="fas fa-lock"></i>
+
             <input
               [type]="passwordFieldType"
               id="password"
               formControlName="password"
-              placeholder="Enter your password"
+              placeholder="Password"
             />
-            <span class="password-toggle" (click)="togglePasswordVisibility()">
-              <i [class]="passwordFieldType === 'password' ? 'fas fa-eye' : 'fas fa-eye-slash'"></i>
-            </span>
+
+            <button type="button" (click)="togglePasswordVisibility()">
+              <i [class]="passwordFieldType === 'password' ? 'far fa-eye' : 'far fa-eye-slash'"></i>
+            </button>
           </div>
+
+          <!-- login -->
+          <button type="submit" class="login-btn" [disabled]="!loginForm.valid || isLoading">
+            <span *ngIf="!isLoading"> Login </span>
+
+            <span *ngIf="isLoading" class="btn-loader"></span>
+          </button>
+        </form>
+
+        <!-- divider -->
+        <div class="qr-divider">
+          <span>OR</span>
         </div>
 
-        <button type="submit" class="login-button" [disabled]="!loginForm.valid || isLoading">
-          <span *ngIf="!isLoading">Login</span>
-          <span *ngIf="isLoading" class="loader"></span>
+        <!-- qr button -->
+        <button class="qr-login-btn" (click)="switchToQr()">
+          <i class="fas fa-qrcode"></i>
+
+          Login with QR Code
         </button>
-      </form>
+      </ng-container>
 
-      <div class="qr-divider">
-        <span>หรือ</span>
-      </div>
+      <!-- ===================================================== -->
+      <!-- QR LOGIN -->
+      <!-- ===================================================== -->
 
-      <button class="qr-toggle-button" (click)="switchToQr()">
-        <i class="fas fa-qrcode"></i>
-        Login ด้วย QR Code
-      </button>
-    </ng-container>
+      <ng-container *ngIf="showQr">
+        <div class="qr-section">
+          <div class="qr-title">Scan QR Code</div>
 
-    <!-- QR Code Section -->
-    <ng-container *ngIf="showQr">
-      <div class="qr-section">
-        <p class="qr-instruction">สแกน QR Code ด้วยกล้องบนมือถือเพื่อเข้าสู่ระบบ</p>
+          <p class="qr-description">Scan this QR code with your mobile device to login securely.</p>
 
-        <div class="qr-image-wrapper">
-          <div *ngIf="qrLoading" class="qr-placeholder">
-            <span class="loader"></span>
+          <!-- loading -->
+          <div *ngIf="qrLoading" class="qr-loading">
+            <span class="btn-loader"></span>
           </div>
 
-          <ng-container *ngIf="!qrLoading && !qrExpired && qrImage">
-            <img [src]="qrImage" alt="QR Code" class="qr-image" />
-          </ng-container>
+          <!-- qr image -->
+          <div *ngIf="!qrLoading && !qrExpired" class="qr-box">
+            <img *ngIf="qrImage" [src]="qrImage" alt="QR Code" />
+          </div>
 
+          <!-- expired -->
           <div *ngIf="qrExpired" class="qr-expired">
             <i class="fas fa-clock"></i>
-            <p>QR หมดอายุแล้ว</p>
-            <button class="qr-refresh-button" (click)="loadQr()">รีเฟรช QR</button>
+
+            <span> QR Code Expired </span>
+
+            <button class="qr-refresh-btn" (click)="loadQr()">Refresh QR</button>
           </div>
+
+          <!-- waiting -->
+          <div *ngIf="!qrExpired && !qrLoading" class="qr-waiting">
+            <span class="pulse-dot"></span>
+
+            Waiting for confirmation...
+          </div>
+
+          <!-- back -->
+          <button class="qr-back-btn" (click)="switchToForm()">
+            <i class="fas fa-arrow-left"></i>
+
+            Back to Login
+          </button>
         </div>
-
-        <p class="qr-waiting" *ngIf="!qrExpired && !qrLoading">
-          <span class="dot-pulse"></span>
-          รอการยืนยันจากมือถือ...
-        </p>
-
-        <button class="qr-back-button" (click)="switchToForm()">
-          <i class="fas fa-arrow-left"></i>
-          กลับไป Login แบบปกติ
-        </button>
-      </div>
-    </ng-container>
-  </div>
-
-  <div class="welcome-panel">
-    <img src="./people.png" alt="Team onee" class="people-img" />
+      </ng-container>
+    </div>
   </div>
 </div>
