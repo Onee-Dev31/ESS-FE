@@ -8,7 +8,7 @@
   position: relative;
 
   width: 100%;
-  min-height: 100vh;
+  height: 100vh;
 
   overflow: hidden;
 
@@ -110,7 +110,7 @@
   z-index: 5;
 
   width: min(1280px, 100%);
-  min-height: 760px;
+  height: 760px;
 
   display: flex;
 
@@ -476,9 +476,27 @@
   }
 }
 
+// .mini-icon {
+//   width: 54px;
+//   height: 54px;
+
+//   margin: auto;
+
+//   border-radius: 18px;
+
+//   display: flex;
+//   align-items: center;
+//   justify-content: center;
+
+//   background: linear-gradient(145deg, #eef4ff, white);
+
+//   color: #2f63d6;
+
+//   box-shadow: 0 10px 24px rgba(0, 0, 0, 0.08);
+// }
 .mini-icon {
-  width: 54px;
-  height: 54px;
+  width: 158px;
+  height: 100px;
 
   margin: auto;
 
@@ -488,11 +506,29 @@
   align-items: center;
   justify-content: center;
 
-  background: linear-gradient(145deg, #eef4ff, white);
+  // background: linear-gradient(145deg, rgba(255, 255, 255, 0.9), rgba(245, 248, 255, 0.75));
 
-  color: #2f63d6;
+  // box-shadow:
+  //   0 10px 24px rgba(0, 0, 0, 0.08),
+  //   inset 0 2px 3px rgba(255, 255, 255, 0.95);
 
-  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+
+  img {
+    width: 72%;
+    height: 72%;
+
+    object-fit: contain;
+
+    display: block;
+  }
+
+  @include mobile {
+    width: 48px;
+    height: 48px;
+
+    border-radius: 14px;
+  }
 }
 
 /* =========================================================
@@ -576,9 +612,9 @@
 
   margin-top: 34px;
 
-  @include mobile {
-    flex-direction: column;
-  }
+  // @include mobile {
+  //   flex-direction: column;
+  // }
 }
 
 .primary-btn,
@@ -728,5 +764,449 @@
 
   100% {
     transform: translateY(0px);
+  }
+}
+
+/* =========================================================
+   RESPONSIVE - LAPTOP
+========================================================= */
+
+@media (max-width: 1440px) {
+  .layer-login-container {
+    height: 600px;
+  }
+
+  .brand-logo-wrap h1 {
+    font-size: 2.6rem;
+  }
+
+  .login-header h2 {
+    font-size: 2.1rem;
+  }
+}
+
+/* =========================================================
+   RESPONSIVE - TABLET LARGE
+========================================================= */
+
+@media (max-width: 1200px) {
+  .layer-login-container {
+    min-height: 640px;
+  }
+
+  .left-content {
+    width: min(360px, 100%);
+  }
+
+  .brand-logo-circle {
+    width: 100px;
+    height: 100px;
+
+    i {
+      font-size: 2.5rem;
+    }
+  }
+
+  .brand-logo-wrap h1 {
+    font-size: 2.3rem;
+  }
+
+  .left-description {
+    font-size: 0.94rem;
+  }
+
+  .login-form-card {
+    padding: 34px;
+  }
+
+  .login-header h2 {
+    font-size: 2rem;
+  }
+
+  .wave-layer {
+    transform: scale(0.88);
+    transform-origin: right center;
+  }
+}
+
+/* =========================================================
+   RESPONSIVE - TABLET
+========================================================= */
+
+@include tablet {
+  .layer-login-page {
+    padding: 20px;
+  }
+
+  .layer-login-container {
+    flex-direction: column;
+
+    min-height: auto;
+
+    border-radius: 34px;
+  }
+
+  /* hide left panel */
+
+  .layer-left-panel {
+    display: none;
+  }
+
+  /* right full width */
+
+  .layer-right-panel {
+    width: 100%;
+
+    height: 100vh;
+
+    padding: 40px 24px;
+  }
+
+  .glass-back {
+    inset: 20px;
+    border-radius: 28px;
+  }
+
+  .login-form-card {
+    width: min(520px, 100%);
+
+    padding: 24px;
+  }
+
+  .login-header {
+    margin-bottom: 28px;
+
+    h2 {
+      font-size: 2rem;
+    }
+
+    p {
+      font-size: 0.92rem;
+    }
+  }
+
+  .input-shell {
+    height: 54px;
+  }
+
+  .action-row {
+    margin-top: 26px;
+  }
+
+  .primary-btn,
+  .secondary-btn {
+    height: 52px;
+  }
+
+  .qr-modern-box {
+    width: 200px;
+    height: 200px;
+  }
+}
+
+/* =========================================================
+   RESPONSIVE - MOBILE
+========================================================= */
+
+@include mobile {
+  .layer-login-page {
+    padding: 12px;
+  }
+
+  .layer-right-panel {
+    padding: 18px;
+  }
+
+  .glass-back {
+    inset: 10px;
+
+    border-radius: 24px;
+  }
+
+  .login-form-card {
+    padding: 12px;
+  }
+
+  .mini-icon {
+    width: 46px;
+    height: 46px;
+
+    border-radius: 14px;
+  }
+
+  .login-header {
+    margin-bottom: 22px;
+
+    h2 {
+      margin-top: 14px;
+
+      font-size: 1.8rem;
+      line-height: 1.2;
+    }
+
+    p {
+      font-size: 0.85rem;
+
+      line-height: 1.6;
+
+      padding: 0 10px;
+    }
+  }
+
+  .custom-input {
+    margin-bottom: 18px;
+
+    label {
+      font-size: 0.88rem;
+    }
+  }
+
+  .input-shell {
+    height: 50px;
+
+    padding: 0 14px;
+
+    border-radius: 16px;
+
+    input {
+      font-size: 0.94rem;
+    }
+  }
+
+  .action-row {
+    // flex-direction: column;
+
+    gap: 12px;
+  }
+
+  .primary-btn,
+  .secondary-btn {
+    width: 100%;
+
+    height: 50px;
+
+    font-size: 0.94rem;
+  }
+
+  .qr-modern-box {
+    width: 170px;
+    height: 170px;
+
+    border-radius: 22px;
+  }
+
+  .qr-modern-text {
+    font-size: 0.84rem;
+  }
+}
+
+/* =========================================================
+   RESPONSIVE - SMALL MOBILE
+========================================================= */
+
+@media (max-width: 420px) {
+  .layer-login-page {
+    // padding: 0;
+    padding: 12px;
+  }
+
+  .layer-login-container {
+    // border-radius: 0;
+    border-radius: 42px;
+  }
+
+  .layer-right-panel {
+    height: 100vh;
+
+    padding: 14px;
+  }
+
+  .glass-back {
+    inset: 0;
+
+    border-radius: 0;
+  }
+
+  .login-form-card {
+    padding: 8px;
+  }
+
+  .login-header h2 {
+    font-size: 1.6rem;
+  }
+
+  .mini-icon {
+    width: 42px;
+    height: 42px;
+  }
+}
+
+/* =========================================================
+   QR MODERN
+========================================================= */
+
+.qr-section-modern {
+  margin-top: 12px;
+
+  text-align: center;
+
+  animation: fadeQr 0.25s ease;
+}
+
+.qr-header {
+  margin-bottom: 24px;
+
+  h3 {
+    margin: 0 0 8px;
+
+    color: #1b2b52;
+
+    font-size: 1.3rem;
+    font-weight: 700;
+  }
+
+  p {
+    margin: 0;
+
+    color: #6d7ea6;
+
+    font-size: 0.94rem;
+  }
+}
+
+.qr-modern-box {
+  width: 240px;
+  height: 240px;
+
+  margin: auto;
+
+  padding: 18px;
+
+  border-radius: 32px;
+
+  background: white;
+
+  box-shadow:
+    0 25px 50px rgba(0, 0, 0, 0.08),
+    inset 0 2px 3px rgba(255, 255, 255, 0.9);
+
+  border: 1px solid #edf2ff;
+
+  img {
+    width: 100%;
+    height: 100%;
+
+    object-fit: contain;
+  }
+}
+
+.qr-loading-modern {
+  width: 240px;
+  height: 240px;
+
+  margin: auto;
+
+  border-radius: 32px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: white;
+
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
+}
+
+.qr-modern-waiting {
+  margin-top: 20px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+
+  color: #5c6f98;
+
+  font-size: 0.95rem;
+}
+
+.pulse-dot {
+  width: 10px;
+  height: 10px;
+
+  border-radius: 999px;
+
+  background: #2f7cff;
+
+  animation: pulseDot 1.2s infinite;
+}
+
+.qr-expired-modern {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+
+  padding: 24px;
+
+  border-radius: 28px;
+
+  background: rgba(255, 120, 120, 0.08);
+
+  color: #d94a4a;
+
+  i {
+    font-size: 2rem;
+  }
+}
+
+.qr-refresh-btn {
+  height: 44px;
+
+  padding: 0 22px;
+
+  border: none;
+
+  border-radius: 999px;
+
+  background: #2f7cff;
+
+  color: white;
+
+  cursor: pointer;
+
+  font-weight: 600;
+}
+
+.qr-back-btn {
+  margin-top: 22px;
+}
+
+@keyframes pulseDot {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+
+  50% {
+    transform: scale(1.5);
+    opacity: 0.5;
+  }
+
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes fadeQr {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }

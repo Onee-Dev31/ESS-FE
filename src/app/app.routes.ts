@@ -9,9 +9,9 @@ import { LoginVersion1 } from './pages/login-version1/login-version1';
 import { LoginVersion2 } from './pages/login-version2/login-version2';
 
 export const routes: Routes = [
-  { path: 'login', component: LoginComponent },
+  { path: 'login-v2', component: LoginComponent },
   { path: 'login-v1', component: LoginVersion1 },
-  { path: 'login-v2', component: LoginVersion2 },
+  { path: 'login', component: LoginVersion2 },
   { path: 'validate/loginSSO', component: ValidateLoginSso },
   {
     path: 'qr-confirm',

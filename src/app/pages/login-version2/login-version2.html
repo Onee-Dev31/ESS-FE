@@ -16,16 +16,16 @@
         <!-- logo -->
         <div class="brand-logo-wrap">
           <div class="brand-logo-circle">
-            <i class="fas fa-rocket"></i>
+            <!-- <i class="fas fa-rocket"></i> -->
+            <div class="mini-icon">
+              <img src="/logo/logo_ONE.png" alt="ONEE Logo" />
+            </div>
           </div>
 
-          <h1>ONE ESS</h1>
+          <h1>ESS</h1>
         </div>
 
-        <p class="left-description">
-          Smart Employee Self-Service platform with modern workflow, approvals, welfare and IT
-          services.
-        </p>
+        <p class="left-description">Employee Self-Service System</p>
 
         <!-- feature pills -->
         <div class="feature-pills">
@@ -62,13 +62,13 @@
 
       <div class="login-form-card">
         <div class="login-header">
-          <div class="mini-icon">
-            <i class="fas fa-link"></i>
-          </div>
+          <!-- <div class="mini-icon">
+            <img src="/logo/logo_ONE.png" alt="ONEE Logo" />
+          </div> -->
 
           <h2>Login Account</h2>
 
-          <p>Sign in to continue into Employee Self-Service System</p>
+          <!-- <p>Employee Self-Service System</p> -->
         </div>
 
         <!-- alert -->
@@ -84,7 +84,7 @@
         </div>
 
         <!-- form -->
-        <form [formGroup]="loginForm" (ngSubmit)="onLogin()" autocomplete="on">
+        <form *ngIf="!showQr" [formGroup]="loginForm" (ngSubmit)="onLogin()" autocomplete="on">
           <!-- username -->
           <div class="custom-input">
             <label>Username</label>
@@ -135,7 +135,7 @@
               <span *ngIf="isLoading" class="btn-loader"></span>
             </button>
 
-            <button type="button" class="secondary-btn" (click)="switchToQr()">
+            <button type="button" class="secondary-btn" (click)="switchToQr()" *ngIf="!showQr">
               <i class="fas fa-qrcode"></i>
 
               QR Login
@@ -143,17 +143,44 @@
           </div>
         </form>
 
-        <!-- qr section -->
-        <div class="qr-section-modern" *ngIf="showQr">
-          <div class="qr-modern-box">
-            <img *ngIf="qrImage && !qrLoading" [src]="qrImage" alt="QR Code" />
+        <!-- ===================================================== -->
+        <!-- QR LOGIN -->
+        <!-- ===================================================== -->
 
-            <div *ngIf="qrLoading" class="qr-loading-modern">
-              <span class="btn-loader"></span>
-            </div>
+        <div class="qr-section-modern" *ngIf="showQr">
+          <p>Scan this QR Code using your mobile device</p>
+          <!-- loading -->
+          <div *ngIf="qrLoading" class="qr-loading-modern">
+            <span class="btn-loader"></span>
           </div>
 
-          <div class="qr-modern-text">Scan QR Code using your mobile device</div>
+          <!-- qr image -->
+          <div class="qr-modern-box" *ngIf="!qrLoading && !qrExpired">
+            <img *ngIf="qrImage" [src]="qrImage" alt="QR Code" />
+          </div>
+
+          <!-- expired -->
+          <div *ngIf="qrExpired" class="qr-expired-modern">
+            <i class="fas fa-clock"></i>
+
+            <span>QR Code Expired</span>
+
+            <button type="button" class="qr-refresh-btn" (click)="loadQr()">Refresh QR</button>
+          </div>
+
+          <!-- waiting -->
+          <div *ngIf="!qrExpired && !qrLoading" class="qr-modern-waiting">
+            <span class="pulse-dot"></span>
+
+            Waiting for confirmation...
+          </div>
+
+          <!-- back -->
+          <button type="button" class="secondary-btn qr-back-btn" (click)="switchToForm()">
+            <i class="fas fa-arrow-left"></i>
+
+            Back to Login
+          </button>
         </div>
       </div>
     </div>
