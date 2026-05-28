@@ -8,9 +8,8 @@ describe('SignatureModal', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [SignatureModal]
-    })
-    .compileComponents();
+      imports: [SignatureModal],
+    }).compileComponents();
 
     fixture = TestBed.createComponent(SignatureModal);
     component = fixture.componentInstance;
