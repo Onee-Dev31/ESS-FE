@@ -261,7 +261,7 @@ export class ItRequestDetailModal {
           const ticketId = this.approvalItem.requestId;
 
           if (command === 'Approved') {
-            this.signalrService.sendNewTicketNotification(this.approvalItem.requestNo);
+            // this.signalrService.sendNewTicketNotification(this.approvalItem.requestNo);
             if (codeEmpId) {
               this.signalrService.ticketStatusNotifyByEmpId(ticketId, codeEmpId, 'Approved');
             }
