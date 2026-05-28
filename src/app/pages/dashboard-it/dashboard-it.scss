@@ -1313,7 +1313,7 @@
   color: var(--text-header);
 
   i {
-    padding-right: 20px;
+    padding-right: 15px;
   }
 
   span:not(.category) {
@@ -1328,6 +1328,9 @@
     transition:
       background 0.2s,
       color 0.2s;
+    border: 1px solid rgba(24, 144, 255, 0.2);
+    border-radius: 999px;
+    background: rgba(24, 144, 255, 0.2);
 
     &:hover {
       color: var(--primary);
@@ -1698,15 +1701,27 @@
   font-weight: 800;
 }
 
-.floating-chat__ticket-no {
-  font-size: 0.78rem;
-  font-weight: 600;
-  opacity: 0.75;
-  background: rgba(255, 255, 255, 0.15);
-  border-radius: 999px;
-  padding: 2px 9px;
-  letter-spacing: 0.02em;
+.floating-chat__label {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  line-height: 1.1;
 }
+
+.floating-chat__ticket-no {
+  font-size: 10px;
+  opacity: 0.7;
+}
+
+// .floating-chat__ticket-no {
+//   font-size: 0.78rem;
+//   font-weight: 600;
+//   opacity: 0.75;
+//   background: rgba(255, 255, 255, 0.15);
+//   border-radius: 999px;
+//   padding: 2px 9px;
+//   letter-spacing: 0.02em;
+// }
 
 .floating-chat__summary {
   border: 1px solid rgba(255, 255, 255, 0.26);
