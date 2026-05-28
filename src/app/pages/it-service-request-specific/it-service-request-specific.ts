@@ -892,7 +892,7 @@ export class ITServiceRequestSpecificComponent implements OnInit {
             `แผนก : ${person.freelance.department?.COSTCENT}-${person.freelance.department?.NAMECOSTCENT}`,
             `ตำแหน่ง : ${person.freelance.position}`,
             `อีเมล : ${person.freelance.email}`,
-            `เบอร์ : ${person.freelance.phone}`,
+            `เบอร์ : ${person.phone}`,
           );
         } else {
           sections.push(`${index + 1}. ${person.openFor?.label}`);
