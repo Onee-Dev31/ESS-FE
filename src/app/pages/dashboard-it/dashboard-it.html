@@ -252,7 +252,7 @@
       <div class="tk-card__title">
         รายละเอียด
         <span (click)="openAllAttachments(t.attachments)" *ngIf="t.attachments.length > 0"
-          ><i class="far fa-eye"></i> ดูไฟล์แนบ ({{ t.attachments?.length }} ไฟล์)</span
+          ><i class="fa-solid fa-paperclip"></i> {{ t.attachments?.length }} ไฟล์</span
         >
       </div>
       <div class="services">
@@ -414,10 +414,17 @@
         <div class="floating-chat__header">
           <div class="floating-chat__title">
             <i class="fa-solid fa-comments"></i>
-            <span>Chat</span>
+            <!-- <span>Chat</span>
             @if (t.ticketNumber) {
               <span class="floating-chat__ticket-no">#{{ t.ticketNumber }}</span>
-            }
+            } -->
+            <div class="floating-chat__label">
+              <span>Chat</span>
+
+              @if (t.ticketNumber) {
+                <span class="floating-chat__ticket-no"> #{{ t.ticketNumber }} </span>
+              }
+            </div>
             @if (getChatAttachmentCount(t) > 0) {
               <button
                 class="floating-chat__summary"
