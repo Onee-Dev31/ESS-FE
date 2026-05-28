@@ -6,10 +6,12 @@ import { menuGuard, roleGuard } from './guards/role-guard';
 import { USER_ROLES } from './constants/user-roles.constant';
 import { ValidateLoginSso } from './pages/validate/validate-login-sso/validate-login-sso';
 import { LoginVersion1 } from './pages/login-version1/login-version1';
+import { LoginVersion2 } from './pages/login-version2/login-version2';
 
 export const routes: Routes = [
   { path: 'login', component: LoginComponent },
   { path: 'login-v1', component: LoginVersion1 },
+  { path: 'login-v2', component: LoginVersion2 },
   { path: 'validate/loginSSO', component: ValidateLoginSso },
   {
     path: 'qr-confirm',
