@@ -1,5 +1,14 @@
 import { CommonModule, formatDate } from '@angular/common';
-import { Component, computed, Inject, inject, PLATFORM_ID, signal } from '@angular/core';
+import {
+  Component,
+  computed,
+  ElementRef,
+  Inject,
+  inject,
+  PLATFORM_ID,
+  signal,
+  ViewChild,
+} from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { NzButtonModule } from 'ng-zorro-antd/button';
 import { PageHeaderComponent } from '../../components/shared/page-header/page-header';
@@ -20,6 +29,7 @@ import { SkeletonComponent } from '../../components/shared/skeleton/skeleton';
 import { SettingEmployeePermissionRoleForm } from '../../components/features/setting-employee-permission-role-form/setting-employee-permission-role-form';
 import { SettingService } from '../../services/setting.service';
 import { environment } from '../../../environments/environment';
+import { SignatureModal } from './signature-modal/signature-modal';
 @Component({
   selector: 'app-setting-employee',
   imports: [
@@ -33,6 +43,7 @@ import { environment } from '../../../environments/environment';
     PaginationComponent,
     NzSelectModule,
     SettingEmployeePermissionRoleForm,
+    SignatureModal,
   ],
   templateUrl: './setting-employee.html',
   styleUrl: './setting-employee.scss',
@@ -159,7 +170,7 @@ export class SettingEmployee {
   }
 
   private mapApiData(items: any[]): any[] {
-    // console.log("items >> ", items)
+    console.log('items >> ', items);
     return items.map((item: any) => ({
       empCode: item.UserID,
       fullNameTh: item.FullNameThai,
@@ -167,6 +178,9 @@ export class SettingEmployee {
       department: item.DEPARTMENT,
       company: item.COMPANY_NAME + ' [' + item.COMPANY_CODE + ']',
       adUser: item.ADUsername,
+      position: item.POSITION,
+      phone: item.TELOFF || item.MOBILE,
+
       // firstNameTh: item.NAMFIRSTT,
       // lastNameTh: item.NAMLASTT,
       // firstNameEn: item.NAMFIRSTE,
@@ -291,5 +305,21 @@ export class SettingEmployee {
         console.error('Error fetching data:', error);
       },
     });
+  }
+
+  // SIGNATURE
+  isSignatureModalOpen = signal(false);
+
+  selectedSignatureEmp = signal<any>(null);
+
+  openSignatureModal(emp: any) {
+    console.log(emp);
+    this.selectedSignatureEmp.set(emp);
+
+    this.isSignatureModalOpen.set(true);
+  }
+
+  closeSignatureModal() {
+    this.isSignatureModalOpen.set(false);
   }
 }

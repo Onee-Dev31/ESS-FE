@@ -1172,3 +1172,251 @@ $border: var(--border);
 //     background-color: #ffffff;
 //     border: 1px solid #cfcfcf00;
 // }
+
+/* =========================================================
+   SIGNATURE BUTTON
+========================================================= */
+
+.action-buttons {
+  display: flex;
+  gap: 10px;
+}
+
+.btn-signature,
+.btn-signature-sm {
+  border: none;
+
+  height: 40px;
+
+  padding: 0 16px;
+
+  border-radius: 12px;
+
+  background: linear-gradient(135deg, #5b7cff, #365dff);
+
+  color: white;
+
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition: 0.2s;
+
+  i {
+    margin-right: 8px;
+  }
+
+  &:hover {
+    transform: translateY(-1px);
+  }
+}
+
+/* =========================================================
+   SIGNATURE MODAL
+========================================================= */
+
+.signature-modal-backdrop {
+  position: fixed;
+  inset: 0;
+
+  z-index: 9999;
+
+  background: rgba(10, 18, 40, 0.55);
+
+  backdrop-filter: blur(8px);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 24px;
+}
+
+.signature-modal {
+  width: min(920px, 100%);
+
+  border-radius: 28px;
+
+  overflow: hidden;
+
+  background: white;
+
+  box-shadow: 0 40px 100px rgba(0, 0, 0, 0.25);
+
+  animation: modalUp 0.22s ease;
+}
+
+.signature-modal-header {
+  height: 84px;
+
+  padding: 0 28px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  border-bottom: 1px solid #edf1fa;
+}
+
+.modal-icon {
+  width: 54px;
+  height: 54px;
+
+  border-radius: 16px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: linear-gradient(135deg, #5d7fff, #315eff);
+
+  color: white;
+
+  font-size: 1.3rem;
+}
+
+.modal-title {
+  font-size: 1.2rem;
+  font-weight: 700;
+
+  color: #1c2f58;
+}
+
+.modal-subtitle {
+  color: #7d8ca9;
+
+  font-size: 0.92rem;
+}
+
+.btn-close-modal {
+  width: 42px;
+  height: 42px;
+
+  border: none;
+
+  border-radius: 12px;
+
+  background: #f5f7fc;
+
+  cursor: pointer;
+}
+
+.signature-modal-body {
+  padding: 28px;
+}
+
+.signature-user-card {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+
+  margin-bottom: 24px;
+
+  img {
+    width: 68px;
+    height: 68px;
+
+    border-radius: 50%;
+
+    object-fit: cover;
+  }
+}
+
+.emp-name {
+  font-size: 1.1rem;
+  font-weight: 700;
+
+  color: #22345d;
+}
+
+.emp-code {
+  color: #8090ae;
+}
+
+.canvas-wrapper {
+  position: relative;
+
+  height: 340px;
+
+  border-radius: 24px;
+
+  overflow: hidden;
+
+  background: linear-gradient(180deg, #ffffff, #f8fbff);
+
+  border: 2px dashed #d7e4ff;
+}
+
+.signature-canvas {
+  width: 100%;
+  height: 100%;
+
+  cursor: crosshair;
+}
+
+.canvas-placeholder {
+  position: absolute;
+  inset: 0;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  pointer-events: none;
+
+  color: #9fb0d0;
+
+  i {
+    font-size: 3rem;
+
+    margin-bottom: 14px;
+  }
+}
+
+.signature-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 14px;
+
+  margin-top: 22px;
+}
+
+.btn-clear,
+.btn-save {
+  height: 48px;
+
+  padding: 0 24px;
+
+  border: none;
+
+  border-radius: 14px;
+
+  cursor: pointer;
+
+  font-weight: 700;
+}
+
+.btn-clear {
+  background: #eef3ff;
+
+  color: #4364b3;
+}
+
+.btn-save {
+  background: linear-gradient(135deg, #5c7eff, #2f5eff);
+
+  color: white;
+}
+
+@keyframes modalUp {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.98);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}

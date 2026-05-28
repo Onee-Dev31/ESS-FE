@@ -1,0 +1,166 @@
+<nz-modal
+  [nzVisible]="true"
+  [nzWidth]="1200"
+  nzCentered
+  [nzFooter]="null"
+  [nzMaskClosable]="false"
+  [nzClosable]="false"
+  class="signature-modal"
+  (nzOnCancel)="close()"
+>
+  <ng-container *nzModalContent>
+    <div class="save-sig-wrapper modal-mode">
+      <!-- Header -->
+      <div class="sig-page-header">
+        <div class="header-left">
+          <div class="page-icon">
+            <i class="fas fa-signature"></i>
+          </div>
+
+          <div>
+            <h1 class="page-title">จัดการลายเซ็น</h1>
+
+            <p class="page-subtitle">Signature Management</p>
+          </div>
+        </div>
+
+        <button class="btn-close" (click)="close()">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+
+      <div class="content-layout">
+        <!-- LEFT -->
+        <div class="info-panel">
+          <div class="info-section">
+            <div class="section-header">
+              <i class="fas fa-user"></i>
+
+              ข้อมูลพนักงาน
+            </div>
+
+            <div class="section-content">
+              <div class="login-user-card">
+                <div class="login-avatar">
+                  <i class="fas fa-user-circle"></i>
+                </div>
+
+                <div class="login-meta">
+                  <div class="login-name-th">
+                    {{ employee()?.fullNameTh }}
+                  </div>
+
+                  <div class="login-name-en">
+                    {{ employee()?.fullNameEn || '-' }}
+                  </div>
+
+                  <div class="login-ad">
+                    <i class="fas fa-id-badge"></i>
+
+                    {{ employee()?.empCode }}
+                  </div>
+                </div>
+              </div>
+
+              <div class="login-details">
+                <div class="info-row">
+                  <div class="info-label">
+                    <i class="fas fa-building"></i>
+
+                    แผนก
+                  </div>
+
+                  <div class="info-value text-value">
+                    {{ employee()?.department || '-' }}
+                  </div>
+                </div>
+
+                <div class="info-row">
+                  <div class="info-label"><i class="fas fa-city"></i> บริษัท</div>
+                  <div class="info-value text-value">{{ employee()?.company || '-' }}</div>
+                </div>
+
+                <div class="info-row">
+                  <div class="info-label">
+                    <i class="fas fa-briefcase"></i>
+
+                    ตำแหน่ง
+                  </div>
+
+                  <div class="info-value text-value">
+                    {{ employee()?.position || '-' }}
+                  </div>
+                </div>
+
+                <div class="info-row">
+                  <div class="info-label">
+                    <i class="fas fa-phone"></i>
+
+                    โทรศัพท์
+                  </div>
+
+                  <div class="info-value text-value">
+                    {{ employee()?.phone || '-' }}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- RIGHT -->
+        <div class="signature-panel">
+          <div class="section-header">
+            <i class="fas fa-pen-nib"></i>
+
+            ลายเซนต์
+
+            <span class="sub">(Signature Pad)</span>
+          </div>
+
+          <div class="canvas-wrapper" [class.has-signature]="hasSignature()">
+            <canvas
+              #signatureCanvas
+              class="signature-canvas"
+              (mousedown)="startDrawing($event)"
+              (mousemove)="draw($event)"
+              (mouseup)="stopDrawing()"
+              (mouseleave)="stopDrawing()"
+              (touchstart)="startDrawing($event)"
+              (touchmove)="draw($event)"
+              (touchend)="stopDrawing()"
+            ></canvas>
+
+            @if (!hasSignature()) {
+              <div class="canvas-placeholder">
+                <i class="fas fa-signature"></i>
+
+                <span>เซนชื่อในพื้นที่นี้</span>
+              </div>
+            }
+          </div>
+
+          <div class="signature-actions">
+            <button class="btn-clear" (click)="clearSignature()" [disabled]="!hasSignature()">
+              <i class="fas fa-eraser"></i>
+
+              ล้าง
+            </button>
+
+            <button class="btn-save" (click)="saveSignature()">
+              <i class="fas fa-save"></i>
+
+              บันทึก Signature
+            </button>
+          </div>
+
+          <p class="signature-note">
+            <i class="fas fa-info-circle"></i>
+
+            ลายเซนต์จะถูกบันทึกเป็นรูปภาพ PNG
+          </p>
+        </div>
+      </div>
+    </div>
+  </ng-container>
+</nz-modal>
