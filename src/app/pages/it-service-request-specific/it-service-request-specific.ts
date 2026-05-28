@@ -442,6 +442,7 @@ export class ITServiceRequestSpecificComponent implements OnInit {
       formData.append('openForType', 'freelance');
     }
 
+    formData.append('subject', 'ขอใช้ระบบเฉพาะ');
     formData.append('description', this.summaryText());
     formData.append('requesterAduser', this.authService.currentUser() || '-');
     formData.append('contactPhone', this.phoneNumber());
@@ -892,7 +893,7 @@ export class ITServiceRequestSpecificComponent implements OnInit {
             `แผนก : ${person.freelance.department?.COSTCENT}-${person.freelance.department?.NAMECOSTCENT}`,
             `ตำแหน่ง : ${person.freelance.position}`,
             `อีเมล : ${person.freelance.email}`,
-            `เบอร์ : ${person.freelance.phone}`,
+            `เบอร์ : ${person.phone}`,
           );
         } else {
           sections.push(`${index + 1}. ${person.openFor?.label}`);
@@ -905,7 +906,7 @@ export class ITServiceRequestSpecificComponent implements OnInit {
         // =========================
 
         if (person.systems.includes('oracle') && person.oracle) {
-          sections.push('<div class="summary-system-title">ระบบ : Oracle</div>');
+          sections.push('[ ระบบ : Oracle ]');
 
           person.oracle.companies.forEach((companyItem: any) => {
             if (companyItem.company) {
@@ -931,7 +932,7 @@ export class ITServiceRequestSpecificComponent implements OnInit {
         // =========================
 
         if (person.systems.includes('bms') && person.bms) {
-          sections.push('<div class="summary-system-title">ระบบ : BMS</div>');
+          sections.push('[ ระบบ : BMS ]');
 
           person.bms.companies.forEach((company: any) => {
             sections.push(`${company.COMPANY_NAME} (${company.COMPANY_CODE})`);
@@ -949,7 +950,7 @@ export class ITServiceRequestSpecificComponent implements OnInit {
         // =========================
 
         if (person.systems.includes('onePortal') && person.onePortal) {
-          sections.push('<div class="summary-system-title">ระบบ : One Portal</div>');
+          sections.push('[ ระบบ : One Portal ]');
 
           person.onePortal.companies.forEach((company: any) => {
             sections.push(`${company.COMPANY_NAME} (${company.COMPANY_CODE})`);
@@ -967,7 +968,7 @@ export class ITServiceRequestSpecificComponent implements OnInit {
         // =========================
 
         if (person.systems.includes('onee') && person.onee) {
-          sections.push('<div class="summary-system-title">ระบบ : OneE</div>');
+          sections.push('[ ระบบ : OneE ]');
 
           person.onee.companies.forEach((company: any) => {
             sections.push(`${company.COMPANY_NAME} (${company.COMPANY_CODE})`);
@@ -994,7 +995,7 @@ export class ITServiceRequestSpecificComponent implements OnInit {
 
         return sections.join('\n');
       })
-      .join('\n\n<hr>\n');
+      .join('\n\n=================================\n');
   }
 
   // Validate

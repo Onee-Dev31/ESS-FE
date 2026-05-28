@@ -188,6 +188,12 @@ export class ITServiceRequestComponent implements OnInit {
     this.selectedOpenFor.set({ value, label: option?.label ?? '' });
     if (value === '__FREELANCE__') {
       this.isAnnounceChooseFreelance.set(true);
+
+      // เอา service id 22 ออก
+      this.serviceOptions.update((services) =>
+        services.map((s) => (s.id === 22 ? { ...s, checked: false } : s)),
+      );
+
       setTimeout(() => {
         this.detailTextarea.nativeElement.focus();
         this.detailTextarea.nativeElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -703,10 +709,22 @@ export class ITServiceRequestComponent implements OnInit {
 
   showEmpAdForm = false;
   requestUserData: any = null;
+  // onServiceChange(index: number, service: any) {
+  //   this.toggleService(index);
+
+  //   if (service.id === 22 && service.checked) {
+  //     this.showEmpAdForm = true;
+  //   }
+  // }
+
   onServiceChange(index: number, service: any) {
     this.toggleService(index);
 
-    if (service.id === 22 && service.checked) {
+    const isRequestUserService = service.id === 22;
+    const isChecked = service.checked;
+    const isFreelance = this.selectedOpenFor()?.value === '__FREELANCE__';
+
+    if (isRequestUserService && isChecked && isFreelance) {
       this.showEmpAdForm = true;
     }
   }
@@ -731,6 +749,8 @@ export class ITServiceRequestComponent implements OnInit {
     this.requestUserData = data;
 
     const requestUserDetail = `
+        FREELANCE
+
         ชื่อ-นามสกุลภาษาไทย : ${data.NAMETHAI}
 
         ชื่อ-นามสกุลภาษาอังกฤษ : ${data.TITLEENG ?? ''} ${data.NAMEENG}
