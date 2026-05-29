@@ -1691,6 +1691,10 @@
   justify-content: space-between;
   gap: 12px;
   flex-shrink: 0;
+
+  @include mobile {
+    gap: 0px;
+  }
 }
 
 .floating-chat__title {
@@ -1699,6 +1703,10 @@
   gap: 10px;
   font-size: 0.95rem;
   font-weight: 800;
+
+  @include mobile {
+    gap: 6px;
+  }
 }
 
 .floating-chat__label {
@@ -1732,6 +1740,7 @@
   align-items: center;
   gap: 6px;
   padding: 4px 9px;
+  height: 30px;
   cursor: pointer;
   font-size: 0.78rem;
   font-weight: 700;
