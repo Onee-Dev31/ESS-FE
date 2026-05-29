@@ -901,7 +901,10 @@ export class ITServiceRequestSpecificComponent implements OnInit {
             `เบอร์ : ${person.phone}`,
           );
         } else {
-          sections.push(`${index + 1}. ${person.openFor?.label}`);
+          sections.push(
+            `${index + 1}. ${person.openFor?.label}`,
+            `${person.openFor?.labelEN.split('-')[1]}`,
+          );
         }
 
         sections.push('');
@@ -1330,6 +1333,7 @@ export class ITServiceRequestSpecificComponent implements OnInit {
       .getOpenFor({ currentEmpId: this.authService.userData().CODEMPID })
       .subscribe({
         next: (res) => {
+          console.log(res);
           this.openForOptions.set(res.data);
 
           const defaultOption = this.openForOptions().find(
