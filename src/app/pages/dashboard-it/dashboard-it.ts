@@ -736,6 +736,10 @@ export class DashboardIT implements OnInit {
     this.prevTicketIds = new Set(this.Tickets().map((t: any) => t.ticketId));
     // console.log(this.prevTicketIds);
     this.getAllTickets(true);
+    const zone = document.getElementById('tickets-zone');
+    if (zone) {
+      zone.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
   }
 
   onStatusChange(status: string | null) {
