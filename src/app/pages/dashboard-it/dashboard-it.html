@@ -269,8 +269,19 @@
     </div>
     <div class="tk-card__body">
       <div class="tk-text" [innerHTML]="formatText.getFormatTextHTML(t.description)"></div>
+      <div class="btn-copy-detail" (click)="copyDescription(t.description)">
+        <i
+          class="fa-solid"
+          [class.fa-copy]="copiedText !== t.description"
+          [class.fa-check]="copiedText === t.description"
+        ></i>
+
+        {{ copiedText === t.description ? 'คัดลอกแล้ว' : 'คัดลอก' }}
+      </div>
+
       <div class="btn-expand-detail" (click)="openDetail(t.description)">
-        <i class="fa-solid fa-expand"></i>ดูรายละเอียดเพิ่มเติม
+        <i class="fa-solid fa-expand"></i>
+        ดูรายละเอียดเพิ่มเติม
       </div>
     </div>
   </section>
@@ -954,7 +965,19 @@
       </div>
       <div class="content-card">
         <div [innerHTML]="formatText.getFormatTextHTML(selectedDetail())"></div>
-        <!-- style="overflow: auto !important; width: 100%" -->
+        <div
+          type="button"
+          class="btn-copy-detail expand"
+          (click)="copyDescription(selectedDetail())"
+        >
+          <i
+            class="fa-solid"
+            [class.fa-copy]="copiedText !== selectedDetail()"
+            [class.fa-check]="copiedText === selectedDetail()"
+          ></i>
+
+          {{ copiedText === selectedDetail() ? 'คัดลอกแล้ว' : 'คัดลอก' }}
+        </div>
       </div>
     </div>
   </div>

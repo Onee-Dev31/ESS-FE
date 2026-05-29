@@ -170,6 +170,7 @@
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
     overflow-y: auto;
     max-height: calc(100vh - 180px);
+    position: relative;
 
     .selection-placeholder {
       margin: 2.5rem 0;
@@ -3209,6 +3210,32 @@
 
   &:hover {
     opacity: 0.8;
+  }
+}
+
+.btn-copy-detail {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  font-size: 12px;
+  color: var(--primary) !important;
+  position: absolute;
+  right: 20px;
+  top: 45px;
+
+  &:hover {
+    opacity: 0.8;
+  }
+  transition: all 0.2s ease;
+}
+
+.btn-copy-detail.expand {
+  top: 22px;
+
+  @include mobile {
+    top: 8px;
   }
 }
 
