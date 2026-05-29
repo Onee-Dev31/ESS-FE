@@ -1379,15 +1379,34 @@ export class DashboardIT implements OnInit {
 
   copiedText: string | null = null;
 
+  // copyDescription(text: string) {
+  //   navigator.clipboard.writeText(text);
+
+  //   this.copiedText = text;
+
+  //   setTimeout(() => {
+  //     if (this.copiedText === text) {
+  //       this.copiedText = null;
+  //     }
+  //     this.cdr.detectChanges();
+  //   }, 2000);
+  // }
+
   copyDescription(text: string) {
-    navigator.clipboard.writeText(text);
+    const textarea = document.createElement('textarea');
+    textarea.value = text;
+
+    document.body.appendChild(textarea);
+    textarea.select();
+
+    document.execCommand('copy');
+
+    document.body.removeChild(textarea);
 
     this.copiedText = text;
 
     setTimeout(() => {
-      if (this.copiedText === text) {
-        this.copiedText = null;
-      }
+      this.copiedText = '';
       this.cdr.detectChanges();
     }, 2000);
   }

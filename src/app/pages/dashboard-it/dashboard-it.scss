@@ -3223,12 +3223,16 @@
   color: var(--primary) !important;
   position: absolute;
   right: 20px;
-  top: 45px;
+  top: 55px;
 
   &:hover {
     opacity: 0.8;
   }
   transition: all 0.2s ease;
+
+  @media (min-width: 1024px) and (max-width: 1440px) {
+    top: 45px;
+  }
 }
 
 .btn-copy-detail.expand {
