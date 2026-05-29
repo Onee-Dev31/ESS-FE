@@ -152,6 +152,7 @@ export class ITServiceRequestSpecificComponent implements OnInit {
     { key: 'onee', label: 'OneE', icon: 'fa-layer-group' },
     { key: 'onePortal', label: 'One Portal', icon: 'fa-globe' },
   ];
+
   oracleModules: any;
   oraclePermissions: any;
   oneePermissions: any;
@@ -221,8 +222,58 @@ export class ITServiceRequestSpecificComponent implements OnInit {
       this.clearFreelanceErrors(person);
     }
 
+    const hasAdUser = value?.AD_USER && value.AD_USER.toString().trim() !== '';
+
+    // ไม่มี AD_USER => เอา BMS และ One Portal ออก
+    if (!hasAdUser) {
+      person.systems = person.systems.filter(
+        (system: string) => !['bms', 'onePortal', 'onee'].includes(system),
+      );
+
+      // reset ค่า BMS
+      person.bms = {
+        companies: [],
+        detail: null,
+      };
+
+      // reset ค่า One Portal
+      person.onePortal = {
+        companies: [],
+        role: null,
+        responseType: null,
+      };
+
+      person.onee = {
+        companies: [],
+        permission: '',
+        supervisor: '',
+      };
+
+      delete person.errors?.['bms_companies'];
+      delete person.errors?.['bms_detail'];
+      delete person.errors?.['oneportal_companies'];
+      delete person.errors?.['oneportal_role'];
+      delete person.errors?.['oneportal_response_type'];
+      delete person.errors?.['onee_companies'];
+      delete person.errors?.['onee_permission'];
+      delete person.errors?.['onee_supervisor'];
+    }
+
     this.touchSpecificPeople();
   }
+
+  // onSpecificOpenForChange(person: any, value: any) {
+  //   person.openFor = value;
+
+  //   const isFreelance = value?.value === '__FREELANCE__';
+
+  //   // ถ้าเปลี่ยนออกจาก freelance
+  //   if (!isFreelance) {
+  //     this.clearFreelanceErrors(person);
+  //   }
+
+  //   this.touchSpecificPeople();
+  // }
 
   touchSpecificPeople() {
     this.specificPeople.set([...this.specificPeople()]);
@@ -864,7 +915,10 @@ export class ITServiceRequestSpecificComponent implements OnInit {
       .filter((x: any) => x !== currentItem && x.company)
       .map((x: any) => x.company.COMPANY_CODE);
 
-    return this.companyList.filter((company: any) => !selectedCodes.includes(company.COMPANY_CODE));
+    return this.companyList.filter(
+      (company: any) =>
+        company.COMPANY_CODE !== 'GTH' && !selectedCodes.includes(company.COMPANY_CODE),
+    );
   }
 
   getAvailableOpenForOptions(currentPerson: any) {

@@ -307,6 +307,18 @@
                     type="button"
                     class="system-choice"
                     [class.active]="person.systems.includes(system.key)"
+                    [class.disabled]="
+                      (system.key === 'bms' ||
+                        system.key === 'onePortal' ||
+                        system.key === 'onee') &&
+                      !person.openFor?.AD_USER
+                    "
+                    [disabled]="
+                      (system.key === 'bms' ||
+                        system.key === 'onePortal' ||
+                        system.key === 'onee') &&
+                      !person.openFor?.AD_USER
+                    "
                     (click)="togglePersonSystem(person, system.key)"
                   >
                     <i class="fas" [class]="system.icon"></i>

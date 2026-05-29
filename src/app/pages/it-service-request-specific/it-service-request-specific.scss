@@ -1589,11 +1589,17 @@ $table-label-bg: var(--border-toolbar);
   transition: 0.2s;
   font-size: $font-size-label;
 
-  &:hover,
+  &:not(:disabled):hover,
   &.active {
     background: var(--primary);
     color: #fff;
     border-color: var(--primary);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    pointer-events: none;
   }
 }
 
