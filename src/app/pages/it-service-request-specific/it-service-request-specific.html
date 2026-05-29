@@ -464,7 +464,7 @@
 
                     <div class="form-field">
                       <label>สิทธิ์เหมือนใคร</label>
-                      <input
+                      <!-- <input
                         class="form-input"
                         placeholder="สิทธิ์เหมือนใคร"
                         [(ngModel)]="person.bms.detail"
@@ -472,7 +472,21 @@
                         [name]="'bmsCompany' + person.id"
                         (input)="validateBmsDetail($event, person)"
                         (focus)="validateBmsDetail($event, person)"
-                      />
+                      /> -->
+                      <nz-select
+                        nzShowSearch
+                        nzAllowClear
+                        nzPlaceHolder="เลือกพนักงาน"
+                        class="form-input"
+                        [(ngModel)]="person.bms.detail"
+                        [name]="'bmsDetail' + person.id"
+                        (ngModelChange)="validateBmsDetail($event, person)"
+                        (nzBlur)="validateBmsDetail(person.bms.detail, person)"
+                      >
+                        @for (opt of openForOptions_noFreelance(); track opt.value) {
+                          <nz-option [nzLabel]="opt.label" [nzValue]="opt" />
+                        }
+                      </nz-select>
                       @if (person.errors?.['bms_detail']) {
                         <span class="error">
                           {{ person.errors?.['bms_detail'] }}
@@ -541,7 +555,7 @@
                     <div class="form-field">
                       <label>หัวหน้างาน</label>
 
-                      <input
+                      <!-- <input
                         nz-input
                         type="text"
                         class="form-input"
@@ -550,7 +564,23 @@
                         name="onee_supervisor"
                         (input)="validateOneeSupervisor($event, person)"
                         (focus)="validateOneeSupervisor($event, person)"
-                      />
+                      /> -->
+                      <nz-select
+                        nzShowSearch
+                        nzAllowClear
+                        nzPlaceHolder="เลือกหัวหน้างาน"
+                        [(ngModel)]="person.onee.supervisor"
+                        name="onee_supervisor"
+                        class="form-input"
+                        (ngModelChange)="validateOneeSupervisor($event, person)"
+                        (nzBlur)="validateOneeSupervisor(person.onee.supervisor, person)"
+                      >
+                        <nz-option
+                          *ngFor="let opt of openForOptions_noFreelance()"
+                          [nzLabel]="opt.label"
+                          [nzValue]="opt"
+                        />
+                      </nz-select>
                       @if (person.errors?.['onee_supervisor']) {
                         <span class="error">
                           {{ person.errors?.['onee_supervisor'] }}

@@ -25,6 +25,7 @@ import { decryptValue } from '../../utils/crypto.js ';
 import { SignalrService } from '../../services/signalr.service';
 import { MasterDataService } from '../../services/master-data.service';
 import { formatText } from '../../utils/formatText';
+import { SettingService } from '../../services/setting.service';
 
 type SpecificSystemKey = 'bms' | 'oracle' | 'onee' | 'onePortal';
 
@@ -99,6 +100,7 @@ export class ITServiceRequestSpecificComponent implements OnInit {
   // Inject Services
   private swalService = inject(SwalService);
   private masterService = inject(MasterDataService);
+  private settingService = inject(SettingService);
   private userService = inject(UserService);
   private itServiceMock = inject(ItServiceMockService);
   private itServiceService = inject(ItServiceService);
@@ -127,10 +129,8 @@ export class ITServiceRequestSpecificComponent implements OnInit {
   userSubOptions = signal<any[]>([]);
   systemSubOptions = signal<any[]>([]);
   openForOptions = signal<any[]>([]);
-  // selectedOpenFor = signal<{ value: string; label: string }>({
-  //   value: this.authService.userData().CODEMPID,
-  //   label: '',
-  // });
+  deptHeads: any[] = [];
+
   openforOneejob: string = '';
   isAnnounceChooseFreelance = signal<boolean>(false);
   // isFreelanceSelected = computed(() => this.selectedOpenFor().value === '__FREELANCE__');
@@ -157,12 +157,14 @@ export class ITServiceRequestSpecificComponent implements OnInit {
   oneePermissions: any;
   onePortalResponseTypes: any;
   onePortalRole: any;
+  openForOptions_noFreelance = signal<any[]>([]);
 
   ngOnInit() {
     this.getOpenFor();
     this.getCompanies();
     this.getDepartments();
     this.getMasterPermission();
+    this.getDeptHeads();
 
     const userData = this.authService.userData();
     if (userData?.TELOFF) {
@@ -247,9 +249,49 @@ export class ITServiceRequestSpecificComponent implements OnInit {
       if (system === 'oracle' && person.oracle.companies.length === 0) {
         this.addOracleCompany(person);
       }
+      if (system === 'onee') {
+        this.autoSelectOneeSupervisor(person);
+      }
     }
 
     this.touchSpecificPeople();
+  }
+
+  autoSelectOneeSupervisor(person: any) {
+    if (person.openFor?.value === '__FREELANCE__') {
+      return;
+    }
+
+    const costCent =
+      person.openFor?.COSTCENT || person.openFor?.costCent || person.openFor?.costcent;
+
+    if (!costCent) {
+      return;
+    }
+
+    const dept = this.deptHeads.find((item: any) => item.cost_cent === costCent);
+
+    if (!dept) {
+      return;
+    }
+
+    const level1 = dept.heads?.find((head: any) => head.level === 1);
+
+    if (!level1) {
+      return;
+    }
+
+    const supervisor = this.openForOptions_noFreelance().find(
+      (emp: any) => emp.value === level1.code,
+    );
+
+    if (supervisor) {
+      person.onee.supervisor = supervisor;
+
+      delete person.errors?.['onee_supervisor'];
+
+      this.touchSpecificPeople();
+    }
   }
 
   getOpenForLabel(value: string): string {
@@ -663,13 +705,14 @@ export class ITServiceRequestSpecificComponent implements OnInit {
   }
 
   addOracleCompany(person: any) {
-    // console.log(this.oracleModules);
+    const firstCompany = person.oracle.companies?.[0];
+
     person.oracle.companies.push({
       company: null,
-
       modules: this.oracleModules.map((item: any) => ({
         module: item.ModuleCode,
-        permission: '-',
+        permission:
+          firstCompany?.modules?.find((m: any) => m.module === item.ModuleCode)?.permission ?? '-',
       })),
     });
 
@@ -748,7 +791,7 @@ export class ITServiceRequestSpecificComponent implements OnInit {
       if (
         !person.onee.companies?.length ||
         !person.onee.permission?.trim() ||
-        !person.onee.supervisor?.trim()
+        !person.onee.supervisor
       ) {
         return false;
       }
@@ -759,7 +802,7 @@ export class ITServiceRequestSpecificComponent implements OnInit {
     // =========================
 
     if (person.systems.includes('bms')) {
-      if (!person.bms.companies?.length || !person.bms.detail?.trim()) {
+      if (!person.bms.companies?.length || !person.bms.detail) {
         return false;
       }
     }
@@ -947,7 +990,7 @@ export class ITServiceRequestSpecificComponent implements OnInit {
           });
 
           if (person.bms.detail) {
-            sections.push(`สิทธิ์เหมือน : ${person.bms.detail}`);
+            sections.push(`สิทธิ์เหมือน : ${person.bms.detail.label}`);
           }
 
           sections.push('');
@@ -991,7 +1034,7 @@ export class ITServiceRequestSpecificComponent implements OnInit {
           }
 
           if (person.onee.supervisor) {
-            sections.push(`หัวหน้างาน : ${person.onee.supervisor.trim()}`);
+            sections.push(`หัวหน้างาน : ${person.onee.supervisor.label}`);
           }
 
           sections.push('');
@@ -1165,17 +1208,30 @@ export class ITServiceRequestSpecificComponent implements OnInit {
 
     this.touchSpecificPeople();
   }
-  validateBmsDetail(event: Event, person: any) {
-    const input = event.target as HTMLInputElement;
+  // validateBmsDetail(event: Event, person: any) {
+  //   const input = event.target as HTMLInputElement;
 
-    const value = input.value.trim();
+  //   const value = input.value.trim();
 
+  //   person.bms.detail = value;
+
+  //   person.errors ??= {};
+
+  //   if (!value) {
+  //     person.errors['bms_detail'] = 'กรุณากรอกสิทธิ์';
+  //   } else {
+  //     delete person.errors['bms_detail'];
+  //   }
+
+  //   this.touchSpecificPeople();
+  // }
+  validateBmsDetail(value: any, person: any) {
     person.bms.detail = value;
 
     person.errors ??= {};
 
     if (!value) {
-      person.errors['bms_detail'] = 'กรุณากรอกสิทธิ์';
+      person.errors['bms_detail'] = 'กรุณาเลือกพนักงาน';
     } else {
       delete person.errors['bms_detail'];
     }
@@ -1204,17 +1260,30 @@ export class ITServiceRequestSpecificComponent implements OnInit {
 
     this.touchSpecificPeople();
   }
-  validateOneeSupervisor(event: Event, person: any) {
-    const input = event.target as HTMLInputElement;
+  // validateOneeSupervisor(event: Event, person: any) {
+  //   const input = event.target as HTMLInputElement;
 
-    const value = input.value.trim();
+  //   const value = input.value.trim();
 
+  //   person.onee.supervisor = value;
+
+  //   person.errors ??= {};
+
+  //   if (!value) {
+  //     person.errors['onee_supervisor'] = 'กรุณากรอกหัวหน้างาน';
+  //   } else {
+  //     delete person.errors['onee_supervisor'];
+  //   }
+
+  //   this.touchSpecificPeople();
+  // }
+  validateOneeSupervisor(value: any, person: any) {
     person.onee.supervisor = value;
 
     person.errors ??= {};
 
     if (!value) {
-      person.errors['onee_supervisor'] = 'กรุณากรอกหัวหน้างาน';
+      person.errors['onee_supervisor'] = 'กรุณาเลือกหัวหน้างาน';
     } else {
       delete person.errors['onee_supervisor'];
     }
@@ -1336,6 +1405,10 @@ export class ITServiceRequestSpecificComponent implements OnInit {
           console.log(res);
           this.openForOptions.set(res.data);
 
+          this.openForOptions_noFreelance.set(
+            res.data.filter((item: any) => item.value !== '__FREELANCE__'),
+          );
+
           const defaultOption = this.openForOptions().find(
             (opt) => opt.value === this.authService.userData().CODEMPID,
           );
@@ -1359,5 +1432,15 @@ export class ITServiceRequestSpecificComponent implements OnInit {
           console.error('Error fetching data:', error);
         },
       });
+  }
+  getDeptHeads() {
+    this.settingService.getDeptHeads().subscribe({
+      next: (res) => {
+        this.deptHeads = res.data;
+      },
+      error: (err) => {
+        console.error(err);
+      },
+    });
   }
 }
