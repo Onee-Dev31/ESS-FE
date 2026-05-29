@@ -891,9 +891,9 @@ export class ITServiceRequestSpecificComponent implements OnInit {
   }
 
   private remapCompanyCode(code: string): string {
-    if (code === 'OTD') return 'ONEE';
-    if (code === 'OTV') return 'ONE31';
-    if (code === 'GMD') return 'ATM';
+    if (code === 'OTD') return 'ONE';
+    if (code === 'OTV') return 'O31';
+    if (code === 'ATM') return 'GMD';
     return code;
   }
 
