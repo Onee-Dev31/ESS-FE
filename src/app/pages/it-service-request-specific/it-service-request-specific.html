@@ -335,7 +335,7 @@
                         <div class="oracle-company-box">
                           <div class="oracle-company-header">
                             <div class="form-field oracle-company-select">
-                              <label>บริษัท</label>
+                              <label>บริษัทที่รับผิดชอบ</label>
 
                               <nz-select
                                 nzShowSearch
@@ -434,6 +434,7 @@
                   <div class="system-detail-card">
                     <h6 class="form-label">BMS</h6>
                     <div class="form-field">
+                      <label>บริษัทที่ใช้</label>
                       <nz-select
                         nzShowSearch
                         nzAllowClear
@@ -449,7 +450,7 @@
                       >
                         <!-- <nz-option nzLabel="เลือกบริษัท" nzValue="" nzDisabled /> -->
                         <nz-option
-                          *ngFor="let company of companyList"
+                          *ngFor="let company of companyList_bms"
                           [nzLabel]="company.COMPANY_NAME + ' (' + company.COMPANY_CODE + ')'"
                           [nzValue]="company"
                         />
@@ -462,6 +463,7 @@
                     </div>
 
                     <div class="form-field">
+                      <label>สิทธิ์เหมือนใคร</label>
                       <input
                         class="form-input"
                         placeholder="สิทธิ์เหมือนใคร"
@@ -484,6 +486,7 @@
                   <div class="system-detail-card">
                     <h6 class="form-label">OneE</h6>
                     <div class="form-field">
+                      <label>บริษัทที่รับผิดชอบ</label>
                       <nz-select
                         nzShowSearch
                         nzAllowClear
@@ -561,6 +564,7 @@
                   <div class="system-detail-card">
                     <h6 class="form-label">One Portal</h6>
                     <div class="form-field">
+                      <label>บริษัทที่รับผิดชอบ</label>
                       <nz-select
                         nzShowSearch
                         nzAllowClear
@@ -589,6 +593,30 @@
                     </div>
                     <div class="form-field">
                       <label>ประเภทสิทธิ์</label>
+
+                      <nz-select
+                        nzPlaceHolder="เลือกประเภท"
+                        [(ngModel)]="person.onePortal.role"
+                        name="portal_response_type"
+                        class="form-input"
+                        (ngModelChange)="validateOnePortalRole($event, person)"
+                        (nzBlur)="validateOnePortalRole(person.onePortal.role, person)"
+                      >
+                        @for (item of onePortalRole; track item) {
+                          <nz-option
+                            [nzValue]="item.RoleName"
+                            [nzLabel]="item.RoleName"
+                          ></nz-option>
+                        }
+                      </nz-select>
+                      @if (person.errors?.['oneportal_role']) {
+                        <span class="error">
+                          {{ person.errors?.['oneportal_role'] }}
+                        </span>
+                      }
+                    </div>
+                    <div class="form-field">
+                      <label>ประเภทรายการ</label>
 
                       <nz-select
                         nzPlaceHolder="เลือกประเภท"

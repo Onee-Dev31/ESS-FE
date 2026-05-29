@@ -78,6 +78,7 @@ interface SpecificPersonRequest {
 
   onePortal: {
     companies: any[];
+    role: string;
     responseType: string;
     supervisor: string;
   };
@@ -155,6 +156,7 @@ export class ITServiceRequestSpecificComponent implements OnInit {
   oraclePermissions: any;
   oneePermissions: any;
   onePortalResponseTypes: any;
+  onePortalRole: any;
 
   ngOnInit() {
     this.getOpenFor();
@@ -653,6 +655,7 @@ export class ITServiceRequestSpecificComponent implements OnInit {
 
       onePortal: {
         companies: [],
+        role: '',
         responseType: '',
         supervisor: '',
       },
@@ -808,6 +811,7 @@ export class ITServiceRequestSpecificComponent implements OnInit {
 
   // NEW!
   companyList: any[] = [];
+  companyList_bms: any[] = [];
   departmentList: any[] = [];
   filteredDepartmentList: any[] = [];
 
@@ -846,6 +850,7 @@ export class ITServiceRequestSpecificComponent implements OnInit {
   private remapCompanyCode(code: string): string {
     if (code === 'OTD') return 'ONEE';
     if (code === 'OTV') return 'ONE31';
+    if (code === 'GMD') return 'ATM';
     return code;
   }
 
@@ -956,8 +961,12 @@ export class ITServiceRequestSpecificComponent implements OnInit {
             sections.push(`${company.COMPANY_NAME} (${company.COMPANY_CODE})`);
           });
 
+          if (person.onePortal.role) {
+            sections.push(`ประเภทสิทธิ์ : ${person.onePortal.role}`);
+          }
+
           if (person.onePortal.responseType) {
-            sections.push(`ประเภทสิทธิ์ : ${person.onePortal.responseType}`);
+            sections.push(`ประเภทรายการ : ${person.onePortal.responseType}`);
           }
 
           sections.push('');
@@ -1220,6 +1229,17 @@ export class ITServiceRequestSpecificComponent implements OnInit {
 
     this.touchSpecificPeople();
   }
+  validateOnePortalRole(value: any, person: any) {
+    person.errors ??= {};
+
+    if (!value) {
+      person.errors['oneportal_role'] = 'กรุณาเลือกประเภทสิทธิ์';
+    } else {
+      delete person.errors['oneportal_role'];
+    }
+
+    this.touchSpecificPeople();
+  }
   validateOnePortalResponseType(value: any, person: any) {
     person.errors ??= {};
 
@@ -1251,6 +1271,7 @@ export class ITServiceRequestSpecificComponent implements OnInit {
         this.oraclePermissions = [{ ID: 0, RoleName: '-' }, ...data.Roles];
         this.oneePermissions = data.Permissions;
         this.onePortalResponseTypes = data.ResponseTypes;
+        this.onePortalRole = data.Roles_bms;
         this.specificPeople.set([this.createSpecificPerson()]);
       },
       error: (error) => {
@@ -1262,10 +1283,30 @@ export class ITServiceRequestSpecificComponent implements OnInit {
   getCompanies() {
     this.masterService.getCompanyMaster().subscribe({
       next: (data) => {
+        console.log(data);
         this.companyList = data.map((item: any) => ({
           ...item,
           COMPANY_CODE: this.remapCompanyCode(item.COMPANY_CODE),
         }));
+
+        this.companyList_bms = [
+          ...data
+            .filter((item: any) =>
+              ['OTV', 'GCH', 'GTV', 'CHA', 'ATM', 'NMP'].includes(item.COMPANY_CODE),
+            )
+            .map((item: any) => ({
+              ...item,
+              COMPANY_CODE: this.remapCompanyCode(item.COMPANY_CODE),
+            })),
+          {
+            COMPANY_CODE: 'GCH',
+            COMPANY_NAME: 'บริษัท จีเอ็มเอ็ม แชนแนล โฮลดิ้ง จำกัด',
+          },
+          {
+            COMPANY_CODE: 'NMP',
+            COMPANY_NAME: 'บริษัท นางแมวป่า จำกัด',
+          },
+        ];
       },
       error: (error) => {
         console.error('Error fetching data:', error);
