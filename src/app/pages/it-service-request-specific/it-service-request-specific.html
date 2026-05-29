@@ -335,7 +335,7 @@
                         <div class="oracle-company-box">
                           <div class="oracle-company-header">
                             <div class="form-field oracle-company-select">
-                              <label>บริษัท</label>
+                              <label>บริษัทที่รับผิดชอบ</label>
 
                               <nz-select
                                 nzShowSearch
@@ -434,6 +434,7 @@
                   <div class="system-detail-card">
                     <h6 class="form-label">BMS</h6>
                     <div class="form-field">
+                      <label>บริษัทที่ใช้</label>
                       <nz-select
                         nzShowSearch
                         nzAllowClear
@@ -449,7 +450,7 @@
                       >
                         <!-- <nz-option nzLabel="เลือกบริษัท" nzValue="" nzDisabled /> -->
                         <nz-option
-                          *ngFor="let company of companyList"
+                          *ngFor="let company of companyList_bms"
                           [nzLabel]="company.COMPANY_NAME + ' (' + company.COMPANY_CODE + ')'"
                           [nzValue]="company"
                         />
@@ -462,7 +463,8 @@
                     </div>
 
                     <div class="form-field">
-                      <input
+                      <label>สิทธิ์เหมือนใคร</label>
+                      <!-- <input
                         class="form-input"
                         placeholder="สิทธิ์เหมือนใคร"
                         [(ngModel)]="person.bms.detail"
@@ -470,7 +472,21 @@
                         [name]="'bmsCompany' + person.id"
                         (input)="validateBmsDetail($event, person)"
                         (focus)="validateBmsDetail($event, person)"
-                      />
+                      /> -->
+                      <nz-select
+                        nzShowSearch
+                        nzAllowClear
+                        nzPlaceHolder="เลือกพนักงาน"
+                        class="form-input"
+                        [(ngModel)]="person.bms.detail"
+                        [name]="'bmsDetail' + person.id"
+                        (ngModelChange)="validateBmsDetail($event, person)"
+                        (nzBlur)="validateBmsDetail(person.bms.detail, person)"
+                      >
+                        @for (opt of openForOptions_noFreelance(); track opt.value) {
+                          <nz-option [nzLabel]="opt.label" [nzValue]="opt" />
+                        }
+                      </nz-select>
                       @if (person.errors?.['bms_detail']) {
                         <span class="error">
                           {{ person.errors?.['bms_detail'] }}
@@ -484,6 +500,7 @@
                   <div class="system-detail-card">
                     <h6 class="form-label">OneE</h6>
                     <div class="form-field">
+                      <label>บริษัทที่รับผิดชอบ</label>
                       <nz-select
                         nzShowSearch
                         nzAllowClear
@@ -538,7 +555,7 @@
                     <div class="form-field">
                       <label>หัวหน้างาน</label>
 
-                      <input
+                      <!-- <input
                         nz-input
                         type="text"
                         class="form-input"
@@ -547,7 +564,23 @@
                         name="onee_supervisor"
                         (input)="validateOneeSupervisor($event, person)"
                         (focus)="validateOneeSupervisor($event, person)"
-                      />
+                      /> -->
+                      <nz-select
+                        nzShowSearch
+                        nzAllowClear
+                        nzPlaceHolder="เลือกหัวหน้างาน"
+                        [(ngModel)]="person.onee.supervisor"
+                        name="onee_supervisor"
+                        class="form-input"
+                        (ngModelChange)="validateOneeSupervisor($event, person)"
+                        (nzBlur)="validateOneeSupervisor(person.onee.supervisor, person)"
+                      >
+                        <nz-option
+                          *ngFor="let opt of openForOptions_noFreelance()"
+                          [nzLabel]="opt.label"
+                          [nzValue]="opt"
+                        />
+                      </nz-select>
                       @if (person.errors?.['onee_supervisor']) {
                         <span class="error">
                           {{ person.errors?.['onee_supervisor'] }}
@@ -561,6 +594,7 @@
                   <div class="system-detail-card">
                     <h6 class="form-label">One Portal</h6>
                     <div class="form-field">
+                      <label>บริษัทที่รับผิดชอบ</label>
                       <nz-select
                         nzShowSearch
                         nzAllowClear
@@ -589,6 +623,30 @@
                     </div>
                     <div class="form-field">
                       <label>ประเภทสิทธิ์</label>
+
+                      <nz-select
+                        nzPlaceHolder="เลือกประเภท"
+                        [(ngModel)]="person.onePortal.role"
+                        name="portal_response_type"
+                        class="form-input"
+                        (ngModelChange)="validateOnePortalRole($event, person)"
+                        (nzBlur)="validateOnePortalRole(person.onePortal.role, person)"
+                      >
+                        @for (item of onePortalRole; track item) {
+                          <nz-option
+                            [nzValue]="item.RoleName"
+                            [nzLabel]="item.RoleName"
+                          ></nz-option>
+                        }
+                      </nz-select>
+                      @if (person.errors?.['oneportal_role']) {
+                        <span class="error">
+                          {{ person.errors?.['oneportal_role'] }}
+                        </span>
+                      }
+                    </div>
+                    <div class="form-field">
+                      <label>ประเภทรายการ</label>
 
                       <nz-select
                         nzPlaceHolder="เลือกประเภท"

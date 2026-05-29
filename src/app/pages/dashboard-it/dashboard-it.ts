@@ -11,6 +11,7 @@ import {
   DestroyRef,
   ViewChild,
   ElementRef,
+  ChangeDetectorRef,
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { EMPTY, interval, firstValueFrom } from 'rxjs';
@@ -276,6 +277,7 @@ export class DashboardIT implements OnInit {
   isSmallMobile = false;
   isTicketDetailOpen = signal(false);
   IS_CHAT_OPEN = signal(false);
+  private cdr = inject(ChangeDetectorRef);
 
   private readonly CHAT_READ_KEY = 'ess_it_chat_read';
 
@@ -736,6 +738,10 @@ export class DashboardIT implements OnInit {
     this.prevTicketIds = new Set(this.Tickets().map((t: any) => t.ticketId));
     // console.log(this.prevTicketIds);
     this.getAllTickets(true);
+    const zone = document.getElementById('tickets-zone');
+    if (zone) {
+      zone.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
   }
 
   onStatusChange(status: string | null) {
@@ -1363,6 +1369,27 @@ export class DashboardIT implements OnInit {
   openDetail(description: string) {
     this.selectedDetail.set(description);
     this.isDetailModalOpen.set(true);
+  }
+
+  // copyDescription(text: string) {
+  //   navigator.clipboard.writeText(text).then(() => {
+  //     this.swalService.success('คัดลอกแล้ว');
+  //   });
+  // }
+
+  copiedText: string | null = null;
+
+  copyDescription(text: string) {
+    navigator.clipboard.writeText(text);
+
+    this.copiedText = text;
+
+    setTimeout(() => {
+      if (this.copiedText === text) {
+        this.copiedText = null;
+      }
+      this.cdr.detectChanges();
+    }, 2000);
   }
 
   openCcModal(): void {
