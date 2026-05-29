@@ -936,17 +936,24 @@ export class ITServiceRequestSpecificComponent implements OnInit {
           sections.push(
             `${index + 1}. Freelance`,
             `ชื่อ-นามสกุลภาษาไทย: ${person.freelance.firstNameTh} ${person.freelance.lastNameTh}`,
-            `ชื่อ-นามสกุลภาษาอังกฤษ : ${person.freelance.firstNameEn} ${person.freelance.lastNameEn}`,
-            `บริษัท : ${person.freelance.company?.COMPANY_NAME} (${person.freelance.company?.COMPANY_CODE})`,
-            `แผนก : ${person.freelance.department?.COSTCENT}-${person.freelance.department?.NAMECOSTCENT}`,
-            `ตำแหน่ง : ${person.freelance.position}`,
-            `อีเมล : ${person.freelance.email}`,
-            `เบอร์ : ${person.phone}`,
+            `ชื่อ-นามสกุลภาษาอังกฤษ: ${person.freelance.firstNameEn} ${person.freelance.lastNameEn}`,
+            `บริษัท: ${person.freelance.company?.COMPANY_NAME} (${person.freelance.company?.COMPANY_CODE})`,
+            `แผนก: ${person.freelance.department?.COSTCENT}-${person.freelance.department?.NAMECOSTCENT}`,
+            `ตำแหน่ง: ${person.freelance.position}`,
+            `อีเมล: ${person.freelance.email}`,
+            `เบอร์: ${person.phone}`,
           );
         } else {
           sections.push(
-            `${index + 1}. ${person.openFor?.label}`,
-            `${person.openFor?.labelEN.split('-')[1]}`,
+            `${index + 1}. ชื่อ-นามสกุลภาษาไทย: ${person.openFor?.label.split('-')[1]}`,
+            `ชื่อ-นามสกุลภาษาอังกฤษ: ${person.openFor?.labelEN.split('-')[1]}`,
+            `รหัสผนักงาน: ${person.openFor?.value}`,
+            `AD USER: ${person.openFor?.AD_USER}`,
+            `บริษัท: ${person.openFor?.COMPANY_NAME}`,
+            `แผนก: ${person.openFor?.DEPARTMENT}`,
+            `ตำแหน่ง: ${person.openFor?.POST}`,
+            `อีเมล: ${person.openFor?.EMAIL}`,
+            `เบอร์: ${person.openFor?.USR_MOBILE} / ${person.phone}`,
           );
         }
 
@@ -971,7 +978,9 @@ export class ITServiceRequestSpecificComponent implements OnInit {
             );
 
             selectedModules.forEach((m: any) => {
-              sections.push(`${m.module.trim()} - ${m.permission.trim()}`);
+              sections.push(
+                `${companyItem.company.COMPANY_CODE} - ${m.module.trim()} ${m.permission.trim()}`,
+              );
             });
 
             sections.push('');
