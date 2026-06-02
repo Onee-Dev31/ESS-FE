@@ -257,6 +257,26 @@ export class ITServiceRequestSpecificComponent implements OnInit {
       delete person.errors?.['onee_companies'];
       delete person.errors?.['onee_permission'];
       delete person.errors?.['onee_supervisor'];
+
+      this.swalService.warning(
+        'พนักงานยังไม่มี User สำหรับเข้าใช้งานระบบ BMS, ONEE Apps, ONEE Portal!!',
+        undefined,
+        `
+            <div style="text-align:center;">
+      <img
+        src="/ex/ex_request-user1.png"
+        alt="Request User"
+        style="max-width:100%; width:400px; margin-bottom:16px;"
+      />
+       <ol style="text-align:left; line-height:1.8; padding-left:20px;">
+      <li>เข้าเมนู <b>IT Service</b></li>
+      <li>เลือก <b>ขอใช้บริการ (พื้นฐาน)</b></li>
+      <li>เลือกบริการ <b>"ขอ User"</b></li>
+      <li>ส่งคำขอและรออนุมัติ</li>
+    </ol>
+    </div>
+  `,
+      );
     }
 
     this.touchSpecificPeople();
