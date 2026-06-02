@@ -328,7 +328,6 @@ $table-label-bg: var(--border-toolbar);
   // Modal Styles
   .modal-overlay {
     @include modal-overlay-styles;
-    z-index: 1000;
 
     .modal-container {
       background: rgba(255, 255, 255, 0.98);
@@ -381,12 +380,11 @@ $table-label-bg: var(--border-toolbar);
       }
 
       .modal-body {
-        padding: 2rem;
         display: flex;
         flex-direction: column;
         gap: 1.25rem;
         background: var(--bg-card);
-        max-height: 60vh;
+        max-height: 100vh;
         overflow-y: auto;
 
         .summary-section {
