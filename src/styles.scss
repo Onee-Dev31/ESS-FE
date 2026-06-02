@@ -342,8 +342,15 @@ label {
 
 /* Text */
 .swal2-html-container {
-  font-size: $font-size-header;
+  font-size: $font-size-header !important;
   color: var(--text-sub);
+
+  li,
+  p,
+  div,
+  span {
+    font-size: inherit;
+  }
 }
 
 /* Confirm Button */
