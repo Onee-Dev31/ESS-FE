@@ -300,7 +300,14 @@
 
           <div class="form-section" style="padding-bottom: 24px">
             <div class="form-group">
-              <label class="form-label">เลือกระบบเฉพาะ <span class="required-badge">*</span></label>
+              <label class="form-label"
+                >เลือกระบบเฉพาะ <span class="required-badge">*</span>
+                <span
+                  class="announcement"
+                  *ngIf="!person.openFor?.AD_USER && person.openFor?.value !== '__FREELANCE__'"
+                  >กรุณาทำการ <span class="">ขอ user</span> ที่ขอใช้บริการ (พื้นฐาน)</span
+                >
+              </label>
               <div class="specific-system-buttons">
                 @for (system of specificSystemChoices; track system.key) {
                   <button
@@ -311,13 +318,15 @@
                       (system.key === 'bms' ||
                         system.key === 'onePortal' ||
                         system.key === 'onee') &&
-                      !person.openFor?.AD_USER
+                      !person.openFor?.AD_USER &&
+                      person.openFor?.value !== '__FREELANCE__'
                     "
                     [disabled]="
                       (system.key === 'bms' ||
                         system.key === 'onePortal' ||
                         system.key === 'onee') &&
-                      !person.openFor?.AD_USER
+                      !person.openFor?.AD_USER &&
+                      person.openFor?.value !== '__FREELANCE__'
                     "
                     (click)="togglePersonSystem(person, system.key)"
                   >

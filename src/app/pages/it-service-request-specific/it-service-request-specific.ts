@@ -224,10 +224,10 @@ export class ITServiceRequestSpecificComponent implements OnInit {
 
     const hasAdUser = value?.AD_USER && value.AD_USER.toString().trim() !== '';
 
-    // ไม่มี AD_USER => เอา BMS และ One Portal ออก
-    if (!hasAdUser) {
+    // ไม่มี AD_USER => เอา BMS onee และ One Portal  ออก
+    if (!hasAdUser && !isFreelance) {
       person.systems = person.systems.filter(
-        (system: string) => !['bms', 'onePortal', 'onee'].includes(system),
+        (system: string) => !['bms', 'onee', 'onePortal'].includes(system),
       );
 
       // reset ค่า BMS
