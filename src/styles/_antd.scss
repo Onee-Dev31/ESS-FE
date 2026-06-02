@@ -5,6 +5,8 @@
 */
 // input
 .ant-select {
+  min-width: 0;
+  max-width: 100%;
   color: var(--input-text);
 }
 
@@ -85,6 +87,7 @@
     text-overflow: ellipsis !important;
     white-space: nowrap !important;
     min-width: 0;
+    max-width: 100%;
   }
 }
 
@@ -96,6 +99,35 @@
   border-radius: 10px;
   display: flex;
   align-items: center;
+}
+
+.ant-select-selector {
+  min-width: 0 !important;
+  max-width: 100% !important;
+}
+
+.ant-select-selection-search {
+  min-width: 0 !important;
+}
+
+.ant-select-selection-overflow {
+  min-width: 0 !important;
+  max-width: 100% !important;
+}
+
+.ant-select-selection-overflow-item {
+  min-width: 0 !important;
+  max-width: 100% !important;
+}
+
+.ant-select-selection-item-content {
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+}
+
+.ant-select-single.ant-select:not(.ant-select-customize-input) .ant-select-selector {
+  padding: 0 !important;
 }
 
 /*

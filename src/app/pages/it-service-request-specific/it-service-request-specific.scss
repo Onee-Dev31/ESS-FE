@@ -1465,6 +1465,12 @@ $table-label-bg: var(--border-toolbar);
       }
     }
   }
+
+  @include mobile {
+    .form-section {
+      padding: 16px 10px 0;
+    }
+  }
 }
 
 .specific-card-header {
@@ -1626,6 +1632,7 @@ $table-label-bg: var(--border-toolbar);
   gap: 14px;
   justify-content: start;
   margin-top: 10px;
+  min-width: 0;
 
   @media (max-width: 768px) {
     grid-template-columns: 1fr;
@@ -1636,6 +1643,7 @@ $table-label-bg: var(--border-toolbar);
   display: flex;
   flex-direction: column;
   gap: 10px;
+  min-width: 0;
   padding: 14px;
   border: 1px solid var(--border);
   border-radius: 10px;
@@ -1716,6 +1724,7 @@ $table-label-bg: var(--border-toolbar);
   display: flex;
   flex-direction: column;
   gap: 2px;
+  min-width: 0;
 
   &.full-width {
     grid-column: 1 / -1;
@@ -1733,6 +1742,8 @@ $table-label-bg: var(--border-toolbar);
 
     background: var(--bg-card);
     overflow-y: auto !important;
+    width: 100%;
+    max-width: 100%;
 
     &.multiple {
       height: 88px !important;
@@ -1869,6 +1880,64 @@ $table-label-bg: var(--border-toolbar);
   }
 }
 
+// :host ::ng-deep nz-select.form-input.ant-select {
+//   min-width: 0 !important;
+//   max-width: 100% !important;
+// }
+
+// :host ::ng-deep nz-select.form-input.ant-select .ant-select-selector {
+//   min-width: 0 !important;
+//   max-width: 100% !important;
+//   overflow: hidden !important;
+// }
+
+// :host ::ng-deep nz-select.form-input.ant-select.ant-select-multiple .ant-select-selector {
+//   overflow-x: hidden !important;
+//   overflow-y: auto !important;
+// }
+
+// :host ::ng-deep nz-select.form-input.ant-select .ant-select-selection-search {
+//   min-width: 0 !important;
+// }
+
+// :host
+//   ::ng-deep
+//   nz-select.form-input.ant-select:not(.ant-select-multiple)
+//   .ant-select-selection-item,
+// :host ::ng-deep nz-select.form-input.ant-select .ant-select-selection-placeholder {
+//   min-width: 0 !important;
+//   max-width: 100% !important;
+//   overflow: hidden !important;
+//   text-overflow: ellipsis !important;
+//   white-space: nowrap !important;
+// }
+
+// :host ::ng-deep nz-select.form-input.ant-select.ant-select-multiple .ant-select-selection-overflow {
+//   min-width: 0 !important;
+//   max-width: 100% !important;
+// }
+
+// :host
+//   ::ng-deep
+//   nz-select.form-input.ant-select.ant-select-multiple
+//   .ant-select-selection-overflow-item {
+//   min-width: 0 !important;
+//   max-width: 100% !important;
+// }
+
+// :host ::ng-deep nz-select.form-input.ant-select.ant-select-multiple .ant-select-selection-item {
+//   min-width: 0 !important;
+//   max-width: 100% !important;
+// }
+
+// :host ::ng-deep nz-select.form-input.ant-select .ant-select-selection-item-content {
+//   min-width: 0 !important;
+//   max-width: 100% !important;
+//   overflow: hidden !important;
+//   text-overflow: ellipsis !important;
+//   white-space: nowrap !important;
+// }
+
 .module-permission-list {
   display: flex;
   flex-direction: column;
@@ -1895,6 +1964,7 @@ $table-label-bg: var(--border-toolbar);
 .module-field,
 .permission-field {
   flex: 1;
+  min-width: 0;
 }
 
 .oracle-top-bar {
@@ -1919,6 +1989,7 @@ $table-label-bg: var(--border-toolbar);
 }
 
 .oracle-company-box {
+  min-width: 0;
   padding: 14px;
   border: 1px solid var(--border);
   border-radius: 10px;
@@ -1931,10 +2002,12 @@ $table-label-bg: var(--border-toolbar);
   gap: 12px;
   align-items: flex-end;
   margin-bottom: 16px;
+  min-width: 0;
 }
 
 .oracle-company-select {
   flex: 1;
+  min-width: 0;
 }
 
 .btn-add {
