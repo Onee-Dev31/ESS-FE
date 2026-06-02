@@ -152,6 +152,7 @@ export class ITServiceRequestSpecificComponent implements OnInit {
     { key: 'onee', label: 'OneE', icon: 'fa-layer-group' },
     { key: 'onePortal', label: 'One Portal', icon: 'fa-globe' },
   ];
+
   oracleModules: any;
   oraclePermissions: any;
   oneePermissions: any;
@@ -221,8 +222,58 @@ export class ITServiceRequestSpecificComponent implements OnInit {
       this.clearFreelanceErrors(person);
     }
 
+    const hasAdUser = value?.AD_USER && value.AD_USER.toString().trim() !== '';
+
+    // ไม่มี AD_USER => เอา BMS onee และ One Portal  ออก
+    if (!hasAdUser && !isFreelance) {
+      person.systems = person.systems.filter(
+        (system: string) => !['bms', 'onee', 'onePortal'].includes(system),
+      );
+
+      // reset ค่า BMS
+      person.bms = {
+        companies: [],
+        detail: null,
+      };
+
+      // reset ค่า One Portal
+      person.onePortal = {
+        companies: [],
+        role: null,
+        responseType: null,
+      };
+
+      person.onee = {
+        companies: [],
+        permission: '',
+        supervisor: '',
+      };
+
+      delete person.errors?.['bms_companies'];
+      delete person.errors?.['bms_detail'];
+      delete person.errors?.['oneportal_companies'];
+      delete person.errors?.['oneportal_role'];
+      delete person.errors?.['oneportal_response_type'];
+      delete person.errors?.['onee_companies'];
+      delete person.errors?.['onee_permission'];
+      delete person.errors?.['onee_supervisor'];
+    }
+
     this.touchSpecificPeople();
   }
+
+  // onSpecificOpenForChange(person: any, value: any) {
+  //   person.openFor = value;
+
+  //   const isFreelance = value?.value === '__FREELANCE__';
+
+  //   // ถ้าเปลี่ยนออกจาก freelance
+  //   if (!isFreelance) {
+  //     this.clearFreelanceErrors(person);
+  //   }
+
+  //   this.touchSpecificPeople();
+  // }
 
   touchSpecificPeople() {
     this.specificPeople.set([...this.specificPeople()]);
@@ -864,7 +915,10 @@ export class ITServiceRequestSpecificComponent implements OnInit {
       .filter((x: any) => x !== currentItem && x.company)
       .map((x: any) => x.company.COMPANY_CODE);
 
-    return this.companyList.filter((company: any) => !selectedCodes.includes(company.COMPANY_CODE));
+    return this.companyList.filter(
+      (company: any) =>
+        company.COMPANY_CODE !== 'GTH' && !selectedCodes.includes(company.COMPANY_CODE),
+    );
   }
 
   getAvailableOpenForOptions(currentPerson: any) {
@@ -891,9 +945,9 @@ export class ITServiceRequestSpecificComponent implements OnInit {
   }
 
   private remapCompanyCode(code: string): string {
-    if (code === 'OTD') return 'ONEE';
-    if (code === 'OTV') return 'ONE31';
-    if (code === 'GMD') return 'ATM';
+    if (code === 'OTD') return 'ONE';
+    if (code === 'OTV') return 'O31';
+    if (code === 'ATM') return 'GMD';
     return code;
   }
 
@@ -936,17 +990,24 @@ export class ITServiceRequestSpecificComponent implements OnInit {
           sections.push(
             `${index + 1}. Freelance`,
             `ชื่อ-นามสกุลภาษาไทย: ${person.freelance.firstNameTh} ${person.freelance.lastNameTh}`,
-            `ชื่อ-นามสกุลภาษาอังกฤษ : ${person.freelance.firstNameEn} ${person.freelance.lastNameEn}`,
-            `บริษัท : ${person.freelance.company?.COMPANY_NAME} (${person.freelance.company?.COMPANY_CODE})`,
-            `แผนก : ${person.freelance.department?.COSTCENT}-${person.freelance.department?.NAMECOSTCENT}`,
-            `ตำแหน่ง : ${person.freelance.position}`,
-            `อีเมล : ${person.freelance.email}`,
-            `เบอร์ : ${person.phone}`,
+            `ชื่อ-นามสกุลภาษาอังกฤษ: ${person.freelance.firstNameEn} ${person.freelance.lastNameEn}`,
+            `บริษัท: ${person.freelance.company?.COMPANY_NAME} (${person.freelance.company?.COMPANY_CODE})`,
+            `แผนก: ${person.freelance.department?.COSTCENT}-${person.freelance.department?.NAMECOSTCENT}`,
+            `ตำแหน่ง: ${person.freelance.position}`,
+            `อีเมล: ${person.freelance.email}`,
+            `เบอร์: ${person.phone}`,
           );
         } else {
           sections.push(
-            `${index + 1}. ${person.openFor?.label}`,
-            `${person.openFor?.labelEN.split('-')[1]}`,
+            `${index + 1}. ชื่อ-นามสกุลภาษาไทย: ${person.openFor?.label.split('-')[1]}`,
+            `ชื่อ-นามสกุลภาษาอังกฤษ: ${person.openFor?.labelEN.split('-')[1]}`,
+            `รหัสผนักงาน: ${person.openFor?.value}`,
+            `AD USER: ${person.openFor?.AD_USER}`,
+            `บริษัท: ${person.openFor?.COMPANY_NAME}`,
+            `แผนก: ${person.openFor?.DEPARTMENT}`,
+            `ตำแหน่ง: ${person.openFor?.POST}`,
+            `อีเมล: ${person.openFor?.EMAIL}`,
+            `เบอร์: ${person.openFor?.USR_MOBILE} / ${person.phone}`,
           );
         }
 
@@ -971,7 +1032,9 @@ export class ITServiceRequestSpecificComponent implements OnInit {
             );
 
             selectedModules.forEach((m: any) => {
-              sections.push(`${m.module.trim()} - ${m.permission.trim()}`);
+              sections.push(
+                `${companyItem.company.COMPANY_CODE} - ${m.module.trim()} ${m.permission.trim()}`,
+              );
             });
 
             sections.push('');

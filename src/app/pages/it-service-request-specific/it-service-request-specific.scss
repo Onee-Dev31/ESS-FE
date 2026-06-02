@@ -699,6 +699,21 @@ $table-label-bg: var(--border-toolbar);
       color: var(--danger);
       font-size: $font-size-body;
     }
+
+    .announcement {
+      color: var(--danger);
+      font-size: $font-size-label;
+      margin-left: 10px;
+    }
+
+    .system-tag {
+      min-height: 42px;
+      padding: 9px 16px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: var(--bg-card);
+      color: var(--text);
+    }
   }
 
   @keyframes slideInRight {
@@ -1589,11 +1604,17 @@ $table-label-bg: var(--border-toolbar);
   transition: 0.2s;
   font-size: $font-size-label;
 
-  &:hover,
+  &:not(:disabled):hover,
   &.active {
     background: var(--primary);
     color: #fff;
     border-color: var(--primary);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    pointer-events: none;
   }
 }
 
