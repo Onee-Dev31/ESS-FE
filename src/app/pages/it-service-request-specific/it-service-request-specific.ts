@@ -149,8 +149,8 @@ export class ITServiceRequestSpecificComponent implements OnInit {
   specificSystemChoices: { key: SpecificSystemKey; label: string; icon: string }[] = [
     { key: 'oracle', label: 'Oracle', icon: 'fa-database' },
     { key: 'bms', label: 'BMS', icon: 'fa-briefcase' },
-    { key: 'onee', label: 'OneE', icon: 'fa-layer-group' },
-    { key: 'onePortal', label: 'One Portal', icon: 'fa-globe' },
+    { key: 'onee', label: 'OneE Apps', icon: 'fa-layer-group' },
+    { key: 'onePortal', label: 'OneE Portal', icon: 'fa-globe' },
   ];
 
   oracleModules: any;
