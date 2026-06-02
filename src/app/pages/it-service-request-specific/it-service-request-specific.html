@@ -72,6 +72,7 @@
                 [ngModel]="person.openFor"
                 (ngModelChange)="onSpecificOpenForChange(person, $event)"
                 [name]="'openFor' + person.id"
+                [class.input-error]="!person.openFor"
               >
                 @for (opt of getAvailableOpenForOptions(person); track opt.value) {
                   <nz-option [nzLabel]="opt.label" [nzValue]="opt" />
@@ -92,6 +93,7 @@
                 (input)="onSpecificPhoneInput($event, person)"
                 (ngModelChange)="touchSpecificPeople()"
                 [name]="'phone' + person.id"
+                [class.input-error]="!person.phone || person.phoneError"
               />
               @if (!person.phone || person.phoneError) {
                 <span class="error-text">
@@ -304,7 +306,11 @@
                 >เลือกระบบเฉพาะ <span class="required-badge">*</span>
                 <span
                   class="announcement"
-                  *ngIf="!person.openFor?.AD_USER && person.openFor?.value !== '__FREELANCE__'"
+                  *ngIf="
+                    !person.openFor?.AD_USER &&
+                    person.openFor?.value !== '__FREELANCE__' &&
+                    person.openFor !== null
+                  "
                   >กรุณาทำการ <span class="">ขอ user</span> ที่ขอใช้บริการ (พื้นฐาน)</span
                 >
               </label>
@@ -347,9 +353,14 @@
                     <div class="oracle-top-bar">
                       <h6 class="form-label">Oracle</h6>
 
-                      <button class="btn-add" type="button" (click)="addOracleCompany(person)">
+                      <!-- <button
+                        class="btn-add"
+                        type="button"
+                        (click)="addOracleCompany(person)"
+                        [disabled]="!canAddOracleCompany(person)"
+                      >
                         + เพิ่มบริษัท
-                      </button>
+                      </button> -->
                     </div>
                     <div [class.oracle-company-grid]="person.oracle.companies.length > 1">
                       @for (companyItem of person.oracle.companies; track $index) {
@@ -367,6 +378,7 @@
                                 class="form-input"
                                 (ngModelChange)="validateOracleCompany(companyItem, person, $index)"
                                 (nzBlur)="validateOracleCompany(companyItem, person, $index)"
+                                [class.input-error]="person.errors?.['oracle_company_' + $index]"
                               >
                                 <nz-option
                                   *ngFor="
@@ -448,6 +460,14 @@
                         </div>
                       }
                     </div>
+                    <button
+                      class="btn-add"
+                      type="button"
+                      (click)="addOracleCompany(person)"
+                      [disabled]="!canAddOracleCompany(person)"
+                    >
+                      + เพิ่มบริษัท
+                    </button>
                   </div>
                 }
 
@@ -468,6 +488,7 @@
                         #company="ngModel"
                         (ngModelChange)="validateBmsCompanies(person)"
                         (nzBlur)="validateBmsCompanies(person)"
+                        [class.input-error]="person.errors?.['bms_companies']"
                       >
                         <!-- <nz-option nzLabel="เลือกบริษัท" nzValue="" nzDisabled /> -->
                         <nz-option
@@ -503,6 +524,7 @@
                         [name]="'bmsDetail' + person.id"
                         (ngModelChange)="validateBmsDetail($event, person)"
                         (nzBlur)="validateBmsDetail(person.bms.detail, person)"
+                        [class.input-error]="person.errors?.['bms_detail']"
                       >
                         @for (opt of openForOptions_noFreelance(); track opt.value) {
                           <nz-option [nzLabel]="opt.label" [nzValue]="opt" />
@@ -534,6 +556,7 @@
                         #company="ngModel"
                         (ngModelChange)="validateOneeCompanies(person)"
                         (nzBlur)="validateOneeCompanies(person)"
+                        [class.input-error]="person.errors?.['onee_companies']"
                       >
                         <nz-option
                           *ngFor="let company of companyList"
@@ -557,6 +580,7 @@
                         class="form-input"
                         (ngModelChange)="validateOneePermission($event, person)"
                         (nzBlur)="validateOneePermission(person.onee.permission, person)"
+                        [class.input-error]="person.errors?.['onee_permission']"
                       >
                         @for (item of oneePermissions; track item) {
                           <nz-option
@@ -595,6 +619,7 @@
                         class="form-input"
                         (ngModelChange)="validateOneeSupervisor($event, person)"
                         (nzBlur)="validateOneeSupervisor(person.onee.supervisor, person)"
+                        [class.input-error]="person.errors?.['onee_supervisor']"
                       >
                         <nz-option
                           *ngFor="let opt of openForOptions_noFreelance()"
@@ -628,6 +653,7 @@
                         #company="ngModel"
                         (ngModelChange)="validateOnePortalCompanies(person)"
                         (nzBlur)="validateOnePortalCompanies(person)"
+                        [class.input-error]="person.errors?.['oneportal_companies']"
                       >
                         <nz-option
                           *ngFor="let company of companyList"
@@ -652,6 +678,7 @@
                         class="form-input"
                         (ngModelChange)="validateOnePortalRole($event, person)"
                         (nzBlur)="validateOnePortalRole(person.onePortal.role, person)"
+                        [class.input-error]="person.errors?.['oneportal_role']"
                       >
                         @for (item of onePortalRole; track item) {
                           <nz-option
@@ -678,6 +705,7 @@
                         (nzBlur)="
                           validateOnePortalResponseType(person.onePortal.responseType, person)
                         "
+                        [class.input-error]="person.errors?.['oneportal_response_type']"
                       >
                         @for (item of onePortalResponseTypes; track item) {
                           <nz-option

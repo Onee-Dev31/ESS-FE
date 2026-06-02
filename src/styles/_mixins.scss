@@ -313,6 +313,7 @@
   @include mobile {
     font-size: $font-size-hint;
     height: 38px;
+    padding: 8px 10px;
   }
 }
 
@@ -440,12 +441,32 @@
     }
 
     & > * {
-      flex: 1;
+      // flex: 1;
       display: flex;
       flex-direction: column;
       overflow: hidden;
       width: 100%;
       min-height: 0;
+    }
+
+    .modal-header {
+      flex-shrink: 0;
+    }
+
+    .modal-body {
+      flex: 1;
+      overflow-y: auto;
+      min-height: 0;
+
+      padding: 2rem;
+
+      @include mobile {
+        padding: 1rem;
+      }
+    }
+
+    .modal-footer {
+      flex-shrink: 0;
     }
   }
 }

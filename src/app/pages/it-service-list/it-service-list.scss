@@ -1853,14 +1853,53 @@ textarea.form-input {
   font-weight: 800;
 }
 
+.floating-chat__label {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  line-height: 1.1;
+}
+
 .floating-chat__ticket-no {
-  font-size: 0.78rem;
-  font-weight: 600;
-  opacity: 0.75;
-  background: rgba(255, 255, 255, 0.15);
+  font-size: 10px;
+  opacity: 0.7;
+}
+
+// .floating-chat__ticket-no {
+//   font-size: 0.78rem;
+//   font-weight: 600;
+//   opacity: 0.75;
+//   background: rgba(255, 255, 255, 0.15);
+//   border-radius: 999px;
+//   padding: 2px 9px;
+//   letter-spacing: 0.02em;
+// }
+
+.floating-chat__summary {
+  border: 1px solid rgba(255, 255, 255, 0.26);
   border-radius: 999px;
-  padding: 2px 9px;
-  letter-spacing: 0.02em;
+  background: rgba(255, 255, 255, 0.14);
+  color: #ffffff;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 9px;
+  height: 30px;
+  cursor: pointer;
+  font-size: 0.78rem;
+  font-weight: 700;
+  transition:
+    background 0.18s,
+    border-color 0.18s;
+
+  i {
+    font-size: 0.72rem;
+  }
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.24);
+    border-color: rgba(255, 255, 255, 0.4);
+  }
 }
 
 .floating-chat__close {

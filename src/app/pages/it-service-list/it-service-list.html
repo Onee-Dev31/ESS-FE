@@ -441,10 +441,19 @@
           <div class="floating-chat__header">
             <div class="floating-chat__title">
               <i class="fa-solid fa-comments"></i>
-              <span>{{ t.status_user === 'Referred_Back' ? 'ข้อความจาก Approver' : 'Chat' }}</span>
-              @if (t.ticketNumber) {
+              <!-- <span>{{ t.status_user === 'Referred_Back' ? 'ข้อความจาก Approver' : 'Chat' }}</span> -->
+              <!-- @if (t.ticketNumber) {
                 <span class="floating-chat__ticket-no">#{{ t.ticketNumber }}</span>
-              }
+              } -->
+              <div class="floating-chat__label">
+                <span>{{
+                  t.status_user === 'Referred_Back' ? 'ข้อความจาก Approver' : 'Chat'
+                }}</span>
+
+                @if (t.ticketNumber) {
+                  <span class="floating-chat__ticket-no"> #{{ t.ticketNumber }} </span>
+                }
+              </div>
               @if (getChatAttachmentCount(t) > 0) {
                 <button
                   class="floating-chat__summary"

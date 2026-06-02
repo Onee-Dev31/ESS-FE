@@ -149,8 +149,8 @@ export class ITServiceRequestSpecificComponent implements OnInit {
   specificSystemChoices: { key: SpecificSystemKey; label: string; icon: string }[] = [
     { key: 'oracle', label: 'Oracle', icon: 'fa-database' },
     { key: 'bms', label: 'BMS', icon: 'fa-briefcase' },
-    { key: 'onee', label: 'OneE', icon: 'fa-layer-group' },
-    { key: 'onePortal', label: 'One Portal', icon: 'fa-globe' },
+    { key: 'onee', label: 'OneE Apps', icon: 'fa-layer-group' },
+    { key: 'onePortal', label: 'OneE Portal', icon: 'fa-globe' },
   ];
 
   oracleModules: any;
@@ -257,6 +257,29 @@ export class ITServiceRequestSpecificComponent implements OnInit {
       delete person.errors?.['onee_companies'];
       delete person.errors?.['onee_permission'];
       delete person.errors?.['onee_supervisor'];
+
+      if (person.openFor !== null) {
+        this.swalService.warning(
+          'พนักงานยังไม่มี User สำหรับเข้าใช้งานระบบ BMS, ONEE Apps, ONEE Portal!!',
+          undefined,
+          `
+            <div style="text-align:center;">
+      <img
+        src="/ex/ex_request-user1.png"
+        alt="Request User"
+        style="max-width:100%; width:400px; margin-bottom:16px;"
+      />
+      <p>กรุณาปฏิบัติตามขั้นตอนด้านล่างนี้</p>
+       <ol style="text-align:left; line-height:1.8; padding-left:20px;">
+      <li>เข้าเมนู <b>IT Service</b></li>
+      <li>เลือก <b>ขอใช้บริการ (พื้นฐาน)</b></li>
+      <li>เลือกบริการ <b>"ขอ User"</b></li>
+      <li>ส่งคำขอและแจ้งหัวหน้างานเพื่ออนุมัติผ่านระบบ</li>
+    </ol>
+    </div>
+  `,
+        );
+      }
     }
 
     this.touchSpecificPeople();
@@ -290,8 +313,11 @@ export class ITServiceRequestSpecificComponent implements OnInit {
   togglePersonSystem(person: SpecificPersonRequest, system: SpecificSystemKey) {
     const exists = person.systems.includes(system);
 
+    console.log(person.systems);
+
     if (exists) {
       person.systems = person.systems.filter((item) => item !== system);
+      this.resetSystemData(person, system);
       this.clearSystemErrors(person, system);
     } else {
       person.systems = [...person.systems, system];
@@ -302,6 +328,18 @@ export class ITServiceRequestSpecificComponent implements OnInit {
       }
       if (system === 'onee') {
         this.autoSelectOneeSupervisor(person);
+        this.validateOneeCompanies(person);
+        this.validateOneePermission('', person);
+        this.validateOneeSupervisor('', person);
+      }
+      if (system === 'bms') {
+        this.validateBmsCompanies(person);
+        this.validateBmsDetail('', person);
+      }
+      if (system === 'onePortal') {
+        this.validateOnePortalCompanies(person);
+        this.validateOnePortalRole('', person);
+        this.validateOnePortalResponseType('', person);
       }
     }
 
@@ -767,6 +805,9 @@ export class ITServiceRequestSpecificComponent implements OnInit {
       })),
     });
 
+    const index = person.oracle.companies.length - 1;
+
+    this.validateOracleCompany(person.oracle.companies[index], person, index);
     this.validateAllOraclePermissions(person);
     this.touchSpecificPeople();
   }
@@ -910,6 +951,43 @@ export class ITServiceRequestSpecificComponent implements OnInit {
   filteredDepartmentList: any[] = [];
 
   // function
+  private resetSystemData(person: SpecificPersonRequest, system: SpecificSystemKey) {
+    switch (system) {
+      case 'bms':
+        person.bms = {
+          companies: [],
+          detail: '',
+        };
+        break;
+
+      case 'oracle':
+        person.oracle = {
+          companies: [],
+        };
+        break;
+
+      case 'onee':
+        person.onee = {
+          companies: [],
+          permission: '',
+          supervisor: '',
+        };
+        break;
+
+      case 'onePortal':
+        person.onePortal = {
+          companies: [],
+          role: '',
+          responseType: '',
+          supervisor: '',
+        };
+        break;
+    }
+  }
+  canAddOracleCompany(person: SpecificPersonRequest): boolean {
+    return this.getAvailableOracleCompanies(person, null).length !== person.oracle.companies.length;
+  }
+
   getAvailableOracleCompanies(person: any, currentItem: any) {
     const selectedCodes = person.oracle.companies
       .filter((x: any) => x !== currentItem && x.company)
