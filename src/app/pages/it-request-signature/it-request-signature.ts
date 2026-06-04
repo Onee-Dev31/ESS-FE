@@ -136,7 +136,7 @@ export class ItRequestSignature implements OnInit, AfterViewInit, OnDestroy {
   }
 
   ngOnDestroy() {
-    window.removeEventListener('resize', this.onResize.bind(this));
+    window.removeEventListener('resize', this.resizeHandler);
     this.themeObserver?.disconnect();
   }
 
@@ -222,7 +222,6 @@ export class ItRequestSignature implements OnInit, AfterViewInit, OnDestroy {
   private resizeCanvas() {
     const canvas = this.ensureCanvasContext();
     if (!canvas || !this.ctx) return;
-
     canvas.width = canvas.offsetWidth || 600;
     canvas.height = canvas.offsetHeight || 200;
 
