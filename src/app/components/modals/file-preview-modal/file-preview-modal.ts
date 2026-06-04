@@ -17,6 +17,7 @@ export interface FilePreviewItem {
   date: string;
   url?: string;
   type?: string;
+  remark?: string;
 }
 
 @Component({

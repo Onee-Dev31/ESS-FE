@@ -117,6 +117,7 @@ export class FileConverterService {
       date: date,
       url: url || '',
       type: file.fileType || file.type || file.file_type || file.file?.type || '',
+      remark: file.remark,
     };
   }
 
