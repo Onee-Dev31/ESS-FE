@@ -124,6 +124,7 @@
       </div>
       <div class="field-input-col">
         <div
+          [class.file-added]="fileAdded()"
           class="dropzone"
           (click)="fileInput.click()"
           (dragover)="onDragOver($event)"

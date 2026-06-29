@@ -260,6 +260,7 @@ export class ItProblemReportComponent implements OnInit {
     }
   }
 
+  fileAdded = signal(false);
   private addClipboardImage(file: File) {
     const image = new File([file], `Screenshot_${Date.now()}.png`, {
       type: file.type,
@@ -270,7 +271,12 @@ export class ItProblemReportComponent implements OnInit {
     dt.items.add(image);
 
     this.addFiles(dt.files);
-    // this.toastService.success('เพิ่มรูปภาพจาก Clipboard แล้ว');
+
+    this.fileAdded.set(true);
+
+    setTimeout(() => {
+      this.fileAdded.set(false);
+    }, 800);
   }
 
   // private addFiles(files: FileList) {
