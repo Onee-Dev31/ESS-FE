@@ -101,16 +101,29 @@
         </label>
       </div>
       <div class="field-input-col">
-        <quill-editor
+        <!-- <quill-editor
           [modules]="quillConfig"
           [ngModel]="problemFormData().detail"
+          (onEditorCreated)="onEditorCreated($event)"
           (ngModelChange)="problemFormData.set({
     ...problemFormData(),
     detail: $event
   })"
           placeholder="อธิบายรายละเอียดปัญหาที่พบ..."
         >
-        </quill-editor>
+        </quill-editor> -->
+        <app-text-editor
+          [value]="problemFormData().detail"
+          (valueChange)="
+    problemFormData.set({
+      ...problemFormData(),
+      detail: $event
+    })
+  "
+          (imagePathsChange)="onEditorImagesChanged($event)"
+          placeholder="อธิบายรายละเอียดปัญหาที่พบ..."
+        >
+        </app-text-editor>
         <!-- <textarea
           [ngModel]="problemFormData().detail"
           (ngModelChange)="problemFormData.set({ ...problemFormData(), detail: $event })"
@@ -274,7 +287,8 @@
               </tr>
               <tr>
                 <th>รายละเอียด</th>
-                <td>{{ problemFormData().detail }}</td>
+                <!-- <td>{{ problemFormData().detail }}</td> -->
+                <td [innerHTML]="problemFormData().detail"></td>
               </tr>
               <tr>
                 <th>หมวดหมู่</th>

@@ -7,6 +7,7 @@ import {
   ChangeDetectorRef,
   effect,
   Input,
+  ViewChild,
 } from '@angular/core';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
@@ -26,7 +27,10 @@ import { AuthService } from '../../services/auth.service';
 import { finalize } from 'rxjs';
 import { NzSelectModule } from 'ng-zorro-antd/select';
 import { SignalrService } from '../../services/signalr.service';
-import { QuillModule } from 'ngx-quill';
+import { QuillEditorComponent, QuillModule } from 'ngx-quill';
+import Quill from 'quill';
+import { TextEditorImageService } from '../../services/text-editor-image.service';
+import { TextEditorComponent } from '../../components/shared/text-editor/text-editor';
 
 @Component({
   selector: 'app-it-problem-report',
@@ -38,6 +42,7 @@ import { QuillModule } from 'ngx-quill';
     FilePreviewModalComponent,
     NzSelectModule,
     QuillModule,
+    TextEditorComponent,
   ],
   templateUrl: './it-problem-report.html',
   styleUrl: './it-problem-report.scss',
@@ -50,6 +55,7 @@ export class ItProblemReportComponent implements OnInit {
   private signalrService = inject(SignalrService);
   private itServiceMock = inject(ItServiceMockService);
   private itServiceService = inject(ItServiceService);
+  private textEditorImageService = inject(TextEditorImageService);
   private authService = inject(AuthService);
   private cdr = inject(ChangeDetectorRef);
 
@@ -79,6 +85,9 @@ export class ItProblemReportComponent implements OnInit {
   ccSearched = signal<boolean>(false);
   readonly CC_CATEGORIES = ['BMS', 'Oracle', 'Onee App'];
 
+  // Editor
+  editorImagePaths: string[] = [];
+
   readonly FILE_CONFIG = {
     maxFiles: 5,
     maxSizeMB: 5,
@@ -92,20 +101,6 @@ export class ItProblemReportComponent implements OnInit {
       'application/vnd.ms-excel',
     ],
     allowedExtensions: ['jpg', 'jpeg', 'png', 'gif', 'pdf', 'docx', 'xlsx', 'xls'],
-  };
-
-  quillConfig = {
-    toolbar: [
-      ['bold'],
-      // ['bold', 'italic', 'underline'],
-
-      // [{ list: 'ordered' }, { list: 'bullet' }],
-
-      // ['blockquote'],
-
-      // ['link'],
-      ['image'],
-    ],
   };
 
   ngOnInit() {
@@ -335,6 +330,25 @@ export class ItProblemReportComponent implements OnInit {
     });
   }
 
+  // EDITOR
+  onEditorImagesChanged(paths: string[]) {
+    this.editorImagePaths = paths;
+
+    console.log('Editor Images', paths);
+  }
+
+  // confirmImages(): Observable<any> {
+  //   if (this.uploadedImages.size === 0) {
+  //     return of(null);
+  //   }
+
+  //   return this.textEditorImageService.confirm({
+  //     image_paths: [...this.uploadedImages],
+  //   });
+  // }
+
+  // STEP 2
+
   showSummaryModal = signal(false);
 
   submittedRequests = signal<any[]>([
@@ -357,15 +371,15 @@ export class ItProblemReportComponent implements OnInit {
   }
 
   submit() {
-    console.log('problemFormData', this.problemFormData());
-    console.log('detail', this.problemFormData().detail);
-    // const data = this.problemFormData();
-    // if (!data.topic.trim() || !data.detail.trim()) {
-    //   this.swalService.warning('แจ้งเตือน', 'กรุณากรอกข้อมูลให้ครบทุกช่อง');
-    //   return;
-    // }
-    // this.problemFormData.update((data) => ({ ...data, phoneNumber: this.phoneModel }));
-    // this.showSummaryModal.set(true);
+    // console.log('problemFormData', this.problemFormData());
+    // console.log('detail', this.problemFormData().detail);
+    const data = this.problemFormData();
+    if (!data.topic.trim() || !data.detail.trim()) {
+      this.swalService.warning('แจ้งเตือน', 'กรุณากรอกข้อมูลให้ครบทุกช่อง');
+      return;
+    }
+    this.problemFormData.update((data) => ({ ...data, phoneNumber: this.phoneModel }));
+    this.showSummaryModal.set(true);
   }
 
   clearForm() {
@@ -427,8 +441,55 @@ export class ItProblemReportComponent implements OnInit {
     });
 
     console.log('formData', [...formData.entries()]);
+    console.log('Editor Images', this.editorImagePaths);
+
+    this.textEditorImageService.confirm({
+      image_paths: this.editorImagePaths,
+    });
 
     this.swalService.loading('กำลังบันทึกข้อมูล...');
+    this.textEditorImageService
+      .confirm({
+        image_paths: this.editorImagePaths,
+      })
+      .subscribe({
+        next: () => {
+          this.createTicket(formData);
+        },
+        error: (err) => {
+          console.error(err);
+          this.swalService.warning('ไม่สามารถยืนยันรูปภาพได้');
+        },
+      });
+    // this.itServiceService
+    //   .createTicket(formData)
+    //   .pipe(
+    //     finalize(() => {
+    //       this.closeSummaryModal();
+    //     }),
+    //   )
+    //   .subscribe({
+    //     next: (res) => {
+    //       if (res.success) {
+    //         // this.signalrService.sendNewTicketNotification(res.ticketNumber);
+    //         this.swalService.success('แจ้งปัญหาสำเร็จ', res.ticketNumber).then(() => {
+    //           this.clearForm();
+    //           this.router.navigate(['/it-service-list']);
+    //         });
+    //       }
+    //     },
+    //     error: (error) => {
+    //       console.error('Error fetching data:', error.error.message);
+    //       this.swalService.warning('เกิดข้อผิดพลาด', error.error.message).then(() => {
+    //         this.clearForm();
+    //         this.router.navigate(['/it-service-list']);
+    //       });
+    //       // const message = error?.error?.message || '';
+    //     },
+    //   });
+  }
+
+  private createTicket(formData: FormData) {
     this.itServiceService
       .createTicket(formData)
       .pipe(
@@ -439,7 +500,6 @@ export class ItProblemReportComponent implements OnInit {
       .subscribe({
         next: (res) => {
           if (res.success) {
-            // this.signalrService.sendNewTicketNotification(res.ticketNumber);
             this.swalService.success('แจ้งปัญหาสำเร็จ', res.ticketNumber).then(() => {
               this.clearForm();
               this.router.navigate(['/it-service-list']);
@@ -447,12 +507,12 @@ export class ItProblemReportComponent implements OnInit {
           }
         },
         error: (error) => {
-          console.error('Error fetching data:', error.error.message);
+          console.error(error.error.message);
+
           this.swalService.warning('เกิดข้อผิดพลาด', error.error.message).then(() => {
             this.clearForm();
             this.router.navigate(['/it-service-list']);
           });
-          // const message = error?.error?.message || '';
         },
       });
   }
