@@ -127,27 +127,10 @@ export class EmpAdForm implements OnChanges {
     this.selectedCompany = company;
     this.addForm.companyCode = company?.COMPANY_CODE ?? '';
     this.addForm.companyName = company?.COMPANY_NAME ?? '';
-    this.addForm.employeeCode = '';
     this.addForm.department = '';
     this.filteredDepartmentList = company
       ? this.departmentList.filter((d) => d.COMPANY_CODE === company.COMPANY_CODE)
       : [];
-
-    if (!this.addForm.companyCode) return;
-
-    const companyCode = this.addForm.companyCode;
-    this.empAdService.getfreelanceCode(companyCode).subscribe({
-      next: (res) => {
-        if (this.addForm.companyCode !== companyCode) return;
-        this.addForm.employeeCode = res?.data?.CODEMPID ?? '';
-        this.cdr.detectChanges();
-      },
-      error: () => {
-        if (this.addForm.companyCode !== companyCode) return;
-        this.addForm.employeeCode = '';
-        this.cdr.detectChanges();
-      },
-    });
   }
 
   ngOnChanges() {
