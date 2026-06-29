@@ -235,6 +235,44 @@ export class ItProblemReportComponent implements OnInit {
     }
   }
 
+  onDetailPaste(event: ClipboardEvent) {
+    const items = event.clipboardData?.items;
+
+    if (!items) return;
+
+    let hasImage = false;
+
+    for (const item of Array.from(items)) {
+      if (item.type.startsWith('image/')) {
+        const file = item.getAsFile();
+
+        if (!file) continue;
+
+        hasImage = true;
+
+        this.addClipboardImage(file);
+      }
+    }
+
+    // ถ้าเป็นรูป ไม่ต้อง paste ลง textarea
+    if (hasImage) {
+      event.preventDefault();
+    }
+  }
+
+  private addClipboardImage(file: File) {
+    const image = new File([file], `Screenshot_${Date.now()}.png`, {
+      type: file.type,
+    });
+
+    const dt = new DataTransfer();
+
+    dt.items.add(image);
+
+    this.addFiles(dt.files);
+    // this.toastService.success('เพิ่มรูปภาพจาก Clipboard แล้ว');
+  }
+
   // private addFiles(files: FileList) {
   //   if (files && files.length > 0) {
   //     const newAttachments = Array.from(files).map((f) => ({

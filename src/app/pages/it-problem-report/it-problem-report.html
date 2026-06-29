@@ -104,6 +104,7 @@
         <textarea
           [ngModel]="problemFormData().detail"
           (ngModelChange)="problemFormData.set({ ...problemFormData(), detail: $event })"
+          (paste)="onDetailPaste($event)"
           class="styled-input"
           [class.textarea-with-chips]="problemFormData().categories.length > 0"
           rows="10"
