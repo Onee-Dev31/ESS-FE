@@ -101,15 +101,24 @@
         </label>
       </div>
       <div class="field-input-col">
-        <textarea
+        <quill-editor
+          [modules]="quillConfig"
+          [ngModel]="problemFormData().detail"
+          (ngModelChange)="problemFormData.set({
+    ...problemFormData(),
+    detail: $event
+  })"
+          placeholder="อธิบายรายละเอียดปัญหาที่พบ..."
+        >
+        </quill-editor>
+        <!-- <textarea
           [ngModel]="problemFormData().detail"
           (ngModelChange)="problemFormData.set({ ...problemFormData(), detail: $event })"
-          (paste)="onDetailPaste($event)"
           class="styled-input"
           [class.textarea-with-chips]="problemFormData().categories.length > 0"
           rows="10"
           placeholder="อธิบายรายละเอียดปัญหาที่พบ..."
-        ></textarea>
+        ></textarea> -->
       </div>
     </div>
 
@@ -124,7 +133,6 @@
       </div>
       <div class="field-input-col">
         <div
-          [class.file-added]="fileAdded()"
           class="dropzone"
           (click)="fileInput.click()"
           (dragover)="onDragOver($event)"

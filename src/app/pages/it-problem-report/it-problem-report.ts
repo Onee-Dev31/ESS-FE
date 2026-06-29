@@ -26,7 +26,7 @@ import { AuthService } from '../../services/auth.service';
 import { finalize } from 'rxjs';
 import { NzSelectModule } from 'ng-zorro-antd/select';
 import { SignalrService } from '../../services/signalr.service';
-import { NzMessageService } from 'ng-zorro-antd/message';
+import { QuillModule } from 'ngx-quill';
 
 @Component({
   selector: 'app-it-problem-report',
@@ -37,6 +37,7 @@ import { NzMessageService } from 'ng-zorro-antd/message';
     PageHeaderComponent,
     FilePreviewModalComponent,
     NzSelectModule,
+    QuillModule,
   ],
   templateUrl: './it-problem-report.html',
   styleUrl: './it-problem-report.scss',
@@ -51,8 +52,6 @@ export class ItProblemReportComponent implements OnInit {
   private itServiceService = inject(ItServiceService);
   private authService = inject(AuthService);
   private cdr = inject(ChangeDetectorRef);
-
-  fileAdded = signal(false);
 
   problemFormData = signal({
     topic: '',
@@ -95,7 +94,19 @@ export class ItProblemReportComponent implements OnInit {
     allowedExtensions: ['jpg', 'jpeg', 'png', 'gif', 'pdf', 'docx', 'xlsx', 'xls'],
   };
 
-  constructor(private message: NzMessageService) {}
+  quillConfig = {
+    toolbar: [
+      ['bold'],
+      // ['bold', 'italic', 'underline'],
+
+      // [{ list: 'ordered' }, { list: 'bullet' }],
+
+      // ['blockquote'],
+
+      // ['link'],
+      ['image'],
+    ],
+  };
 
   ngOnInit() {
     this.getSubProblem();
@@ -156,8 +167,8 @@ export class ItProblemReportComponent implements OnInit {
   isFormValid = computed(() => {
     const { topic, detail, categories, phoneNumber } = this.problemFormData();
     return (
-      topic.trim().length > 0 &&
-      detail.trim().length > 0 &&
+      topic?.trim().length > 0 &&
+      detail.length > 0 &&
       categories.length > 0 &&
       phoneNumber !== '' &&
       !this.phoneError
@@ -293,57 +304,6 @@ export class ItProblemReportComponent implements OnInit {
     return false;
   }
 
-  onDetailPaste(event: ClipboardEvent) {
-    const items = event.clipboardData?.items;
-
-    if (!items) return;
-
-    let hasImage = false;
-
-    for (const item of Array.from(items)) {
-      if (item.type.startsWith('image/')) {
-        const file = item.getAsFile();
-
-        if (!file) continue;
-
-        hasImage = true;
-
-        this.addClipboardImage(file);
-      }
-    }
-
-    // ถ้าเป็นรูป ไม่ต้อง paste ลง textarea
-    if (hasImage) {
-      event.preventDefault();
-    }
-  }
-
-  private addClipboardImage(file: File) {
-    const image = new File([file], `Screenshot_${Date.now()}.png`, {
-      type: file.type,
-    });
-
-    const dt = new DataTransfer();
-
-    dt.items.add(image);
-
-    const success = this.addFiles(dt.files);
-
-    if (!success) {
-      return;
-    }
-
-    this.message.success('เพิ่มรูปภาพเป็นไฟล์แนบแล้ว', {
-      nzDuration: 2000,
-    });
-
-    this.fileAdded.set(true);
-
-    setTimeout(() => {
-      this.fileAdded.set(false);
-    }, 800);
-  }
-
   viewFile(fileObj: any) {
     if (fileObj.file) {
       const url = URL.createObjectURL(fileObj.file);
@@ -397,13 +357,15 @@ export class ItProblemReportComponent implements OnInit {
   }
 
   submit() {
-    const data = this.problemFormData();
-    if (!data.topic.trim() || !data.detail.trim()) {
-      this.swalService.warning('แจ้งเตือน', 'กรุณากรอกข้อมูลให้ครบทุกช่อง');
-      return;
-    }
-    this.problemFormData.update((data) => ({ ...data, phoneNumber: this.phoneModel }));
-    this.showSummaryModal.set(true);
+    console.log('problemFormData', this.problemFormData());
+    console.log('detail', this.problemFormData().detail);
+    // const data = this.problemFormData();
+    // if (!data.topic.trim() || !data.detail.trim()) {
+    //   this.swalService.warning('แจ้งเตือน', 'กรุณากรอกข้อมูลให้ครบทุกช่อง');
+    //   return;
+    // }
+    // this.problemFormData.update((data) => ({ ...data, phoneNumber: this.phoneModel }));
+    // this.showSummaryModal.set(true);
   }
 
   clearForm() {
