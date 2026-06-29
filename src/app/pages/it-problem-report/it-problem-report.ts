@@ -26,6 +26,7 @@ import { AuthService } from '../../services/auth.service';
 import { finalize } from 'rxjs';
 import { NzSelectModule } from 'ng-zorro-antd/select';
 import { SignalrService } from '../../services/signalr.service';
+import { NzMessageService } from 'ng-zorro-antd/message';
 
 @Component({
   selector: 'app-it-problem-report',
@@ -50,6 +51,8 @@ export class ItProblemReportComponent implements OnInit {
   private itServiceService = inject(ItServiceService);
   private authService = inject(AuthService);
   private cdr = inject(ChangeDetectorRef);
+
+  fileAdded = signal(false);
 
   problemFormData = signal({
     topic: '',
@@ -91,6 +94,8 @@ export class ItProblemReportComponent implements OnInit {
     ],
     allowedExtensions: ['jpg', 'jpeg', 'png', 'gif', 'pdf', 'docx', 'xlsx', 'xls'],
   };
+
+  constructor(private message: NzMessageService) {}
 
   ngOnInit() {
     this.getSubProblem();
@@ -189,8 +194,53 @@ export class ItProblemReportComponent implements OnInit {
     this.addFiles(files);
   }
 
-  private addFiles(files: FileList) {
-    if (!files || files.length === 0) return;
+  // private addFiles(files: FileList) {
+  //   if (!files || files.length === 0) return;
+
+  //   const current = this.problemFormData().attachments;
+  //   const errors: string[] = [];
+  //   const validFiles: { name: string; size: number; file: File }[] = [];
+
+  //   for (const f of Array.from(files)) {
+  //     const reasons: string[] = [];
+
+  //     // เช็คจำนวน
+  //     if (current.length + validFiles.length >= this.FILE_CONFIG.maxFiles) {
+  //       reasons.push(`เกินจำนวนสูงสุด ${this.FILE_CONFIG.maxFiles} ไฟล์`);
+  //     }
+
+  //     // เช็คขนาด
+  //     const sizeMB = f.size / (1024 * 1024);
+  //     if (sizeMB > this.FILE_CONFIG.maxSizeMB) {
+  //       reasons.push(`ขนาดเกิน ${this.FILE_CONFIG.maxSizeMB} MB`);
+  //     }
+
+  //     // เช็ค type
+  //     const ext = f.name.split('.').pop()?.toLowerCase() ?? '';
+  //     if (
+  //       !this.FILE_CONFIG.allowedTypes.includes(f.type) &&
+  //       !this.FILE_CONFIG.allowedExtensions.includes(ext)
+  //     ) {
+  //       reasons.push(`ประเภทไฟล์ไม่รองรับ`);
+  //     }
+
+  //     if (reasons.length > 0) {
+  //       errors.push(`${f.name} (${reasons.join(', ')})`);
+  //       this.swalService.warning(errors.join('\n'));
+  //     } else {
+  //       validFiles.push({ name: f.name, size: f.size, file: f });
+  //     }
+  //   }
+
+  //   if (validFiles.length > 0) {
+  //     this.problemFormData.update((data) => ({
+  //       ...data,
+  //       attachments: [...current, ...validFiles],
+  //     }));
+  //   }
+  // }
+  private addFiles(files: FileList): boolean {
+    if (!files || files.length === 0) return false;
 
     const current = this.problemFormData().attachments;
     const errors: string[] = [];
@@ -199,40 +249,48 @@ export class ItProblemReportComponent implements OnInit {
     for (const f of Array.from(files)) {
       const reasons: string[] = [];
 
-      // เช็คจำนวน
       if (current.length + validFiles.length >= this.FILE_CONFIG.maxFiles) {
         reasons.push(`เกินจำนวนสูงสุด ${this.FILE_CONFIG.maxFiles} ไฟล์`);
       }
 
-      // เช็คขนาด
       const sizeMB = f.size / (1024 * 1024);
       if (sizeMB > this.FILE_CONFIG.maxSizeMB) {
         reasons.push(`ขนาดเกิน ${this.FILE_CONFIG.maxSizeMB} MB`);
       }
 
-      // เช็ค type
       const ext = f.name.split('.').pop()?.toLowerCase() ?? '';
       if (
         !this.FILE_CONFIG.allowedTypes.includes(f.type) &&
         !this.FILE_CONFIG.allowedExtensions.includes(ext)
       ) {
-        reasons.push(`ประเภทไฟล์ไม่รองรับ`);
+        reasons.push('ประเภทไฟล์ไม่รองรับ');
       }
 
       if (reasons.length > 0) {
         errors.push(`${f.name} (${reasons.join(', ')})`);
-        this.swalService.warning(errors.join('\n'));
       } else {
-        validFiles.push({ name: f.name, size: f.size, file: f });
+        validFiles.push({
+          name: f.name,
+          size: f.size,
+          file: f,
+        });
       }
     }
 
-    if (validFiles.length > 0) {
+    if (errors.length) {
+      this.swalService.warning(errors.join('\n'));
+    }
+
+    if (validFiles.length) {
       this.problemFormData.update((data) => ({
         ...data,
         attachments: [...current, ...validFiles],
       }));
+
+      return true;
     }
+
+    return false;
   }
 
   onDetailPaste(event: ClipboardEvent) {
@@ -260,7 +318,6 @@ export class ItProblemReportComponent implements OnInit {
     }
   }
 
-  fileAdded = signal(false);
   private addClipboardImage(file: File) {
     const image = new File([file], `Screenshot_${Date.now()}.png`, {
       type: file.type,
@@ -270,7 +327,15 @@ export class ItProblemReportComponent implements OnInit {
 
     dt.items.add(image);
 
-    this.addFiles(dt.files);
+    const success = this.addFiles(dt.files);
+
+    if (!success) {
+      return;
+    }
+
+    this.message.success('เพิ่มรูปภาพเป็นไฟล์แนบแล้ว', {
+      nzDuration: 2000,
+    });
 
     this.fileAdded.set(true);
 
@@ -278,23 +343,6 @@ export class ItProblemReportComponent implements OnInit {
       this.fileAdded.set(false);
     }, 800);
   }
-
-  // private addFiles(files: FileList) {
-  //   if (files && files.length > 0) {
-  //     const newAttachments = Array.from(files).map((f) => ({
-  //       name: f.name,
-  //       size: f.size,
-  //       file: f,
-  //     }));
-
-  //     const currentAttachments = this.problemFormData().attachments;
-
-  //     this.problemFormData.set({
-  //       ...this.problemFormData(),
-  //       attachments: [...currentAttachments, ...newAttachments],
-  //     });
-  //   }
-  // }
 
   viewFile(fileObj: any) {
     if (fileObj.file) {
