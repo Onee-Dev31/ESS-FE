@@ -528,7 +528,6 @@ export class DashboardIT implements OnInit {
 
   @HostListener('document:click', ['$event'])
   onDocumentClick(event: MouseEvent) {
-    console.log(this.isPreviewModalOpen());
     // ถ้ามี Preview เปิดอยู่ ไม่ต้องปิด Chat
     if (this.isPreviewModalOpen()) return;
 
@@ -908,6 +907,7 @@ export class DashboardIT implements OnInit {
           return next;
         });
       }
+
       if (this.isMobile) {
         this.isTicketDetailOpen.set(true);
       }
@@ -950,7 +950,6 @@ export class DashboardIT implements OnInit {
     this.IS_CHAT_OPEN.update((isOpen) => {
       const next = !isOpen;
       if (next) {
-        this.prepareChatImages();
         this.scrollToBottom();
         this.markChatAsRead();
       }
@@ -1648,18 +1647,12 @@ export class DashboardIT implements OnInit {
     return ['png', 'jpg', 'jpeg', 'gif', 'webp', 'bmp'].includes(ext ?? '');
   }
 
-  prepareChatImages() {
-    const ticket = this.selectedTicket();
+  getImages(files: any[] = []) {
+    return files.filter((f) => this.isImage(f));
+  }
 
-    if (!ticket) return;
-
-    ticket.itNotes.forEach((note: any) => {
-      note.attachments?.forEach((file: any) => {
-        if (!file.previewUrl) {
-          file.previewUrl = this.fileConverter.buildPreviewFile(file).url;
-        }
-      });
-    });
+  getFiles(files: any[] = []) {
+    return files.filter((f) => !this.isImage(f));
   }
 
   getChatAttachments(ticket: any): any[] {
@@ -1724,6 +1717,7 @@ export class DashboardIT implements OnInit {
       replies.map(async (r) => {
         const files = attachments.filter((a) => a.reply_id === r.id);
         const convertedFiles = await this.fileConverter.convertUrlsToFiles(files);
+
         const senderRole =
           requesterAduser && (r.user_aduser || '').toLowerCase() === requesterAduser.toLowerCase()
             ? 'requester'
