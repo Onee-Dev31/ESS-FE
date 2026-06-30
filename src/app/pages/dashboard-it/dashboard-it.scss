@@ -1636,6 +1636,23 @@
   white-space: pre-wrap;
 }
 
+.chat-images {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.chat-image {
+  // max-width: 280px;
+  // max-height: 280px;
+  // border-radius: 10px;
+  cursor: pointer;
+  // object-fit: contain;
+  // border: 1px solid #e5e7eb;
+  max-width: 100%;
+}
+
 .floating-chat {
   position: fixed;
   right: 28px;
