@@ -115,11 +115,11 @@
         <app-text-editor
           [value]="problemFormData().detail"
           (valueChange)="
-    problemFormData.set({
-      ...problemFormData(),
-      detail: $event
-    })
-  "
+            problemFormData.set({
+              ...problemFormData(),
+              detail: $event,
+            })
+          "
           (imagePathsChange)="onEditorImagesChanged($event)"
           placeholder="อธิบายรายละเอียดปัญหาที่พบ..."
         >

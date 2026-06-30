@@ -252,9 +252,7 @@ export class AllowanceComponent implements OnInit {
   trackByRowId(
     _index: number,
     itemOrRow:
-      | AllowanceRequest
-      | FlatAllowanceRow
-      | import('@tanstack/angular-table').Row<FlatAllowanceRow>,
+      AllowanceRequest | FlatAllowanceRow | import('@tanstack/angular-table').Row<FlatAllowanceRow>,
   ): string {
     const item = 'original' in itemOrRow ? itemOrRow.original : itemOrRow;
     const id = (item as FlatAllowanceRow).requestId || (item as AllowanceRequest).id || 'row';
