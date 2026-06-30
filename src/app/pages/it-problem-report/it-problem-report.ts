@@ -87,6 +87,8 @@ export class ItProblemReportComponent implements OnInit {
 
   // Editor
   editorImagePaths: string[] = [];
+  // @ViewChild(TextEditorComponent)
+  // textEditor!: TextEditorComponent;
 
   readonly FILE_CONFIG = {
     maxFiles: 5,
@@ -383,6 +385,24 @@ export class ItProblemReportComponent implements OnInit {
   }
 
   clearForm() {
+    const detail = this.problemFormData().detail;
+
+    const imageUrls = this.extractImageUrls(detail);
+
+    if (imageUrls.length > 0) {
+      this.textEditorImageService
+        .deleteTemp({
+          image_paths: imageUrls,
+        })
+        .subscribe({
+          next: () => {
+            console.log('Delete temp images success');
+          },
+          error: (err) => {
+            console.error(err);
+          },
+        });
+    }
     const original = this.authData.employee.TELOFF;
     this.phoneModel = '';
     this.cdr.detectChanges();
@@ -395,6 +415,14 @@ export class ItProblemReportComponent implements OnInit {
       categories: [],
       attachments: [],
     });
+  }
+
+  private extractImageUrls(html: string): string[] {
+    const doc = new DOMParser().parseFromString(html, 'text/html');
+
+    return Array.from(doc.querySelectorAll('img'))
+      .map((img) => img.getAttribute('src'))
+      .filter((src): src is string => !!src);
   }
 
   closePage() {
