@@ -269,17 +269,17 @@
     </div>
     <div class="tk-card__body">
       <div class="tk-text" [innerHTML]="formatText.getFormatTextHTML(t.description)"></div>
-      <div class="btn-copy-detail" (click)="copyDescription(t.description)">
+      <div class="btn-copy-detail" (click)="copyDescription(t.id, t.description)">
         <i
           class="fa-solid"
-          [class.fa-copy]="copiedText !== t.description"
-          [class.fa-check]="copiedText === t.description"
+          [class.fa-copy]="copiedTicketId !== t.id"
+          [class.fa-check]="copiedTicketId === t.id"
         ></i>
 
         <!-- {{ copiedText === t.description ? 'คัดลอกแล้ว' : 'คัดลอก' }} -->
       </div>
 
-      <div class="btn-expand-detail" (click)="openDetail(t.description)">
+      <div class="btn-expand-detail" (click)="openDetail(t.ticketId, t.description)">
         <i class="fa-solid fa-expand"></i>
         ดูรายละเอียดเพิ่มเติม
       </div>
@@ -305,7 +305,7 @@
     </div>
     <div class="tk-card__body">
       <div class="tk-text" [innerHTML]="formatText.getFormatTextHTML(t.noteForIt)"></div>
-      <div class="btn-expand-detail" (click)="openDetail(t.noteForIt)">
+      <div class="btn-expand-detail" (click)="openDetail(t.ticketId, t.noteForIt)">
         <i class="fa-solid fa-expand"></i>ดูรายละเอียดเพิ่มเติม
       </div>
     </div>
@@ -968,15 +968,15 @@
         <div
           type="button"
           class="btn-copy-detail expand"
-          (click)="copyDescription(selectedDetail())"
+          (click)="copyDescription(selectedTicketId(), selectedDetail())"
         >
           <i
             class="fa-solid"
-            [class.fa-copy]="copiedText !== selectedDetail()"
-            [class.fa-check]="copiedText === selectedDetail()"
+            [class.fa-copy]="copiedTicketId !== selectedTicketId()"
+            [class.fa-check]="copiedTicketId === selectedTicketId()"
           ></i>
 
-          <!-- {{ copiedText === selectedDetail() ? 'คัดลอกแล้ว' : 'คัดลอก' }} -->
+          <!-- {{ copiedTicketId === selectedTicketId() ? 'คัดลอกแล้ว' : 'คัดลอก' }} -->
         </div>
       </div>
     </div>

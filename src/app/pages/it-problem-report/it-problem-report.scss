@@ -2019,3 +2019,11 @@ $table-label-bg: var(--border-toolbar);
     box-shadow: 0 0 0 4px rgba(167, 139, 250, 0.1) !important;
   }
 }
+
+::ng-deep .ql-container {
+  min-height: 260px;
+}
+
+::ng-deep .ql-editor {
+  min-height: 220px;
+}

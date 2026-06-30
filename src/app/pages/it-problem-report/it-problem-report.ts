@@ -7,6 +7,7 @@ import {
   ChangeDetectorRef,
   effect,
   Input,
+  ViewChild,
 } from '@angular/core';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
@@ -26,6 +27,10 @@ import { AuthService } from '../../services/auth.service';
 import { finalize } from 'rxjs';
 import { NzSelectModule } from 'ng-zorro-antd/select';
 import { SignalrService } from '../../services/signalr.service';
+import { QuillEditorComponent, QuillModule } from 'ngx-quill';
+import Quill from 'quill';
+import { TextEditorImageService } from '../../services/text-editor-image.service';
+import { TextEditorComponent } from '../../components/shared/text-editor/text-editor';
 
 @Component({
   selector: 'app-it-problem-report',
@@ -36,6 +41,8 @@ import { SignalrService } from '../../services/signalr.service';
     PageHeaderComponent,
     FilePreviewModalComponent,
     NzSelectModule,
+    QuillModule,
+    TextEditorComponent,
   ],
   templateUrl: './it-problem-report.html',
   styleUrl: './it-problem-report.scss',
@@ -48,6 +55,7 @@ export class ItProblemReportComponent implements OnInit {
   private signalrService = inject(SignalrService);
   private itServiceMock = inject(ItServiceMockService);
   private itServiceService = inject(ItServiceService);
+  private textEditorImageService = inject(TextEditorImageService);
   private authService = inject(AuthService);
   private cdr = inject(ChangeDetectorRef);
 
@@ -76,6 +84,9 @@ export class ItProblemReportComponent implements OnInit {
   readonly nzFilterOption = () => true;
   ccSearched = signal<boolean>(false);
   readonly CC_CATEGORIES = ['BMS', 'Oracle', 'Onee App'];
+
+  // Editor
+  editorImagePaths: string[] = [];
 
   readonly FILE_CONFIG = {
     maxFiles: 5,
@@ -151,8 +162,8 @@ export class ItProblemReportComponent implements OnInit {
   isFormValid = computed(() => {
     const { topic, detail, categories, phoneNumber } = this.problemFormData();
     return (
-      topic.trim().length > 0 &&
-      detail.trim().length > 0 &&
+      topic?.trim().length > 0 &&
+      detail.length > 0 &&
       categories.length > 0 &&
       phoneNumber !== '' &&
       !this.phoneError
@@ -189,8 +200,53 @@ export class ItProblemReportComponent implements OnInit {
     this.addFiles(files);
   }
 
-  private addFiles(files: FileList) {
-    if (!files || files.length === 0) return;
+  // private addFiles(files: FileList) {
+  //   if (!files || files.length === 0) return;
+
+  //   const current = this.problemFormData().attachments;
+  //   const errors: string[] = [];
+  //   const validFiles: { name: string; size: number; file: File }[] = [];
+
+  //   for (const f of Array.from(files)) {
+  //     const reasons: string[] = [];
+
+  //     // เช็คจำนวน
+  //     if (current.length + validFiles.length >= this.FILE_CONFIG.maxFiles) {
+  //       reasons.push(`เกินจำนวนสูงสุด ${this.FILE_CONFIG.maxFiles} ไฟล์`);
+  //     }
+
+  //     // เช็คขนาด
+  //     const sizeMB = f.size / (1024 * 1024);
+  //     if (sizeMB > this.FILE_CONFIG.maxSizeMB) {
+  //       reasons.push(`ขนาดเกิน ${this.FILE_CONFIG.maxSizeMB} MB`);
+  //     }
+
+  //     // เช็ค type
+  //     const ext = f.name.split('.').pop()?.toLowerCase() ?? '';
+  //     if (
+  //       !this.FILE_CONFIG.allowedTypes.includes(f.type) &&
+  //       !this.FILE_CONFIG.allowedExtensions.includes(ext)
+  //     ) {
+  //       reasons.push(`ประเภทไฟล์ไม่รองรับ`);
+  //     }
+
+  //     if (reasons.length > 0) {
+  //       errors.push(`${f.name} (${reasons.join(', ')})`);
+  //       this.swalService.warning(errors.join('\n'));
+  //     } else {
+  //       validFiles.push({ name: f.name, size: f.size, file: f });
+  //     }
+  //   }
+
+  //   if (validFiles.length > 0) {
+  //     this.problemFormData.update((data) => ({
+  //       ...data,
+  //       attachments: [...current, ...validFiles],
+  //     }));
+  //   }
+  // }
+  private addFiles(files: FileList): boolean {
+    if (!files || files.length === 0) return false;
 
     const current = this.problemFormData().attachments;
     const errors: string[] = [];
@@ -199,58 +255,49 @@ export class ItProblemReportComponent implements OnInit {
     for (const f of Array.from(files)) {
       const reasons: string[] = [];
 
-      // เช็คจำนวน
       if (current.length + validFiles.length >= this.FILE_CONFIG.maxFiles) {
         reasons.push(`เกินจำนวนสูงสุด ${this.FILE_CONFIG.maxFiles} ไฟล์`);
       }
 
-      // เช็คขนาด
       const sizeMB = f.size / (1024 * 1024);
       if (sizeMB > this.FILE_CONFIG.maxSizeMB) {
         reasons.push(`ขนาดเกิน ${this.FILE_CONFIG.maxSizeMB} MB`);
       }
 
-      // เช็ค type
       const ext = f.name.split('.').pop()?.toLowerCase() ?? '';
       if (
         !this.FILE_CONFIG.allowedTypes.includes(f.type) &&
         !this.FILE_CONFIG.allowedExtensions.includes(ext)
       ) {
-        reasons.push(`ประเภทไฟล์ไม่รองรับ`);
+        reasons.push('ประเภทไฟล์ไม่รองรับ');
       }
 
       if (reasons.length > 0) {
         errors.push(`${f.name} (${reasons.join(', ')})`);
-        this.swalService.warning(errors.join('\n'));
       } else {
-        validFiles.push({ name: f.name, size: f.size, file: f });
+        validFiles.push({
+          name: f.name,
+          size: f.size,
+          file: f,
+        });
       }
     }
 
-    if (validFiles.length > 0) {
+    if (errors.length) {
+      this.swalService.warning(errors.join('\n'));
+    }
+
+    if (validFiles.length) {
       this.problemFormData.update((data) => ({
         ...data,
         attachments: [...current, ...validFiles],
       }));
+
+      return true;
     }
+
+    return false;
   }
-
-  // private addFiles(files: FileList) {
-  //   if (files && files.length > 0) {
-  //     const newAttachments = Array.from(files).map((f) => ({
-  //       name: f.name,
-  //       size: f.size,
-  //       file: f,
-  //     }));
-
-  //     const currentAttachments = this.problemFormData().attachments;
-
-  //     this.problemFormData.set({
-  //       ...this.problemFormData(),
-  //       attachments: [...currentAttachments, ...newAttachments],
-  //     });
-  //   }
-  // }
 
   viewFile(fileObj: any) {
     if (fileObj.file) {
@@ -283,6 +330,25 @@ export class ItProblemReportComponent implements OnInit {
     });
   }
 
+  // EDITOR
+  onEditorImagesChanged(paths: string[]) {
+    this.editorImagePaths = paths;
+
+    console.log('Editor Images', paths);
+  }
+
+  // confirmImages(): Observable<any> {
+  //   if (this.uploadedImages.size === 0) {
+  //     return of(null);
+  //   }
+
+  //   return this.textEditorImageService.confirm({
+  //     image_paths: [...this.uploadedImages],
+  //   });
+  // }
+
+  // STEP 2
+
   showSummaryModal = signal(false);
 
   submittedRequests = signal<any[]>([
@@ -305,6 +371,8 @@ export class ItProblemReportComponent implements OnInit {
   }
 
   submit() {
+    // console.log('problemFormData', this.problemFormData());
+    // console.log('detail', this.problemFormData().detail);
     const data = this.problemFormData();
     if (!data.topic.trim() || !data.detail.trim()) {
       this.swalService.warning('แจ้งเตือน', 'กรุณากรอกข้อมูลให้ครบทุกช่อง');
@@ -341,7 +409,7 @@ export class ItProblemReportComponent implements OnInit {
     const data = this.problemFormData();
     const formData = new FormData();
     formData.append('subject', data.topic);
-    formData.append('description', data.detail);
+    // formData.append('description', data.detail);
     formData.append('requesterAduser', this.authService.currentUser() || '-');
     formData.append('subCategoryId', data.categories[0].id);
     formData.append('contactPhone', data.phoneNumber);
@@ -373,8 +441,63 @@ export class ItProblemReportComponent implements OnInit {
     });
 
     console.log('formData', [...formData.entries()]);
+    console.log('Editor Images', this.editorImagePaths);
+
+    this.textEditorImageService.confirm({
+      image_paths: this.editorImagePaths,
+    });
 
     this.swalService.loading('กำลังบันทึกข้อมูล...');
+    this.textEditorImageService
+      .confirm({
+        image_paths: this.editorImagePaths,
+      })
+      .subscribe({
+        next: (res) => {
+          let description = data.detail;
+
+          res.data.forEach((item: any) => {
+            description = description.replaceAll(item.tempPath, item.fileUrl);
+          });
+
+          formData.append('description', description);
+
+          this.createTicket(formData);
+        },
+        error: (err) => {
+          console.error(err);
+          this.swalService.warning('ไม่สามารถยืนยันรูปภาพได้');
+        },
+      });
+    // this.itServiceService
+    //   .createTicket(formData)
+    //   .pipe(
+    //     finalize(() => {
+    //       this.closeSummaryModal();
+    //     }),
+    //   )
+    //   .subscribe({
+    //     next: (res) => {
+    //       if (res.success) {
+    //         // this.signalrService.sendNewTicketNotification(res.ticketNumber);
+    //         this.swalService.success('แจ้งปัญหาสำเร็จ', res.ticketNumber).then(() => {
+    //           this.clearForm();
+    //           this.router.navigate(['/it-service-list']);
+    //         });
+    //       }
+    //     },
+    //     error: (error) => {
+    //       console.error('Error fetching data:', error.error.message);
+    //       this.swalService.warning('เกิดข้อผิดพลาด', error.error.message).then(() => {
+    //         this.clearForm();
+    //         this.router.navigate(['/it-service-list']);
+    //       });
+    //       // const message = error?.error?.message || '';
+    //     },
+    //   });
+  }
+
+  private createTicket(formData: FormData) {
     this.itServiceService
       .createTicket(formData)
       .pipe(
@@ -385,7 +508,6 @@ export class ItProblemReportComponent implements OnInit {
       .subscribe({
         next: (res) => {
           if (res.success) {
-            // this.signalrService.sendNewTicketNotification(res.ticketNumber);
             this.swalService.success('แจ้งปัญหาสำเร็จ', res.ticketNumber).then(() => {
               this.clearForm();
               this.router.navigate(['/it-service-list']);
@@ -393,12 +515,12 @@ export class ItProblemReportComponent implements OnInit {
           }
         },
         error: (error) => {
-          console.error('Error fetching data:', error.error.message);
+          console.error(error.error.message);
+
           this.swalService.warning('เกิดข้อผิดพลาด', error.error.message).then(() => {
             this.clearForm();
             this.router.navigate(['/it-service-list']);
           });
-          // const message = error?.error?.message || '';
         },
       });
   }

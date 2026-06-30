@@ -1,0 +1,22 @@
+:host {
+  display: block;
+  width: 100%;
+}
+
+.editor {
+  width: 100%;
+}
+
+::ng-deep .ql-toolbar {
+  border-radius: 10px 10px 0 0;
+}
+
+::ng-deep .ql-container {
+  min-height: 250px;
+  border-radius: 0 0 10px 10px;
+}
+
+::ng-deep .ql-editor {
+  min-height: 220px;
+  font-family: inherit;
+}
