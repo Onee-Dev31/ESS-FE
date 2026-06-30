@@ -6,6 +6,7 @@ import { TextEditorImageManager } from './image-manager';
 import Quill from 'quill';
 import { TextEditorImageService } from '../../../services/text-editor-image.service';
 import { SwalService } from '../../../services/swal.service';
+import { map, Observable, of } from 'rxjs';
 
 @Component({
   selector: 'app-text-editor',
@@ -120,6 +121,65 @@ export class TextEditorComponent {
           this.emitImagePaths();
 
           console.log('Delete success');
+        },
+        error: (err) => {
+          console.error(err);
+        },
+      });
+  }
+
+  confirmImages(): Observable<string> {
+    if (this.uploadedImages.size === 0) {
+      return of(this.value);
+    }
+
+    return this.textEditorImageService
+      .confirm({
+        image_paths: [...this.uploadedImages],
+      })
+      .pipe(
+        map((res) => {
+          let html = this.value;
+
+          res.data.forEach((item: any) => {
+            html = html.replaceAll(item.tempPath, item.fileUrl);
+          });
+
+          return html;
+        }),
+      );
+  }
+
+  clear() {
+    this.clearImages();
+
+    this.uploadedImages.clear();
+
+    this.value = '';
+
+    this.valueChange.emit('');
+
+    this.quill?.setContents([]);
+  }
+
+  clearImages() {
+    if (this.uploadedImages.size === 0) {
+      return;
+    }
+
+    const imagePaths = [...this.uploadedImages];
+
+    this.textEditorImageService
+      .deleteTemp({
+        image_paths: imagePaths,
+      })
+      .subscribe({
+        next: () => {
+          this.uploadedImages.clear();
+
+          this.emitImagePaths();
+
+          console.log('Delete temp images success');
         },
         error: (err) => {
           console.error(err);

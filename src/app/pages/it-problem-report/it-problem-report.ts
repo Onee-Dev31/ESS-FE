@@ -86,7 +86,9 @@ export class ItProblemReportComponent implements OnInit {
   readonly CC_CATEGORIES = ['BMS', 'Oracle', 'Onee App'];
 
   // Editor
-  editorImagePaths: string[] = [];
+  // editorImagePaths: string[] = [];
+  @ViewChild(TextEditorComponent)
+  textEditor!: TextEditorComponent;
 
   readonly FILE_CONFIG = {
     maxFiles: 5,
@@ -330,23 +332,6 @@ export class ItProblemReportComponent implements OnInit {
     });
   }
 
-  // EDITOR
-  onEditorImagesChanged(paths: string[]) {
-    this.editorImagePaths = paths;
-
-    console.log('Editor Images', paths);
-  }
-
-  // confirmImages(): Observable<any> {
-  //   if (this.uploadedImages.size === 0) {
-  //     return of(null);
-  //   }
-
-  //   return this.textEditorImageService.confirm({
-  //     image_paths: [...this.uploadedImages],
-  //   });
-  // }
-
   // STEP 2
 
   showSummaryModal = signal(false);
@@ -383,6 +368,7 @@ export class ItProblemReportComponent implements OnInit {
   }
 
   clearForm() {
+    this.textEditor.clear();
     const original = this.authData.employee.TELOFF;
     this.phoneModel = '';
     this.cdr.detectChanges();
@@ -441,60 +427,19 @@ export class ItProblemReportComponent implements OnInit {
     });
 
     console.log('formData', [...formData.entries()]);
-    console.log('Editor Images', this.editorImagePaths);
-
-    this.textEditorImageService.confirm({
-      image_paths: this.editorImagePaths,
-    });
 
     this.swalService.loading('กำลังบันทึกข้อมูล...');
-    this.textEditorImageService
-      .confirm({
-        image_paths: this.editorImagePaths,
-      })
-      .subscribe({
-        next: (res) => {
-          let description = data.detail;
 
-          res.data.forEach((item: any) => {
-            description = description.replaceAll(item.tempPath, item.fileUrl);
-          });
+    this.textEditor.confirmImages().subscribe({
+      next: (description) => {
+        formData.append('description', description);
 
-          formData.append('description', description);
-
-          this.createTicket(formData);
-        },
-        error: (err) => {
-          console.error(err);
-          this.swalService.warning('ไม่สามารถยืนยันรูปภาพได้');
-        },
-      });
-    // this.itServiceService
-    //   .createTicket(formData)
-    //   .pipe(
-    //     finalize(() => {
-    //       this.closeSummaryModal();
-    //     }),
-    //   )
-    //   .subscribe({
-    //     next: (res) => {
-    //       if (res.success) {
-    //         // this.signalrService.sendNewTicketNotification(res.ticketNumber);
-    //         this.swalService.success('แจ้งปัญหาสำเร็จ', res.ticketNumber).then(() => {
-    //           this.clearForm();
-    //           this.router.navigate(['/it-service-list']);
-    //         });
-    //       }
-    //     },
-    //     error: (error) => {
-    //       console.error('Error fetching data:', error.error.message);
-    //       this.swalService.warning('เกิดข้อผิดพลาด', error.error.message).then(() => {
-    //         this.clearForm();
-    //         this.router.navigate(['/it-service-list']);
-    //       });
-    //       // const message = error?.error?.message || '';
-    //     },
-    //   });
+        this.createTicket(formData);
+      },
+      error: (err) => {
+        console.error(err);
+      },
+    });
   }
 
   private createTicket(formData: FormData) {
