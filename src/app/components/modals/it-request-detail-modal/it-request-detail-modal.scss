@@ -474,3 +474,8 @@
     }
   }
 }
+
+.html-detail ::ng-deep th {
+  text-align: start;
+  padding-right: 16px;
+}

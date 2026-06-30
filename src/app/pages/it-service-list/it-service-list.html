@@ -257,7 +257,8 @@
       </div>
     </div>
     <div class="tk-card__body" *ngIf="t.status !== 'Waiting you'">
-      <div class="tk-text" [innerHTML]="formatText.getFormatTextHTML(t.description)"></div>
+      <div class="tk-text html-detail" [innerHTML]="t.description"></div>
+      <!-- <div class="tk-text" [innerHTML]="formatText.getFormatTextHTML(t.description)"></div> -->
     </div>
     <div class="tk-card__body detail" *ngIf="t.status === 'Waiting you'">
       <textarea
@@ -288,7 +289,8 @@
       </div>
     </div>
     <div class="tk-card__body">
-      <div class="tk-text" [innerHTML]="formatText.getFormatTextHTML(t.rejection_reason)"></div>
+      <div class="tk-text html-detail" [innerHTML]="t.rejection_reason"></div>
+      <!-- <div class="tk-text" [innerHTML]="formatText.getFormatTextHTML(t.rejection_reason)"></div> -->
     </div>
   </section>
 
@@ -923,7 +925,8 @@
         </button>
       </div>
       <div class="modal-body">
-        <div [innerHTML]="formatText.getFormatTextHTML(selectedDetail())"></div>
+        <div class="html-detail" [innerHTML]="selectedDetail()"></div>
+        <!-- <div [innerHTML]="formatText.getFormatTextHTML(selectedDetail())"></div> -->
       </div>
     </div>
   </div>

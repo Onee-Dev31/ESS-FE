@@ -2017,7 +2017,7 @@ $table-label-bg: var(--border-toolbar);
   @include btn-outline;
 }
 
-.summary-preview ::ng-deep th {
+.html-detail ::ng-deep th {
   text-align: start;
   padding-right: 16px;
 }
