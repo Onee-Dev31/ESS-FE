@@ -2021,3 +2021,9 @@ $table-label-bg: var(--border-toolbar);
   text-align: start;
   padding-right: 16px;
 }
+
+.html-detail ::ng-deep img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}

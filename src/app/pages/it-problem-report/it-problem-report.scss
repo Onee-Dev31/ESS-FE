@@ -1186,6 +1186,12 @@ $table-label-bg: var(--border-toolbar);
   }
 }
 
+:host ::ng-deep .info-table img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
 /* ==========================================================================
    11. VIEW DETAILS BUTTON
    ========================================================================== */
