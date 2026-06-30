@@ -2016,3 +2016,8 @@ $table-label-bg: var(--border-toolbar);
 .btn-delete {
   @include btn-outline;
 }
+
+.summary-preview ::ng-deep th {
+  text-align: start;
+  padding-right: 16px;
+}

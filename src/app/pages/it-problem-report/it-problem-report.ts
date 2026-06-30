@@ -163,7 +163,7 @@ export class ItProblemReportComponent implements OnInit {
     const { topic, detail, categories, phoneNumber } = this.problemFormData();
     return (
       topic?.trim().length > 0 &&
-      detail.length > 0 &&
+      detail?.length > 0 &&
       categories.length > 0 &&
       phoneNumber !== '' &&
       !this.phoneError
