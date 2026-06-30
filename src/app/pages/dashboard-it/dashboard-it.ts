@@ -950,6 +950,7 @@ export class DashboardIT implements OnInit {
     this.IS_CHAT_OPEN.update((isOpen) => {
       const next = !isOpen;
       if (next) {
+        this.prepareChatImages();
         this.scrollToBottom();
         this.markChatAsRead();
       }
@@ -1606,7 +1607,6 @@ export class DashboardIT implements OnInit {
   }
 
   viewFile(file: any) {
-    console.log(file);
     this.previewFiles.set([this.fileConverter.buildPreviewFile(file)]);
     this.IS_CHAT_OPEN.set(true);
     this.isPreviewModalOpen.set(true);
@@ -1648,20 +1648,18 @@ export class DashboardIT implements OnInit {
     return ['png', 'jpg', 'jpeg', 'gif', 'webp', 'bmp'].includes(ext ?? '');
   }
 
-  getFileUrl(file: any): string {
-    if (file.filePath) {
-      return file.filePath;
-    }
+  prepareChatImages() {
+    const ticket = this.selectedTicket();
 
-    if (file.file_path) {
-      return file.file_path;
-    }
+    if (!ticket) return;
 
-    if (file.url) {
-      return file.url;
-    }
-
-    return '';
+    ticket.itNotes.forEach((note: any) => {
+      note.attachments?.forEach((file: any) => {
+        if (!file.previewUrl) {
+          file.previewUrl = this.fileConverter.buildPreviewFile(file).url;
+        }
+      });
+    });
   }
 
   getChatAttachments(ticket: any): any[] {

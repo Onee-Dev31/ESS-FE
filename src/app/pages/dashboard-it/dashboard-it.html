@@ -509,7 +509,7 @@
                   <img
                     *ngIf="isImage(file)"
                     class="chat-image"
-                    [src]="getFileUrl(file)"
+                    [src]="file.previewUrl"
                     [alt]="file.name"
                     (click)="viewFile(file)"
                   />
