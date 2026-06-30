@@ -40,11 +40,10 @@ export class FileConverterService {
       type: fileData.FILE_TYPE || fileData.file_type,
     });
 
-    // console.log("fileData", fileData)
-    return {
+    const converted: ConvertedFile = {
       fieldId: fileData.FileID || fileData.attachment_id,
       name: fileData.FILE_NAME || fileData.file_name,
-      file: file,
+      file,
       description: fileData.DESCRIPTION || fileData.file_description || '',
       uploadedByAduser: fileData.uploadedByaAduser,
       createdDate: fileData.created_at,
@@ -53,6 +52,24 @@ export class FileConverterService {
       type: fileData.file_type,
       ...fileData,
     };
+
+    return {
+      ...converted,
+      previewUrl: this.buildPreviewFile(converted).url,
+    };
+    // // console.log('fileData', fileData);
+    // return {
+    //   fieldId: fileData.FileID || fileData.attachment_id,
+    //   name: fileData.FILE_NAME || fileData.file_name,
+    //   file: file,
+    //   description: fileData.DESCRIPTION || fileData.file_description || '',
+    //   uploadedByAduser: fileData.uploadedByaAduser,
+    //   createdDate: fileData.created_at,
+    //   filePath: fileData.file_path || fileData.file_url,
+    //   size: fileData.file_size,
+    //   type: fileData.file_type,
+    //   ...fileData,
+    // };
   }
 
   // แปลงหลายไฟล์

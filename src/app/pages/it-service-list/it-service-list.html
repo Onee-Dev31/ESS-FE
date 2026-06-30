@@ -527,7 +527,36 @@
                   </span>
                   {{ n.message }}
                 </div>
-                <ul class="attachment-list" *ngIf="n.attachments?.length > 0">
+                <!-- รูป -->
+                <div class="image-grid" *ngIf="getImages(n.attachments).length">
+                  <img
+                    *ngFor="let file of getImages(n.attachments)"
+                    class="chat-image"
+                    [src]="file.previewUrl"
+                    [alt]="file.name"
+                    (click)="viewFile(file)"
+                  />
+                </div>
+
+                <!-- ไฟล์ -->
+                <div class="attachment-list" *ngIf="getFiles(n.attachments).length">
+                  <div
+                    *ngFor="let file of getFiles(n.attachments)"
+                    class="attachment-item"
+                    (click)="viewFile(file)"
+                  >
+                    <div class="file-icon-box">
+                      <i class="far fa-file-alt"></i>
+                    </div>
+
+                    <span class="file-name">
+                      {{ file.name }}
+                    </span>
+
+                    <i class="fas fa-download download-small"></i>
+                  </div>
+                </div>
+                <!-- <ul class="attachment-list" *ngIf="n.attachments?.length > 0">
                   <li
                     *ngFor="let file of n.attachments"
                     class="attachment-item"
@@ -537,7 +566,7 @@
                     <span class="file-name">{{ file.name }}</span>
                     <i class="fas fa-download download-small"></i>
                   </li>
-                </ul>
+                </ul> -->
                 <div
                   class="read-receipt"
                   *ngIf="last && readersForNote(n.id).length > 0"
@@ -673,6 +702,7 @@
                 rows="1"
                 placeholder="(พิมพ์ @ เพื่อ mention)"
                 aria-label="พิมพ์ข้อความ"
+                (paste)="onChatPaste($event)"
                 (keydown)="handleChatKeydown($event, t)"
               ></textarea>
               <button
@@ -907,7 +937,11 @@
 }
 
 @if (isPreviewModalOpen()) {
-  <app-file-preview-modal [files]="previewFiles()" (onClose)="closePreview()">
+  <app-file-preview-modal
+    [files]="previewFiles()"
+    (onClose)="closePreview()"
+    (click)="$event.stopPropagation()"
+  >
   </app-file-preview-modal>
 }
 

@@ -1799,6 +1799,35 @@ textarea.form-input {
   }
 }
 
+.image-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.chat-image {
+  width: 100%;
+  aspect-ratio: 1;
+  object-fit: cover;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: 0.2s;
+  object-position: center;
+}
+
+.chat-image:hover {
+  transform: scale(1.02);
+}
+
+.attachment-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+
+  margin-top: 12px;
+}
+
 .floating-chat {
   position: fixed;
   right: 28px;

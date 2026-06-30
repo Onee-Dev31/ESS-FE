@@ -503,42 +503,35 @@
                 </div>
               </div>
               <div class="note__msg">{{ n.message }}</div>
-              <div class="chat-images" *ngIf="n.attachments?.length">
-                <ng-container *ngFor="let file of n.attachments">
-                  <!-- รูป -->
-                  <img
-                    *ngIf="isImage(file)"
-                    class="chat-image"
-                    [src]="file.previewUrl"
-                    [alt]="file.name"
-                    (click)="viewFile(file)"
-                  />
-
-                  <!-- ไฟล์อื่น -->
-                  <ul *ngIf="!isImage(file)" class="attachment-list">
-                    <li class="attachment-item" (click)="viewFile(file)">
-                      <div class="file-icon-box">
-                        <i class="far fa-file-alt"></i>
-                      </div>
-
-                      <span class="file-name">{{ file.name }}</span>
-
-                      <i class="fas fa-download download-small"></i>
-                    </li>
-                  </ul>
-                </ng-container>
+              <!-- รูป -->
+              <div class="image-grid" *ngIf="getImages(n.attachments).length">
+                <img
+                  *ngFor="let file of getImages(n.attachments)"
+                  class="chat-image"
+                  [src]="file.previewUrl"
+                  [alt]="file.name"
+                  (click)="viewFile(file)"
+                />
               </div>
-              <!-- <ul class="attachment-list" *ngIf="n.attachments?.length > 0">
-                <li
-                  *ngFor="let file of n.attachments"
+
+              <!-- ไฟล์ -->
+              <div class="attachment-list" *ngIf="getFiles(n.attachments).length">
+                <div
+                  *ngFor="let file of getFiles(n.attachments)"
                   class="attachment-item"
                   (click)="viewFile(file)"
                 >
-                  <div class="file-icon-box"><i class="far fa-file-alt"></i></div>
-                  <span class="file-name">{{ file.name }}</span>
+                  <div class="file-icon-box">
+                    <i class="far fa-file-alt"></i>
+                  </div>
+
+                  <span class="file-name">
+                    {{ file.name }}
+                  </span>
+
                   <i class="fas fa-download download-small"></i>
-                </li>
-              </ul> -->
+                </div>
+              </div>
               <div
                 class="read-receipt"
                 *ngIf="last && readersForNote(n.id).length > 0"

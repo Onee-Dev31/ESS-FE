@@ -806,9 +806,41 @@ export class ItService implements OnInit {
     }
   }
 
+  onChatPaste(event: ClipboardEvent) {
+    const items = event.clipboardData?.items;
+
+    if (!items) return;
+
+    const files: File[] = [];
+
+    for (const item of Array.from(items)) {
+      if (item.kind === 'file') {
+        const file = item.getAsFile();
+
+        if (file) {
+          files.push(file);
+        }
+      }
+    }
+
+    if (!files.length) {
+      // paste ข้อความปกติ
+      return;
+    }
+
+    // ไม่ให้ paste รูปเป็นข้อความ/base64
+    event.preventDefault();
+
+    const dataTransfer = new DataTransfer();
+
+    files.forEach((file) => dataTransfer.items.add(file));
+
+    this.addChatFiles(dataTransfer.files);
+  }
+
   private detectMentionTrigger(value: string) {
     const atMatch = value.match(/@([^\s@]*)$/);
-    console.log('[mention] value:', JSON.stringify(value), 'atMatch:', atMatch);
+    // console.log('[mention] value:', JSON.stringify(value), 'atMatch:', atMatch);
     if (atMatch) {
       this.mentionAtIndex = value.lastIndexOf('@');
       this.mentionQuery = atMatch[1];
@@ -1223,6 +1255,7 @@ export class ItService implements OnInit {
 
   viewFile(file: any) {
     this.previewFiles.set([this.fileConverter.buildPreviewFile(file)]);
+    this.IS_CHAT_OPEN.set(true);
     this.isPreviewModalOpen.set(true);
   }
 
@@ -1248,6 +1281,26 @@ export class ItService implements OnInit {
     ]);
 
     this.isPreviewModalOpen.set(true);
+  }
+
+  isImage(file: any): boolean {
+    const type = file.type || '';
+
+    if (type.startsWith('image/')) {
+      return true;
+    }
+
+    const ext = (file.name || '').split('.').pop()?.toLowerCase();
+
+    return ['png', 'jpg', 'jpeg', 'gif', 'webp', 'bmp'].includes(ext ?? '');
+  }
+
+  getImages(files: any[] = []) {
+    return files.filter((f) => this.isImage(f));
+  }
+
+  getFiles(files: any[] = []) {
+    return files.filter((f) => !this.isImage(f));
   }
 
   getChatAttachments(ticket: any): any[] {
