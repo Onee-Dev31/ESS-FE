@@ -425,10 +425,6 @@
         <div class="floating-chat__header">
           <div class="floating-chat__title">
             <i class="fa-solid fa-comments"></i>
-            <!-- <span>Chat</span>
-            @if (t.ticketNumber) {
-              <span class="floating-chat__ticket-no">#{{ t.ticketNumber }}</span>
-            } -->
             <div class="floating-chat__label">
               <span>Chat</span>
 
@@ -507,7 +503,32 @@
                 </div>
               </div>
               <div class="note__msg">{{ n.message }}</div>
-              <ul class="attachment-list" *ngIf="n.attachments?.length > 0">
+              <div class="chat-images" *ngIf="n.attachments?.length">
+                <ng-container *ngFor="let file of n.attachments">
+                  <!-- รูป -->
+                  <img
+                    *ngIf="isImage(file)"
+                    class="chat-image"
+                    [src]="getFileUrl(file)"
+                    [alt]="file.name"
+                    (click)="viewFile(file)"
+                  />
+
+                  <!-- ไฟล์อื่น -->
+                  <ul *ngIf="!isImage(file)" class="attachment-list">
+                    <li class="attachment-item" (click)="viewFile(file)">
+                      <div class="file-icon-box">
+                        <i class="far fa-file-alt"></i>
+                      </div>
+
+                      <span class="file-name">{{ file.name }}</span>
+
+                      <i class="fas fa-download download-small"></i>
+                    </li>
+                  </ul>
+                </ng-container>
+              </div>
+              <!-- <ul class="attachment-list" *ngIf="n.attachments?.length > 0">
                 <li
                   *ngFor="let file of n.attachments"
                   class="attachment-item"
@@ -517,7 +538,7 @@
                   <span class="file-name">{{ file.name }}</span>
                   <i class="fas fa-download download-small"></i>
                 </li>
-              </ul>
+              </ul> -->
               <div
                 class="read-receipt"
                 *ngIf="last && readersForNote(n.id).length > 0"
@@ -638,6 +659,7 @@
             placeholder="(พิมพ์ @ เพื่อ mention)"
             aria-label="พิมพ์ข้อความ"
             (keydown)="handleChatKeydown($event, t)"
+            (paste)="onChatPaste($event)"
             (click)="emojiPickerOpen = false"
           ></textarea>
           <button
@@ -930,7 +952,11 @@
 }
 
 @if (isPreviewModalOpen()) {
-  <app-file-preview-modal [files]="previewFiles()" (onClose)="closePreview()">
+  <app-file-preview-modal
+    [files]="previewFiles()"
+    (onClose)="closePreview()"
+    (click)="$event.stopPropagation()"
+  >
   </app-file-preview-modal>
 }
 

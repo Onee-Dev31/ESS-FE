@@ -528,7 +528,12 @@ export class DashboardIT implements OnInit {
 
   @HostListener('document:click', ['$event'])
   onDocumentClick(event: MouseEvent) {
+    console.log(this.isPreviewModalOpen());
+    // ถ้ามี Preview เปิดอยู่ ไม่ต้องปิด Chat
+    if (this.isPreviewModalOpen()) return;
+
     if (!this.IS_CHAT_OPEN()) return;
+
     const el = this.floatingChatRef?.nativeElement;
     if (el && !el.contains(event.target as Node)) {
       this.closeChat();
@@ -1104,6 +1109,38 @@ export class DashboardIT implements OnInit {
     }
   }
 
+  onChatPaste(event: ClipboardEvent) {
+    const items = event.clipboardData?.items;
+
+    if (!items) return;
+
+    const files: File[] = [];
+
+    for (const item of Array.from(items)) {
+      if (item.kind === 'file') {
+        const file = item.getAsFile();
+
+        if (file) {
+          files.push(file);
+        }
+      }
+    }
+
+    if (!files.length) {
+      // paste ข้อความปกติ
+      return;
+    }
+
+    // ไม่ให้ paste รูปเป็นข้อความ/base64
+    event.preventDefault();
+
+    const dataTransfer = new DataTransfer();
+
+    files.forEach((file) => dataTransfer.items.add(file));
+
+    this.addChatFiles(dataTransfer.files);
+  }
+
   private detectMentionTrigger(value: string) {
     const atMatch = value.match(/@([^\s@]*)$/);
     if (atMatch) {
@@ -1569,8 +1606,9 @@ export class DashboardIT implements OnInit {
   }
 
   viewFile(file: any) {
-    // console.log(file);
+    console.log(file);
     this.previewFiles.set([this.fileConverter.buildPreviewFile(file)]);
+    this.IS_CHAT_OPEN.set(true);
     this.isPreviewModalOpen.set(true);
   }
 
@@ -1596,6 +1634,34 @@ export class DashboardIT implements OnInit {
     ]);
 
     this.isPreviewModalOpen.set(true);
+  }
+
+  isImage(file: any): boolean {
+    const type = file.type || '';
+
+    if (type.startsWith('image/')) {
+      return true;
+    }
+
+    const ext = (file.name || '').split('.').pop()?.toLowerCase();
+
+    return ['png', 'jpg', 'jpeg', 'gif', 'webp', 'bmp'].includes(ext ?? '');
+  }
+
+  getFileUrl(file: any): string {
+    if (file.filePath) {
+      return file.filePath;
+    }
+
+    if (file.file_path) {
+      return file.file_path;
+    }
+
+    if (file.url) {
+      return file.url;
+    }
+
+    return '';
   }
 
   getChatAttachments(ticket: any): any[] {
