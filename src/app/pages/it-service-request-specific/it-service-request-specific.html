@@ -777,10 +777,11 @@
         </div>
 
         <div class="modal-body">
-          <div
+          <!-- <div
             class="summary-preview"
             [innerHTML]="formatText.getFormatTextHTML(summaryText())"
-          ></div>
+          ></div> -->
+          <div class="summary-preview html-detail" [innerHTML]="summaryText()"></div>
         </div>
 
         <div class="modal-footer">

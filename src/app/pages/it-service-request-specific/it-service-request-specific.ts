@@ -1055,68 +1055,202 @@ export class ITServiceRequestSpecificComponent implements OnInit {
     this.touchSpecificPeople();
   }
 
+  // buildRequestSummary(data: any[]): string {
+  //   return data
+  //     .map((person, index) => {
+  //       const sections: string[] = [];
+
+  //       // =========================
+  //       // HEADER
+  //       // =========================
+
+  //       if (person.openFor?.isFreelance) {
+  //         sections.push(
+  //           `${index + 1}. Freelance`,
+  //           `ชื่อ-นามสกุลภาษาไทย: ${person.freelance.firstNameTh} ${person.freelance.lastNameTh}`,
+  //           `ชื่อ-นามสกุลภาษาอังกฤษ: ${person.freelance.firstNameEn} ${person.freelance.lastNameEn}`,
+  //           `บริษัท: ${person.freelance.company?.COMPANY_NAME} (${person.freelance.company?.COMPANY_CODE})`,
+  //           `แผนก: ${person.freelance.department?.COSTCENT}-${person.freelance.department?.NAMECOSTCENT}`,
+  //           `ตำแหน่ง: ${person.freelance.position}`,
+  //           `อีเมล: ${person.freelance.email}`,
+  //           `เบอร์: ${person.phone}`,
+  //         );
+  //       } else {
+  //         sections.push(
+  //           `${index + 1}. ชื่อ-นามสกุลภาษาไทย: ${person.openFor?.label.split('-')[1]}`,
+  //           `ชื่อ-นามสกุลภาษาอังกฤษ: ${person.openFor?.labelEN.split('-')[1]}`,
+  //           `รหัสผนักงาน: ${person.openFor?.value}`,
+  //           `AD USER: ${person.openFor?.AD_USER}`,
+  //           `บริษัท: ${person.openFor?.COMPANY_NAME}`,
+  //           `แผนก: ${person.openFor?.DEPARTMENT}`,
+  //           `ตำแหน่ง: ${person.openFor?.POST}`,
+  //           `อีเมล: ${person.openFor?.EMAIL}`,
+  //           `เบอร์: ${person.openFor?.USR_MOBILE} / ${person.phone}`,
+  //         );
+  //       }
+
+  //       sections.push('');
+
+  //       // =========================
+  //       // ORACLE
+  //       // =========================
+
+  //       if (person.systems.includes('oracle') && person.oracle) {
+  //         sections.push('[ ระบบ : Oracle ]');
+
+  //         person.oracle.companies.forEach((companyItem: any) => {
+  //           if (companyItem.company) {
+  //             sections.push(
+  //               `บริษัท : ${companyItem.company.COMPANY_NAME} (${companyItem.company.COMPANY_CODE})`,
+  //             );
+  //           }
+
+  //           const selectedModules = companyItem.modules.filter(
+  //             (m: any) => m.permission && m.permission.trim() !== '-',
+  //           );
+
+  //           selectedModules.forEach((m: any) => {
+  //             sections.push(
+  //               `${companyItem.company.COMPANY_CODE} - ${m.module.trim()} ${m.permission.trim()}`,
+  //             );
+  //           });
+
+  //           sections.push('');
+  //         });
+  //       }
+
+  //       // =========================
+  //       // BMS
+  //       // =========================
+
+  //       if (person.systems.includes('bms') && person.bms) {
+  //         sections.push('[ ระบบ : BMS ]');
+
+  //         person.bms.companies.forEach((company: any) => {
+  //           sections.push(`${company.COMPANY_NAME} (${company.COMPANY_CODE})`);
+  //         });
+
+  //         if (person.bms.detail) {
+  //           sections.push(`สิทธิ์เหมือน : ${person.bms.detail.label}`);
+  //         }
+
+  //         sections.push('');
+  //       }
+
+  //       // =========================
+  //       // ONE PORTAL
+  //       // =========================
+
+  //       if (person.systems.includes('onePortal') && person.onePortal) {
+  //         sections.push('[ ระบบ : One Portal ]');
+
+  //         person.onePortal.companies.forEach((company: any) => {
+  //           sections.push(`${company.COMPANY_NAME} (${company.COMPANY_CODE})`);
+  //         });
+
+  //         if (person.onePortal.role) {
+  //           sections.push(`ประเภทสิทธิ์ : ${person.onePortal.role}`);
+  //         }
+
+  //         if (person.onePortal.responseType) {
+  //           sections.push(`ประเภทรายการ : ${person.onePortal.responseType}`);
+  //         }
+
+  //         sections.push('');
+  //       }
+
+  //       // =========================
+  //       // ONEE
+  //       // =========================
+
+  //       if (person.systems.includes('onee') && person.onee) {
+  //         sections.push('[ ระบบ : OneE ]');
+
+  //         person.onee.companies.forEach((company: any) => {
+  //           sections.push(`${company.COMPANY_NAME} (${company.COMPANY_CODE})`);
+  //         });
+
+  //         if (person.onee.permission) {
+  //           sections.push(`สิทธิ์ : ${person.onee.permission.trim()}`);
+  //         }
+
+  //         if (person.onee.supervisor) {
+  //           sections.push(`หัวหน้างาน : ${person.onee.supervisor.label}`);
+  //         }
+
+  //         sections.push('');
+  //       }
+
+  //       // =========================
+  //       // NOTE
+  //       // =========================
+
+  //       if (person.note) {
+  //         sections.push(`หมายเหตุ : ${person.note}`);
+  //       }
+
+  //       return sections.join('\n');
+  //     })
+  //     .join('\n\n=================================\n');
+  // }
   buildRequestSummary(data: any[]): string {
     return data
       .map((person, index) => {
-        const sections: string[] = [];
+        let html = '';
 
         // =========================
         // HEADER
         // =========================
 
-        if (person.openFor?.isFreelance) {
-          sections.push(
-            `${index + 1}. Freelance`,
-            `ชื่อ-นามสกุลภาษาไทย: ${person.freelance.firstNameTh} ${person.freelance.lastNameTh}`,
-            `ชื่อ-นามสกุลภาษาอังกฤษ: ${person.freelance.firstNameEn} ${person.freelance.lastNameEn}`,
-            `บริษัท: ${person.freelance.company?.COMPANY_NAME} (${person.freelance.company?.COMPANY_CODE})`,
-            `แผนก: ${person.freelance.department?.COSTCENT}-${person.freelance.department?.NAMECOSTCENT}`,
-            `ตำแหน่ง: ${person.freelance.position}`,
-            `อีเมล: ${person.freelance.email}`,
-            `เบอร์: ${person.phone}`,
-          );
-        } else {
-          sections.push(
-            `${index + 1}. ชื่อ-นามสกุลภาษาไทย: ${person.openFor?.label.split('-')[1]}`,
-            `ชื่อ-นามสกุลภาษาอังกฤษ: ${person.openFor?.labelEN.split('-')[1]}`,
-            `รหัสผนักงาน: ${person.openFor?.value}`,
-            `AD USER: ${person.openFor?.AD_USER}`,
-            `บริษัท: ${person.openFor?.COMPANY_NAME}`,
-            `แผนก: ${person.openFor?.DEPARTMENT}`,
-            `ตำแหน่ง: ${person.openFor?.POST}`,
-            `อีเมล: ${person.openFor?.EMAIL}`,
-            `เบอร์: ${person.openFor?.USR_MOBILE} / ${person.phone}`,
-          );
-        }
+        html += `<div class="request-person">`;
+        html += `<h3>${index + 1}. ${person.openFor?.isFreelance ? 'Freelance' : 'พนักงาน'}</h3>`;
 
-        sections.push('');
+        if (person.openFor?.isFreelance) {
+          html += `
+          <table>
+            <tr><th>ชื่อ-นามสกุลภาษาไทย</th><td>${person.freelance.firstNameTh} ${person.freelance.lastNameTh}</td></tr>
+            <tr><th>ชื่อ-นามสกุลภาษาอังกฤษ</th><td>${person.freelance.firstNameEn} ${person.freelance.lastNameEn}</td></tr>
+            <tr><th>บริษัท</th><td>${person.freelance.company?.COMPANY_NAME} (${person.freelance.company?.COMPANY_CODE})</td></tr>
+            <tr><th>แผนก</th><td>${person.freelance.department?.COSTCENT}-${person.freelance.department?.NAMECOSTCENT}</td></tr>
+            <tr><th>ตำแหน่ง</th><td>${person.freelance.position}</td></tr>
+            <tr><th>อีเมล</th><td>${person.freelance.email}</td></tr>
+            <tr><th>เบอร์</th><td>${person.phone}</td></tr>
+          </table>
+        `;
+        } else {
+          html += `
+          <table>
+            <tr><th>ชื่อ-นามสกุลภาษาไทย</th><td>${person.openFor?.label.split('-')[1]}</td></tr>
+            <tr><th>ชื่อ-นามสกุลภาษาอังกฤษ</th><td>${person.openFor?.labelEN.split('-')[1]}</td></tr>
+            <tr><th>รหัสพนักงาน</th><td>${person.openFor?.value}</td></tr>
+            <tr><th>AD USER</th><td>${person.openFor?.AD_USER}</td></tr>
+            <tr><th>บริษัท</th><td>${person.openFor?.COMPANY_NAME}</td></tr>
+            <tr><th>แผนก</th><td>${person.openFor?.DEPARTMENT}</td></tr>
+            <tr><th>ตำแหน่ง</th><td>${person.openFor?.POST}</td></tr>
+            <tr><th>อีเมล</th><td>${person.openFor?.EMAIL}</td></tr>
+            <tr><th>เบอร์</th><td>${person.openFor?.USR_MOBILE} / ${person.phone}</td></tr>
+          </table>
+        `;
+        }
 
         // =========================
         // ORACLE
         // =========================
 
         if (person.systems.includes('oracle') && person.oracle) {
-          sections.push('[ ระบบ : Oracle ]');
+          html += `<h4>Oracle</h4><ul>`;
 
           person.oracle.companies.forEach((companyItem: any) => {
-            if (companyItem.company) {
-              sections.push(
-                `บริษัท : ${companyItem.company.COMPANY_NAME} (${companyItem.company.COMPANY_CODE})`,
-              );
-            }
+            html += `<li><b>${companyItem.company.COMPANY_NAME} (${companyItem.company.COMPANY_CODE})</b></li>`;
 
-            const selectedModules = companyItem.modules.filter(
-              (m: any) => m.permission && m.permission.trim() !== '-',
-            );
-
-            selectedModules.forEach((m: any) => {
-              sections.push(
-                `${companyItem.company.COMPANY_CODE} - ${m.module.trim()} ${m.permission.trim()}`,
-              );
-            });
-
-            sections.push('');
+            companyItem.modules
+              .filter((m: any) => m.permission && m.permission.trim() !== '-')
+              .forEach((m: any) => {
+                html += `<li style="margin-left:20px">${m.module.trim()} - ${m.permission.trim()}</li>`;
+              });
           });
+
+          html += `</ul>`;
         }
 
         // =========================
@@ -1124,17 +1258,17 @@ export class ITServiceRequestSpecificComponent implements OnInit {
         // =========================
 
         if (person.systems.includes('bms') && person.bms) {
-          sections.push('[ ระบบ : BMS ]');
+          html += `<h4>BMS</h4><ul>`;
 
           person.bms.companies.forEach((company: any) => {
-            sections.push(`${company.COMPANY_NAME} (${company.COMPANY_CODE})`);
+            html += `<li>${company.COMPANY_NAME} (${company.COMPANY_CODE})</li>`;
           });
 
           if (person.bms.detail) {
-            sections.push(`สิทธิ์เหมือน : ${person.bms.detail.label}`);
+            html += `<li>สิทธิ์เหมือน : ${person.bms.detail.label}</li>`;
           }
 
-          sections.push('');
+          html += `</ul>`;
         }
 
         // =========================
@@ -1142,21 +1276,21 @@ export class ITServiceRequestSpecificComponent implements OnInit {
         // =========================
 
         if (person.systems.includes('onePortal') && person.onePortal) {
-          sections.push('[ ระบบ : One Portal ]');
+          html += `<h4>One Portal</h4><ul>`;
 
           person.onePortal.companies.forEach((company: any) => {
-            sections.push(`${company.COMPANY_NAME} (${company.COMPANY_CODE})`);
+            html += `<li>${company.COMPANY_NAME} (${company.COMPANY_CODE})</li>`;
           });
 
           if (person.onePortal.role) {
-            sections.push(`ประเภทสิทธิ์ : ${person.onePortal.role}`);
+            html += `<li>ประเภทสิทธิ์ : ${person.onePortal.role}</li>`;
           }
 
           if (person.onePortal.responseType) {
-            sections.push(`ประเภทรายการ : ${person.onePortal.responseType}`);
+            html += `<li>ประเภทรายการ : ${person.onePortal.responseType}</li>`;
           }
 
-          sections.push('');
+          html += `</ul>`;
         }
 
         // =========================
@@ -1164,21 +1298,21 @@ export class ITServiceRequestSpecificComponent implements OnInit {
         // =========================
 
         if (person.systems.includes('onee') && person.onee) {
-          sections.push('[ ระบบ : OneE ]');
+          html += `<h4>OneE</h4><ul>`;
 
           person.onee.companies.forEach((company: any) => {
-            sections.push(`${company.COMPANY_NAME} (${company.COMPANY_CODE})`);
+            html += `<li>${company.COMPANY_NAME} (${company.COMPANY_CODE})</li>`;
           });
 
           if (person.onee.permission) {
-            sections.push(`สิทธิ์ : ${person.onee.permission.trim()}`);
+            html += `<li>สิทธิ์ : ${person.onee.permission.trim()}</li>`;
           }
 
           if (person.onee.supervisor) {
-            sections.push(`หัวหน้างาน : ${person.onee.supervisor.label}`);
+            html += `<li>หัวหน้างาน : ${person.onee.supervisor.label}</li>`;
           }
 
-          sections.push('');
+          html += `</ul>`;
         }
 
         // =========================
@@ -1186,12 +1320,14 @@ export class ITServiceRequestSpecificComponent implements OnInit {
         // =========================
 
         if (person.note) {
-          sections.push(`หมายเหตุ : ${person.note}`);
+          html += `<p><b>หมายเหตุ :</b> ${person.note}</p>`;
         }
 
-        return sections.join('\n');
+        html += `</div>`;
+
+        return html;
       })
-      .join('\n\n=================================\n');
+      .join('<hr>');
   }
 
   // Validate

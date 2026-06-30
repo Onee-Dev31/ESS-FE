@@ -3208,3 +3208,8 @@ textarea.form-input {
     transform: translateY(0);
   }
 }
+
+.html-detail ::ng-deep th {
+  text-align: start;
+  padding-right: 16px;
+}
