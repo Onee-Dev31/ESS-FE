@@ -1364,9 +1364,12 @@ export class DashboardIT implements OnInit {
   }
 
   isDetailModalOpen = signal(false);
+  selectedTicketId = signal('');
   selectedDetail = signal('');
 
-  openDetail(description: string) {
+  openDetail(id: any, description: string) {
+    // console.log('id', id);
+    this.selectedTicketId.set(id);
     this.selectedDetail.set(description);
     this.isDetailModalOpen.set(true);
   }
@@ -1377,7 +1380,7 @@ export class DashboardIT implements OnInit {
   //   });
   // }
 
-  copiedText: string | null = null;
+  copiedTicketId: string | null = null;
 
   // copyDescription(text: string) {
   //   navigator.clipboard.writeText(text);
@@ -1392,7 +1395,9 @@ export class DashboardIT implements OnInit {
   //   }, 2000);
   // }
 
-  copyDescription(text: string) {
+  copyDescription(ticketId: string, html: string) {
+    const text = this.toPlainText(html);
+
     const textarea = document.createElement('textarea');
     textarea.value = text;
 
@@ -1403,12 +1408,94 @@ export class DashboardIT implements OnInit {
 
     document.body.removeChild(textarea);
 
-    this.copiedText = text;
+    this.copiedTicketId = ticketId;
 
     setTimeout(() => {
-      this.copiedText = '';
+      this.copiedTicketId = '';
       this.cdr.detectChanges();
     }, 2000);
+  }
+
+  // copyDescription(text: string) {
+  //   const textarea = document.createElement('textarea');
+  //   textarea.value = text;
+
+  //   document.body.appendChild(textarea);
+  //   textarea.select();
+
+  //   document.execCommand('copy');
+
+  //   document.body.removeChild(textarea);
+
+  //   this.copiedText = text;
+
+  //   setTimeout(() => {
+  //     this.copiedText = '';
+  //     this.cdr.detectChanges();
+  //   }, 2000);
+  // }
+
+  private toPlainText(html: string): string {
+    const doc = new DOMParser().parseFromString(html, 'text/html');
+
+    const lines: string[] = [];
+
+    const walk = (node: Node) => {
+      if (node.nodeType === Node.TEXT_NODE) {
+        const text = node.textContent?.replace(/\s+/g, ' ').trim();
+        if (text) {
+          lines.push(text);
+        }
+        return;
+      }
+
+      if (!(node instanceof HTMLElement)) return;
+
+      switch (node.tagName) {
+        case 'IMG': {
+          const src = node.getAttribute('src');
+          if (src) {
+            lines.push(src);
+            lines.push('');
+          }
+          break;
+        }
+
+        case 'LI': {
+          lines.push(`• ${node.textContent?.trim()}`);
+          break;
+        }
+
+        case 'P': {
+          node.childNodes.forEach(walk);
+          lines.push('');
+          break;
+        }
+
+        case 'BR': {
+          lines.push('');
+          break;
+        }
+
+        case 'A': {
+          const text = node.textContent?.trim() ?? '';
+          const href = node.getAttribute('href');
+
+          lines.push(href ? `${text} (${href})` : text);
+          break;
+        }
+
+        default:
+          node.childNodes.forEach(walk);
+      }
+    };
+
+    doc.body.childNodes.forEach(walk);
+
+    return lines
+      .join('\n')
+      .replace(/\n{3,}/g, '\n\n')
+      .trim();
   }
 
   openCcModal(): void {
@@ -1482,13 +1569,13 @@ export class DashboardIT implements OnInit {
   }
 
   viewFile(file: any) {
-    console.log(file);
+    // console.log(file);
     this.previewFiles.set([this.fileConverter.buildPreviewFile(file)]);
     this.isPreviewModalOpen.set(true);
   }
 
   viewFileChat(file: any) {
-    console.log(file);
+    // console.log(file);
     let url = '';
 
     if (file.file) {

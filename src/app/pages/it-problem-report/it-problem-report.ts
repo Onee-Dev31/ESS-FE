@@ -409,7 +409,7 @@ export class ItProblemReportComponent implements OnInit {
     const data = this.problemFormData();
     const formData = new FormData();
     formData.append('subject', data.topic);
-    formData.append('description', data.detail);
+    // formData.append('description', data.detail);
     formData.append('requesterAduser', this.authService.currentUser() || '-');
     formData.append('subCategoryId', data.categories[0].id);
     formData.append('contactPhone', data.phoneNumber);
@@ -453,7 +453,15 @@ export class ItProblemReportComponent implements OnInit {
         image_paths: this.editorImagePaths,
       })
       .subscribe({
-        next: () => {
+        next: (res) => {
+          let description = data.detail;
+
+          res.data.forEach((item: any) => {
+            description = description.replaceAll(item.tempPath, item.fileUrl);
+          });
+
+          formData.append('description', description);
+
           this.createTicket(formData);
         },
         error: (err) => {
