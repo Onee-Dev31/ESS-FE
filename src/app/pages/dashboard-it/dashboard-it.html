@@ -304,7 +304,8 @@
       </div>
     </div>
     <div class="tk-card__body">
-      <div class="tk-text html-detail" [innerHTML]="t.noteForIt"></div>
+      <div class="tk-text html-detail">{{ t.noteForIt }}</div>
+      <!-- <div class="tk-text html-detail" [innerHTML]="t.noteForIt"></div> -->
       <div class="btn-expand-detail" (click)="openDetail(t.ticketId, t.noteForIt)">
         <i class="fa-solid fa-expand"></i>ดูรายละเอียดเพิ่มเติม
       </div>
