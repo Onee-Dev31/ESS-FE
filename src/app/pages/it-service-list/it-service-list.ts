@@ -48,6 +48,7 @@ import { CcModal } from '../dashboard-it/modal/cc-modal/cc-modal';
 import { ReOpenModal } from '../dashboard-it/modal/re-open-modal/re-open-modal';
 import { AvatarPreviewModal } from '../../components/modals/avatar-preview-modal/avatar-preview-modal';
 import { NzDatePickerModule } from 'ng-zorro-antd/date-picker';
+import { ExpandIconComponent } from '../../components/shared/icon/expand-icon';
 
 interface ReplyReader {
   userCodeempid: string;
@@ -76,6 +77,7 @@ interface ReplyReader {
     ReOpenModal,
     AvatarPreviewModal,
     NzDatePickerModule,
+    ExpandIconComponent,
   ],
   templateUrl: './it-service-list.html',
   styleUrl: './it-service-list.scss',

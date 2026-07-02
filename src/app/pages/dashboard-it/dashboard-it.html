@@ -269,18 +269,33 @@
     </div>
     <div class="tk-card__body">
       <div class="tk-text html-detail" [innerHTML]="t.description"></div>
-      <div class="btn-copy-detail" (click)="copyDescription(t.id, t.description)">
+      <!-- <div class="btn-copy-detail" (click)="copyDescription(t.id, t.description)">
         <i
           class="fa-solid"
           [class.fa-copy]="copiedTicketId !== t.id"
           [class.fa-check]="copiedTicketId === t.id"
         ></i>
 
-        <!-- {{ copiedText === t.description ? 'คัดลอกแล้ว' : 'คัดลอก' }} -->
-      </div>
+        {{ copiedTicketId === t.id ? 'คัดลอกแล้ว' : 'คัดลอก' }}
+      </div> -->
 
-      <div class="btn-expand-detail" (click)="openDetail(t.ticketId, t.description)">
+      <!-- <div class="btn-expand-detail" (click)="openDetail(t.ticketId, t.description)">
         <i class="fa-solid fa-expand"></i>
+        ดูรายละเอียดเพิ่มเติม
+      </div> -->
+    </div>
+    <div class="tk-card__footer">
+      <div class="action-btn" (click)="copyDescription(t.id, t.description)">
+        <i
+          class="fa-solid"
+          [class.fa-copy]="copiedTicketId !== t.id"
+          [class.fa-check]="copiedTicketId === t.id"
+        ></i>
+
+        {{ copiedTicketId === t.id ? 'คัดลอกแล้ว' : 'คัดลอก' }}
+      </div>
+      <div class="action-btn action-btn-primary" (click)="openDetail(t.ticketId, t.description)">
+        <app-expand-icon />
         ดูรายละเอียดเพิ่มเติม
       </div>
     </div>
@@ -305,9 +320,10 @@
     </div>
     <div class="tk-card__body">
       <div class="tk-text html-detail">{{ t.noteForIt }}</div>
-      <!-- <div class="tk-text html-detail" [innerHTML]="t.noteForIt"></div> -->
-      <div class="btn-expand-detail" (click)="openDetail(t.ticketId, t.noteForIt)">
-        <i class="fa-solid fa-expand"></i>ดูรายละเอียดเพิ่มเติม
+    </div>
+    <div class="tk-card__footer">
+      <div class="action-btn action-btn-primary" (click)="openDetail(t.ticketId, t.noteForIt)">
+        <app-expand-icon />ดูรายละเอียดเพิ่มเติม
       </div>
     </div>
   </section>
@@ -985,7 +1001,7 @@
       </div>
       <div class="content-card">
         <div class="html-detail" [innerHTML]="selectedDetail()"></div>
-        <div
+        <!-- <div
           type="button"
           class="btn-copy-detail expand"
           (click)="copyDescription(selectedTicketId(), selectedDetail())"
@@ -996,7 +1012,18 @@
             [class.fa-check]="copiedTicketId === selectedTicketId()"
           ></i>
 
-          <!-- {{ copiedTicketId === selectedTicketId() ? 'คัดลอกแล้ว' : 'คัดลอก' }} -->
+          {{ copiedTicketId === selectedTicketId() ? 'คัดลอกแล้ว' : 'คัดลอก' }}
+        </div> -->
+      </div>
+      <div class="form-actions-footer">
+        <div class="action-btn" (click)="copyDescription(selectedTicketId(), selectedDetail())">
+          <i
+            class="fa-solid"
+            [class.fa-copy]="copiedTicketId !== selectedTicketId()"
+            [class.fa-check]="copiedTicketId === selectedTicketId()"
+          ></i>
+
+          {{ copiedTicketId === selectedTicketId() ? 'คัดลอกแล้ว' : 'คัดลอก' }}
         </div>
       </div>
     </div>

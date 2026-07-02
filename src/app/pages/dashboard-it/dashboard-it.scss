@@ -1544,6 +1544,18 @@
   border-radius: 12px;
 }
 
+.tk-card__footer {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 10px;
+
+  margin-top: 12px;
+  padding: 2px 6px;
+
+  border-top: 1px solid #edf2f7;
+}
+
 /* notes */
 .note-list {
   display: flex;
@@ -2990,7 +3002,7 @@
   }
 
   .tk-card {
-    min-height: 150px;
+    min-height: 250px;
   }
 
   .tk-card.note {
@@ -3233,43 +3245,100 @@
   @include btn-primary;
 }
 
-.btn-expand-detail {
+// .btn-expand-detail {
+//   display: flex;
+//   justify-content: flex-end;
+//   align-items: center;
+//   gap: 6px;
+//   cursor: pointer;
+//   font-size: 12px;
+//   color: var(--primary) !important;
+//   padding: 4px 8px;
+
+//   &:hover {
+//     opacity: 0.8;
+//   }
+// }
+
+// .btn-copy-detail {
+//   display: flex;
+//   justify-content: flex-end;
+//   align-items: center;
+//   gap: 6px;
+//   cursor: pointer;
+//   font-size: 12px;
+//   color: var(--primary) !important;
+
+//   &:hover {
+//     opacity: 0.8;
+//   }
+//   transition: all 0.2s ease;
+
+//   @media (min-width: 1024px) and (max-width: 1440px) {
+//     top: 45px;
+//   }
+// }
+.detail-actions {
   display: flex;
   justify-content: flex-end;
   align-items: center;
-  gap: 6px;
-  cursor: pointer;
-  font-size: 12px;
-  color: var(--primary) !important;
-  position: absolute;
-  right: 20px;
-  bottom: 8px;
+  gap: 10px;
 
-  &:hover {
-    opacity: 0.8;
+  margin-top: 12px;
+  padding-top: 12px;
+
+  border-top: 1px solid #edf2f7;
+}
+
+.action-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+
+  height: 30px;
+  padding: 0 12px;
+
+  border: 1px solid #dbe4f0;
+  border-radius: 10px;
+
+  background: #fff;
+  color: #4b5563;
+
+  font-size: $font-size-hint;
+  font-weight: 500;
+
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  i {
+    font-size: 14px;
   }
 }
 
-.btn-copy-detail {
-  display: flex;
-  justify-content: flex-end;
-  align-items: center;
-  gap: 6px;
-  cursor: pointer;
-  font-size: 12px;
-  color: var(--primary) !important;
-  position: absolute;
-  right: 15px;
-  top: 60px;
+.action-btn:hover {
+  background: #f8fafc;
+  border-color: #3b82f6;
+  color: #2563eb;
+}
 
-  &:hover {
-    opacity: 0.8;
-  }
-  transition: all 0.2s ease;
+.action-btn:active {
+  transform: scale(0.98);
+}
 
-  @media (min-width: 1024px) and (max-width: 1440px) {
-    top: 45px;
-  }
+.action-btn-primary {
+  background: #eff6ff;
+  color: #2563eb;
+  border-color: #bfdbfe;
+}
+
+.action-btn-primary:hover {
+  background: #dbeafe;
+  border-color: #60a5fa;
+}
+
+app-expand-icon {
+  width: 20px;
+  height: 20px;
 }
 
 .btn-copy-detail.expand {
@@ -3327,4 +3396,10 @@
   max-width: 100%;
   height: auto;
   display: block;
+}
+
+@media (max-width: 575.98px) {
+  .modal-overlay .form-actions-footer {
+    justify-content: flex-start;
+  }
 }
