@@ -258,7 +258,6 @@
     </div>
     <div class="tk-card__body" *ngIf="t.status !== 'Waiting you'">
       <div class="tk-text html-detail" [innerHTML]="t.description"></div>
-      <!-- <div class="tk-text" [innerHTML]="formatText.getFormatTextHTML(t.description)"></div> -->
     </div>
     <div class="tk-card__body detail" *ngIf="t.status === 'Waiting you'">
       <textarea
@@ -269,12 +268,18 @@
         placeholder="กรอกรายละเอียด ticket"
       ></textarea>
     </div>
-    <div
+    <!-- <div
       class="btn-expand-detail"
       (click)="openDetail(t.description)"
       *ngIf="t.status !== 'Waiting you'"
     >
       <i class="fa-solid fa-expand"></i>ดูรายละเอียดเพิ่มเติม
+    </div> -->
+    <div class="tk-card__footer" *ngIf="t.status !== 'Waiting you'">
+      <div class="action-btn action-btn-primary" (click)="openDetail(t.description)">
+        <app-expand-icon />
+        ดูรายละเอียดเพิ่มเติม
+      </div>
     </div>
   </section>
 

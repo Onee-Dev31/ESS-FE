@@ -62,6 +62,7 @@ import { NzDatePickerModule } from 'ng-zorro-antd/date-picker';
 import { en_US, NzI18nService } from 'ng-zorro-antd/i18n';
 import { environment } from '../../../environments/environment';
 import { TicketService } from '../../services/ticket.service';
+import { ExpandIconComponent } from '../../components/shared/icon/expand-icon';
 
 interface ReplyReader {
   userCodeempid: string;
@@ -96,6 +97,7 @@ interface ReplyReader {
     NoteForItModal,
     AvatarPreviewModal,
     NzDatePickerModule,
+    ExpandIconComponent,
   ],
   templateUrl: './dashboard-it.html',
   styleUrl: './dashboard-it.scss',
