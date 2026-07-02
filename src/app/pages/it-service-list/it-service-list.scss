@@ -1690,7 +1690,7 @@ textarea.form-input {
   gap: 10px;
 
   margin-top: 12px;
-  padding: 2px 6px;
+  padding: 4px 6px;
 
   border-top: 1px solid #edf2f7;
 }
@@ -3227,7 +3227,7 @@ textarea.form-input {
   align-items: center;
   gap: 8px;
 
-  height: 30px;
+  height: 28px;
   padding: 0 12px;
 
   border: 1px solid color-mix(in srgb, var(--text) 20%, transparent);
@@ -3269,8 +3269,8 @@ textarea.form-input {
 }
 
 app-expand-icon {
-  width: clamp(11px, 1.2vw, 12px);
-  height: clamp(11px, 1.2vw, 12px);
+  width: clamp(15px, 2vw, 18px);
+  height: clamp(15px, 2vw, 18px);
 }
 
 @keyframes fadeIn {
