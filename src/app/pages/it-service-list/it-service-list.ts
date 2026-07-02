@@ -671,9 +671,9 @@ export class ItService implements OnInit {
       }
       if (options?.openChat && this.canAccessChat()) {
         this.IS_CHAT_OPEN.set(true);
-        this.markChatAsRead();
         setTimeout(() => this.chatTextareaRef?.nativeElement.focus(), 100);
       }
+      if (this.IS_CHAT_OPEN()) this.markChatAsRead();
       this.scrollToBottom();
 
       const codeempid = this.authService.userData()?.CODEMPID;
