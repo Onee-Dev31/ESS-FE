@@ -3337,8 +3337,8 @@
 }
 
 app-expand-icon {
-  width: 20px;
-  height: 20px;
+  width: clamp(15px, 2vw, 18px);
+  height: clamp(15px, 2vw, 18px);
 }
 
 .btn-copy-detail.expand {
