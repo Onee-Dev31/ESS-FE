@@ -185,7 +185,8 @@ export class SignalrService {
       this.eventMap.set(eventName, subject);
       this.hubConnection.on(eventName, (data) => {
         console.log(`[SignalR] ← ${eventName}`, data);
-        if (eventName === 'NewTicket' || eventName === 'NotificationCreated') {
+        if (eventName === 'NewTicket') {
+          //  || eventName === 'NotificationCreated' เอาออกเพราะเวลามีข้อความเข้ามาใหม่มัน จะทำให้ pendingNewTickets เพิ่มขึ้น ซึ่ง มันตวรเพิ่มเฉพาะตอนที่มี ticket ใหม่เท่านั้น
           if (data.messageId && this.processedIds.has(data.messageId)) return;
           if (data.messageId) {
             if (this.processedIds.size >= 500) this.processedIds.clear();
