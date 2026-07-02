@@ -1215,7 +1215,7 @@ export class ITServiceRequestSpecificComponent implements OnInit {
             <tr><th>ตำแหน่ง</th><td>${person.freelance.position}</td></tr>
             <tr><th>อีเมล</th><td>${person.freelance.email}</td></tr>
             <tr><th>เบอร์</th><td>${person.phone}</td></tr>
-          </table>
+          </table><br>
         `;
         } else {
           html += `
@@ -1228,8 +1228,8 @@ export class ITServiceRequestSpecificComponent implements OnInit {
             <tr><th>แผนก</th><td>${person.openFor?.DEPARTMENT}</td></tr>
             <tr><th>ตำแหน่ง</th><td>${person.openFor?.POST}</td></tr>
             <tr><th>อีเมล</th><td>${person.openFor?.EMAIL}</td></tr>
-            <tr><th>เบอร์</th><td>${person.openFor?.USR_MOBILE} / ${person.phone}</td></tr>
-          </table>
+            <tr><th>เบอร์</th><td>${person.openFor?.USR_MOBILE ?? person.phone}</td></tr>
+          </table><br>
         `;
         }
 
@@ -1241,7 +1241,7 @@ export class ITServiceRequestSpecificComponent implements OnInit {
           html += `<h4>Oracle</h4><ul>`;
 
           person.oracle.companies.forEach((companyItem: any) => {
-            html += `<li><b>${companyItem.company.COMPANY_NAME} (${companyItem.company.COMPANY_CODE})</b></li>`;
+            html += `<b>${companyItem.company.COMPANY_NAME} (${companyItem.company.COMPANY_CODE})</b>`;
 
             companyItem.modules
               .filter((m: any) => m.permission && m.permission.trim() !== '-')
@@ -1265,7 +1265,7 @@ export class ITServiceRequestSpecificComponent implements OnInit {
           });
 
           if (person.bms.detail) {
-            html += `<li>สิทธิ์เหมือน : ${person.bms.detail.label}</li>`;
+            html += `สิทธิ์เหมือน : ${person.bms.detail.label}`;
           }
 
           html += `</ul>`;
@@ -1283,11 +1283,11 @@ export class ITServiceRequestSpecificComponent implements OnInit {
           });
 
           if (person.onePortal.role) {
-            html += `<li>ประเภทสิทธิ์ : ${person.onePortal.role}</li>`;
+            html += `ประเภทสิทธิ์ : ${person.onePortal.role}<br>`;
           }
 
           if (person.onePortal.responseType) {
-            html += `<li>ประเภทรายการ : ${person.onePortal.responseType}</li>`;
+            html += `ประเภทรายการ : ${person.onePortal.responseType}`;
           }
 
           html += `</ul>`;
@@ -1305,11 +1305,11 @@ export class ITServiceRequestSpecificComponent implements OnInit {
           });
 
           if (person.onee.permission) {
-            html += `<li>สิทธิ์ : ${person.onee.permission.trim()}</li>`;
+            html += `สิทธิ์ : ${person.onee.permission.trim()}<br>`;
           }
 
           if (person.onee.supervisor) {
-            html += `<li>หัวหน้างาน : ${person.onee.supervisor.label}</li>`;
+            html += `หัวหน้างาน : ${person.onee.supervisor.label}`;
           }
 
           html += `</ul>`;
