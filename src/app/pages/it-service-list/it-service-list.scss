@@ -3230,11 +3230,11 @@ textarea.form-input {
   height: 30px;
   padding: 0 12px;
 
-  border: 1px solid #dbe4f0;
+  border: 1px solid color-mix(in srgb, var(--text) 20%, transparent);
   border-radius: 10px;
 
-  background: #fff;
-  color: #4b5563;
+  background: var(--bg-card);
+  color: var(--text-header);
 
   font-size: $font-size-hint;
   font-weight: 500;
@@ -3243,14 +3243,14 @@ textarea.form-input {
   transition: all 0.2s ease;
 
   i {
-    font-size: 14px;
+    font-size: $font-size-hint;
   }
 }
 
 .action-btn:hover {
-  background: #f8fafc;
-  border-color: #3b82f6;
-  color: #2563eb;
+  background: var(--bg-page);
+  border-color: var(--primary);
+  color: color-mix(in srgb, var(--primary) 80%, transparent);
 }
 
 .action-btn:active {
@@ -3258,19 +3258,19 @@ textarea.form-input {
 }
 
 .action-btn-primary {
-  background: #eff6ff;
-  color: #2563eb;
-  border-color: #bfdbfe;
+  background: color-mix(in srgb, var(--primary) 10%, transparent);
+  color: var(--primary);
+  border-color: color-mix(in srgb, var(--primary) 20%, transparent);
 }
 
 .action-btn-primary:hover {
-  background: #dbeafe;
-  border-color: #60a5fa;
+  background: color-mix(in srgb, var(--primary) 20%, transparent);
+  border-color: var(--primary);
 }
 
 app-expand-icon {
-  width: 20px;
-  height: 20px;
+  width: clamp(11px, 1.2vw, 12px);
+  height: clamp(11px, 1.2vw, 12px);
 }
 
 @keyframes fadeIn {
