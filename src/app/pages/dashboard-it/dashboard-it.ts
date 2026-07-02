@@ -1524,6 +1524,43 @@ export class DashboardIT implements OnInit {
           break;
         }
 
+        case 'TABLE':
+        case 'TBODY': {
+          node.childNodes.forEach(walk);
+          lines.push('');
+          break;
+        }
+
+        case 'TR': {
+          const th = node.querySelector('th')?.textContent?.trim();
+          const td = node.querySelector('td')?.textContent?.trim();
+
+          if (th || td) {
+            lines.push(`${th}: ${td}`);
+          }
+
+          break;
+        }
+
+        case 'H3': {
+          lines.push('');
+          lines.push(node.textContent?.trim() ?? '');
+          lines.push('--------------------');
+          break;
+        }
+
+        case 'H4': {
+          lines.push('');
+          lines.push(`[ ${node.textContent?.trim()} ]`);
+          break;
+        }
+
+        case 'DIV': {
+          node.childNodes.forEach(walk);
+          lines.push('');
+          break;
+        }
+
         default:
           node.childNodes.forEach(walk);
       }
