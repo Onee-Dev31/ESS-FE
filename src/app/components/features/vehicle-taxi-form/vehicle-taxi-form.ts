@@ -3,7 +3,6 @@ import {
   EventEmitter,
   OnInit,
   OnChanges,
-  AfterViewChecked,
   Output,
   Input,
   inject,
@@ -22,6 +21,7 @@ import { AuthService } from '../../../services/auth.service';
 import { FileConverterService } from '../../../services/file-converter';
 import { SwalService } from '../../../services/swal.service';
 import { finalize } from 'rxjs';
+import { mapTaxiClaimDetail, TaxiClaimDetailResponse } from '../../../interfaces/taxi.interface';
 
 @Component({
   selector: 'app-vehicle-taxi-form',
@@ -30,7 +30,7 @@ import { finalize } from 'rxjs';
   templateUrl: './vehicle-taxi-form.html',
   styleUrl: './vehicle-taxi-form.scss',
 })
-export class VehicleTaxiFormComponent implements OnInit, OnChanges, AfterViewChecked {
+export class VehicleTaxiFormComponent implements OnInit, OnChanges {
   @Input() requests: any = null;
 
   @Output() onClose = new EventEmitter<void>();
@@ -62,9 +62,11 @@ export class VehicleTaxiFormComponent implements OnInit, OnChanges, AfterViewChe
 
   isEditMode = false;
   originalClaimId?: number;
+  originalDetailCount = 0;
 
-  private pendingFocusId: string | null = null;
   private clientIdSequence = 0;
+  private locationsLoaded = false;
+  private loadSequence = 0;
 
   get pageTitle(): string {
     return this.isEditMode ? 'แก้ไขข้อมูลค่าเดินทาง (Taxi)' : 'บันทึกข้อมูลค่าเดินทาง (Taxi)';
@@ -83,6 +85,7 @@ export class VehicleTaxiFormComponent implements OnInit, OnChanges, AfterViewChe
     this.taxiService.getLocations().subscribe({
       next: (res: any) => {
         this.locations = res.data ?? [];
+        this.locationsLoaded = true;
         this.checkAndLoadData();
       },
       error: () => this.toastService.error('ไม่สามารถโหลดข้อมูลสถานที่ได้'),
@@ -91,15 +94,18 @@ export class VehicleTaxiFormComponent implements OnInit, OnChanges, AfterViewChe
 
   ngOnChanges(changes: SimpleChanges) {
     if (changes['requests']) {
-      this.checkAndLoadData();
+      // Inputs are available before the first template check. Establish the
+      // complete view mode now so it never flips after the initial render.
+      this.isEditMode = Boolean(this.requests);
+      this.originalClaimId = this.requests?.claimId;
+      this.isLoading = true;
+
+      if (this.locationsLoaded) this.checkAndLoadData();
     }
   }
 
-  ngAfterViewChecked() {
-    if (this.pendingFocusId) {
-      const id = this.pendingFocusId;
-      this.pendingFocusId = null;
-
+  private focusFieldAfterRender(id: string): void {
+    setTimeout(() => {
       const desktop = document.getElementById(id) as HTMLInputElement | null;
       const mobile = document.getElementById(`mob-${id}`) as HTMLInputElement | null;
       const el = (desktop?.offsetParent !== null ? desktop : null) ?? mobile ?? desktop;
@@ -108,7 +114,7 @@ export class VehicleTaxiFormComponent implements OnInit, OnChanges, AfterViewChe
         el.focus();
         if (el instanceof HTMLInputElement) el.select();
       }
-    }
+    });
   }
 
   private checkAndLoadData() {
@@ -124,6 +130,7 @@ export class VehicleTaxiFormComponent implements OnInit, OnChanges, AfterViewChe
 
   // ====================== EDIT MODE ======================
   private loadClaimForEdit(claimId: number) {
+    const loadId = ++this.loadSequence;
     this.isLoading = true;
     this.items = [];
     const param = {
@@ -135,64 +142,75 @@ export class VehicleTaxiFormComponent implements OnInit, OnChanges, AfterViewChe
 
     this.taxiService.getTaxiClaims(param).subscribe({
       next: (res: any) => {
+        if (loadId !== this.loadSequence) return;
         const claim = res.data[0] || res;
         const originalTotalsByDate = new Map<string, number>();
-        (claim.details || []).forEach((detail: any) => {
-          const date = this.toDateKey(detail.work_date || detail.workDate);
-          const amount = Number(detail.rate_amount || detail.amount || 0);
+        const claimDetails = ((claim.details ?? []) as TaxiClaimDetailResponse[]).map(
+          mapTaxiClaimDetail,
+        );
+        claimDetails.forEach((detail) => {
+          const date = this.toDateKey(detail.workDate);
+          const amount = detail.rateAmount;
           originalTotalsByDate.set(date, (originalTotalsByDate.get(date) || 0) + amount);
         });
 
-        const itemPromises = (claim.details || []).map(async (d: any) => {
-          const attachedFiles = d.attachments
-            ? await this.fileConvertService.convertUrlsToFiles(d.attachments)
+        const itemPromises = claimDetails.map(async (detail) => {
+          const attachedFiles = detail.attachments.length
+            ? await this.fileConvertService.convertUrlsToFiles(detail.attachments)
             : [];
 
           return {
             clientId: this.createClientId(),
-            detailId: d.detail_id ?? d.detailId,
-            date: d.work_date || d.workDate,
-            description: d.description || '',
+            detailId: detail.detailId,
+            date: detail.workDate,
+            description: detail.description,
             destination: '',
             distance: 0,
-            locationFromId: d.location_from_id || d.locationFromId,
-            locationToId: d.location_to_id || d.locationToId,
-            otherFrom: d.other_from || d.otherFrom || '',
-            otherTo: d.other_to || d.otherTo || '',
-            amount: Number(d.rate_amount || d.amount || 0),
-            shiftCode: d.shift_code || d.shiftCode || '',
+            locationFromId: detail.locationFromId,
+            locationToId: detail.locationToId,
+            otherFrom: detail.otherFrom,
+            otherTo: detail.otherTo,
+            amount: detail.rateAmount,
+            shiftCode: detail.shiftCode ?? '',
             selected: true,
             attachedFileNames: attachedFiles.map((file: File) => file.name),
             attachedFiles: attachedFiles,
             fileToUpload: null,
-            checkIn: d.check_in || d.time_in,
-            checkOut: d.check_out || d.time_out,
-            dayType: d.day_type || d.dayType,
-            remainingAmount: Number(d.remaining_amount ?? d.remainingAmount ?? 0),
-            usedAmount: Number(d.used_amount ?? d.usedAmount ?? 0),
-            dailyLimit: Number(d.daily_limit ?? d.dailyLimit ?? 0),
+            checkIn: detail.timeIn ?? undefined,
+            checkOut: detail.timeOut ?? undefined,
+            dayType: detail.dayType ?? undefined,
+            remainingAmount: detail.remainingAmount,
+            usedAmount: detail.usedAmount,
+            dailyLimit: detail.dailyLimit,
             availableAmount:
-              Number(d.remaining_amount ?? d.remainingAmount ?? 0) +
-              (originalTotalsByDate.get(this.toDateKey(d.work_date || d.workDate)) || 0),
+              detail.remainingAmount +
+              (originalTotalsByDate.get(this.toDateKey(detail.workDate)) || 0),
             isEligible: true,
           };
         });
 
         Promise.all(itemPromises)
           .then((items) => {
-            this.items = items;
+            if (loadId !== this.loadSequence) return;
+            // Promise callbacks may resolve between Angular's development-mode
+            // verification passes. Commit the complete snapshot on the next task.
+            setTimeout(() => {
+              if (loadId !== this.loadSequence) return;
+              this.items = items;
+              this.originalDetailCount = items.length;
 
-            if (this.items.length > 0) {
-              const firstDate = new Date(this.items[0].date);
-              this.selectedMonthIndex = firstDate.getMonth();
-              this.selectedYear = firstDate.getFullYear() + 543;
-            }
+              if (this.items.length > 0) {
+                const [year, month] = this.items[0].date.split('-').map(Number);
+                this.selectedMonthIndex = month - 1;
+                this.selectedYear = year + 543;
+              }
 
-            // Render the edit form only after every detail and attachment is ready.
-            this.isLoading = false;
-            this.cdr.detectChanges();
+              this.isLoading = false;
+              this.cdr.markForCheck();
+            });
           })
           .catch((error) => {
+            if (loadId !== this.loadSequence) return;
             console.error(error);
             this.isLoading = false;
             this.toastService.error('ไม่สามารถโหลดไฟล์แนบของรายการเบิกได้');
@@ -200,6 +218,7 @@ export class VehicleTaxiFormComponent implements OnInit, OnChanges, AfterViewChe
           });
       },
       error: (err: any) => {
+        if (loadId !== this.loadSequence) return;
         console.error(err);
         this.isLoading = false;
         this.toastService.error('ไม่สามารถโหลดข้อมูลการเบิกเพื่อแก้ไขได้');
@@ -210,6 +229,7 @@ export class VehicleTaxiFormComponent implements OnInit, OnChanges, AfterViewChe
 
   // ====================== CREATE MODE ======================
   loadEligibleDates() {
+    const loadId = ++this.loadSequence;
     const empCode = this.authService.userData().CODEMPID;
     const month = this.selectedMonthIndex + 1;
 
@@ -220,6 +240,7 @@ export class VehicleTaxiFormComponent implements OnInit, OnChanges, AfterViewChe
 
     this.taxiService.getEligibleDates(empCode, this.selectedYear, month).subscribe({
       next: (res: any) => {
+        if (loadId !== this.loadSequence) return;
         const rows: any[] = res.data ?? [];
         this.eligibleDates = rows.map(
           (row: any) =>
@@ -259,6 +280,7 @@ export class VehicleTaxiFormComponent implements OnInit, OnChanges, AfterViewChe
         this.cdr.markForCheck();
       },
       error: () => {
+        if (loadId !== this.loadSequence) return;
         this.isLoading = false;
         this.toastService.error('ไม่สามารถโหลดข้อมูลวันที่ได้');
         this.cdr.markForCheck();
@@ -276,8 +298,8 @@ export class VehicleTaxiFormComponent implements OnInit, OnChanges, AfterViewChe
     return date?.split('T')[0] || '';
   }
 
-  trackByClientId(_index: number, item: TaxiLogItem): string {
-    return item.clientId;
+  trackByClientId(_index: number, item: TaxiLogItem): string | number {
+    return item.detailId ?? item.clientId;
   }
 
   addSelectedDate(): void {
@@ -372,6 +394,28 @@ export class VehicleTaxiFormComponent implements OnInit, OnChanges, AfterViewChe
     return `ใช้แล้ว ${this.formatNumber(used)} / ${this.formatNumber(limit)} บาท — คงเหลือ ${this.formatNumber(Number(item.remainingAmount || 0))} บาท`;
   }
 
+  getShiftTimeLabel(item: TaxiLogItem): string {
+    const shiftCode = item.shiftCode?.trim();
+    const checkIn = item.checkIn?.trim();
+    const checkOut = item.checkOut?.trim();
+
+    if (!shiftCode && !checkIn && !checkOut) return 'ไม่มีข้อมูลกะ';
+
+    const shiftLabel = shiftCode ? `กะ ${shiftCode}` : '';
+    const timeRange = checkIn || checkOut ? `${checkIn || '-'} - ${checkOut || '-'}` : '';
+    return [shiftLabel, timeRange].filter(Boolean).join(' — ');
+  }
+
+  dayTypeLabel(code: string | undefined): string {
+    const labels: Record<string, string> = {
+      W: 'วันทำงานปกติ',
+      H: 'วันหยุด',
+      T: 'วันหยุดประเพณี',
+      L: 'วันลา',
+    };
+    return code ? (labels[code] ?? code) : '-';
+  }
+
   canAddTrip(item: TaxiLogItem): boolean {
     return item.isEligible !== false && this.getAvailableAmount(item) > 0;
   }
@@ -399,7 +443,7 @@ export class VehicleTaxiFormComponent implements OnInit, OnChanges, AfterViewChe
         item.otherTo = '';
       }
 
-      this.pendingFocusId = `other-from-${rowIndex}`;
+      this.focusFieldAfterRender(`other-from-${rowIndex}`);
       return;
     }
 
@@ -409,7 +453,7 @@ export class VehicleTaxiFormComponent implements OnInit, OnChanges, AfterViewChe
       item.locationToId = other.location_id;
     }
 
-    this.pendingFocusId = `other-to-${rowIndex}`;
+    this.focusFieldAfterRender(`other-to-${rowIndex}`);
   }
 
   onToLocationChange(item: TaxiLogItem, rowIndex: number) {
@@ -428,7 +472,7 @@ export class VehicleTaxiFormComponent implements OnInit, OnChanges, AfterViewChe
         item.otherFrom = '';
       }
 
-      this.pendingFocusId = `other-to-${rowIndex}`;
+      this.focusFieldAfterRender(`other-to-${rowIndex}`);
       return;
     }
 
@@ -438,7 +482,7 @@ export class VehicleTaxiFormComponent implements OnInit, OnChanges, AfterViewChe
       item.locationFromId = other.location_id;
     }
 
-    this.pendingFocusId = `other-from-${rowIndex}`;
+    this.focusFieldAfterRender(`other-from-${rowIndex}`);
   }
 
   onInputChange(item: TaxiLogItem) {
@@ -708,14 +752,23 @@ export class VehicleTaxiFormComponent implements OnInit, OnChanges, AfterViewChe
     return selectedItems.length > 0 && selectedItems.every((item) => this.isItemValid(item));
   }
 
+  isSubmitDisabled(): boolean {
+    if (this.isSubmitting) return true;
+    if (this.isEditMode && this.hasDelete()) return false;
+    return !this.areAllItemsValid();
+  }
+
   isKeep(): number {
     const selectedLogs = this.items.filter((item) => item.selected);
     return selectedLogs.length;
   }
 
   isDelete(): number {
-    const selectedLogs = this.items.filter((item) => !item.selected);
-    return selectedLogs.length;
+    if (this.isEditMode) {
+      const keptExistingItems = this.items.filter((item) => item.selected && item.detailId != null);
+      return Math.max(0, this.originalDetailCount - keptExistingItems.length);
+    }
+    return this.items.filter((item) => !item.selected).length;
   }
 
   totalClaims(): string {
