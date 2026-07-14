@@ -463,28 +463,30 @@
     </main>
   }
 
-  <div class="form-actions">
-    <button
-      type="button"
-      class="btn-submit"
-      (click)="save()"
-      [disabled]="isLoading || isSubmitting || !areAllItemsValid()"
-    >
-      <i
-        class="fas"
-        [class.fa-check]="!isSubmitting"
-        [class.fa-spinner]="isSubmitting"
-        [class.fa-spin]="isSubmitting"
-      ></i>
-      {{
-        !isEditMode
-          ? 'ยืนยันการเบิก'
-          : hasDelete()
-            ? 'ลบรายการเบิกทั้งหมด'
-            : 'ยืนยันการแก้ไขการเบิก'
-      }}
-    </button>
-  </div>
+  @if (!isLoading) {
+    <div class="form-actions">
+      <button
+        type="button"
+        class="btn-submit"
+        (click)="save()"
+        [disabled]="isSubmitting || !areAllItemsValid()"
+      >
+        <i
+          class="fas"
+          [class.fa-check]="!isSubmitting"
+          [class.fa-spinner]="isSubmitting"
+          [class.fa-spin]="isSubmitting"
+        ></i>
+        {{
+          !isEditMode
+            ? 'ยืนยันการเบิก'
+            : hasDelete()
+              ? 'ลบรายการเบิกทั้งหมด'
+              : 'ยืนยันการแก้ไขการเบิก'
+        }}
+      </button>
+    </div>
+  }
 
   <!-- File Upload Modal -->
   <app-file-upload-modal

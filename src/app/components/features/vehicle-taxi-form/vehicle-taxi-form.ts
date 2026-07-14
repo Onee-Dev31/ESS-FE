@@ -178,21 +178,26 @@ export class VehicleTaxiFormComponent implements OnInit, OnChanges, AfterViewChe
           };
         });
 
-        // ใช้ Promise.all หลัง map เพื่อ resolve ทุก promise
-        Promise.all(itemPromises).then((items) => {
-          this.items = items;
+        Promise.all(itemPromises)
+          .then((items) => {
+            this.items = items;
 
-          if (this.items.length > 0) {
-            const firstDate = new Date(this.items[0].date);
-            this.selectedMonthIndex = firstDate.getMonth();
-            this.selectedYear = firstDate.getFullYear() + 543;
-          }
-        });
+            if (this.items.length > 0) {
+              const firstDate = new Date(this.items[0].date);
+              this.selectedMonthIndex = firstDate.getMonth();
+              this.selectedYear = firstDate.getFullYear() + 543;
+            }
 
-        setTimeout(() => {
-          this.isLoading = false;
-          this.cdr.markForCheck();
-        }, 500);
+            // Render the edit form only after every detail and attachment is ready.
+            this.isLoading = false;
+            this.cdr.detectChanges();
+          })
+          .catch((error) => {
+            console.error(error);
+            this.isLoading = false;
+            this.toastService.error('ไม่สามารถโหลดไฟล์แนบของรายการเบิกได้');
+            this.onClose.emit();
+          });
       },
       error: (err: any) => {
         console.error(err);

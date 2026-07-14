@@ -3,6 +3,8 @@ import { Requester } from './core.interface';
 export interface TaxiItem {
   date: string;
   description: string;
+  locationFrom?: string;
+  locationTo?: string;
   destination: string;
   distance: number;
   amount: number;

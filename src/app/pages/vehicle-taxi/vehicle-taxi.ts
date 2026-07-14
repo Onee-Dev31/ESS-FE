@@ -145,6 +145,8 @@ export class VehicleTaxiComponent implements OnInit {
           return {
             date: d.work_date ?? '',
             description: d.description ?? '',
+            locationFrom: fromName,
+            locationTo: toName,
             destination: fromName && toName ? `${fromName} → ${toName}` : fromName || toName,
             distance: 0,
             amount: d.rate_amount ?? 0,
