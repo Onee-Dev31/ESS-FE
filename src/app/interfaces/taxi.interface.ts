@@ -11,6 +11,10 @@ export interface TaxiItem {
 }
 
 export interface TaxiLogItem extends TaxiItem {
+  /** Stable identity for rendering and attachment mapping. Never sent to the API. */
+  clientId: string;
+  /** Backend identity. Present only for details that already exist. */
+  detailId?: number;
   attachedFileNames: string[];
   selected: boolean;
   checkIn?: string;
@@ -18,6 +22,9 @@ export interface TaxiLogItem extends TaxiItem {
   dayType?: string;
   remainingAmount: number;
   usedAmount?: number;
+  dailyLimit?: number;
+  availableAmount?: number;
+  isEligible?: boolean;
   locationFromId?: number;
   locationToId?: number;
   otherFrom?: string;
