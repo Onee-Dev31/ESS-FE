@@ -80,10 +80,11 @@
           <small>สามารถเลือกวันที่เดิมแล้วกดเพิ่มเที่ยวซ้ำสำหรับขาไป–ขากลับได้</small>
         </div>
       </section>
+
       <section class="filter-controls" *ngIf="isEditMode">
         <div class="alert-delete" *ngIf="isDelete()">
           <i class="fa-solid fa-triangle-exclamation"></i>
-          รายการที่ยกเลิก {{ isDelete() }} รายการ จะถูกลบถาวรเมื่อกด "ลบรายการเบิกทั้งหมด"
+          รายการที่ยกเลิก {{ isDelete() }} รายการ จะถูกลบเมื่อกดยืนยันการแก้ไข
         </div>
 
         <div class="display-order">
@@ -258,10 +259,11 @@
                     dateUtil.formatDateToBE(item.date, 'ddd. DD/MM/YYYY')
                   }}</span>
                   <span
+                    *ngIf="item.dayType"
                     class="day-type"
                     [style.color]="item.dayType === 'H' ? 'var(--danger)' : 'var(--text-muted)'"
                   >
-                    ({{ item.dayType }})
+                    ({{ item.dayType }} = {{ dayTypeLabel(item.dayType) }})
                   </span>
                   <span class="trip-number">เที่ยวที่ {{ getTripNumber(item) }}</span>
                 </div>
@@ -288,6 +290,7 @@
                     }}
                   </button>
                   <button
+                    *ngIf="!isEditMode"
                     type="button"
                     class="btn-trip-action add"
                     (click)="addTrip(item)"
@@ -326,7 +329,7 @@
                 <div class="grid-item">
                   <label for="mob-shift-{{ i }}">รหัสกะ / เวลา</label>
                   <div class="val" id="mob-shift-{{ i }}">
-                    {{ item.shiftCode }} ({{ item.checkIn || '-' }} - {{ item.checkOut || '-' }})
+                    {{ getShiftTimeLabel(item) }}
                   </div>
                 </div>
                 <div class="grid-item">
@@ -465,12 +468,7 @@
 
   @if (!isLoading) {
     <div class="form-actions">
-      <button
-        type="button"
-        class="btn-submit"
-        (click)="save()"
-        [disabled]="isSubmitting || !areAllItemsValid()"
-      >
+      <button type="button" class="btn-submit" (click)="save()" [disabled]="isSubmitDisabled()">
         <i
           class="fas"
           [class.fa-check]="!isSubmitting"
