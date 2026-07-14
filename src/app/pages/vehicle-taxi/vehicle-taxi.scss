@@ -199,6 +199,18 @@ $border-color: var(--border-color);
       min-width: 0;
     }
 
+    &__count {
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    &__trips {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
     &__amount {
       display: flex;
       flex-direction: column;
@@ -210,8 +222,10 @@ $border-color: var(--border-color);
       gap: 4px;
 
       @media screen and (max-width: 425px) {
-        // align-items: flex-start;
-        padding: 4px 16px;
+        align-items: flex-start;
+        padding: 10px 16px;
+        border-top: 1px solid var(--border-toolbar);
+        border-left: 0;
       }
     }
 
@@ -222,6 +236,54 @@ $border-color: var(--border-color);
       padding: 8px 16px;
       border-top: 1px solid var(--border-toolbar);
       background: var(--bg-table-head);
+    }
+  }
+
+  .claim-trip {
+    min-width: 0;
+    padding: 9px 10px;
+    border: 1px solid var(--border-toolbar);
+    border-radius: 9px;
+    background: var(--bg-table-head);
+
+    &__number {
+      margin-bottom: 6px;
+      color: var(--primary);
+      font-size: 0.72rem;
+      font-weight: 700;
+    }
+
+    &__field {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+      gap: 2px;
+    }
+
+    &__label {
+      color: var(--text-muted);
+      font-size: 0.68rem;
+      font-weight: 600;
+    }
+
+    &__value {
+      overflow-wrap: anywhere;
+      color: var(--text);
+      font-size: 0.78rem;
+      line-height: 1.35;
+    }
+
+    &__route {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+      align-items: center;
+      gap: 8px;
+      margin-top: 7px;
+
+      i {
+        color: var(--primary);
+        font-size: 0.7rem;
+      }
     }
   }
 
@@ -287,6 +349,29 @@ $border-color: var(--border-color);
     .request-no {
       font-size: $font-size-label;
       color: $primary;
+    }
+
+    .trip-details-cell {
+      min-width: 220px;
+      max-width: 320px;
+    }
+
+    .trip-location-cell {
+      min-width: 150px;
+      max-width: 220px;
+    }
+
+    .trip-field-row {
+      min-height: 24px;
+      padding: 3px 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      color: var(--text);
+
+      & + .trip-field-row {
+        border-top: 1px dashed var(--border);
+      }
     }
   }
 
