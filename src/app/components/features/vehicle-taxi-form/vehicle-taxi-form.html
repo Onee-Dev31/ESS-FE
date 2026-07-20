@@ -48,11 +48,43 @@
             </button>
           </div>
         </div>
+        <div class="date-selector">
+          <label for="eligible-date-select">เลือกวันที่ต้องการเบิก :</label>
+          <div class="inputs-row">
+            <select
+              id="eligible-date-select"
+              class="form-control"
+              [(ngModel)]="selectedEligibleDate"
+              title="เลือกวันที่ต้องการเบิก"
+              aria-label="เลือกวันที่ต้องการเบิก"
+            >
+              <option value="">-- เลือกวันที่ --</option>
+              <option
+                *ngFor="let date of eligibleDates; trackBy: trackByClientId"
+                [value]="date.date.split('T')[0]"
+                [disabled]="!canAddTrip(date)"
+              >
+                {{ dateUtil.formatDateToBE(date.date, 'ddd. DD/MM/YYYY') }} —
+                {{ getEligibilityText(date) }}
+              </option>
+            </select>
+            <button
+              type="button"
+              class="btn-add-date"
+              (click)="addSelectedDate()"
+              [disabled]="!selectedEligibleDate"
+            >
+              <i class="fas fa-plus"></i> เพิ่มเที่ยว
+            </button>
+          </div>
+          <small>สามารถเลือกวันที่เดิมแล้วกดเพิ่มเที่ยวซ้ำสำหรับขาไป–ขากลับได้</small>
+        </div>
       </section>
+
       <section class="filter-controls" *ngIf="isEditMode">
         <div class="alert-delete" *ngIf="isDelete()">
           <i class="fa-solid fa-triangle-exclamation"></i>
-          รายการที่ยกเลิก {{ isDelete() }} รายการ จะถูกลบถาวรเมื่อกด "ลบรายการเบิกทั้งหมด"
+          รายการที่ยกเลิก {{ isDelete() }} รายการ จะถูกลบเมื่อกดยืนยันการแก้ไข
         </div>
 
         <div class="display-order">
@@ -73,10 +105,15 @@
       </section>
 
       @if (isLoading) {
-      } @else if (items.length === 0) {
+      } @else if (!isEditMode && eligibleDates.length === 0) {
         <div class="empty-row">
           <i class="fas fa-calendar-times"></i>
-          {{ isEditMode ? 'ไม่พบข้อมูลการเบิกนี้' : 'ไม่พบวันที่มีสิทธิ์เบิกในเดือนนี้' }}
+          ไม่พบวันที่มีสิทธิ์เบิกในเดือนนี้
+        </div>
+      } @else if (items.length === 0) {
+        <div class="empty-row">
+          <i class="fas fa-calendar-plus"></i>
+          {{ isEditMode ? 'ไม่พบข้อมูลการเบิกนี้' : 'กรุณาเลือกวันที่และกด “เพิ่มเที่ยว”' }}
         </div>
       } @else {
         <div class="table-container">
@@ -205,11 +242,12 @@
           <!-- ====================== MOBILE CARDS ====================== -->
           <div class="mobile-cards-view mobile-only">
             <div
-              *ngFor="let item of items; let i = index"
+              *ngFor="let item of items; let i = index; trackBy: trackByClientId"
               [id]="'taxi-card-' + i"
               class="log-card"
               [class.highlight-card]="item.selected"
               [class.disable]="!item.selected && isEditMode"
+              [class.ineligible]="item.isEligible === false || getAvailableAmount(item) <= 0"
             >
               <div class="card-header">
                 <div class="date-info">
@@ -221,11 +259,13 @@
                     dateUtil.formatDateToBE(item.date, 'ddd. DD/MM/YYYY')
                   }}</span>
                   <span
+                    *ngIf="item.dayType"
                     class="day-type"
                     [style.color]="item.dayType === 'H' ? 'var(--danger)' : 'var(--text-muted)'"
                   >
-                    ({{ item.dayType }})
+                    ({{ item.dayType }} = {{ dayTypeLabel(item.dayType) }})
                   </span>
+                  <span class="trip-number">เที่ยวที่ {{ getTripNumber(item) }}</span>
                 </div>
                 <div class="header-right">
                   <!-- <button class="btn-card-upload" (click)="openUploadModal(item)"
@@ -249,11 +289,33 @@
                         : 'แนบไฟล์'
                     }}
                   </button>
+                  <button
+                    *ngIf="!isEditMode"
+                    type="button"
+                    class="btn-trip-action add"
+                    (click)="addTrip(item)"
+                    [disabled]="!canAddTrip(item)"
+                    title="เพิ่มเที่ยวในวันเดียวกัน"
+                    aria-label="เพิ่มเที่ยวในวันเดียวกัน"
+                  >
+                    <i class="fas fa-plus"></i> เพิ่มเที่ยว
+                  </button>
+                  <button
+                    type="button"
+                    class="btn-trip-action remove"
+                    (click)="removeTrip(item)"
+                    *ngIf="item.selected || getTripsForDate(item).length > 1 || isEditMode"
+                    title="ลบเที่ยวนี้"
+                    aria-label="ลบเที่ยวนี้"
+                  >
+                    <i class="fas fa-trash"></i>
+                  </button>
                   <input
                     type="checkbox"
                     id="mob-select-{{ i }}"
                     [(ngModel)]="item.selected"
                     class="card-checkbox"
+                    [disabled]="item.isEligible === false || getAvailableAmount(item) <= 0"
                     title="เลือกรายการ"
                     aria-label="เลือกรายการ"
                   />
@@ -261,10 +323,13 @@
               </div>
 
               <div class="card-grid">
+                <div class="grid-item full-width eligibility-summary">
+                  {{ getEligibilityText(item) }}
+                </div>
                 <div class="grid-item">
                   <label for="mob-shift-{{ i }}">รหัสกะ / เวลา</label>
                   <div class="val" id="mob-shift-{{ i }}">
-                    {{ item.shiftCode }} ({{ item.checkIn || '-' }} - {{ item.checkOut || '-' }})
+                    {{ getShiftTimeLabel(item) }}
                   </div>
                 </div>
                 <div class="grid-item">
@@ -389,6 +454,9 @@
                   <div *ngIf="item.amountError" class="error">
                     {{ item.amountError }}
                   </div>
+                  <div *ngIf="getDailyAmountError(item) as dailyError" class="error">
+                    {{ dailyError }}
+                  </div>
                 </div>
               </div>
             </div>
@@ -398,23 +466,25 @@
     </main>
   }
 
-  <div class="form-actions">
-    <button
-      type="button"
-      class="btn-submit"
-      (click)="save()"
-      [disabled]="isLoading || !areAllItemsValid()"
-    >
-      <i class="fas fa-check"></i>
-      {{
-        !isEditMode
-          ? 'ยืนยันการเบิก'
-          : hasDelete()
-            ? 'ลบรายการเบิกทั้งหมด'
-            : 'ยืนยันการแก้ไขการเบิก'
-      }}
-    </button>
-  </div>
+  @if (!isLoading) {
+    <div class="form-actions">
+      <button type="button" class="btn-submit" (click)="save()" [disabled]="isSubmitDisabled()">
+        <i
+          class="fas"
+          [class.fa-check]="!isSubmitting"
+          [class.fa-spinner]="isSubmitting"
+          [class.fa-spin]="isSubmitting"
+        ></i>
+        {{
+          !isEditMode
+            ? 'ยืนยันการเบิก'
+            : hasDelete()
+              ? 'ลบรายการเบิกทั้งหมด'
+              : 'ยืนยันการแก้ไขการเบิก'
+        }}
+      </button>
+    </div>
+  }
 
   <!-- File Upload Modal -->
   <app-file-upload-modal
