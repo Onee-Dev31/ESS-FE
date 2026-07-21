@@ -845,10 +845,11 @@ export class ITServiceRequestComponent implements OnInit {
         const data = res[0];
         // console.log('data : ', data);
         this.openforOneejob = data
-          ? `${data.FirstNameThai} ${data.LastNameThai} (พนักงานใหม่)`
+          ? `${data.FirstNameThai} ${data.LastNameThai}`
           : '';
         this.requestDetails.set(
-          `ชื่อ-นามสกุล: ${data.FirstNameThai} ${data.LastNameThai} (พนักงานใหม่)\n` +
+            `- พนักงานใหม่ -\n` +
+            `ชื่อ-นามสกุล: ${data.FirstNameThai} ${data.LastNameThai}\n` +
             `Email: ${data.Email}\n` +
             `ตำแหน่ง: ${data.JobTitle}\n` +
             `บริษัท: ${data.Location}`,
