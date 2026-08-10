@@ -46,8 +46,6 @@ export class EmpAdForm implements OnChanges {
     'department',
     'headEmployeeCode',
     'adUser',
-    'email',
-    'mobile',
   ];
 
   // View form
@@ -259,8 +257,6 @@ export class EmpAdForm implements OnChanges {
       NUMBANK: this.addForm.numberBank,
       COMPANY_CODE: this.addForm.companyCode,
       COMPANY_NAME: this.addForm.companyName,
-      EMAIL: this.addForm.email,
-      USR_MOBILE: this.addForm.mobile,
       DEPARTMENT: this.addForm.department,
       CODEMPIDH: this.addForm.headEmployeeCode,
       HEAD_NAME: selectedHead?.NAMETHAI ?? '',

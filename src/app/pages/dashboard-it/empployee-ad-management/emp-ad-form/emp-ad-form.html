@@ -285,23 +285,21 @@
           </nz-select>
         </div>
         <div class="field-group span-2">
-          <label>Email <span class="req">*</span></label>
+          <label>Email</label>
           <input
             type="email"
             [(ngModel)]="addForm.email"
             name="email"
             placeholder="Enter Email"
-            [class.invalid]="isInvalid('email')"
           />
         </div>
         <div class="field-group span-2">
-          <label>Mobile <span class="req">*</span></label>
+          <label>Mobile</label>
           <input
             type="text"
             [(ngModel)]="addForm.mobile"
             name="mobile"
             placeholder="Enter Mobile"
-            [class.invalid]="isInvalid('mobile')"
           />
         </div>
       </div>
