@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output, signal, SimpleChanges } from '@angular/core';
+import { Component, EventEmitter, inject, Input, Output, signal, SimpleChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, NgForm } from '@angular/forms';
 import {
@@ -6,6 +6,8 @@ import {
   FilePreviewModalComponent,
 } from '../../../../components/modals/file-preview-modal/file-preview-modal';
 import dayjs from 'dayjs';
+import { SwalService } from '../../../../services/swal.service';
+import { IT_ATTACHMENT_FILE_CONFIG } from '../../../../constants/it-attachment-file.constant';
 
 @Component({
   selector: 'app-acknowledge-modal',
@@ -14,6 +16,8 @@ import dayjs from 'dayjs';
   styleUrl: './acknowledge-modal.scss',
 })
 export class AcknowledgeModal {
+  private readonly swalService = inject(SwalService);
+
   @Input() ticket: any;
   @Output() submitModal = new EventEmitter<any>();
   @Output() closeModal = new EventEmitter<void>();
@@ -24,6 +28,7 @@ export class AcknowledgeModal {
 
   message: string = '';
   attachments: any[] = [];
+  readonly FILE_CONFIG = IT_ATTACHMENT_FILE_CONFIG;
 
   isPreviewModalOpen = signal<boolean>(false);
   previewFiles = signal<FilePreviewItem[]>([]);
@@ -63,19 +68,51 @@ export class AcknowledgeModal {
     this.repairCostType = null;
   }
 
-  onFileSelected(event: any) {
-    const files: FileList = event.target.files;
-    this.addFiles(files);
+  onFileSelected(event: Event) {
+    const input = event.target as HTMLInputElement;
+    if (input.files) {
+      this.addFiles(input.files);
+    }
+    input.value = '';
   }
 
   private addFiles(files: FileList) {
-    const newFiles = Array.from(files).map((f) => ({
-      name: f.name,
-      size: f.size,
-      file: f,
-    }));
+    if (!files.length) return;
 
-    this.attachments = [...this.attachments, ...newFiles];
+    const errors: string[] = [];
+    const validFiles: { name: string; size: number; file: File }[] = [];
+
+    for (const file of Array.from(files)) {
+      const reasons: string[] = [];
+
+      if (this.attachments.length + validFiles.length >= this.FILE_CONFIG.maxFiles) {
+        reasons.push(`เกินจำนวนสูงสุด ${this.FILE_CONFIG.maxFiles} ไฟล์`);
+      }
+
+      if (file.size / (1024 * 1024) > this.FILE_CONFIG.maxSizeMB) {
+        reasons.push(`ขนาดเกิน ${this.FILE_CONFIG.maxSizeMB} MB`);
+      }
+
+      const extension = file.name.split('.').pop()?.toLowerCase() ?? '';
+      if (
+        !this.FILE_CONFIG.allowedTypes.includes(file.type) &&
+        !this.FILE_CONFIG.allowedExtensions.includes(extension)
+      ) {
+        reasons.push('ประเภทไฟล์ไม่รองรับ');
+      }
+
+      if (reasons.length) {
+        errors.push(`${file.name} (${reasons.join(', ')})`);
+      } else {
+        validFiles.push({ name: file.name, size: file.size, file });
+      }
+    }
+
+    if (errors.length) {
+      this.swalService.warning(errors.join('\n'));
+    }
+
+    this.attachments = [...this.attachments, ...validFiles];
   }
 
   removeAttachment(index: number) {
