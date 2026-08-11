@@ -260,13 +260,12 @@
       <div class="tk-text html-detail" [innerHTML]="t.description"></div>
     </div>
     <div class="tk-card__body detail" *ngIf="t.status === 'Waiting you'">
-      <textarea
-        [(ngModel)]="t.description"
-        class="form-input-textarea"
-        aria-label="รายละเอียด ticket"
-        title="รายละเอียด ticket"
+      <app-text-editor
+        [value]="t.description"
+        (valueChange)="t.description = $event"
         placeholder="กรอกรายละเอียด ticket"
-      ></textarea>
+      >
+      </app-text-editor>
     </div>
     <!-- <div
       class="btn-expand-detail"
@@ -744,18 +743,20 @@
         </section>
       }
 
-      <button
-        class="floating-chat__button"
-        type="button"
-        title="เปิดแชท"
-        aria-label="เปิดแชท"
-        (click)="toggleChat()"
-      >
-        <i class="fa-solid" [ngClass]="IS_CHAT_OPEN() ? 'fa-times' : 'fa-comments'"></i>
-        @if (!IS_CHAT_OPEN() && unreadChatCount() > 0) {
-          <span class="floating-chat__badge">{{ unreadChatCount() }}</span>
-        }
-      </button>
+      @if (t.status?.toLowerCase() !== 'new') {
+        <button
+          class="floating-chat__button"
+          type="button"
+          title="เปิดแชท"
+          aria-label="เปิดแชท"
+          (click)="toggleChat()"
+        >
+          <i class="fa-solid" [ngClass]="IS_CHAT_OPEN() ? 'fa-times' : 'fa-comments'"></i>
+          @if (!IS_CHAT_OPEN() && unreadChatCount() > 0) {
+            <span class="floating-chat__badge">{{ unreadChatCount() }}</span>
+          }
+        </button>
+      }
     }
   </div>
 }

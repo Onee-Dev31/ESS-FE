@@ -49,6 +49,7 @@ import { ReOpenModal } from '../dashboard-it/modal/re-open-modal/re-open-modal';
 import { AvatarPreviewModal } from '../../components/modals/avatar-preview-modal/avatar-preview-modal';
 import { NzDatePickerModule } from 'ng-zorro-antd/date-picker';
 import { ExpandIconComponent } from '../../components/shared/icon/expand-icon';
+import { TextEditorComponent } from '../../components/shared/text-editor/text-editor';
 
 interface ReplyReader {
   userCodeempid: string;
@@ -78,11 +79,14 @@ interface ReplyReader {
     AvatarPreviewModal,
     NzDatePickerModule,
     ExpandIconComponent,
+    TextEditorComponent,
   ],
   templateUrl: './it-service-list.html',
   styleUrl: './it-service-list.scss',
 })
 export class ItService implements OnInit {
+  @ViewChild(TextEditorComponent) textEditor?: TextEditorComponent;
+
   isLaptop = false;
   isMobile = false;
   isSmallMobile = false;
@@ -1103,22 +1107,33 @@ export class ItService implements OnInit {
         const senderAdUser = this.authService.currentUser() ?? '';
         const senderName = `${userData?.NAMFIRSTT ?? ''} ${userData?.NAMLASTT ?? ''}`.trim();
         if (data.id && requesterAdUser && senderAdUser) {
+          // Type 3 (ขอใช้บริการ) ที่ยังไม่ Approve: step ล่าสุดใน timeline คือ "รออนุมัติ"
+          // ซึ่ง Assignee คือกลุ่มผู้อนุมัติ ไม่ใช่คนที่ควรได้รับ noti แชท จึงข้ามการดึง assignee ตอนนี้
+          const isPendingApprovalType3 =
+            ticket?.ticketTypeId === 3 && (ticket?.status_user === 'New' || !ticket?.status_user);
           const timeline: any[] = ticket?.assignTimeline ?? [];
           const latestStep = timeline[timeline.length - 1];
-          const assigneeAdUsers = ((latestStep?.Assignee ?? []) as any[])
-            .map((a: any) => (a.adUser || a.aduser || '').toLowerCase())
-            .filter((u: string) => !!u && u !== senderAdUser.toLowerCase());
+          const assigneeAdUsers = isPendingApprovalType3
+            ? []
+            : ((latestStep?.Assignee ?? []) as any[])
+                .map((a: any) => (a.adUser || a.aduser || '').toLowerCase())
+                .filter((u: string) => !!u && u !== senderAdUser.toLowerCase());
           const allRecipients = [
             ...new Set([...assigneeAdUsers, ...(data.mentionedAdUsers ?? [])]),
           ];
-          this.signalrService.noteNotify(
-            data.id,
-            requesterAdUser,
-            senderAdUser,
-            senderName,
-            data.message,
-            allRecipients,
-          );
+          // requester พิมพ์แชทเอง (เช่น type 3 ก่อน approve ที่ยังไม่มี assignee) และไม่มีคนอื่นให้แจ้ง
+          // → ไม่ต้องยิง noti เพราะจะกลายเป็นแจ้งเตือนตัวเอง
+          const isSelfChat = senderAdUser.toLowerCase() === requesterAdUser.toLowerCase();
+          if (!(isSelfChat && allRecipients.length === 0)) {
+            this.signalrService.noteNotify(
+              data.id,
+              requesterAdUser,
+              senderAdUser,
+              senderName,
+              data.message,
+              allRecipients,
+            );
+          }
         }
 
         if (!silent) setTimeout(() => this.swalService.success(res.message || 'บันทึกสำเร็จ'), 100);
@@ -1651,7 +1666,7 @@ export class ItService implements OnInit {
       cancelButtonText: 'ยกเลิก',
       confirmButtonColor: '#3085d6',
       cancelButtonColor: '#aaa',
-    }).then((result) => {
+    }).then(async (result) => {
       if (!result.isConfirmed) return;
 
       const requester = JSON.parse(localStorage.getItem('employee') || '{}');
@@ -1667,7 +1682,17 @@ export class ItService implements OnInit {
       formData.append('TicketId', String(current.ticketId));
       formData.append('Requester', requester.CODEMPID ?? '');
       formData.append('TicketNumber', current.ticketNumber ?? '');
-      formData.append('Description', current.description ?? '');
+
+      try {
+        const description = this.textEditor
+          ? await firstValueFrom(this.textEditor.confirmImages())
+          : (current.description ?? '');
+        formData.append('Description', description);
+      } catch (error) {
+        console.error('Error confirming editor images:', error);
+        this.swalService.warning('ไม่สามารถบันทึกรูปภาพในรายละเอียดได้');
+        return;
+      }
 
       const newFiles = (current.attachments || []).filter((x: any) => x.isNew && x.file);
       newFiles.forEach((item: any) => {

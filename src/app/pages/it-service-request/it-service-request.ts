@@ -32,6 +32,7 @@ import dayjs from 'dayjs';
 import { MasterDataService } from '../../services/master-data.service';
 import { NzModalModule } from 'ng-zorro-antd/modal';
 import { EmpAdForm } from '../dashboard-it/empployee-ad-management/emp-ad-form/emp-ad-form';
+import { IT_ATTACHMENT_FILE_CONFIG } from '../../constants/it-attachment-file.constant';
 
 @Component({
   selector: 'app-it-service-request',
@@ -74,20 +75,7 @@ export class ITServiceRequestComponent implements OnInit {
   isPreviewModalOpen = signal<boolean>(false);
   previewFiles = signal<FilePreviewItem[]>([]);
 
-  readonly FILE_CONFIG = {
-    maxFiles: 5,
-    maxSizeMB: 5,
-    allowedTypes: [
-      'image/jpeg',
-      'image/png',
-      'image/gif',
-      'application/pdf',
-      'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-      'application/vnd.ms-excel',
-    ],
-    allowedExtensions: ['jpg', 'jpeg', 'png', 'gif', 'pdf', 'docx', 'xlsx', 'xls'],
-  };
+  readonly FILE_CONFIG = IT_ATTACHMENT_FILE_CONFIG;
 
   // CONDITION
   @Input() openBy!: string;

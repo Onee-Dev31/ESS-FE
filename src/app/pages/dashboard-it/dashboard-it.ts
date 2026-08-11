@@ -2527,22 +2527,34 @@ export class DashboardIT implements OnInit {
         const senderName = `${userData?.NAMFIRSTT ?? ''} ${userData?.NAMLASTT ?? ''}`.trim();
 
         if (requesterAdUser && senderAdUser) {
+          // Type 3 (ขอใช้บริการ) ที่ยังไม่ Approve: step ล่าสุดใน timeline คือ "รออนุมัติ"
+          // ซึ่ง Assignee คือกลุ่มผู้อนุมัติ ไม่ใช่คนที่ควรได้รับ noti แชท จึงข้ามการดึง assignee ตอนนี้
+          const isPendingApprovalType3 =
+            ticket?.ticketTypeId === 3 &&
+            (ticket?.approval_status === 'New' || !ticket?.approval_status);
           const timeline: any[] = ticket?.assignTimeline ?? [];
           const latestStep = timeline[timeline.length - 1];
-          const assigneeAdUsers = ((latestStep?.Assignee ?? []) as any[])
-            .map((a: any) => (a.adUser || a.aduser || '').toLowerCase())
-            .filter((u: string) => !!u && u !== senderAdUser.toLowerCase());
+          const assigneeAdUsers = isPendingApprovalType3
+            ? []
+            : ((latestStep?.Assignee ?? []) as any[])
+                .map((a: any) => (a.adUser || a.aduser || '').toLowerCase())
+                .filter((u: string) => !!u && u !== senderAdUser.toLowerCase());
           const allRecipients = [
             ...new Set([...assigneeAdUsers, ...(data.mentionedAdUsers ?? [])]),
           ];
-          this.signalrService.noteNotify(
-            data.id,
-            requesterAdUser,
-            senderAdUser,
-            senderName,
-            data.message,
-            allRecipients,
-          );
+          // requester พิมพ์แชทเอง (เช่น type 3 ก่อน approve ที่ยังไม่มี assignee) และไม่มีคนอื่นให้แจ้ง
+          // → ไม่ต้องยิง noti เพราะจะกลายเป็นแจ้งเตือนตัวเอง
+          const isSelfChat = senderAdUser.toLowerCase() === requesterAdUser.toLowerCase();
+          if (!(isSelfChat && allRecipients.length === 0)) {
+            this.signalrService.noteNotify(
+              data.id,
+              requesterAdUser,
+              senderAdUser,
+              senderName,
+              data.message,
+              allRecipients,
+            );
+          }
         }
 
         if (!silent) {

@@ -75,7 +75,14 @@
               [(ngModel)]="message"
             ></textarea>
             <!-- Field: ไฟล์แนบ -->
-            <input type="file" multiple hidden #fileInput (change)="onFileSelected($event)" />
+            <input
+              type="file"
+              multiple
+              hidden
+              #fileInput
+              [accept]="'.' + FILE_CONFIG.allowedExtensions.join(',.')"
+              (change)="onFileSelected($event)"
+            />
             <button
               type="button"
               class="attach-btn"
