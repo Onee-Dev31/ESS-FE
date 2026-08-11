@@ -1227,10 +1227,11 @@ export class ITServiceRequestSpecificComponent implements OnInit {
             <tr><th>แผนก</th><td>${person.openFor?.DEPARTMENT}</td></tr>
             <tr><th>ตำแหน่ง</th><td>${person.openFor?.POST}</td></tr>
             <tr><th>อีเมล</th><td>${person.openFor?.EMAIL}</td></tr>
-            <tr><th>เบอร์</th><td>${person.openFor?.USR_MOBILE ?? person.phone}</td></tr>
+            <tr><th>เบอร์</th><td>${person.phone}</td></tr>
           </table><br>
         `;
         }
+        // <tr><th>เบอร์</th><td>${person.openFor?.USR_MOBILE ?? person.phone}</td></tr>
 
         // =========================
         // ORACLE
