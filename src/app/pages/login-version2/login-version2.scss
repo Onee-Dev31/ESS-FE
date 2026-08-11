@@ -1217,7 +1217,7 @@
 .input-shell input:-webkit-autofill:active {
   -webkit-text-fill-color: #000000 !important;
 
-  caret-color: #ffffff !important;
+  caret-color: #000000 !important;
 
   border: none !important;
 
@@ -1231,18 +1231,24 @@
 
   transition: background-color 9999s ease-in-out 0s;
 }
-.input-shell input {
+.input-shell input,
+.input-shell input:focus {
   color: #000000 !important;
+  -webkit-text-fill-color: #000000 !important;
+  caret-color: #000000 !important;
 }
 
 .input-shell input::placeholder {
   color: rgba(0, 0, 0, 0.489);
+  -webkit-text-fill-color: rgba(0, 0, 0, 0.489);
+  opacity: 1;
 }
 
 input:-webkit-autofill {
-  -webkit-text-fill-color: #fff !important;
+  -webkit-text-fill-color: #000000 !important;
+  caret-color: #000000 !important;
 }
 
 input:-webkit-autofill::first-line {
-  color: #fff !important;
+  color: #000000 !important;
 }

@@ -95,18 +95,69 @@
                   <span class="emp-id">{{ emp.ID }}</span>
                 </td>
                 <td>
-                  <div>{{ emp.nameThai1 }}</div>
-                  <div class="line2">{{ emp.nameThai2 }}</div>
-                  <div class="line3">{{ emp.nameThai3 }}</div>
+                  <div class="table-emp-name">
+                    <div>
+                      <div>{{ emp.nameThai1 }}</div>
+                      <div class="line2">{{ emp.nameThai2 }}</div>
+                      <div class="line3">{{ emp.nameThai3 }}</div>
+                    </div>
+                    <button
+                      type="button"
+                      class="copy-name-btn"
+                      (click)="copyThaiName(emp)"
+                      [attr.aria-label]="'Copy name ' + emp.nameThai1 + ' ' + emp.nameThai2"
+                      title="Copy name"
+                    >
+                      <i
+                        class="fas"
+                        [class.fa-copy]="copiedField() !== emp.ID + ':thai'"
+                        [class.fa-check]="copiedField() === emp.ID + ':thai'"
+                      ></i>
+                    </button>
+                  </div>
                 </td>
                 <td>
-                  <div>{{ emp.nameEng1 }}</div>
-                  <div class="line2">{{ emp.nameEng2 }}</div>
+                  <div class="copy-field">
+                    <div>
+                      <div>{{ emp.nameEng1 }}</div>
+                      <div class="line2">{{ emp.nameEng2 }}</div>
+                    </div>
+                    <button
+                      type="button"
+                      class="copy-name-btn"
+                      (click)="copyEnglishName(emp)"
+                      [attr.aria-label]="'Copy English name ' + emp.nameEng1 + ' ' + emp.nameEng2"
+                      title="Copy English name"
+                    >
+                      <i
+                        class="fas"
+                        [class.fa-copy]="copiedField() !== emp.ID + ':english'"
+                        [class.fa-check]="copiedField() === emp.ID + ':english'"
+                      ></i>
+                    </button>
+                  </div>
                 </td>
                 <td>{{ emp.COMPANY }}</td>
                 <td>
-                  <div>{{ emp.dept1 }}</div>
-                  <div class="line2">{{ emp.dept2 }}</div>
+                  <div class="copy-field">
+                    <div>
+                      <div>{{ emp.dept1 }}</div>
+                      <div class="line2">{{ emp.dept2 }}</div>
+                    </div>
+                    <button
+                      type="button"
+                      class="copy-name-btn"
+                      (click)="copyDepartment(emp)"
+                      [attr.aria-label]="'Copy department ' + emp.dept1 + ' ' + emp.dept2"
+                      title="Copy department"
+                    >
+                      <i
+                        class="fas"
+                        [class.fa-copy]="copiedField() !== emp.ID + ':department'"
+                        [class.fa-check]="copiedField() === emp.ID + ':department'"
+                      ></i>
+                    </button>
+                  </div>
                 </td>
                 <td>
                   <span class="ad-user">{{ emp.AD_USER || '-' }}</span>
@@ -154,11 +205,41 @@
               <div class="header-content">
                 <span class="emp-id">{{ emp.ID }}</span>
                 <div class="emp-name">
-                  <div>{{ emp.nameThai1 }}</div>
-                  <div class="line2">{{ emp.nameThai2 }}</div>
-                  <div class="line3">{{ emp.nameThai3 }}</div>
+                  <div class="emp-name-text">
+                    <div>{{ emp.nameThai1 }}</div>
+                    <div class="line2">{{ emp.nameThai2 }}</div>
+                    <div class="line3">{{ emp.nameThai3 }}</div>
+                  </div>
+                  <button
+                    type="button"
+                    class="copy-name-btn"
+                    (click)="copyThaiName(emp)"
+                    [attr.aria-label]="'Copy name ' + emp.nameThai1 + ' ' + emp.nameThai2"
+                    title="Copy name"
+                  >
+                    <i
+                      class="fas"
+                      [class.fa-copy]="copiedField() !== emp.ID + ':thai'"
+                      [class.fa-check]="copiedField() === emp.ID + ':thai'"
+                    ></i>
+                  </button>
                 </div>
-                <div class="text-muted small">{{ emp.nameEng1 }} {{ emp.nameEng2 }}</div>
+                <div class="copy-field text-muted small">
+                  <span>{{ emp.nameEng1 }} {{ emp.nameEng2 }}</span>
+                  <button
+                    type="button"
+                    class="copy-name-btn"
+                    (click)="copyEnglishName(emp)"
+                    [attr.aria-label]="'Copy English name ' + emp.nameEng1 + ' ' + emp.nameEng2"
+                    title="Copy English name"
+                  >
+                    <i
+                      class="fas"
+                      [class.fa-copy]="copiedField() !== emp.ID + ':english'"
+                      [class.fa-check]="copiedField() === emp.ID + ':english'"
+                    ></i>
+                  </button>
+                </div>
               </div>
               <span
                 class="status-badge"
@@ -175,9 +256,24 @@
               </div>
               <div class="info-row">
                 <span class="label"><i class="fas fa-sitemap"></i> Department:</span>
-                <span class="value">
-                  <div>{{ emp.dept1 }}</div>
-                  <div class="line2">{{ emp.dept2 }}</div>
+                <span class="value copy-field">
+                  <span>
+                    <span>{{ emp.dept1 }}</span>
+                    <span class="line2">{{ emp.dept2 }}</span>
+                  </span>
+                  <button
+                    type="button"
+                    class="copy-name-btn"
+                    (click)="copyDepartment(emp)"
+                    [attr.aria-label]="'Copy department ' + emp.dept1 + ' ' + emp.dept2"
+                    title="Copy department"
+                  >
+                    <i
+                      class="fas"
+                      [class.fa-copy]="copiedField() !== emp.ID + ':department'"
+                      [class.fa-check]="copiedField() === emp.ID + ':department'"
+                    ></i>
+                  </button>
                 </span>
               </div>
               <div class="info-row">
