@@ -199,12 +199,40 @@ export class EmpList {
   private async copyText(text: string, fieldKey: string) {
     if (!text) return;
 
-    await navigator.clipboard.writeText(text);
+    if (navigator.clipboard?.writeText && window.isSecureContext) {
+      try {
+        await navigator.clipboard.writeText(text);
+      } catch {
+        this.copyTextFallback(text);
+      }
+    } else {
+      this.copyTextFallback(text);
+    }
+
     this.copiedField.set(fieldKey);
 
     clearTimeout(this.copyResetTimer);
     this.copyResetTimer = setTimeout(() => {
       if (this.copiedField() === fieldKey) this.copiedField.set(null);
     }, 1500);
+  }
+
+  private copyTextFallback(text: string) {
+    const textarea = document.createElement('textarea');
+    textarea.value = text;
+    textarea.readOnly = true;
+    textarea.style.position = 'fixed';
+    textarea.style.opacity = '0';
+    textarea.style.pointerEvents = 'none';
+
+    document.body.appendChild(textarea);
+    textarea.select();
+
+    try {
+      const copied = document.execCommand('copy');
+      if (!copied) throw new Error('Copy command was rejected by the browser');
+    } finally {
+      document.body.removeChild(textarea);
+    }
   }
 }
