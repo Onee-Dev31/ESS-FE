@@ -744,18 +744,20 @@
         </section>
       }
 
-      <button
-        class="floating-chat__button"
-        type="button"
-        title="เปิดแชท"
-        aria-label="เปิดแชท"
-        (click)="toggleChat()"
-      >
-        <i class="fa-solid" [ngClass]="IS_CHAT_OPEN() ? 'fa-times' : 'fa-comments'"></i>
-        @if (!IS_CHAT_OPEN() && unreadChatCount() > 0) {
-          <span class="floating-chat__badge">{{ unreadChatCount() }}</span>
-        }
-      </button>
+      @if (t.status?.toLowerCase() !== 'new') {
+        <button
+          class="floating-chat__button"
+          type="button"
+          title="เปิดแชท"
+          aria-label="เปิดแชท"
+          (click)="toggleChat()"
+        >
+          <i class="fa-solid" [ngClass]="IS_CHAT_OPEN() ? 'fa-times' : 'fa-comments'"></i>
+          @if (!IS_CHAT_OPEN() && unreadChatCount() > 0) {
+            <span class="floating-chat__badge">{{ unreadChatCount() }}</span>
+          }
+        </button>
+      }
     }
   </div>
 }
