@@ -1110,8 +1110,7 @@ export class ItService implements OnInit {
           // Type 3 (ขอใช้บริการ) ที่ยังไม่ Approve: step ล่าสุดใน timeline คือ "รออนุมัติ"
           // ซึ่ง Assignee คือกลุ่มผู้อนุมัติ ไม่ใช่คนที่ควรได้รับ noti แชท จึงข้ามการดึง assignee ตอนนี้
           const isPendingApprovalType3 =
-            ticket?.ticketTypeId === 3 &&
-            (ticket?.status_user === 'New' || !ticket?.status_user);
+            ticket?.ticketTypeId === 3 && (ticket?.status_user === 'New' || !ticket?.status_user);
           const timeline: any[] = ticket?.assignTimeline ?? [];
           const latestStep = timeline[timeline.length - 1];
           const assigneeAdUsers = isPendingApprovalType3
