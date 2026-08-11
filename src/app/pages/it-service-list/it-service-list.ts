@@ -49,6 +49,7 @@ import { ReOpenModal } from '../dashboard-it/modal/re-open-modal/re-open-modal';
 import { AvatarPreviewModal } from '../../components/modals/avatar-preview-modal/avatar-preview-modal';
 import { NzDatePickerModule } from 'ng-zorro-antd/date-picker';
 import { ExpandIconComponent } from '../../components/shared/icon/expand-icon';
+import { TextEditorComponent } from '../../components/shared/text-editor/text-editor';
 
 interface ReplyReader {
   userCodeempid: string;
@@ -78,11 +79,14 @@ interface ReplyReader {
     AvatarPreviewModal,
     NzDatePickerModule,
     ExpandIconComponent,
+    TextEditorComponent,
   ],
   templateUrl: './it-service-list.html',
   styleUrl: './it-service-list.scss',
 })
 export class ItService implements OnInit {
+  @ViewChild(TextEditorComponent) textEditor?: TextEditorComponent;
+
   isLaptop = false;
   isMobile = false;
   isSmallMobile = false;
@@ -1663,7 +1667,7 @@ export class ItService implements OnInit {
       cancelButtonText: 'ยกเลิก',
       confirmButtonColor: '#3085d6',
       cancelButtonColor: '#aaa',
-    }).then((result) => {
+    }).then(async (result) => {
       if (!result.isConfirmed) return;
 
       const requester = JSON.parse(localStorage.getItem('employee') || '{}');
@@ -1679,7 +1683,17 @@ export class ItService implements OnInit {
       formData.append('TicketId', String(current.ticketId));
       formData.append('Requester', requester.CODEMPID ?? '');
       formData.append('TicketNumber', current.ticketNumber ?? '');
-      formData.append('Description', current.description ?? '');
+
+      try {
+        const description = this.textEditor
+          ? await firstValueFrom(this.textEditor.confirmImages())
+          : (current.description ?? '');
+        formData.append('Description', description);
+      } catch (error) {
+        console.error('Error confirming editor images:', error);
+        this.swalService.warning('ไม่สามารถบันทึกรูปภาพในรายละเอียดได้');
+        return;
+      }
 
       const newFiles = (current.attachments || []).filter((x: any) => x.isNew && x.file);
       newFiles.forEach((item: any) => {
