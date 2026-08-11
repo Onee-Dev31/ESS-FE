@@ -64,6 +64,11 @@
     border: 1px solid var(--border-table-head) !important;
     border-radius: 8px !important;
     background: var(--input-bg) !important;
+
+    .ant-select-selection-wrap {
+      padding-inline: 11px;
+    }
+
     .ant-select-selection-search-input {
       height: 36px !important;
     }
@@ -167,6 +172,7 @@
 
 // ==================== BADGES ====================
 .line2 {
+  display: block;
   font-size: 0.8rem;
 }
 
@@ -179,6 +185,43 @@
   font-weight: 700;
   color: $primary;
   font-size: 0.85rem;
+}
+
+.table-emp-name,
+.copy-field {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+}
+
+.copy-field > :first-child {
+  min-width: 0;
+}
+
+.copy-name-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  margin-left: auto;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+
+  &:hover {
+    background: var(--border-toolbar);
+    color: $primary;
+  }
+
+  .fa-check {
+    color: var(--status-success-text);
+  }
 }
 
 .ad-user {
@@ -236,10 +279,20 @@
       padding: 14px 16px;
       border-bottom: 1px solid var(--border-toolbar);
 
+      .header-content {
+        flex: 1;
+        min-width: 0;
+        margin-right: 12px;
+      }
+
       .emp-name {
+        display: flex;
+        align-items: center;
+        gap: 8px;
         font-weight: 700;
         font-size: 1rem;
         color: var(--text-header);
+        width: 100%;
       }
       .text-muted {
         font-size: 0.8rem;

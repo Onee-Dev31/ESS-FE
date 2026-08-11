@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectorRef, Component } from '@angular/core';
+import { ChangeDetectorRef, Component, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { NzSelectModule } from 'ng-zorro-antd/select';
 import { PageHeaderComponent } from '../../../../components/shared/page-header/page-header';
@@ -44,6 +44,8 @@ export class EmpList {
   currentPage = 0;
   pageSize = 20;
   totalItems = 0;
+  readonly copiedField = signal<string | null>(null);
+  private copyResetTimer?: ReturnType<typeof setTimeout>;
 
   constructor(
     private resignService: ResignManagementService,
@@ -177,5 +179,32 @@ export class EmpList {
     this.pageSize = size;
     this.currentPage = 0;
     this.updatePage();
+  }
+
+  async copyThaiName(emp: any) {
+    const fullName = `${emp.nameThai1 ?? ''} ${emp.nameThai2 ?? ''}`.trim();
+    await this.copyText(fullName, `${emp.ID}:thai`);
+  }
+
+  async copyEnglishName(emp: any) {
+    const fullName = `${emp.nameEng1 ?? ''} ${emp.nameEng2 ?? ''}`.trim();
+    await this.copyText(fullName, `${emp.ID}:english`);
+  }
+
+  async copyDepartment(emp: any) {
+    const department = `${emp.dept1 ?? ''} ${emp.dept2 ?? ''}`.trim();
+    await this.copyText(department, `${emp.ID}:department`);
+  }
+
+  private async copyText(text: string, fieldKey: string) {
+    if (!text) return;
+
+    await navigator.clipboard.writeText(text);
+    this.copiedField.set(fieldKey);
+
+    clearTimeout(this.copyResetTimer);
+    this.copyResetTimer = setTimeout(() => {
+      if (this.copiedField() === fieldKey) this.copiedField.set(null);
+    }, 1500);
   }
 }
