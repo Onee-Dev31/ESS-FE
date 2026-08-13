@@ -3002,6 +3002,114 @@ textarea.form-input {
   // border-bottom: 1px solid var(--border-color);
 }
 
+.requester-profile {
+  gap: 7px;
+
+  .side-avatar {
+    width: 72px;
+    height: 72px;
+    border: 3px solid var(--bg-card);
+    outline: 2px solid color-mix(in srgb, var(--primary), transparent 65%);
+    box-shadow: 0 6px 16px rgba(17, 24, 39, 0.14);
+  }
+
+  .requester-detail {
+    gap: 3px;
+  }
+
+  .requester-name {
+    color: var(--text-header);
+    font-weight: 700;
+    line-height: 1.35;
+  }
+
+  .requester-meta {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    color: var(--text-muted);
+    line-height: 1.4;
+    overflow-wrap: anywhere;
+
+    i {
+      width: 13px;
+      color: var(--text-table-head);
+      flex-shrink: 0;
+    }
+  }
+
+  .contact-toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    width: auto;
+    height: 30px;
+    margin-top: 3px;
+    padding: 0 10px;
+    border: 1px solid var(--border-color);
+    border-radius: 999px;
+    background: var(--bg-card);
+    color: var(--primary);
+    font-family: inherit;
+    font-size: $font-size-hint;
+    font-weight: 600;
+    box-shadow: 0 2px 6px rgba(17, 24, 39, 0.08);
+    transition: all 0.2s ease;
+
+    &:hover {
+      border-color: var(--primary);
+      background: color-mix(in srgb, var(--primary), transparent 92%);
+      text-decoration: none;
+    }
+  }
+}
+
+.requester-contact {
+  display: grid;
+  gap: 7px;
+  margin-top: 12px !important;
+  padding: 10px 12px;
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  background: var(--bg-slate);
+}
+
+.requester-contact-item {
+  display: grid;
+  grid-template-columns: 18px minmax(0, 1fr);
+  align-items: center;
+  gap: 7px;
+  color: var(--text-table-head);
+
+  i {
+    color: var(--primary);
+    text-align: center;
+  }
+
+  span {
+    overflow-wrap: anywhere;
+  }
+}
+
+.progress-title {
+  > .progress-status-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    line-height: 1.5;
+
+    i {
+      font-size: inherit;
+    }
+  }
+}
+
 .side-name {
   font-weight: 900;
   color: var(--text-header);

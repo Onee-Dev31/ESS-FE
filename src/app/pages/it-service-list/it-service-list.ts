@@ -633,7 +633,7 @@ export class ItService implements OnInit {
           ? res.requestFor
           : null;
 
-      this.showRequesterContact = !hasOpenFor || !!isOpenForSelf;
+      // this.showRequesterContact = !hasOpenFor || !!isOpenForSelf;
 
       const objectData = {
         ticketId: ticket.id,

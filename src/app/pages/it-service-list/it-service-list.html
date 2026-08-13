@@ -766,7 +766,7 @@
   <!-- Requester -->
   <section class="side-card requester" *ngIf="t.requester as requester">
     <div class="side-title">ผู้ขอใช้บริการ</div>
-    <div class="side-profile">
+    <div class="side-profile requester-profile">
       <div class="side-avatar">
         <app-avatar-preview-modal
           [src]="'https://empimg.oneeclick.co:8048/employeeimage/' + requester.emp_code + '.jpg'"
@@ -777,19 +777,38 @@
           "
         />
       </div>
-      <div class="side-detail">
-        <div>{{ requester.fullname }} ({{ requester.nickname }})</div>
-        <div>{{ requester.department_name }}</div>
-        <div>{{ requester.company_name }}</div>
-        <div class="contact-toggle" (click)="showRequesterContact = !showRequesterContact">
-          <i [class]="showRequesterContact ? 'fa-solid fa-angle-up' : 'fa-solid fa-angle-down'"></i>
+      <div class="side-detail requester-detail">
+        <div class="requester-name">
+          {{ requester.fullname }}
+          <span *ngIf="requester.nickname">({{ requester.nickname }})</span>
+        </div>
+        <div class="requester-meta">
+          {{ requester.department_name }}
+        </div>
+        <div class="requester-meta">
+          {{ requester.company_name }}
         </div>
       </div>
+      <button
+        type="button"
+        class="contact-toggle"
+        [attr.aria-label]="showRequesterContact ? 'ซ่อนข้อมูลติดต่อ' : 'แสดงข้อมูลติดต่อ'"
+        [attr.aria-expanded]="showRequesterContact"
+        (click)="showRequesterContact = !showRequesterContact"
+      >
+        <span>{{ showRequesterContact ? 'ซ่อนข้อมูลติดต่อ' : 'ดูข้อมูลติดต่อ' }}</span>
+        <i [class]="showRequesterContact ? 'fa-solid fa-angle-up' : 'fa-solid fa-angle-down'"></i>
+      </button>
     </div>
-    <div class="side-contact" *ngIf="showRequesterContact">
-      <p>ช่องทางการติดต่อ</p>
-      <div>อีเมล: {{ requester.email }}</div>
-      <div>ติดต่อ: {{ requester.contact_phone || '-' }}</div>
+    <div class="side-contact requester-contact" *ngIf="showRequesterContact">
+      <div class="requester-contact-item">
+        <i class="fa-regular fa-envelope" aria-hidden="true"></i>
+        <span>{{ requester.email || '-' }}</span>
+      </div>
+      <div class="requester-contact-item">
+        <i class="fa-solid fa-phone" aria-hidden="true"></i>
+        <span>{{ requester.contact_phone || '-' }}</span>
+      </div>
     </div>
     <div class="side-cc" *ngIf="t.ccList.length > 0">
       CC:
@@ -816,7 +835,12 @@
 
   <!-- Progress / Timeline -->
   <section class="side-card assignee">
-    <div class="side-title">Progress</div>
+    <div class="side-title progress-title">
+      <span class="progress-status-pill" [ngStyle]="StatusColor.getStyle(t.status)">
+        <i class="fas fa-sync-alt" aria-hidden="true"></i>
+        {{ statusLabel(t.status) }}
+      </span>
+    </div>
     <div class="timeline" *ngIf="t.assignTimeline.length > 0; else noAssignee">
       <div
         class="timeline-item"
