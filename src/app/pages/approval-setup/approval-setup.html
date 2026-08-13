@@ -42,10 +42,11 @@
         <thead>
           <tr>
             <th style="width: 250px">แผนก</th>
-            <th style="width: 250px">Approve 1</th>
-            <th style="width: 250px">Approve 2</th>
-            <th style="width: 250px">Approve 3</th>
-            <th style="width: 250px">Approve 4</th>
+            <th style="width: 250px">เลขา</th>
+            <th style="width: 250px">ผู้อนุมัติลำดับที่ 1</th>
+            <th style="width: 250px">ผู้อนุมัติลำดับที่ 2</th>
+            <th style="width: 250px">HR</th>
+            <th style="width: 250px">IT Director (IT Service)</th>
             <th style="width: 10px">แก้ไขล่าสุด</th>
             <th style="width: 50px"></th>
           </tr>
@@ -53,7 +54,7 @@
         <tbody>
           <ng-container *ngFor="let group of groupedList()">
             <tr class="company-row">
-              <td colspan="7">
+              <td colspan="9">
                 <div class="company-header">
                   <i class="fas fa-building"></i>
                   {{ group.companyName }} ({{ group.companyCode }})
@@ -70,12 +71,27 @@
                 </div>
               </td>
 
+              <!-- Approve Secretary -->
+              <td>
+                <div class="approver-cell" *ngIf="!row.isSkipSecretary && row.secretaryEmpNo">
+                  <div class="approver-item">
+                    <div class="approver-avatar">
+                      <img
+                        [src]="getEmployeeImage(row.secretaryEmpNo)"
+                        (error)="$any($event.target).src = 'user.png'"
+                      />
+                    </div>
+                    <div class="approver-info">
+                      <span class="approver-name">{{ row.secretaryEmpName }}</span>
+                      <span class="approver-code">{{ row.secretaryEmpNo }}</span>
+                    </div>
+                  </div>
+                </div>
+              </td>
+
               <!-- Approve 1 -->
               <td>
-                <div
-                  class="approver-cell"
-                  *ngIf="!row.isSkipApprove1 && row.approve1EmpNo; else skipCell"
-                >
+                <div class="approver-cell" *ngIf="row.approve1EmpNo">
                   <div class="approver-item">
                     <div class="approver-avatar">
                       <img
@@ -89,12 +105,7 @@
                     </div>
                   </div>
                 </div>
-                <ng-template #skipCell>
-                  <div class="skip-badge">
-                    <i class="fas fa-forward"></i>
-                    ข้ามไป Approve 2
-                  </div>
-                </ng-template>
+                <span class="text-muted" *ngIf="!row.approve1EmpNo">-</span>
               </td>
 
               <!-- Approve 2 -->
@@ -116,16 +127,13 @@
                 <span class="text-muted" *ngIf="!row.approve2EmpNo">-</span>
               </td>
 
-              <!-- Approve 3 -->
+              <!-- Approve HR -->
               <td>
-                <div class="approver-cell approver3" *ngIf="row.approve3Emps">
-                  @for (emp of row.approve3Emps; track emp.empNo) {
+                <div class="approver-cell approver3" *ngIf="row.hrApprovers.length">
+                  @for (emp of row.hrApprovers; track emp.empNo) {
                     <div class="approver-item">
                       <div class="approver-avatar">
-                        <img
-                          [src]="getEmployeeImage(emp.empNo)"
-                          (error)="$any($event.target).src = 'user.png'"
-                        />
+                        <img [src]="getEmployeeImage(emp.empNo)" (error)="onImgError($event)" />
                       </div>
                       <div class="approver-info">
                         <span class="approver-name">{{ emp.empName }}</span>
@@ -134,26 +142,26 @@
                     </div>
                   }
                 </div>
-                <span class="text-muted" *ngIf="!row.approve3Emps">-</span>
+                <span class="text-muted" *ngIf="!row.hrApprovers.length">-</span>
               </td>
 
-              <!-- Approve 4 -->
+              <!-- Approve IT Director -->
               <td>
-                <div class="approver-cell" *ngIf="row.approve4EmpNo">
+                <div class="approver-cell" *ngIf="row.itDirectorEmpNo">
                   <div class="approver-item">
                     <div class="approver-avatar">
                       <img
-                        [src]="getEmployeeImage(row.approve4EmpNo)"
+                        [src]="getEmployeeImage(row.itDirectorEmpNo)"
                         (error)="onImgError($event)"
                       />
                     </div>
                     <div class="approver-info">
-                      <span class="approver-name">{{ row.approve4EmpName }}</span>
-                      <span class="approver-code">{{ row.approve4EmpNo }}</span>
+                      <span class="approver-name">{{ row.itDirectorEmpName }}</span>
+                      <span class="approver-code">{{ row.itDirectorEmpNo }}</span>
                     </div>
                   </div>
                 </div>
-                <span class="text-muted" *ngIf="!row.approve4EmpNo">-</span>
+                <span class="text-muted" *ngIf="!row.itDirectorEmpNo">-</span>
               </td>
 
               <!-- แก้ไขล่าสุด -->
@@ -178,7 +186,7 @@
 
             <!-- Empty -->
             <tr *ngIf="group.departments.length === 0 && !isLoading()">
-              <td colspan="7" class="empty-row">
+              <td colspan="9" class="empty-row">
                 <i class="fas fa-inbox"></i>
                 <p>ไม่พบข้อมูล</p>
               </td>
@@ -213,48 +221,64 @@
         <div class="flow-steps">
           <div
             class="flow-step"
-            *ngIf="!editingRow()?.isSkipApprove1 && editingRow()?.approve1EmpNo"
+            *ngIf="!editingRow()?.isSkipSecretary && editingRow()?.secretaryEmpNo"
           >
-            <div class="step-badge">1</div>
+            <div class="step-badge">เลขา</div>
             <div class="step-info">
-              <span class="step-name">{{ editingRow()?.approve1EmpName }}</span>
-              <span class="step-code">{{ editingRow()?.approve1EmpNo }}</span>
+              <span class="step-name">{{ editingRow()?.secretaryEmpName }}</span>
+              <span class="step-code">{{ editingRow()?.secretaryEmpNo }}</span>
             </div>
           </div>
-          <div class="flow-step skip-step" *ngIf="editingRow()?.isSkipApprove1">
+          <div class="flow-step skip-step" *ngIf="editingRow()?.isSkipSecretary">
             <div class="step-badge skip">→</div>
             <div class="step-info">
-              <span class="step-name">ข้าม Approve 1</span>
-              <span class="step-code">ส่งตรงไปยัง Approve 2</span>
+              <span class="step-name">ข้ามเลขา</span>
+              <span class="step-code">ส่งตรงไปยังผู้อนุมัติลำดับที่ 1</span>
             </div>
           </div>
-          <div class="flow-arrow" *ngIf="editingRow()?.approve1EmpNo">↓</div>
+          <div class="flow-arrow" *ngIf="editingRow()?.secretaryEmpNo">↓</div>
           <div class="flow-step">
+            <div class="step-badge">1</div>
+            <div class="step-info">
+              <span class="step-name">{{ editingRow()?.approve1EmpName || '-' }}</span>
+              <span class="step-code">{{ editingRow()?.approve1EmpNo || 'ไม่มีข้อมูล' }}</span>
+            </div>
+          </div>
+          <div class="flow-arrow" *ngIf="editingRow()?.approve2EmpNo">↓</div>
+          <div class="flow-step" *ngIf="editingRow()?.approve2EmpNo">
             <div class="step-badge">2</div>
             <div class="step-info">
               <span class="step-name">{{ editingRow()?.approve2EmpName || '-' }}</span>
               <span class="step-code">{{ editingRow()?.approve2EmpNo || 'ไม่มีข้อมูล' }}</span>
             </div>
           </div>
-          <div class="flow-arrow" *ngIf="editingRow()?.approve3Emps">↓</div>
-          <div class="flow-step" *ngIf="editingRow()?.approve3Emps">
+          <div class="flow-arrow" *ngIf="editingRow()?.approve3EmpNo">
+            ↓
+            <div class="knowledge">(ในกรณี IT Request)</div>
+          </div>
+          <div class="flow-step">
             <div class="step-badge">3</div>
             <div class="step-info">
-              @for (emp of editingRow()?.approve3Emps; track emp.empNo) {
+              <span class="step-name">{{ editingRow()?.approve3EmpName || '-' }}</span>
+              <span class="step-code">{{ editingRow()?.approve3EmpNo || 'ไม่มีข้อมูล' }}</span>
+            </div>
+          </div>
+          <div class="flow-arrow" *ngIf="editingRow()?.hrApprovers?.length">↓</div>
+          <div class="flow-step" *ngIf="editingRow()?.hrApprovers?.length">
+            <div class="step-badge">HR</div>
+            <div class="step-info">
+              @for (emp of editingRow()?.hrApprovers; track emp.empNo) {
                 <span class="step-name">{{ emp.empName }}</span>
                 <span class="step-code">{{ emp.empNo }}</span>
               }
             </div>
           </div>
-          <div class="flow-arrow" *ngIf="editingRow()?.approve4EmpNo">
-            ↓
-            <div class="knowledge">(ในกรณี IT Request)</div>
-          </div>
-          <div class="flow-step">
-            <div class="step-badge">4</div>
+          <div class="flow-arrow" *ngIf="editingRow()?.itDirectorEmpNo">↓</div>
+          <div class="flow-step" *ngIf="editingRow()?.itDirectorEmpNo">
+            <div class="step-badge">IT</div>
             <div class="step-info">
-              <span class="step-name">{{ editingRow()?.approve4EmpName || '-' }}</span>
-              <span class="step-code">{{ editingRow()?.approve4EmpNo || 'ไม่มีข้อมูล' }}</span>
+              <span class="step-name">{{ editingRow()?.itDirectorEmpName || '-' }}</span>
+              <span class="step-code">{{ editingRow()?.itDirectorEmpNo || 'ไม่มีข้อมูล' }}</span>
             </div>
           </div>
         </div>
@@ -262,21 +286,21 @@
 
       <!-- Toggle skip -->
       <div class="section">
-        <div class="section-label">ตั้งค่า Approve 1</div>
-        <div class="toggle-row" (click)="onSkipToggle(!skipApprove1())">
+        <div class="section-label">ตั้งค่าเลขา</div>
+        <div class="toggle-row" (click)="onSkipToggle(!skipSecretary())">
           <div class="toggle-info">
-            <span class="toggle-label">ข้าม Approve 1</span>
-            <span class="toggle-sub">ส่งตรงไปยัง Approve 2 โดยไม่ผ่าน Approve 1</span>
+            <span class="toggle-label">ข้ามเลขา</span>
+            <span class="toggle-sub">ส่งตรงไปยังผู้อนุมัติลำดับที่ 1 โดยไม่ผ่านเลขา</span>
           </div>
-          <div class="toggle" [class.on]="skipApprove1()">
+          <div class="toggle" [class.on]="skipSecretary()">
             <div class="toggle-thumb"></div>
           </div>
         </div>
       </div>
 
       <!-- Search employee -->
-      <div class="section" *ngIf="!skipApprove1()">
-        <div class="section-label">ค้นหาผู้อนุมัติลำดับที่ 1</div>
+      <div class="section" *ngIf="!skipSecretary()">
+        <div class="section-label">ค้นหาเลขา</div>
         <div class="search-emp-box">
           <i class="fas fa-search"></i>
           <input
@@ -308,20 +332,20 @@
         </div>
 
         <!-- Selected -->
-        <div class="selected-emp" *ngIf="selectedApprove1()">
+        <div class="selected-emp" *ngIf="selectedSecretary()">
           <div class="selected-emp__avatar">
             <img
-              [src]="getEmployeeImage(selectedApprove1()?.empNo)"
+              [src]="getEmployeeImage(selectedSecretary()?.empNo)"
               (error)="$any($event.target).src = 'user.png'"
             />
           </div>
           <div class="selected-emp__info">
-            <span class="selected-emp__name">{{ selectedApprove1()?.empName }}</span>
+            <span class="selected-emp__name">{{ selectedSecretary()?.empName }}</span>
             <span class="selected-emp__meta">
-              {{ selectedApprove1()?.empNo }} · {{ selectedApprove1()?.departmentName }}
+              {{ selectedSecretary()?.empNo }} · {{ selectedSecretary()?.departmentName }}
             </span>
           </div>
-          <button class="btn-clear-emp" (click)="clearApprove1()">
+          <button class="btn-clear-emp" (click)="clearSecretary()">
             <i class="fas fa-times"></i>
           </button>
         </div>

@@ -17,7 +17,7 @@ import { debounceTime, distinctUntilChanged, Subject, switchMap } from 'rxjs';
 import {
   ApprovalSetupGroup,
   ApprovalSetupRow,
-  Approve3Emp,
+  HrApproverEmp,
 } from '../../interfaces/approval-setup.interface';
 import { onImgError } from '../../utils/image.util';
 import { SkeletonComponent } from '../../components/shared/skeleton/skeleton';
@@ -71,8 +71,8 @@ export class ApprovalSetup implements OnInit {
 
   // ===== Drawer / Edit =====
   editingRow = signal<any | null>(null);
-  selectedApprove1 = signal<any | null>(null);
-  skipApprove1 = signal(false);
+  selectedSecretary = signal<any | null>(null);
+  skipSecretary = signal(false);
 
   // ===== Employee Search =====
   employeeResults = signal<any[]>([]);
@@ -88,9 +88,9 @@ export class ApprovalSetup implements OnInit {
         !kw ||
         row.costCent.toLowerCase().includes(kw) ||
         (row.costCenterName ?? '').toLowerCase().includes(kw) ||
-        (row.approve1EmpName ?? '').toLowerCase().includes(kw) ||
-        (row.approve2EmpName ?? '').toLowerCase().includes(kw);
-      const matchSkip = this.filterSkip === null ? true : row.isSkipApprove1 === this.filterSkip;
+        (row.secretaryEmpName ?? '').toLowerCase().includes(kw) ||
+        (row.approve1EmpName ?? '').toLowerCase().includes(kw);
+      const matchSkip = this.filterSkip === null ? true : row.isSkipSecretary === this.filterSkip;
       return matchKw && matchSkip;
     });
   });
@@ -118,25 +118,28 @@ export class ApprovalSetup implements OnInit {
             !keyword ||
             dep.costCent?.toLowerCase().includes(keyword) ||
             dep.costCenterName?.toLowerCase().includes(keyword) ||
+            dep.secretaryEmpName?.toLowerCase().includes(keyword) ||
+            dep.secretaryEmpNo?.toLowerCase().includes(keyword) ||
             dep.approve1EmpName?.toLowerCase().includes(keyword) ||
             dep.approve1EmpNo?.toLowerCase().includes(keyword) ||
             dep.approve2EmpName?.toLowerCase().includes(keyword) ||
             dep.approve2EmpNo?.toLowerCase().includes(keyword) ||
-            dep.approve3Emps?.some(
-              (emp: any) =>
+            dep.approve3EmpName?.toLowerCase().includes(keyword) ||
+            dep.approve3EmpNo?.toLowerCase().includes(keyword) ||
+            dep.hrApprovers?.some(
+              (emp: HrApproverEmp) =>
                 emp.empNo?.toLowerCase().includes(keyword) ||
                 emp.empName?.toLowerCase().includes(keyword),
-            );
-
-          // dep.approve4EmpName?.toLowerCase().includes(keyword) ||
-          // dep.approve4EmpNo?.toLowerCase().includes(keyword);
+            ) ||
+            dep.itDirectorEmpName?.toLowerCase().includes(keyword) ||
+            dep.itDirectorEmpNo?.toLowerCase().includes(keyword);
 
           // 🔘 skip filter
           let matchSkip = true;
           if (skipFilter === true) {
-            matchSkip = !dep.approve1EmpNo;
+            matchSkip = !dep.secretaryEmpNo;
           } else if (skipFilter === false) {
-            matchSkip = !!dep.approve1EmpNo;
+            matchSkip = !!dep.secretaryEmpNo;
           }
 
           return matchKeyword && matchSkip;
@@ -157,6 +160,7 @@ export class ApprovalSetup implements OnInit {
     this.isLoading.set(true);
     this.approvalService.getApprovalSetupList().subscribe({
       next: (res) => {
+        console.log(res); // --- IGNORE ---
         const mapped = (res?.data ?? []).map((emp: any) => this.mapSetupRow(emp));
         const grouped = this.groupByCompany(mapped);
 
@@ -177,9 +181,9 @@ export class ApprovalSetup implements OnInit {
   openEdit(row: any) {
     console.log(row);
     this.editingRow.set({ ...row });
-    this.skipApprove1.set(row.isSkipApprove1);
-    this.selectedApprove1.set(
-      row.approve1EmpNo ? { empNo: row.approve1EmpNo, empName: row.approve1EmpName } : null,
+    this.skipSecretary.set(row.isSkipSecretary);
+    this.selectedSecretary.set(
+      row.secretaryEmpNo ? { empNo: row.secretaryEmpNo, empName: row.secretaryEmpName } : null,
     );
     this.employeeResults.set([]);
     this.empSearchKeyword = '';
@@ -229,19 +233,19 @@ export class ApprovalSetup implements OnInit {
   }
 
   selectEmployee(emp: any) {
-    this.selectedApprove1.set(emp);
+    this.selectedSecretary.set(emp);
     this.empSearchKeyword = emp.empName ?? emp.empNo;
     this.employeeResults.set([]);
   }
 
-  clearApprove1() {
-    this.selectedApprove1.set(null);
+  clearSecretary() {
+    this.selectedSecretary.set(null);
     this.empSearchKeyword = '';
   }
 
   onSkipToggle(skip: boolean) {
-    this.skipApprove1.set(skip);
-    // if (skip) this.clearApprove1();
+    this.skipSecretary.set(skip);
+    // if (skip) this.clearSecretary();
   }
 
   // ===== Save =====
@@ -255,12 +259,12 @@ export class ApprovalSetup implements OnInit {
     this.isSaving.set(true);
     this.swalService.loading('กำลังบันทึก...');
 
-    const approve1EmpNo = this.skipApprove1() ? null : (this.selectedApprove1()?.empNo ?? null);
+    const secretaryEmpNo = this.skipSecretary() ? null : (this.selectedSecretary()?.empNo ?? null);
 
     this.approvalService
       .saveApprovalSetup({
         costCent: row.costCent,
-        approve1EmpNo,
+        approve1EmpNo: secretaryEmpNo,
         modifiedBy: this.authService.userData().AD_USER,
         companyCode: row.companyCode ?? '',
       })
@@ -279,7 +283,7 @@ export class ApprovalSetup implements OnInit {
   }
 
   // MAP
-  private mapApprove3Emps(empNos: string | null, empNames: string | null): Approve3Emp[] {
+  private mapHrApprovers(empNos: string | null, empNames: string | null): HrApproverEmp[] {
     const nos = empNos
       ? empNos
           .split(',')
@@ -304,14 +308,16 @@ export class ApprovalSetup implements OnInit {
       costCent: emp.COSTCENT,
       costCenterName: emp.DepartmentName,
       companyCode: emp.COMPANY_CODE,
-      approve1EmpNo: emp.Approve1EmpNo,
-      approve1EmpName: emp.Approve1Name,
-      approve2EmpNo: emp.Approve2EmpNo,
-      approve2EmpName: emp.Approve2Name,
-      approve3Emps: this.mapApprove3Emps(emp.Approve3EmpNo, emp.Approve3Users),
-      approve4EmpNo: emp.Approve4EmpNo,
-      approve4EmpName: emp.Approve4Name,
-      isSkipApprove1: emp.ConfigMode === 'AutoSkip',
+      secretaryEmpNo: emp.SecretaryEmpNo,
+      secretaryEmpName: emp.SecretaryName,
+      approve1EmpNo: emp.Approver1EmpNo,
+      approve1EmpName: emp.Approver1Name,
+      approve2EmpNo: emp.HeadOfApprover1EmpNo,
+      approve2EmpName: emp.HeadOfApprover1Name,
+      hrApprovers: this.mapHrApprovers(emp.HREmpNo, emp.HRUsers),
+      itDirectorEmpNo: emp.ITDirectorEmpNo,
+      itDirectorEmpName: emp.ITDirectorName,
+      isSkipSecretary: emp.ConfigMode === 'AutoSkip',
       modifiedDate: emp.ModifiedDate,
       modifiedBy: emp.ModifiedBy,
     };

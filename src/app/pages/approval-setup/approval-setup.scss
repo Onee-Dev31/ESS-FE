@@ -177,7 +177,7 @@
 
 .setup-table {
   width: 100%;
-  min-width: 1310px;
+  min-width: 1560px;
   border-collapse: collapse;
   font-size: 13px;
 
@@ -260,18 +260,21 @@
   display: flex;
   align-items: center;
   gap: 8px;
+  width: 100%;
 
   &.approver3 {
     flex-direction: column;
-    align-items: start;
+    align-items: stretch;
   }
 }
 
 .approver-item {
   display: flex;
   flex-direction: row;
+  width: 100%;
+  min-width: 0;
   gap: 8px;
-  background: var(--bg-table-head);
+  background: var(--bg-item);
   padding: 6px 12px;
   border-radius: 40px;
   align-items: center;
@@ -295,6 +298,8 @@
 .approver-info {
   display: flex;
   flex-direction: column;
+  min-width: 0;
+  flex: 1;
   gap: 1px;
 }
 
@@ -302,11 +307,17 @@
   font-weight: 500;
   color: var(--text-header);
   font-size: $font-size-hint;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .approver-code {
   font-size: 11px;
   color: var(--text-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .skip-badge {
