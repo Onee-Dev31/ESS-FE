@@ -36,5 +36,6 @@ export interface ApprovalCategory {
   skipApprover2: boolean;
   skipApprover3: boolean;
   skipApprover4: boolean;
+  skipApprover5: boolean;
   activeFlag: boolean;
 }
