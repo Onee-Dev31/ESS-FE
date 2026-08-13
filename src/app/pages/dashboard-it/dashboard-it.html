@@ -212,14 +212,14 @@
 <ng-template #ticketCenter let-t="t">
   <section class="tk-hero">
     <div class="tk-hero__left">
-      <div class="avatar">
+      <!-- <div class="avatar">
         <img
           [src]="'https://empimg.oneeclick.co:8048/employeeimage/' + t.requesterCode + '.jpg'"
           alt="รูปโปรไฟล์ของผู้แจ้ง {{ t.requesterName }}"
           title="รูปโปรไฟล์ของผู้แจ้ง {{ t.requesterName }}"
           (error)="onImgError($event)"
         />
-      </div>
+      </div> -->
       <div>
         <div class="tk-hero__title">{{ t.subject }}</div>
         <div class="tk-hero__sub">
@@ -237,12 +237,6 @@
           </span>
         </div>
       </div>
-    </div>
-    <div class="tk-hero__right">
-      <span class="tk-pill" [ngStyle]="StatusColor_Reverse.getStyle(t.it_satus)">
-        <span class="dot"></span>
-        {{ statusLabel(t.it_satus) }}
-      </span>
     </div>
   </section>
 
@@ -285,45 +279,24 @@
       </div> -->
     </div>
     <div class="tk-card__footer">
-      <div class="action-btn" (click)="copyDescription(t.id, t.description)">
-        <i
-          class="fa-solid"
-          [class.fa-copy]="copiedTicketId !== t.id"
-          [class.fa-check]="copiedTicketId === t.id"
-        ></i>
+      <div class="ticket-type-detail">
+        <span class="ticket-type-label">ประเภทคำขอ</span>
+        <span>{{ t.ticketType }}</span>
+      </div>
+      <div class="tk-card__footer-actions">
+        <div class="action-btn" (click)="copyDescription(t.id, t.description)">
+          <i
+            class="fa-solid"
+            [class.fa-copy]="copiedTicketId !== t.id"
+            [class.fa-check]="copiedTicketId === t.id"
+          ></i>
 
-        {{ copiedTicketId === t.id ? 'คัดลอกแล้ว' : 'คัดลอก' }}
-      </div>
-      <div class="action-btn action-btn-primary" (click)="openDetail(t.ticketId, t.description)">
-        <app-expand-icon />
-        ดูรายละเอียดเพิ่มเติม
-      </div>
-    </div>
-  </section>
-
-  <!-- NOTE FOR IT -->
-  <section
-    class="tk-card"
-    *ngIf="
-      allDataUserLogin.permission.Role.includes('it-staff') ||
-      allDataUserLogin.permission.Role.includes('system-admin')
-    "
-  >
-    <div class="tk-card__head">
-      <div class="tk-card__title">
-        <i class="fa-solid fa-note-sticky"></i>Note for IT
-        <span class="category">{{ t.ticketCategory ? `[${t.ticketCategory}]` : '' }}</span>
-      </div>
-      <div class="btn-edit" (click)="openNoteForItModal()">
-        <i class="fa-solid fa-pen-to-square"></i>
-      </div>
-    </div>
-    <div class="tk-card__body">
-      <div class="tk-text html-detail">{{ t.noteForIt }}</div>
-    </div>
-    <div class="tk-card__footer">
-      <div class="action-btn action-btn-primary" (click)="openDetail(t.ticketId, t.noteForIt)">
-        <app-expand-icon />ดูรายละเอียดเพิ่มเติม
+          {{ copiedTicketId === t.id ? 'คัดลอกแล้ว' : 'คัดลอก' }}
+        </div>
+        <div class="action-btn action-btn-primary" (click)="openDetail(t.ticketId, t.description)">
+          <app-expand-icon />
+          ดูรายละเอียดเพิ่มเติม
+        </div>
       </div>
     </div>
   </section>
@@ -769,7 +742,31 @@
 
   <!-- Progress / Timeline -->
   <section class="side-card assignee">
-    <div class="side-title">Progress - {{ t.ticketType }}</div>
+    <div class="progress-header">
+      <div class="side-title progress-title">
+        <span
+          class="tk-pill progress-status-pill"
+          [ngStyle]="StatusColor.getStyle(t.it_satus)"
+        >
+          <i class="fa-solid fa-arrows-rotate" aria-hidden="true"></i>
+          {{ statusLabel(t.it_satus) }}
+        </span>
+        <button
+          *ngIf="
+            allDataUserLogin.permission.Role.includes('it-staff') ||
+            allDataUserLogin.permission.Role.includes('system-admin')
+          "
+          type="button"
+          class="note-for-it-button"
+          [class.has-note]="!!t.noteForIt"
+          [attr.aria-label]="t.noteForIt ? 'เปิดหรือแก้ไข Note for IT' : 'เพิ่ม Note for IT'"
+          [attr.data-tooltip]="t.noteForIt ? 'เปิดหรือแก้ไข Note for IT' : 'เพิ่ม Note for IT'"
+          (click)="openNoteForItModal()"
+        >
+          <i class="fa-solid fa-note-sticky" aria-hidden="true"></i>
+        </button>
+      </div>
+    </div>
     <div class="timeline" *ngIf="t.assignTimeline.length > 0; else noAssignee">
       <div
         class="timeline-item"
