@@ -918,7 +918,7 @@ export class DashboardIT implements OnInit {
       const scrollToTicket = (id: string, retries = 10) => {
         const el = document.getElementById('ticket-' + id);
         if (el) {
-          el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          el.scrollIntoView({ behavior: 'smooth' });
         } else if (retries > 0) {
           setTimeout(() => scrollToTicket(id, retries - 1), 300);
         }
@@ -2008,8 +2008,6 @@ export class DashboardIT implements OnInit {
     window.open(`/employee-Info`, '_blank');
   }
 
-  showRequesterContact = false;
-
   // MODAL
   //>>> function
   updateTicket(
@@ -2690,6 +2688,8 @@ export class DashboardIT implements OnInit {
 
   //   this.getAllTickets();
   // }
+
+  showRequesterContact = false;
 
   // @ViewChild(ItDashboardSummary) dashboardSummary!: ItDashboardSummary;
   // exportCharts() {
