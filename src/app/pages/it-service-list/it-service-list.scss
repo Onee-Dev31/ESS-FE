@@ -3093,23 +3093,6 @@ textarea.form-input {
   }
 }
 
-.progress-title {
-  > .progress-status-pill {
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    padding: 2px 8px;
-    border-radius: 12px;
-    font-size: 0.75rem;
-    font-weight: 500;
-    line-height: 1.5;
-
-    i {
-      font-size: inherit;
-    }
-  }
-}
-
 .side-name {
   font-weight: 900;
   color: var(--text-header);
@@ -3327,6 +3310,8 @@ textarea.form-input {
   display: flex;
   flex-direction: column;
   gap: 12px;
+  min-height: 0;
+  overscroll-behavior: contain;
   scrollbar-width: thin;
 }
 

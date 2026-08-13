@@ -48,8 +48,10 @@ import { CcModal } from '../dashboard-it/modal/cc-modal/cc-modal';
 import { ReOpenModal } from '../dashboard-it/modal/re-open-modal/re-open-modal';
 import { AvatarPreviewModal } from '../../components/modals/avatar-preview-modal/avatar-preview-modal';
 import { NzDatePickerModule } from 'ng-zorro-antd/date-picker';
-import { ExpandIconComponent } from '../../components/shared/icon/expand-icon';
-import { TextEditorComponent } from '../../components/shared/text-editor/text-editor';
+import { TicketRequesterCardComponent } from '../../components/shared/ticket-requester-card/ticket-requester-card';
+import { TicketOpenForCardComponent } from '../../components/shared/ticket-open-for-card/ticket-open-for-card';
+import { TicketProgressCardComponent } from '../../components/shared/ticket-progress-card/ticket-progress-card';
+import { TicketDetailCardComponent } from '../../components/shared/ticket-detail-card/ticket-detail-card';
 
 interface ReplyReader {
   userCodeempid: string;
@@ -78,14 +80,16 @@ interface ReplyReader {
     ReOpenModal,
     AvatarPreviewModal,
     NzDatePickerModule,
-    ExpandIconComponent,
-    TextEditorComponent,
+    TicketRequesterCardComponent,
+    TicketOpenForCardComponent,
+    TicketProgressCardComponent,
+    TicketDetailCardComponent,
   ],
   templateUrl: './it-service-list.html',
   styleUrl: './it-service-list.scss',
 })
 export class ItService implements OnInit {
-  @ViewChild(TextEditorComponent) textEditor?: TextEditorComponent;
+  @ViewChild(TicketDetailCardComponent) textEditor?: TicketDetailCardComponent;
 
   isLaptop = false;
   isMobile = false;
@@ -587,7 +591,6 @@ export class ItService implements OnInit {
     // }
   }
 
-  showRequesterContact = false;
   /**
    *
    * NEW!!
@@ -633,7 +636,6 @@ export class ItService implements OnInit {
           ? res.requestFor
           : null;
 
-      // this.showRequesterContact = !hasOpenFor || !!isOpenForSelf;
 
       const objectData = {
         ticketId: ticket.id,

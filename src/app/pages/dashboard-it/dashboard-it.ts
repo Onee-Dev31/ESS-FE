@@ -62,7 +62,10 @@ import { NzDatePickerModule } from 'ng-zorro-antd/date-picker';
 import { en_US, NzI18nService } from 'ng-zorro-antd/i18n';
 import { environment } from '../../../environments/environment';
 import { TicketService } from '../../services/ticket.service';
-import { ExpandIconComponent } from '../../components/shared/icon/expand-icon';
+import { TicketRequesterCardComponent } from '../../components/shared/ticket-requester-card/ticket-requester-card';
+import { TicketOpenForCardComponent } from '../../components/shared/ticket-open-for-card/ticket-open-for-card';
+import { TicketProgressCardComponent } from '../../components/shared/ticket-progress-card/ticket-progress-card';
+import { TicketDetailCardComponent } from '../../components/shared/ticket-detail-card/ticket-detail-card';
 
 interface ReplyReader {
   userCodeempid: string;
@@ -97,7 +100,10 @@ interface ReplyReader {
     NoteForItModal,
     AvatarPreviewModal,
     NzDatePickerModule,
-    ExpandIconComponent,
+    TicketRequesterCardComponent,
+    TicketOpenForCardComponent,
+    TicketProgressCardComponent,
+    TicketDetailCardComponent,
   ],
   templateUrl: './dashboard-it.html',
   styleUrl: './dashboard-it.scss',
@@ -838,7 +844,6 @@ export class DashboardIT implements OnInit {
           ? res.requestFor
           : null;
 
-      // this.showRequesterContact = !hasOpenFor || isOpenForSelf;
 
       const objectData = {
         ticketId: ticket.id,
@@ -2688,8 +2693,6 @@ export class DashboardIT implements OnInit {
 
   //   this.getAllTickets();
   // }
-
-  showRequesterContact = false;
 
   // @ViewChild(ItDashboardSummary) dashboardSummary!: ItDashboardSummary;
   // exportCharts() {

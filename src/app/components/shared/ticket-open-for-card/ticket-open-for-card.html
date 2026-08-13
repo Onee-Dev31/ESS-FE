@@ -1,0 +1,16 @@
+<section class="open-for-card">
+  <div class="card-title">เปิดให้</div>
+  <div class="detail">
+    @if (openFor.open_for_type === 'freelance') {
+      <div>Freelance หรือ หลายบุคคล</div>
+    } @else {
+      <div>
+        {{ openFor.fullname }}
+        @if (openFor.nickname) { <span>({{ openFor.nickname }})</span> }
+        @if (openFor.open_for_type) { <span>({{ openFor.open_for_type }})</span> }
+      </div>
+      <div>{{ openFor.department_name }}</div>
+      <div>{{ openFor.company_name }}</div>
+    }
+  </div>
+</section>
