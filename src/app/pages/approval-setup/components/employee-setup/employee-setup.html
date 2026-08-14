@@ -1,0 +1,286 @@
+<div class="employee-filter-card">
+  <div class="employee-filter-title">
+    <i class="fa-solid fa-magnifying-glass-chart"></i>
+    ตัวเลือกสำหรับการค้นหา
+  </div>
+  <div class="employee-filter-grid">
+    <label class="employee-field field-box">
+      <span class="field-label">บริษัท</span>
+      <nz-select
+        class="field-nz-select"
+        nzShowSearch
+        nzAllowClear
+        nzPlaceHolder="-- เลือกบริษัท --"
+        [ngModel]="employeeCompanyFilter()"
+        (ngModelChange)="onEmployeeCompanyChange($event)"
+      >
+        @for (company of employeeCompanyList(); track company.code) {
+          <nz-option
+            [nzValue]="company.code"
+            [nzLabel]="company.name + ' (' + company.code + ')'"
+          />
+        }
+      </nz-select>
+    </label>
+
+    <label class="employee-field field-box">
+      <span class="field-label">แผนก</span>
+      <nz-select
+        class="field-nz-select"
+        nzShowSearch
+        nzAllowClear
+        nzPlaceHolder="-- เลือกแผนก --"
+        [nzDisabled]="!employeeCompanyFilter()"
+        [ngModel]="employeeDeptFilter()"
+        (ngModelChange)="employeeDeptFilter.set($event ?? '')"
+      >
+        @for (department of employeeDeptList(); track department.costCent) {
+          <nz-option
+            [nzValue]="department.costCent"
+            [nzLabel]="department.name + ' (' + department.costCent + ')'"
+          />
+        }
+      </nz-select>
+    </label>
+
+    <div class="filter-bottom-row">
+      <label class="employee-field field-box field-grow">
+        <span class="field-label">ค้นหาพนักงาน</span>
+        <input
+          class="field-input"
+          type="text"
+          placeholder="ชื่อ-นามสกุล, ชื่อเล่น หรือรหัสพนักงาน..."
+          [ngModel]="employeeSearchText()"
+          (ngModelChange)="employeeSearchText.set($event)"
+          (keyup.enter)="applyEmployeeFilter()"
+        />
+      </label>
+      <button type="button" class="btn-employee-search" (click)="applyEmployeeFilter()">
+        <i class="fas fa-search"></i> Search
+      </button>
+      <button type="button" class="btn-employee-clear" (click)="clearEmployeeFilter()">
+        <i class="fas fa-times"></i> Clear
+      </button>
+    </div>
+  </div>
+</div>
+
+<div class="employee-content-card">
+  <div class="employee-card-title">
+    รายชื่อพนักงาน
+    @if (appliedEmployeeDept()) {
+      <span>({{ empDisplayEmployees().length }} คน)</span>
+    }
+  </div>
+
+  @if (selectedEmployeeCount() > 0) {
+    <div class="employee-bulk-bar">
+      <span>เลือกแล้ว {{ selectedEmployeeCount() }} คน</span>
+      <div>
+        <button type="button" class="btn-employee-search" (click)="openEmployeeBulkEdit()">
+          <i class="fas fa-users-cog"></i>
+          ตั้งค่าพร้อมกัน ({{ selectedEmployeeCount() }} คน)
+        </button>
+        <button type="button" class="btn-employee-clear" (click)="clearEmployeeSelection()">
+          ยกเลิกการเลือก
+        </button>
+      </div>
+    </div>
+  }
+
+  @if (isEmployeeListLoading()) {
+    <app-skeleton type="table" [rows]="5"></app-skeleton>
+  } @else if (!appliedEmployeeDept()) {
+    <div class="employee-empty">
+      <i class="fas fa-filter"></i>
+      <span>กรุณาเลือกบริษัทและแผนกเพื่อแสดงรายชื่อพนักงาน</span>
+    </div>
+  } @else {
+    <div class="employee-table-wrapper">
+      <table class="setup-table employee-setup-table">
+        <thead>
+          <tr>
+            <th class="employee-checkbox-column">
+              <input
+                type="checkbox"
+                class="employee-row-checkbox"
+                [checked]="areAllEmployeesSelected()"
+                [indeterminate]="areSomeEmployeesSelected()"
+                (change)="toggleAllEmployees()"
+              />
+            </th>
+            <th style="width: 34%">พนักงาน</th>
+            <th style="width: 33%">ผู้อนุมัติลำดับที่ 1</th>
+            <th style="width: 33%">ผู้อนุมัติลำดับที่ 2</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (employee of empDisplayEmployees(); track employee.emp_code) {
+            <tr>
+              <td class="employee-checkbox-column">
+                <input
+                  type="checkbox"
+                  class="employee-row-checkbox"
+                  [checked]="isEmployeeSelected(employee.emp_code)"
+                  (change)="toggleEmployeeSelection(employee.emp_code)"
+                />
+              </td>
+              <td>
+                <div class="employee-person">
+                  <img [src]="getEmployeeImage(employee.emp_code)" (error)="onImgError($event)" />
+                  <div>
+                    <strong>{{ employee.emp_name }}</strong>
+                    <small>{{ employee.emp_code }}</small>
+                  </div>
+                </div>
+              </td>
+              <td>
+                @if (getEmployeeApprover(employee.emp_code, 1); as approver1) {
+                  <div class="approver-cell">
+                    <div class="approver-item">
+                      <div class="approver-avatar">
+                        <img
+                          [src]="getEmployeeImage(approver1.empNo)"
+                          (error)="onImgError($event)"
+                        />
+                      </div>
+                      <div class="approver-info">
+                        <span class="approver-name">{{ approver1.empName }}</span>
+                        <span class="approver-code">{{ approver1.empNo }}</span>
+                      </div>
+                    </div>
+                  </div>
+                } @else {
+                  <span class="text-muted">-</span>
+                }
+              </td>
+              <td>
+                @if (getEmployeeApprover(employee.emp_code, 2); as approver2) {
+                  <div class="approver-cell">
+                    <div class="approver-item">
+                      <div class="approver-avatar">
+                        <img
+                          [src]="getEmployeeImage(approver2.empNo)"
+                          (error)="onImgError($event)"
+                        />
+                      </div>
+                      <div class="approver-info">
+                        <span class="approver-name">{{ approver2.empName }}</span>
+                        <span class="approver-code">{{ approver2.empNo }}</span>
+                      </div>
+                    </div>
+                  </div>
+                } @else {
+                  <span class="text-muted">-</span>
+                }
+              </td>
+            </tr>
+          } @empty {
+            <tr>
+              <td colspan="4" class="employee-empty-row">ไม่พบข้อมูลพนักงาน</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</div>
+
+@if (employeeBulkModalOpen()) {
+  <div class="employee-modal-backdrop" (click)="closeEmployeeBulkEdit()">
+    <section class="employee-edit-modal" (click)="$event.stopPropagation()">
+      <header class="employee-edit-header">
+        <div>
+          <h3><i class="fas fa-users-cog"></i> ตั้งค่าผู้อนุมัติพร้อมกัน</h3>
+          <p>ผู้อนุมัติที่กำหนดจะใช้กับพนักงาน {{ selectedEmployeeCount() }} คนที่เลือก</p>
+        </div>
+        <button type="button" class="employee-modal-close" (click)="closeEmployeeBulkEdit()">
+          <i class="fas fa-times"></i>
+        </button>
+      </header>
+
+      <div class="employee-edit-body">
+        <div class="selected-employee-preview">
+          @for (employee of selectedEmployees(); track employee.emp_code) {
+            <span>
+              {{ employee.emp_name }}
+              <small>{{ employee.emp_code }}</small>
+            </span>
+          }
+        </div>
+
+        @for (row of employeeBulkRows(); track row.level; let index = $index) {
+          <div class="employee-override-row">
+            <div class="employee-bulk-level">
+              <strong class="employee-level-label">ระดับ {{ row.level }}</strong>
+            </div>
+            <div class="employee-override-select">
+              <label>ผู้อนุมัติสำหรับทุกคนที่เลือก</label>
+              <nz-select
+                nzShowSearch
+                nzAllowClear
+                [nzPlaceHolder]="
+                  getEmployeeDefaultApprover(row.level)?.empName
+                    ? 'Default: ' +
+                      getEmployeeDefaultApprover(row.level)?.empName +
+                      ' (' +
+                      getEmployeeDefaultApprover(row.level)?.empNo +
+                      ')'
+                    : '-- ไม่มีค่า Default --'
+                "
+                [ngModel]="row.headCode"
+                (ngModelChange)="updateEmployeeBulkRow(index, $event)"
+              >
+                @for (option of employeeBulkApproverOptions(); track option.emp_code) {
+                  <nz-option
+                    [nzValue]="option.emp_code"
+                    [nzLabel]="
+                      option.emp_name +
+                      (option.nickname ? ' (' + option.nickname + ')' : '') +
+                      ' - ' +
+                      option.emp_code
+                    "
+                  />
+                }
+              </nz-select>
+            </div>
+          </div>
+        }
+
+        <div class="employee-default-hint">
+          <i class="fas fa-circle-info"></i>
+          ช่องที่เว้นว่าง เมื่อตอนบันทึกจะลบ Override และกลับไปใช้ Default ของแผนก
+        </div>
+
+        <label class="employee-reason-field">
+          <span>เหตุผล (ไม่บังคับ)</span>
+          <input
+            type="text"
+            placeholder="ระบุเหตุผลในการเปลี่ยนผู้อนุมัติ..."
+            [ngModel]="employeeBulkReason()"
+            (ngModelChange)="employeeBulkReason.set($event)"
+          />
+        </label>
+      </div>
+
+      <footer class="employee-edit-footer">
+        <button type="button" class="btn-employee-clear" (click)="closeEmployeeBulkEdit()">
+          ยกเลิก
+        </button>
+        <button
+          type="button"
+          class="btn-employee-search"
+          [disabled]="isSavingEmployeeBulk()"
+          (click)="saveEmployeeBulkOverride()"
+        >
+          <i class="fas fa-save"></i>
+          {{
+            isSavingEmployeeBulk()
+              ? 'กำลังบันทึก...'
+              : 'บันทึก (' + selectedEmployeeCount() + ' คน)'
+          }}
+        </button>
+      </footer>
+    </section>
+  </div>
+}
