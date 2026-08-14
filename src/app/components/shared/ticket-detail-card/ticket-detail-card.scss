@@ -97,11 +97,15 @@
   padding: 4px 10px;
   border: 0;
   border-radius: 50px;
-  background: var(--bg-table-head);
-  color: var(--text);
   font-size: $font-size-hint;
 }
+.services span {
+  background: var(--primary);
+  color: var(--text-reverse);
+}
 .services button {
+  background: var(--bg-table-head);
+  color: var(--text);
   cursor: pointer;
 }
 .detail-body {
