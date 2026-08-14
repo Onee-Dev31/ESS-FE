@@ -98,6 +98,13 @@
   overflow: hidden;
   position: relative;
   overflow-x: auto;
+
+  .approver-item {
+    width: 200px;
+    min-width: 200px;
+    max-width: 200px;
+    box-sizing: border-box;
+  }
 }
 
 .loading-overlay {
@@ -306,17 +313,45 @@
 .flow-steps {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 0;
+  padding: 4px 0;
 }
 
 .flow-step {
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 10px 12px;
-  background: var(--bg-slate);
+  gap: 12px;
+  min-height: 62px;
+  padding: 11px 14px;
+  background: var(--bg-card);
   border: 1px solid var(--border-color);
-  border-radius: 10px;
+  border-left: 3px solid var(--primary);
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
+
+  &.level-two {
+    border-left-color: var(--warning);
+
+    .step-badge {
+      background: var(--warning);
+    }
+  }
+
+  &.it-step {
+    border-left-color: #8b5cf6;
+
+    .step-badge {
+      background: #8b5cf6;
+    }
+  }
+
+  &.hr-step {
+    border-left-color: var(--success);
+
+    .step-badge {
+      background: var(--success);
+    }
+  }
 
   &.skip-step {
     background: color-mix(in srgb, var(--warning), transparent 90%);
@@ -325,12 +360,12 @@
 }
 
 .step-badge {
-  width: 24px;
-  height: 24px;
+  width: 32px;
+  height: 32px;
   border-radius: 50%;
   background: var(--primary);
   color: #fff;
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 700;
   display: flex;
   align-items: center;
@@ -340,12 +375,25 @@
   &.skip {
     background: var(--warning);
   }
+
+  &.secretary {
+    background: #64748b;
+  }
 }
 
 .step-info {
   display: flex;
   flex-direction: column;
-  gap: 1px;
+  min-width: 0;
+  gap: 2px;
+}
+
+.step-role {
+  color: var(--text-muted);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
 }
 
 .step-name {
@@ -360,13 +408,44 @@
 }
 
 .flow-arrow {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 30px;
   text-align: center;
-  color: var(--text-muted);
-  font-size: 14px;
-  padding: 2px 0;
+  color: var(--primary);
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 50%;
+    width: 2px;
+    background: color-mix(in srgb, var(--primary), transparent 75%);
+    transform: translateX(-50%);
+  }
+
+  > span {
+    position: relative;
+    z-index: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    border: 1px solid color-mix(in srgb, var(--primary), transparent 65%);
+    border-radius: 50%;
+    background: var(--bg-card);
+    font-size: 8px;
+  }
 
   .knowledge {
+    position: absolute;
+    left: calc(50% + 18px);
     font-size: $font-size-hint;
+    white-space: nowrap;
   }
 }
 

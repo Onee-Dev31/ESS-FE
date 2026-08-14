@@ -260,8 +260,9 @@
             class="flow-step"
             *ngIf="!editingRow()?.isSkipSecretary && editingRow()?.secretaryEmpNo"
           >
-            <div class="step-badge">เลขา</div>
+            <div class="step-badge secretary"><i class="fas fa-user-pen"></i></div>
             <div class="step-info">
+              <span class="step-role">เลขานุการ</span>
               <span class="step-name">{{ editingRow()?.secretaryEmpName }}</span>
               <span class="step-code">{{ editingRow()?.secretaryEmpNo }}</span>
             </div>
@@ -269,51 +270,56 @@
           <div class="flow-step skip-step" *ngIf="editingRow()?.isSkipSecretary">
             <div class="step-badge skip">→</div>
             <div class="step-info">
+              <span class="step-role">เลขานุการ</span>
               <span class="step-name">ข้ามเลขา</span>
               <span class="step-code">ส่งตรงไปยังผู้อนุมัติลำดับที่ 1</span>
             </div>
           </div>
-          <div class="flow-arrow" *ngIf="editingRow()?.secretaryEmpNo">↓</div>
-          <div class="flow-step">
+          <div
+            class="flow-arrow"
+            *ngIf="editingRow()?.secretaryEmpNo || editingRow()?.isSkipSecretary"
+          >
+            <span><i class="fas fa-chevron-down"></i></span>
+          </div>
+          <div class="flow-step level-one">
             <div class="step-badge">1</div>
             <div class="step-info">
+              <span class="step-role">ผู้อนุมัติระดับ 1</span>
               <span class="step-name">{{ editingRow()?.approve1EmpName || '-' }}</span>
               <span class="step-code">{{ editingRow()?.approve1EmpNo || 'ไม่มีข้อมูล' }}</span>
             </div>
           </div>
-          <div class="flow-arrow" *ngIf="editingRow()?.approve2EmpNo">↓</div>
-          <div class="flow-step" *ngIf="editingRow()?.approve2EmpNo">
+          <div class="flow-arrow" *ngIf="editingRow()?.approve2EmpNo">
+            <span><i class="fas fa-chevron-down"></i></span>
+          </div>
+          <div class="flow-step level-two" *ngIf="editingRow()?.approve2EmpNo">
             <div class="step-badge">2</div>
             <div class="step-info">
+              <span class="step-role">ผู้อนุมัติระดับ 2</span>
               <span class="step-name">{{ editingRow()?.approve2EmpName || '-' }}</span>
               <span class="step-code">{{ editingRow()?.approve2EmpNo || 'ไม่มีข้อมูล' }}</span>
             </div>
           </div>
-          <div class="flow-arrow" *ngIf="editingRow()?.approve3EmpNo">
-            ↓
-            <div class="knowledge">(ในกรณี IT Request)</div>
+          <div class="flow-arrow" *ngIf="editingRow()?.hrApprovers?.length">
+            <span><i class="fas fa-chevron-down"></i></span>
           </div>
-          <div class="flow-step">
-            <div class="step-badge">3</div>
-            <div class="step-info">
-              <span class="step-name">{{ editingRow()?.approve3EmpName || '-' }}</span>
-              <span class="step-code">{{ editingRow()?.approve3EmpNo || 'ไม่มีข้อมูล' }}</span>
-            </div>
-          </div>
-          <div class="flow-arrow" *ngIf="editingRow()?.hrApprovers?.length">↓</div>
-          <div class="flow-step" *ngIf="editingRow()?.hrApprovers?.length">
+          <div class="flow-step hr-step" *ngIf="editingRow()?.hrApprovers?.length">
             <div class="step-badge">HR</div>
             <div class="step-info">
+              <span class="step-role">ผู้อนุมัติฝ่ายบุคคล</span>
               @for (emp of editingRow()?.hrApprovers; track emp.empNo) {
                 <span class="step-name">{{ emp.empName }}</span>
                 <span class="step-code">{{ emp.empNo }}</span>
               }
             </div>
           </div>
-          <div class="flow-arrow" *ngIf="editingRow()?.itDirectorEmpNo">↓</div>
-          <div class="flow-step" *ngIf="editingRow()?.itDirectorEmpNo">
+          <div class="flow-arrow" *ngIf="editingRow()?.itDirectorEmpNo">
+            <span><i class="fas fa-chevron-down"></i></span>
+          </div>
+          <div class="flow-step it-step" *ngIf="editingRow()?.itDirectorEmpNo">
             <div class="step-badge">IT</div>
             <div class="step-info">
+              <span class="step-role">IT Director</span>
               <span class="step-name">{{ editingRow()?.itDirectorEmpName || '-' }}</span>
               <span class="step-code">{{ editingRow()?.itDirectorEmpNo || 'ไม่มีข้อมูล' }}</span>
             </div>
