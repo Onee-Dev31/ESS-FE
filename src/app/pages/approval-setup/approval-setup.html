@@ -42,15 +42,65 @@
   </div>
 
   @if (activeTab() === 'department') {
-    <!-- Filter Bar -->
-    <div class="filter-bar">
-      <div class="search-box">
-        <i class="fas fa-search"></i>
-        <input
-          [ngModel]="searchKeyword()"
-          (ngModelChange)="searchKeyword.set($event); applyFilter()"
-          placeholder="ค้นหาแผนก, รหัส, ชื่อผู้อนุมัติ..."
-        />
+    <div class="employee-filter-card">
+      <div class="employee-filter-title">
+        <i class="fa-solid fa-magnifying-glass-chart"></i>
+        ตัวเลือกสำหรับการค้นหา
+      </div>
+      <div class="employee-filter-grid">
+        <label class="employee-field">
+          <span>บริษัท</span>
+          <nz-select
+            nzShowSearch
+            nzAllowClear
+            nzPlaceHolder="-- เลือกบริษัท --"
+            [ngModel]="departmentCompanyFilter()"
+            (ngModelChange)="onDepartmentCompanyChange($event)"
+          >
+            @for (company of departmentCompanyList(); track company.code) {
+              <nz-option
+                [nzValue]="company.code"
+                [nzLabel]="company.name + ' (' + company.code + ')'"
+              />
+            }
+          </nz-select>
+        </label>
+
+        <label class="employee-field">
+          <span>แผนก</span>
+          <nz-select
+            nzShowSearch
+            nzAllowClear
+            nzPlaceHolder="-- เลือกแผนก --"
+            [nzDisabled]="!departmentCompanyFilter()"
+            [ngModel]="departmentDeptFilter()"
+            (ngModelChange)="departmentDeptFilter.set($event ?? '')"
+          >
+            @for (department of departmentDeptList(); track department.costCent) {
+              <nz-option
+                [nzValue]="department.costCent"
+                [nzLabel]="department.name + ' (' + department.costCent + ')'"
+              />
+            }
+          </nz-select>
+        </label>
+
+        <label class="employee-field employee-search-field">
+          <span>ค้นหา</span>
+          <input
+            type="text"
+            [ngModel]="searchKeyword()"
+            (ngModelChange)="searchKeyword.set($event)"
+            (keyup.enter)="applyFilter()"
+            placeholder="ค้นหาแผนก, รหัส, ชื่อผู้อนุมัติ..."
+          />
+        </label>
+        <button type="button" class="btn-employee-search" (click)="applyFilter()">
+          <i class="fas fa-search"></i> ค้นหา
+        </button>
+        <button type="button" class="btn-employee-clear" (click)="clearDepartmentFilter()">
+          <i class="fas fa-times"></i> ล้าง
+        </button>
       </div>
       <div class="filter-count">{{ getTotalCount() }} รายการ</div>
     </div>

@@ -7,6 +7,7 @@ export interface ApprovalSetupRow {
   costCent: string;
   costCenterName: string;
   companyCode: string;
+  companyName: string;
   secretaryEmpNo: string | null;
   secretaryEmpName: string | null;
   approve1EmpNo: string | null;

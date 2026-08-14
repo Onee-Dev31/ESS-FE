@@ -118,7 +118,8 @@ export class ApprovalSetup implements OnInit {
   isSavingEmployeeBulk = signal(false);
 
   // ===== Filter =====
-  filterCompany = '';
+  departmentCompanyFilter = signal('');
+  departmentDeptFilter = signal('');
   searchKeyword = signal('');
   filterSkip = signal<boolean | null>(null);
 
@@ -159,6 +160,27 @@ export class ApprovalSetup implements OnInit {
     return this.departmentItems()
       .filter((item) => !company || item.company_code === company)
       .map((item) => ({ costCent: item.cost_cent, name: item.name_cost_cent }));
+  });
+
+  departmentCompanyList = computed(() =>
+    this.originalGroupedList().map((group) => ({
+      code: group.companyCode,
+      name: group.companyName,
+    })),
+  );
+
+  departmentDeptList = computed(() => {
+    const companyCode = this.departmentCompanyFilter();
+    if (!companyCode) return [];
+
+    return (
+      this.originalGroupedList()
+        .find((group) => group.companyCode === companyCode)
+        ?.departments.map((department: any) => ({
+          costCent: department.costCent,
+          name: department.costCenterName,
+        })) ?? []
+    );
   });
 
   empDisplayEmployees = computed(() => {
@@ -268,7 +290,7 @@ export class ApprovalSetup implements OnInit {
       departmentDefault: this.approvalService.getApprovalSetupByCostCenter(costCent),
     }).subscribe({
       next: ({ overrides, departmentDefault }) => {
-        console.log('overrides >>> ', overrides, departmentDefault);
+        // console.log('overrides >>> ', overrides, departmentDefault);
         this.employeeOverrides.set(overrides?.data ?? []);
 
         const rawDefault = Array.isArray(departmentDefault?.data)
@@ -325,8 +347,7 @@ export class ApprovalSetup implements OnInit {
     this.employeeBulkRows.set(
       ([1, 2] as const).map((level) => {
         const overrides = this.employeeOverrides().filter(
-          (item) =>
-            employeeCodes.includes(item.employee_codeempid) && Number(item.level) === level,
+          (item) => employeeCodes.includes(item.employee_codeempid) && Number(item.level) === level,
         );
         const uniqueHeads = new Set(overrides.map((item) => item.head_codeempid));
         const allHaveSameValue =
@@ -351,9 +372,7 @@ export class ApprovalSetup implements OnInit {
   updateEmployeeBulkRow(index: number, headCode: string | null) {
     this.employeeBulkRows.update((rows) =>
       rows.map((row, rowIndex) =>
-        rowIndex === index
-          ? { ...row, headCode: headCode ?? '' }
-          : row,
+        rowIndex === index ? { ...row, headCode: headCode ?? '' } : row,
       ),
     );
   }
@@ -367,8 +386,7 @@ export class ApprovalSetup implements OnInit {
     const requests = employeeCodes.flatMap((employeeCode) =>
       this.employeeBulkRows().flatMap((row) => {
         const existing = this.employeeOverrides().some(
-          (item) =>
-            item.employee_codeempid === employeeCode && Number(item.level) === row.level,
+          (item) => item.employee_codeempid === employeeCode && Number(item.level) === row.level,
         );
         if (!row.headCode) {
           return existing
@@ -459,13 +477,29 @@ export class ApprovalSetup implements OnInit {
     }, 0);
   }
 
+  onDepartmentCompanyChange(companyCode: string | null) {
+    this.departmentCompanyFilter.set(companyCode ?? '');
+    this.departmentDeptFilter.set('');
+  }
+
+  clearDepartmentFilter() {
+    this.departmentCompanyFilter.set('');
+    this.departmentDeptFilter.set('');
+    this.searchKeyword.set('');
+    this.applyFilter();
+  }
+
   applyFilter() {
     const keyword = this.searchKeyword()?.toLowerCase() || '';
+    const companyFilter = this.departmentCompanyFilter();
+    const departmentFilter = this.departmentDeptFilter();
     const skipFilter = this.filterSkip();
 
     const filtered = this.originalGroupedList()
+      .filter((group) => !companyFilter || group.companyCode === companyFilter)
       .map((group) => {
         const departments = group.departments.filter((dep: any) => {
+          const matchDepartment = !departmentFilter || dep.costCent === departmentFilter;
           // 🔎 search
           const matchKeyword =
             !keyword ||
@@ -495,7 +529,7 @@ export class ApprovalSetup implements OnInit {
             matchSkip = !!dep.secretaryEmpNo;
           }
 
-          return matchKeyword && matchSkip;
+          return matchDepartment && matchKeyword && matchSkip;
         });
 
         return {
@@ -513,7 +547,6 @@ export class ApprovalSetup implements OnInit {
     this.isLoading.set(true);
     this.approvalService.getApprovalSetupList().subscribe({
       next: (res) => {
-        console.log(res); // --- IGNORE ---
         const mapped = (res?.data ?? []).map((emp: any) => this.mapSetupRow(emp));
         const grouped = this.groupByCompany(mapped);
 
@@ -661,6 +694,7 @@ export class ApprovalSetup implements OnInit {
       costCent: emp.COSTCENT,
       costCenterName: emp.DepartmentName,
       companyCode: emp.COMPANY_CODE,
+      companyName: emp.COMPANY_NAME,
       secretaryEmpNo: emp.SecretaryEmpNo,
       secretaryEmpName: emp.SecretaryName,
       approve1EmpNo: emp.Approver1EmpNo || emp.Approve1EmpNo,
