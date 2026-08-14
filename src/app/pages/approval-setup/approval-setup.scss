@@ -80,6 +80,7 @@
   min-width: 0;
   gap: 8px;
   overflow-x: auto;
+  overflow-y: hidden;
   scrollbar-width: none;
 
   &::-webkit-scrollbar {

@@ -89,9 +89,16 @@
           <tr class="company-row">
             <td colspan="9">
               <div class="company-header">
-                <i class="fas fa-building"></i>
-                {{ group.companyName }} ({{ group.companyCode }})
-                <span class="dept-count">{{ group.departments.length }} แผนก</span>
+                <span class="company-title">
+                  <span class="company-icon"><i class="fas fa-building"></i></span>
+                  <span class="company-name">{{ group.companyName }}</span>
+                  <span class="company-separator">·</span>
+                  <span class="company-code">{{ group.companyCode }}</span>
+                </span>
+                <span class="dept-count">
+                  <i class="fas fa-sitemap"></i>
+                  {{ group.departments.length }} แผนก
+                </span>
               </div>
             </td>
           </tr>

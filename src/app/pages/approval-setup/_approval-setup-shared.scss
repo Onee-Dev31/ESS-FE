@@ -180,6 +180,12 @@
   border-collapse: collapse;
   font-size: 13px;
 
+  thead {
+    position: relative;
+    z-index: 1;
+    box-shadow: 0 4px 8px -6px rgba(15, 23, 42, 0.3);
+  }
+
   thead tr {
     border-bottom: 1px solid var(--border-color);
     background: var(--bg-table-head);
@@ -213,29 +219,79 @@
 
   .company-row td {
     padding: 0;
-    background: var(--bg-table-head);
+    background: linear-gradient(
+      90deg,
+      color-mix(in srgb, var(--primary), transparent 90%),
+      color-mix(in srgb, var(--primary), transparent 97%) 55%,
+      var(--bg-table-head)
+    );
   }
 
   .company-header {
     display: flex;
     align-items: center;
-    gap: 8px;
-    padding: 8px 14px;
+    justify-content: space-between;
+    gap: 12px;
+    min-height: 46px;
+    padding: 9px 14px 9px 12px;
     font-weight: 700;
     font-size: 13px;
     color: var(--text-header);
-    border-left: 3px solid var(--primary);
+    border-left: 4px solid var(--primary);
 
-    i {
+    .company-title {
+      display: flex;
+      align-items: center;
+      min-width: 0;
+      gap: 8px;
+    }
+
+    .company-icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      width: 28px;
+      height: 28px;
+      border-radius: 8px;
+      background: color-mix(in srgb, var(--primary), transparent 84%);
       color: var(--primary);
+    }
+
+    .company-name {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .company-separator,
+    .company-code {
+      color: var(--text-muted);
+    }
+
+    .company-code {
+      flex-shrink: 0;
+      font-size: 12px;
+      font-weight: 600;
     }
   }
 
   .dept-count {
+    display: inline-flex;
+    align-items: center;
+    flex-shrink: 0;
+    gap: 6px;
+    padding: 4px 10px;
+    border: 1px solid color-mix(in srgb, var(--primary), transparent 75%);
+    border-radius: 999px;
+    background: var(--bg-card);
+    color: var(--primary);
     font-size: 11px;
-    color: var(--text-muted);
-    font-weight: 400;
-    margin-left: auto;
+    font-weight: 600;
+
+    i {
+      font-size: 10px;
+    }
   }
 }
 
