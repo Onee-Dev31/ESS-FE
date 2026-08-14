@@ -77,9 +77,10 @@
 .tab-bar-scroll {
   display: flex;
   flex: 1;
+  flex-wrap: wrap;
   min-width: 0;
   gap: 8px;
-  overflow-x: auto;
+  overflow-x: visible;
   overflow-y: hidden;
   scrollbar-width: none;
 

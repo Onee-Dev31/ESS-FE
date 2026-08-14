@@ -3,22 +3,24 @@ import { Component, signal, viewChild } from '@angular/core';
 import { ApprovalSetupChainModal } from '../../components/modals/approval-setup-chain-modal/approval-setup-chain-modal';
 import { DepartmentSetup } from './components/department-setup/department-setup';
 import { EmployeeSetup } from './components/employee-setup/employee-setup';
+import { ItPaidSetup } from './components/it-paid-setup/it-paid-setup';
 
 @Component({
   selector: 'app-approval-setup',
   standalone: true,
-  imports: [CommonModule, ApprovalSetupChainModal, DepartmentSetup, EmployeeSetup],
+  imports: [CommonModule, ApprovalSetupChainModal, DepartmentSetup, EmployeeSetup, ItPaidSetup],
   templateUrl: './approval-setup.html',
   styleUrl: './approval-setup.scss',
 })
 export class ApprovalSetup {
-  activeTab = signal<'department' | 'employee'>('department');
+  activeTab = signal<'department' | 'employee' | 'it-paid'>('department');
   isSetupModalOpen = signal(false);
 
   departmentSetup = viewChild(DepartmentSetup);
   employeeSetup = viewChild(EmployeeSetup);
+  itPaidSetup = viewChild(ItPaidSetup);
 
-  setTab(tab: 'department' | 'employee') {
+  setTab(tab: 'department' | 'employee' | 'it-paid') {
     this.activeTab.set(tab);
   }
 
@@ -28,7 +30,12 @@ export class ApprovalSetup {
       return;
     }
 
-    this.employeeSetup()?.refresh();
+    if (this.activeTab() === 'employee') {
+      this.employeeSetup()?.refresh();
+      return;
+    }
+
+    this.itPaidSetup()?.refresh();
   }
 
   openSetupModal() {
