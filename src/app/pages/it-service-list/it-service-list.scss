@@ -786,6 +786,7 @@ textarea.form-input {
   background: none;
   border: none;
   color: var(--primary);
+  font-size: $font-size-label;
   transition: all 0.2s;
 
   &:hover {
@@ -1461,7 +1462,7 @@ textarea.form-input {
         flex: 1;
         color: var(--text-header);
         font-weight: 600;
-        font-size: 0.85rem;
+        font-size: $font-size-label;
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
@@ -1556,13 +1557,14 @@ textarea.form-input {
 .tk-card__title {
   font-weight: 900;
   color: var(--text-header);
+  font-size: $font-size-label;
 
   i {
     padding-right: 20px;
   }
 
   .files {
-    font-size: 0.8rem;
+    font-size: $font-size-hint;
     font-weight: 600;
     color: var(--primary);
     cursor: pointer;
@@ -1608,7 +1610,7 @@ textarea.form-input {
   border-radius: 50px;
   background-color: var(--bg-table-head);
   cursor: pointer;
-  font-size: 12px;
+  font-size: $font-size-hint;
 }
 
 .tk-card__body {
@@ -1647,7 +1649,7 @@ textarea.form-input {
 .tk-text {
   color: var(--text-header);
   line-height: 1.65;
-  font-size: 14px;
+  font-size: $font-size-label;
 }
 
 .att-list {
@@ -1692,7 +1694,7 @@ textarea.form-input {
 }
 
 .att__sub {
-  font-size: 12px;
+  font-size: $font-size-hint;
   color: var(--text-table-head);
   margin-top: 2px;
 }
