@@ -40,7 +40,7 @@ export class ApprovalSetupChainModal {
     { key: 'skipApprover2' as const, label: 'ผู้อนุมัติลำดับที่ 1' },
     { key: 'skipApprover3' as const, label: 'ผู้อนุมัติลำดับที่ 2' },
     { key: 'skipApprover4' as const, label: 'Hr' },
-    { key: 'skipApprover5' as const, label: 'IT Director (it-service)' },
+    { key: 'skipApprover5' as const, label: 'IT Director (IT-service)' },
   ];
 
   ngOnInit() {
@@ -60,6 +60,8 @@ export class ApprovalSetupChainModal {
     source$.subscribe({
       next: (res) => {
         const mapped = (res?.data ?? []).map((emp: any) => this.mapCategory(emp));
+
+        console.log('Fetched categories:', mapped);
         this.categories.set(mapped);
         this.loadingService.stop('setup-modal');
       },

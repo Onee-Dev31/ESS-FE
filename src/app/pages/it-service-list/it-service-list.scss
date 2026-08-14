@@ -1517,6 +1517,29 @@ textarea.form-input {
   display: none;
 }
 
+/* The shared card fills its parent by default. Attachments must follow their
+   content height so they do not squeeze/cover the editable detail card. */
+.tk-card.waiting-attachments {
+  flex: 0 0 auto;
+  height: auto;
+  min-height: 0;
+
+  .tk-card__body {
+    flex: 0 0 auto;
+    overflow-y: visible;
+  }
+}
+
+@media (min-height: 701px) {
+  .tk-card.waiting-attachments {
+    min-height: calc(100vh - 600px);
+
+    .tk-card__body {
+      flex: 1;
+    }
+  }
+}
+
 .tk-card__head {
   padding: 12px 14px;
   display: flex;
