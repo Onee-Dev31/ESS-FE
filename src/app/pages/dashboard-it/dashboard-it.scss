@@ -845,6 +845,12 @@
             font-weight: 500;
           }
 
+          .ticket-elapsed {
+            font-size: $font-size-hint;
+            color: var(--text-muted);
+            font-weight: 400;
+          }
+
           .ticket-meta-right {
             display: flex;
             gap: 12px;

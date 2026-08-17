@@ -98,7 +98,10 @@
           </div>
           <div class="ticket-info">
             <div class="ticket-header">
-              <span class="ticket-number">{{ ticket.ticketNumber }}</span>
+              <span class="ticket-number"
+                >{{ ticket.ticketNumber
+                }}<span class="ticket-elapsed"> ({{ ticket.elapsed_hours }}) </span>
+              </span>
               <div class="ticket-meta-right">
                 <i class="fa-solid fa-paperclip" *ngIf="ticket.attachment_count > 0"></i>
                 <i

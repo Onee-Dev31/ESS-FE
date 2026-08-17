@@ -66,6 +66,7 @@ import { TicketRequesterCardComponent } from '../../components/shared/ticket-req
 import { TicketOpenForCardComponent } from '../../components/shared/ticket-open-for-card/ticket-open-for-card';
 import { TicketProgressCardComponent } from '../../components/shared/ticket-progress-card/ticket-progress-card';
 import { TicketDetailCardComponent } from '../../components/shared/ticket-detail-card/ticket-detail-card';
+import { formatElapsedTime } from '../../utils/time.util';
 
 interface ReplyReader {
   userCodeempid: string;
@@ -573,7 +574,7 @@ export class DashboardIT implements OnInit {
 
   currentUserEmpCode = this.authService.userData().CODEMPID;
 
-  Tickets = signal<any[]>(tickets);
+  Tickets = signal<any[]>([]);
   summaryRes = signal<any>(null);
   selectedTicket = signal<any | undefined>(undefined);
   isPreviewModalOpen = signal<boolean>(false);
@@ -843,7 +844,6 @@ export class DashboardIT implements OnInit {
         : hasOpenFor
           ? res.requestFor
           : null;
-
 
       const objectData = {
         ticketId: ticket.id,
@@ -1884,7 +1884,7 @@ export class DashboardIT implements OnInit {
       })
       .subscribe({
         next: (res) => {
-          // console.log(res);
+          console.log(res);
           this.summaryRes.set(res);
 
           const mapped = res.data.map((ticket: any) => {
@@ -1895,6 +1895,7 @@ export class DashboardIT implements OnInit {
               ticket.IT_Status === 'Assigned'
                 ? 'In Progress'
                 : ticket.IT_Status;
+
             return {
               ...ticket,
               ticketId: ticket.id,
@@ -1905,6 +1906,7 @@ export class DashboardIT implements OnInit {
               createdDate: new Date(ticket.created_at).toISOString(),
               requesterEmpId: ticket.requester_code,
               subject: ticket.subject,
+              elapsed_hours: formatElapsedTime(ticket.hours_elapsed),
             };
           });
           this.Tickets.set(mapped);
