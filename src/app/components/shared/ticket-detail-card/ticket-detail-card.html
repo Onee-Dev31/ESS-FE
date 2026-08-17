@@ -30,7 +30,9 @@
           <span>{{ service.service_name_th }}</span>
         }
         @if (services.length > serviceLimit) {
-          <button type="button" (click)="servicesClick.emit(services)">+{{ services.length - serviceLimit }}</button>
+          <button type="button" (click)="servicesClick.emit(services)">
+            +{{ services.length - serviceLimit }}
+          </button>
         }
       </div>
     }

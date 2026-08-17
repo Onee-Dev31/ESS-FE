@@ -312,7 +312,6 @@ export class DashboardIT implements OnInit {
     return Math.max(0, total - read);
   });
 
-
   @ViewChild(TicketChatComponent) ticketChat?: TicketChatComponent;
 
   filter = {
@@ -825,7 +824,6 @@ export class DashboardIT implements OnInit {
       contentDisposition.match(/filename="?([^";]+)"?/i)?.[1] || `chat-history-${ticketId}.xlsx`
     );
   }
-
 
   showAllServices: boolean = false;
   selectedServices: any[] = [];

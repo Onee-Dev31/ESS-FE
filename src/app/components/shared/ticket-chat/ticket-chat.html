@@ -28,7 +28,8 @@
                 title="Export chat history"
                 (click)="export.emit()"
               >
-                <i class="fas fa-file-export"></i><span class="floating-chat__export-label">Export</span>
+                <i class="fas fa-file-export"></i
+                ><span class="floating-chat__export-label">Export</span>
               </button>
             }
           </div>
@@ -215,11 +216,7 @@
                   </div>
                   <div class="emoji-picker__grid">
                     @for (emoji of emojiTabs[emojiPickerTab]?.emojis ?? []; track emoji) {
-                      <button
-                        type="button"
-                        class="emoji-picker__item"
-                        (click)="selectEmoji(emoji)"
-                      >
+                      <button type="button" class="emoji-picker__item" (click)="selectEmoji(emoji)">
                         {{ emoji }}
                       </button>
                     }
@@ -263,10 +260,7 @@
                 (click)="pendingAttachmentView.emit(file)"
               >
                 <i [class]="getFileIcon(file.name)"></i><span>{{ file.name }}</span>
-                <i
-                  class="fas fa-times"
-                  (click)="removeAttachment(i); $event.stopPropagation()"
-                ></i>
+                <i class="fas fa-times" (click)="removeAttachment(i); $event.stopPropagation()"></i>
               </button>
             }
           </div>

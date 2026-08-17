@@ -25,8 +25,16 @@
         <div class="timeline-item">
           <div
             class="timeline-icon"
-            [class.done]="!first || ticket.assignTimeline.length === 1 || step.title.includes('ปิด')"
-            [class.active]="first && ticket.assignTimeline.length !== 1 && !step.title.includes('ปิด') && !step.title.includes('ปฏิเสธ') && !step.title.includes('Hold')"
+            [class.done]="
+              !first || ticket.assignTimeline.length === 1 || step.title.includes('ปิด')
+            "
+            [class.active]="
+              first &&
+              ticket.assignTimeline.length !== 1 &&
+              !step.title.includes('ปิด') &&
+              !step.title.includes('ปฏิเสธ') &&
+              !step.title.includes('Hold')
+            "
             [class.deny]="step.title.includes('ปฏิเสธ')"
             [class.hold]="step.title.includes('Hold')"
           ></div>
@@ -35,7 +43,9 @@
               Step {{ step.step }} - {{ step.title }}<br />
               <small>
                 by {{ step.createBy.nickName }}
-                @if (audience === 'it' && step.createBy.department?.includes('10806')) { (IT) }
+                @if (audience === 'it' && step.createBy.department?.includes('10806')) {
+                  (IT)
+                }
                 •
                 @if (isToday(step.createdDate)) {
                   {{ step.createdDate | date: 'HH:mm' }}
@@ -48,7 +58,14 @@
               <div class="timeline-assignee">
                 @for (assignee of step.Assignee; track assignee.empCode) {
                   <button type="button" class="assignee-item" (click)="selectAssignee(assignee)">
-                    <img [src]="'https://empimg.oneeclick.co:8048/employeeimage/' + assignee.empCode + '.jpg'" alt="" />
+                    <img
+                      [src]="
+                        'https://empimg.oneeclick.co:8048/employeeimage/' +
+                        assignee.empCode +
+                        '.jpg'
+                      "
+                      alt=""
+                    />
                     <span>{{ assignee.nickName }}</span>
                   </button>
                 }
@@ -70,7 +87,12 @@
 @if (selectedAssignee(); as assignee) {
   <div class="assignee-overlay" (click)="selectedAssignee.set(null)">
     <div class="assignee-card" (click)="$event.stopPropagation()">
-      <button type="button" class="close-button" aria-label="ปิด" (click)="selectedAssignee.set(null)">
+      <button
+        type="button"
+        class="close-button"
+        aria-label="ปิด"
+        (click)="selectedAssignee.set(null)"
+      >
         <i class="fas fa-times"></i>
       </button>
       <div class="assignee-avatar">

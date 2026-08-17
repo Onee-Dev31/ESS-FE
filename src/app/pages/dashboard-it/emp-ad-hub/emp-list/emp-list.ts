@@ -194,17 +194,17 @@ export class EmpList {
     if (!this.pagedEmployees.length) return;
 
     const rows = this.pagedEmployees.map((emp) => ({
-      'รหัสพนักงาน': emp.ID ?? '-',
+      รหัสพนักงาน: emp.ID ?? '-',
       'ชื่อ (ไทย)': [emp.nameThai1, emp.nameThai2, emp.nameThai3].filter(Boolean).join(' '),
       'ชื่อ (English)': [emp.nameEng1, emp.nameEng2].filter(Boolean).join(' '),
-      'บริษัท': emp.COMPANY ?? '-',
-      'แผนก': [emp.dept1, emp.dept2].filter(Boolean).join(' '),
+      บริษัท: emp.COMPANY ?? '-',
+      แผนก: [emp.dept1, emp.dept2].filter(Boolean).join(' '),
       'AD User': emp.AD_USER || '-',
-      'เบอร์โทร': emp.TEL || '-',
-      'Email': emp.EMAIL || '-',
-      'สถานะ': emp.STATUS || '-',
-      'วันที่เริ่มงาน': emp.START_DATE || '-',
-      'วันที่ลาออก': emp.RESIGNDATE || '-',
+      เบอร์โทร: emp.TEL || '-',
+      Email: emp.EMAIL || '-',
+      สถานะ: emp.STATUS || '-',
+      วันที่เริ่มงาน: emp.START_DATE || '-',
+      วันที่ลาออก: emp.RESIGNDATE || '-',
     }));
 
     const worksheet = XLSX.utils.json_to_sheet(rows);

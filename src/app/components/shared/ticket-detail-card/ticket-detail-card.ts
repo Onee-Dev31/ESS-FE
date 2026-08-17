@@ -25,8 +25,12 @@ export class TicketDetailCardComponent {
   @Output() copyClick = new EventEmitter<void>();
   @Output() detailClick = new EventEmitter<void>();
 
-  get attachments(): any[] { return this.ticket?.attachments ?? []; }
-  get services(): any[] { return this.ticket?.services ?? []; }
+  get attachments(): any[] {
+    return this.ticket?.attachments ?? [];
+  }
+  get services(): any[] {
+    return this.ticket?.services ?? [];
+  }
 
   confirmImages() {
     return this.textEditor!.confirmImages();
