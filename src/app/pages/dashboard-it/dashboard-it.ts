@@ -57,24 +57,19 @@ import { NzCheckboxModule } from 'ng-zorro-antd/checkbox';
 import { SignalrService } from '../../services/signalr.service';
 import { CcModal } from './modal/cc-modal/cc-modal';
 import { NoteForItModal } from './modal/note-for-it-modal/note-for-it-modal';
-import { AvatarPreviewModal } from '../../components/modals/avatar-preview-modal/avatar-preview-modal';
 import { NzDatePickerModule } from 'ng-zorro-antd/date-picker';
 import { en_US, NzI18nService } from 'ng-zorro-antd/i18n';
-import { environment } from '../../../environments/environment';
 import { TicketService } from '../../services/ticket.service';
 import { TicketRequesterCardComponent } from '../../components/shared/ticket-requester-card/ticket-requester-card';
 import { TicketOpenForCardComponent } from '../../components/shared/ticket-open-for-card/ticket-open-for-card';
 import { TicketProgressCardComponent } from '../../components/shared/ticket-progress-card/ticket-progress-card';
 import { TicketDetailCardComponent } from '../../components/shared/ticket-detail-card/ticket-detail-card';
+import {
+  TicketChatComponent,
+  TicketChatReader,
+  isSameTicketId,
+} from '../../components/shared/ticket-chat/ticket-chat';
 import { formatElapsedTime } from '../../utils/time.util';
-
-interface ReplyReader {
-  userCodeempid: string;
-  aduser: string;
-  nickName: string;
-  lastReadReplyId: number;
-  readAt: string;
-}
 
 @Component({
   selector: 'app-dashboard-it',
@@ -99,12 +94,12 @@ interface ReplyReader {
     NzCheckboxModule,
     CcModal,
     NoteForItModal,
-    AvatarPreviewModal,
     NzDatePickerModule,
     TicketRequesterCardComponent,
     TicketOpenForCardComponent,
     TicketProgressCardComponent,
     TicketDetailCardComponent,
+    TicketChatComponent,
   ],
   templateUrl: './dashboard-it.html',
   styleUrl: './dashboard-it.scss',
@@ -306,7 +301,7 @@ export class DashboardIT implements OnInit {
 
   private chatReadCounts = signal<Map<number, number>>(new Map());
 
-  replyReaders = signal<ReplyReader[]>([]);
+  replyReaders = signal<TicketChatReader[]>([]);
   replyingTo = signal<any>(null);
 
   unreadChatCount = computed(() => {
@@ -317,217 +312,13 @@ export class DashboardIT implements OnInit {
     return Math.max(0, total - read);
   });
 
-  emojiPickerOpen = false;
-  emojiPickerTab = 0;
-  readonly EMOJI_TABS = [
-    {
-      label: '😊',
-      emojis: [
-        '😀',
-        '😃',
-        '😄',
-        '😁',
-        '😆',
-        '😅',
-        '🤣',
-        '😂',
-        '🙂',
-        '😊',
-        '😇',
-        '🥰',
-        '😍',
-        '🤩',
-        '😘',
-        '😋',
-        '😛',
-        '😜',
-        '🤪',
-        '😝',
-        '😏',
-        '🙄',
-        '😬',
-        '😌',
-        '😔',
-        '😴',
-        '😷',
-        '🤒',
-        '🥵',
-        '🥶',
-        '😵',
-        '🥳',
-        '😎',
-        '🤓',
-        '😕',
-        '🥺',
-        '😢',
-        '😭',
-        '😱',
-        '😤',
-        '😡',
-        '😠',
-        '🤬',
-        '😈',
-        '👿',
-        '💀',
-        '👻',
-        '👽',
-        '🤖',
-        '💩',
-      ],
-    },
-    {
-      label: '👍',
-      emojis: [
-        '👍',
-        '👎',
-        '👌',
-        '✌️',
-        '🤞',
-        '🤟',
-        '🤘',
-        '🤙',
-        '👈',
-        '👉',
-        '👆',
-        '👇',
-        '☝️',
-        '👋',
-        '🤚',
-        '🖐️',
-        '✋',
-        '🖖',
-        '💪',
-        '✍️',
-        '🙏',
-        '🤲',
-        '👐',
-        '🫶',
-        '🤝',
-        '👏',
-        '✊',
-        '👊',
-        '🤜',
-        '🤛',
-      ],
-    },
-    {
-      label: '❤️',
-      emojis: [
-        '❤️',
-        '🧡',
-        '💛',
-        '💚',
-        '💙',
-        '💜',
-        '🖤',
-        '🤍',
-        '🤎',
-        '❤️‍🔥',
-        '💔',
-        '💕',
-        '💞',
-        '💓',
-        '💗',
-        '💖',
-        '💘',
-        '💝',
-        '💟',
-        '♥️',
-        '😻',
-        '💌',
-        '💋',
-        '👄',
-      ],
-    },
-    {
-      label: '🎉',
-      emojis: [
-        '🎉',
-        '🎊',
-        '🎈',
-        '🎁',
-        '🏆',
-        '🥇',
-        '⭐',
-        '🌟',
-        '💫',
-        '✨',
-        '🔥',
-        '💯',
-        '✅',
-        '❌',
-        '⚡',
-        '💡',
-        '🔔',
-        '📢',
-        '🎵',
-        '🎶',
-        '🚀',
-        '💎',
-        '🌈',
-        '👑',
-        '🎯',
-        '🌸',
-        '🌺',
-        '☀️',
-        '🌙',
-        '❄️',
-        '🌊',
-        '⚽',
-        '🏀',
-        '🍕',
-        '🍔',
-        '☕',
-        '🍺',
-        '🥂',
-        '🍰',
-        '🎂',
-      ],
-    },
-  ];
 
-  mentionResults = signal<any[]>([]);
-  mentionVisible = signal(false);
-  mentionActiveIndex = 0;
-  private mentionQuery = '';
-  private mentionAtIndex = -1;
-  private mentionDebounce: ReturnType<typeof setTimeout> | null = null;
-  private pendingMentionAdUsers = new Set<string>();
-
-  @ViewChild('chatTextareaRef') chatTextareaRef?: ElementRef<HTMLTextAreaElement>;
-  @ViewChild('floatingChatRef') floatingChatRef?: ElementRef<HTMLElement>;
-
-  private _chatMessage = '';
-  get chatMessage() {
-    return this._chatMessage;
-  }
-  set chatMessage(value: string) {
-    this._chatMessage = value;
-    this.detectMentionTrigger(value);
-  }
-
-  chatAttachments: { name: string; size: number; file: File }[] = [];
-
-  readonly CHAT_FILE_CONFIG = {
-    maxFiles: 5,
-    maxSizeMB: 5,
-    allowedTypes: [
-      'image/jpeg',
-      'image/png',
-      'image/gif',
-      'application/pdf',
-      'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-      'application/vnd.ms-excel',
-    ],
-    allowedExtensions: ['jpg', 'jpeg', 'png', 'gif', 'pdf', 'docx', 'xlsx', 'xls'],
-  };
+  @ViewChild(TicketChatComponent) ticketChat?: TicketChatComponent;
 
   filter = {
     dateRange: [dayjs().subtract(3, 'month').toDate(), dayjs().toDate()] as [Date, Date] | null,
   };
 
-  @ViewChild('cardBody') cardBodyEl?: ElementRef<HTMLElement>;
   @ViewChild('ticketList') ticketList!: ElementRef;
 
   @HostListener('window:resize')
@@ -542,8 +333,7 @@ export class DashboardIT implements OnInit {
 
     if (!this.IS_CHAT_OPEN()) return;
 
-    const el = this.floatingChatRef?.nativeElement;
-    if (el && !el.contains(event.target as Node)) {
+    if (this.ticketChat && !this.ticketChat.contains(event.target)) {
       this.closeChat();
     }
   }
@@ -687,7 +477,7 @@ export class DashboardIT implements OnInit {
           if ((data.note ?? data.message ?? '').startsWith('Re-Open')) {
             this.Tickets.update((list) =>
               list.map((t: any) =>
-                t.ticketId === data.ticketId
+                isSameTicketId(t.ticketId, data.ticketId)
                   ? { ...t, IT_Status: getStatusLabel('ReOpened'), status: 'Re-Opened' }
                   : t,
               ),
@@ -695,7 +485,7 @@ export class DashboardIT implements OnInit {
           }
 
           // 3. If viewing this ticket, refresh details to show new note instantly
-          if (this.selectedTicket()?.ticketId === data.ticketId) {
+          if (isSameTicketId(this.selectedTicket()?.ticketId, data.ticketId)) {
             this.selectTicket(String(data.ticketId));
           }
         }
@@ -705,7 +495,7 @@ export class DashboardIT implements OnInit {
       .on('ChatRead')
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((data: any) => {
-        if (data.ticketId !== this.selectedTicket()?.ticketId) return;
+        if (!isSameTicketId(data.ticketId, this.selectedTicket()?.ticketId)) return;
         this.replyReaders.update((readers) => {
           const others = readers.filter((r) => r.userCodeempid !== data.userCodeempid);
           return [
@@ -722,7 +512,7 @@ export class DashboardIT implements OnInit {
       });
 
     // Poll for new notes every 5s while chat panel is open (fallback when SignalR doesn't reach all parties)
-    interval(5000)
+    interval(2000)
       .pipe(
         takeUntilDestroyed(this.destroyRef),
         filter(() => this.IS_CHAT_OPEN() && !!this.selectedTicket()),
@@ -888,7 +678,7 @@ export class DashboardIT implements OnInit {
       }
       if (options?.openChat) {
         this.IS_CHAT_OPEN.set(true);
-        setTimeout(() => this.chatTextareaRef?.nativeElement.focus(), 100);
+        setTimeout(() => this.ticketChat?.focusComposer(), 100);
       }
       if (this.IS_CHAT_OPEN()) this.markChatAsRead();
       this.scrollToBottom();
@@ -969,14 +759,12 @@ export class DashboardIT implements OnInit {
   }
 
   private clearChatDraft() {
-    this.chatMessage = '';
-    this.chatAttachments = [];
-    this.pendingMentionAdUsers.clear();
+    this.ticketChat?.clearDraft();
   }
 
   private focusChatComposer() {
     requestAnimationFrame(() => {
-      setTimeout(() => this.chatTextareaRef?.nativeElement.focus(), 0);
+      setTimeout(() => this.ticketChat?.focusComposer(), 0);
     });
   }
 
@@ -1038,301 +826,6 @@ export class DashboardIT implements OnInit {
     );
   }
 
-  sendChatMessage(ticket: any) {
-    const message = this.chatMessage.trim();
-
-    if (!message) {
-      this.msg.warning('กรุณากรอกข้อความ');
-      return;
-    }
-
-    const attachments = [...this.chatAttachments];
-    const mentionedAdUsers = [...this.pendingMentionAdUsers];
-    this.chatMessage = '';
-    this.chatAttachments = [];
-    this.pendingMentionAdUsers.clear();
-    this.submitNote(
-      {
-        id: ticket.ticketId,
-        message,
-        attachments,
-        mentionedAdUsers,
-      },
-      { silent: true },
-    );
-  }
-
-  startReply(note: any) {
-    this.replyingTo.set(note);
-    setTimeout(() => this.chatTextareaRef?.nativeElement.focus(), 0);
-  }
-
-  cancelReply() {
-    this.replyingTo.set(null);
-  }
-
-  insertEmoji(emoji: string) {
-    this.chatMessage = this.chatMessage + emoji;
-    this.emojiPickerOpen = false;
-    setTimeout(() => {
-      const ta = this.chatTextareaRef?.nativeElement;
-      if (ta) {
-        ta.focus();
-        ta.setSelectionRange(ta.value.length, ta.value.length);
-      }
-    }, 0);
-  }
-
-  handleChatKeydown(event: KeyboardEvent, ticket: any) {
-    if (this.mentionVisible()) {
-      if (event.key === 'ArrowDown') {
-        event.preventDefault();
-        this.mentionActiveIndex = Math.min(
-          this.mentionActiveIndex + 1,
-          this.mentionResults().length - 1,
-        );
-        return;
-      }
-      if (event.key === 'ArrowUp') {
-        event.preventDefault();
-        this.mentionActiveIndex = Math.max(this.mentionActiveIndex - 1, 0);
-        return;
-      }
-      if (event.key === 'Enter') {
-        event.preventDefault();
-        const emp = this.mentionResults()[this.mentionActiveIndex];
-        if (emp) this.selectMention(emp);
-        return;
-      }
-      if (event.key === 'Escape') {
-        event.preventDefault();
-        this.closeMention();
-        return;
-      }
-    }
-    if (event.key === 'Enter' && !event.shiftKey) {
-      event.preventDefault();
-      this.sendChatMessage(ticket);
-    }
-  }
-
-  onChatPaste(event: ClipboardEvent) {
-    const items = event.clipboardData?.items;
-
-    if (!items) return;
-
-    const files: File[] = [];
-
-    for (const item of Array.from(items)) {
-      if (item.kind === 'file') {
-        const file = item.getAsFile();
-
-        if (file) {
-          files.push(file);
-        }
-      }
-    }
-
-    if (!files.length) {
-      // paste ข้อความปกติ
-      return;
-    }
-
-    // ไม่ให้ paste รูปเป็นข้อความ/base64
-    event.preventDefault();
-
-    const dataTransfer = new DataTransfer();
-
-    files.forEach((file) => dataTransfer.items.add(file));
-
-    this.addChatFiles(dataTransfer.files);
-  }
-
-  private detectMentionTrigger(value: string) {
-    const atMatch = value.match(/@([^\s@]*)$/);
-    if (atMatch) {
-      this.mentionAtIndex = value.lastIndexOf('@');
-      this.mentionQuery = atMatch[1];
-      this.mentionActiveIndex = 0;
-      this.searchMentionEmployees(this.mentionQuery);
-    } else {
-      this.closeMention();
-    }
-  }
-
-  private searchMentionEmployees(query: string) {
-    if (this.mentionDebounce) clearTimeout(this.mentionDebounce);
-
-    const participants = this.getTicketParticipants();
-
-    if (!query.trim() || !environment.allowMentionAnyone) {
-      const filtered = query.trim()
-        ? participants.filter((p) => {
-            const q = query.toLowerCase();
-            return (
-              p.Nickname?.toLowerCase().includes(q) || p.FullNameThai?.toLowerCase().includes(q)
-            );
-          })
-        : participants;
-      this.mentionResults.set(filtered);
-      this.mentionVisible.set(filtered.length > 0);
-      this.mentionActiveIndex = 0;
-      return;
-    }
-
-    this.mentionDebounce = setTimeout(() => {
-      this.itServiceService.searchEmployees({ search: query || undefined, pageSize: 8 }).subscribe({
-        next: (res) => {
-          const list = (res.data || []).map((e: any) => ({
-            Nickname: e.Nickname || e.nickname || '',
-            FullNameThai: e.FullNameThai || e.fullname || '',
-            CODEEMPID: e.CODEEMPID || e.codeempid || '',
-          }));
-          this.mentionResults.set(list);
-          this.mentionVisible.set(list.length > 0);
-          this.mentionActiveIndex = 0;
-        },
-        error: () => this.closeMention(),
-      });
-    }, 200);
-  }
-
-  private getTicketParticipants(): any[] {
-    const ticket = this.selectedTicket();
-    if (!ticket) return [];
-
-    const myCode = this.currentUserEmpCode;
-    const participants: any[] = [];
-    const seen = new Set<string>([myCode]); // exclude self
-
-    // requester
-    if (ticket.requester?.emp_code && !seen.has(ticket.requester.emp_code)) {
-      seen.add(ticket.requester.emp_code);
-      participants.push({
-        Nickname: ticket.requester.nickname || ticket.requester.fullname || '',
-        FullNameThai: ticket.requester.fullname || '',
-        CODEEMPID: ticket.requester.emp_code,
-        adUser: ticket.requesterAduser || ticket.requester.aduser || '',
-      });
-    }
-
-    // assignees of the latest step only (not historical approvers)
-    const timeline: any[] = ticket.assignTimeline || [];
-    const latestStep = timeline.length > 0 ? timeline[timeline.length - 1] : null;
-    if (latestStep) {
-      for (const a of latestStep.Assignee || []) {
-        if (a.empCode && !seen.has(a.empCode)) {
-          seen.add(a.empCode);
-          participants.push({
-            Nickname: a.nickName || a.fullName || '',
-            FullNameThai: a.fullName || '',
-            CODEEMPID: a.empCode,
-            adUser: a.adUser || a.aduser || '',
-          });
-        }
-      }
-    }
-
-    return [{ Nickname: 'All', FullNameThai: 'แจ้งทุกคน', CODEEMPID: '__all__' }, ...participants];
-  }
-
-  selectMention(emp: any) {
-    const name = emp.Nickname || emp.FullNameThai || '';
-    const before = this.chatMessage.substring(0, this.mentionAtIndex);
-    const after = this.chatMessage.substring(this.mentionAtIndex + 1 + this.mentionQuery.length);
-    this._chatMessage = `${before}@${name} ${after}`;
-
-    // Track who was mentioned so we can notify them
-    if (emp.CODEEMPID === '__all__') {
-      for (const p of this.getTicketParticipants()) {
-        const au = (p.adUser || '').toLowerCase();
-        if (au && p.CODEEMPID !== '__all__') this.pendingMentionAdUsers.add(au);
-      }
-    } else {
-      const au = (emp.adUser || emp.AD_USER || emp.aduser || '').toLowerCase();
-      if (au) this.pendingMentionAdUsers.add(au);
-    }
-
-    this.closeMention();
-    setTimeout(() => this.chatTextareaRef?.nativeElement.focus(), 0);
-  }
-
-  closeMention() {
-    this.mentionVisible.set(false);
-    this.mentionResults.set([]);
-    this.mentionQuery = '';
-    this.mentionAtIndex = -1;
-    if (this.mentionDebounce) {
-      clearTimeout(this.mentionDebounce);
-      this.mentionDebounce = null;
-    }
-  }
-
-  handleChatEnter(event: Event, ticket: any) {
-    const keyboardEvent = event as KeyboardEvent;
-
-    if (keyboardEvent.shiftKey) {
-      return;
-    }
-
-    keyboardEvent.preventDefault();
-    this.sendChatMessage(ticket);
-  }
-
-  onChatFileSelected(event: Event) {
-    const input = event.target as HTMLInputElement;
-    if (input.files) {
-      this.addChatFiles(input.files);
-    }
-    input.value = '';
-  }
-
-  removeChatAttachment(index: number) {
-    this.chatAttachments.splice(index, 1);
-  }
-
-  private addChatFiles(files: FileList) {
-    if (!files || files.length === 0) return;
-
-    const errors: string[] = [];
-    const validFiles: { name: string; size: number; file: File }[] = [];
-
-    for (const file of Array.from(files)) {
-      const reasons: string[] = [];
-
-      if (this.chatAttachments.length + validFiles.length >= this.CHAT_FILE_CONFIG.maxFiles) {
-        reasons.push(`เกินจำนวนสูงสุด ${this.CHAT_FILE_CONFIG.maxFiles} ไฟล์`);
-      }
-
-      const sizeMB = file.size / (1024 * 1024);
-      if (sizeMB > this.CHAT_FILE_CONFIG.maxSizeMB) {
-        reasons.push(`ขนาดเกิน ${this.CHAT_FILE_CONFIG.maxSizeMB} MB`);
-      }
-
-      const ext = file.name.split('.').pop()?.toLowerCase() ?? '';
-      if (
-        !this.CHAT_FILE_CONFIG.allowedTypes.includes(file.type) &&
-        !this.CHAT_FILE_CONFIG.allowedExtensions.includes(ext)
-      ) {
-        reasons.push('ประเภทไฟล์ไม่รองรับ');
-      }
-
-      if (reasons.length > 0) {
-        errors.push(`${file.name} (${reasons.join(', ')})`);
-        continue;
-      }
-
-      validFiles.push({ name: file.name, size: file.size, file });
-    }
-
-    if (errors.length > 0) {
-      this.swalService.warning(errors.join('\n'));
-    }
-
-    if (validFiles.length > 0) {
-      this.chatAttachments = [...this.chatAttachments, ...validFiles];
-    }
-  }
 
   showAllServices: boolean = false;
   selectedServices: any[] = [];
@@ -1418,26 +911,7 @@ export class DashboardIT implements OnInit {
     this.isDetailModalOpen.set(true);
   }
 
-  // copyDescription(text: string) {
-  //   navigator.clipboard.writeText(text).then(() => {
-  //     this.swalService.success('คัดลอกแล้ว');
-  //   });
-  // }
-
   copiedTicketId: string | null = null;
-
-  // copyDescription(text: string) {
-  //   navigator.clipboard.writeText(text);
-
-  //   this.copiedText = text;
-
-  //   setTimeout(() => {
-  //     if (this.copiedText === text) {
-  //       this.copiedText = null;
-  //     }
-  //     this.cdr.detectChanges();
-  //   }, 2000);
-  // }
 
   copyDescription(ticketId: string, html: string) {
     const text = this.toPlainText(html);
@@ -1459,25 +933,6 @@ export class DashboardIT implements OnInit {
       this.cdr.detectChanges();
     }, 2000);
   }
-
-  // copyDescription(text: string) {
-  //   const textarea = document.createElement('textarea');
-  //   textarea.value = text;
-
-  //   document.body.appendChild(textarea);
-  //   textarea.select();
-
-  //   document.execCommand('copy');
-
-  //   document.body.removeChild(textarea);
-
-  //   this.copiedText = text;
-
-  //   setTimeout(() => {
-  //     this.copiedText = '';
-  //     this.cdr.detectChanges();
-  //   }, 2000);
-  // }
 
   private toPlainText(html: string): string {
     const doc = new DOMParser().parseFromString(html, 'text/html');
@@ -1798,12 +1253,16 @@ export class DashboardIT implements OnInit {
         replyAttachments,
         ticket.requesterAduser,
       );
+      this.loadReplyReadStatus(ticket.ticketId);
       const currentIds = new Set((ticket.itNotes ?? []).map((n: any) => n.id));
       const hasNew = itNotes.some((n: any) => !currentIds.has(n.id));
       if (!hasNew) return;
       this.selectedTicket.update((t) => (t ? { ...t, itNotes } : t));
       this.scrollToBottom();
-      if (this.IS_CHAT_OPEN()) this.markChatAsRead();
+      if (this.IS_CHAT_OPEN()) {
+        this.markChatAsRead();
+        this.markLatestReplyRead(ticket.ticketId, itNotes);
+      }
     } catch {
       // silent fail — chat still works, just won't show new messages until next poll
     }
@@ -1811,8 +1270,7 @@ export class DashboardIT implements OnInit {
 
   scrollToBottom() {
     setTimeout(() => {
-      const el = this.cardBodyEl?.nativeElement;
-      if (el) el.scrollTop = el.scrollHeight;
+      this.ticketChat?.scrollToBottom();
     }, 0);
   }
 
@@ -1825,7 +1283,17 @@ export class DashboardIT implements OnInit {
     });
   }
 
-  readersForNote(replyId: number): ReplyReader[] {
+  private markLatestReplyRead(ticketId: string | number, notes: any[]): void {
+    const codeempid = this.authService.userData()?.CODEMPID;
+    const latestReply = notes.at(-1);
+    if (!codeempid || !latestReply) return;
+    this.itServiceService.markReplyRead(ticketId, codeempid, latestReply.id).subscribe({
+      complete: () => this.loadReplyReadStatus(ticketId),
+      error: () => {},
+    });
+  }
+
+  readersForNote(replyId: number): TicketChatReader[] {
     const myCode = this.authService.userData()?.CODEMPID;
     return this.replyReaders().filter(
       (r) => r.lastReadReplyId >= replyId && r.userCodeempid !== myCode,
