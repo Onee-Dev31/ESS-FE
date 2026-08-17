@@ -63,7 +63,18 @@
 
   <!-- Total -->
   <div class="total-bar">
-    Total Results: <strong>{{ totalItems }}</strong>
+    <span
+      >Total Results: <strong>{{ totalItems }}</strong></span
+    >
+    <button
+      type="button"
+      class="export-button"
+      [disabled]="isLoading || !pagedEmployees.length"
+      (click)="exportCurrentPage()"
+    >
+      <i class="fas fa-file-excel"></i>
+      Export Excel
+    </button>
   </div>
 
   <div class="content-card">

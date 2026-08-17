@@ -36,10 +36,11 @@ export class ApprovalSetupChainModal {
   categories = signal<ApprovalCategory[]>([]);
 
   readonly approverSteps = [
-    { key: 'skipApprover1' as const, label: 'Approver 1' },
-    { key: 'skipApprover2' as const, label: 'Approver 2' },
-    { key: 'skipApprover3' as const, label: 'Approver 3' },
-    { key: 'skipApprover4' as const, label: 'Approver 4' },
+    { key: 'skipApprover1' as const, label: 'เลขา' },
+    { key: 'skipApprover2' as const, label: 'ผู้อนุมัติลำดับที่ 1' },
+    { key: 'skipApprover3' as const, label: 'ผู้อนุมัติลำดับที่ 2' },
+    { key: 'skipApprover4' as const, label: 'Hr' },
+    { key: 'skipApprover5' as const, label: 'IT Director (IT-service)' },
   ];
 
   ngOnInit() {
@@ -59,6 +60,8 @@ export class ApprovalSetupChainModal {
     source$.subscribe({
       next: (res) => {
         const mapped = (res?.data ?? []).map((emp: any) => this.mapCategory(emp));
+
+        console.log('Fetched categories:', mapped);
         this.categories.set(mapped);
         this.loadingService.stop('setup-modal');
       },
@@ -78,6 +81,7 @@ export class ApprovalSetupChainModal {
       skipApprover2: raw.SkipApprover2,
       skipApprover3: raw.SkipApprover3,
       skipApprover4: raw.SkipApprover4,
+      skipApprover5: raw.SkipApprover5,
       activeFlag: raw.ActiveFlag,
     };
   }
@@ -86,7 +90,7 @@ export class ApprovalSetupChainModal {
     categoryId: number,
     step: keyof Pick<
       ApprovalCategory,
-      'skipApprover1' | 'skipApprover2' | 'skipApprover3' | 'skipApprover4'
+      'skipApprover1' | 'skipApprover2' | 'skipApprover3' | 'skipApprover4' | 'skipApprover5'
     >,
   ) {
     this.categories.update((list) =>
@@ -102,6 +106,7 @@ export class ApprovalSetupChainModal {
       skipApprover2: cat.skipApprover2,
       skipApprover3: cat.skipApprover3,
       skipApprover4: cat.skipApprover4,
+      skipApprover5: cat.skipApprover5,
     }));
 
     this.approvalService

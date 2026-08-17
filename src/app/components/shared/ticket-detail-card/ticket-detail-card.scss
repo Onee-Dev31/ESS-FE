@@ -1,0 +1,262 @@
+@use '../../../../styles/variables' as *;
+
+:host {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+  flex-direction: column;
+  gap: 6px;
+}
+.ticket-hero {
+  flex-shrink: 0;
+  padding: 10px 16px;
+  border-radius: 16px;
+  background: linear-gradient(
+    150deg,
+    var(--primary) 50%,
+    color-mix(in srgb, var(--primary), var(--text-reverse) 20%)
+  );
+  color: var(--text-reverse);
+}
+.ticket-title {
+  font-size: $font-size-header;
+  font-weight: 800;
+  line-height: 1.4;
+  overflow-wrap: anywhere;
+}
+.ticket-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin-top: 3px;
+  font-size: $font-size-hint;
+}
+.ticket-meta strong {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+}
+.separator {
+  opacity: 0.7;
+}
+.waiting-alert {
+  flex-shrink: 0;
+  padding: 7px 12px;
+  border-radius: 10px;
+  background: var(--status-waiting-bg);
+  color: var(--status-waiting-text);
+  font-size: $font-size-label;
+}
+.detail-card {
+  display: flex;
+  flex: 1;
+  min-height: 250px;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid rgba(15, 23, 42, 0.06);
+  border-radius: 16px;
+  background: var(--bg-card);
+  box-shadow: 0 10px 30px rgba(17, 24, 39, 0.08);
+}
+.detail-header {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--border-color);
+}
+.detail-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--text-header);
+  font-size: $font-size-label;
+  font-weight: 700;
+}
+.attachment-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 9px;
+  border: 1px solid color-mix(in srgb, var(--primary), transparent 65%);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--primary), transparent 88%);
+  color: var(--primary);
+  font: inherit;
+  cursor: pointer;
+}
+.services {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 3px;
+}
+.services span,
+.services button {
+  padding: 4px 10px;
+  border: 0;
+  border-radius: 50px;
+  font-size: $font-size-hint;
+}
+.services span {
+  background: var(--primary);
+  color: var(--text-reverse);
+}
+.services button {
+  background: var(--bg-table-head);
+  color: var(--text);
+  cursor: pointer;
+}
+.detail-body {
+  display: flex;
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+  padding: 14px;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+.detail-body app-text-editor {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+}
+
+:host ::ng-deep .detail-body app-text-editor quill-editor.editor {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+  flex-direction: column;
+}
+
+:host ::ng-deep .detail-body app-text-editor .ql-container {
+  flex: 1;
+  min-height: calc(100% - 100px);
+}
+
+:host ::ng-deep .detail-body app-text-editor .ql-editor {
+  min-height: calc(100% - 100px);
+}
+
+.description {
+  width: 100%;
+  min-width: 0;
+  color: var(--text-header);
+  font-size: $font-size-label;
+  line-height: 1.65;
+  overflow-wrap: anywhere;
+}
+
+:host ::ng-deep .description img,
+:host ::ng-deep .description video,
+:host ::ng-deep .description iframe,
+:host ::ng-deep .description table {
+  max-width: 100% !important;
+}
+
+:host ::ng-deep .description img,
+:host ::ng-deep .description video {
+  height: auto !important;
+  object-fit: contain;
+}
+
+:host ::ng-deep .description pre,
+:host ::ng-deep .description code {
+  max-width: 100%;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.detail-footer {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding: 6px;
+  border-top: 1px solid var(--border-color);
+}
+.ticket-type {
+  display: flex;
+  min-width: 0;
+  align-items: baseline;
+  gap: 8px;
+  color: var(--text-header);
+  overflow-wrap: anywhere;
+}
+.ticket-type span {
+  flex-shrink: 0;
+  color: var(--text-muted);
+  font-size: $font-size-hint;
+}
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-left: auto;
+}
+.action-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 32px;
+  padding: 4px 12px;
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  background: var(--bg-card);
+  color: var(--text-table-head);
+  font: 600 #{$font-size-hint}/ 1.2 $font-main;
+  cursor: pointer;
+}
+.action-button.primary {
+  border-color: color-mix(in srgb, var(--primary), transparent 60%);
+  background: color-mix(in srgb, var(--primary), transparent 90%);
+  color: var(--primary);
+}
+@media (max-width: 576px) {
+  .detail-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+  .detail-footer {
+    align-items: stretch;
+  }
+  .ticket-type,
+  .actions {
+    width: 100%;
+  }
+  .actions {
+    justify-content: flex-end;
+  }
+}
+
+@media (max-width: 860px) {
+  :host {
+    flex: none;
+    min-height: auto;
+  }
+
+  .detail-card {
+    flex: none;
+    min-height: 0;
+    overflow: visible;
+  }
+
+  .detail-body {
+    flex: none;
+    min-height: 140px;
+    max-height: none;
+    overflow: visible;
+  }
+
+  .detail-body app-text-editor {
+    flex: none;
+  }
+
+  :host ::ng-deep .detail-body app-text-editor .ql-container,
+  :host ::ng-deep .detail-body app-text-editor .ql-editor {
+    min-height: clamp(220px, 38vh, 320px);
+  }
+}

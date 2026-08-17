@@ -1,0 +1,279 @@
+@if (visible && ticket && canAccess) {
+  <div class="floating-chat" [class.is-open]="isOpen" #root>
+    @if (isOpen) {
+      <section class="floating-chat__panel" aria-label="Ticket chat">
+        <div class="floating-chat__header">
+          <div class="floating-chat__title">
+            <i class="fa-solid fa-comments"></i>
+            <div class="floating-chat__label">
+              <span>{{ chatTitle }}</span>
+              @if (ticket.ticketNumber) {
+                <span class="floating-chat__ticket-no">#{{ ticket.ticketNumber }}</span>
+              }
+            </div>
+            @if (attachmentCount > 0) {
+              <button
+                class="floating-chat__summary"
+                type="button"
+                title="ดูไฟล์แนบทั้งหมด"
+                (click)="attachmentsOpen.emit()"
+              >
+                <i class="fa-solid fa-paperclip"></i>{{ attachmentCount }} ไฟล์
+              </button>
+            }
+            @if (showExport && notes.length > 0) {
+              <button
+                class="floating-chat__summary floating-chat__export"
+                type="button"
+                title="Export chat history"
+                (click)="export.emit()"
+              >
+                <i class="fas fa-file-export"></i
+                ><span class="floating-chat__export-label">Export</span>
+              </button>
+            }
+          </div>
+          <button class="floating-chat__close" type="button" title="ปิดแชท" (click)="close.emit()">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+
+        <div class="floating-chat__body" #cardBody>
+          @if (notes.length) {
+            <div class="note-list">
+              @for (note of notes; track note.id; let i = $index; let last = $last) {
+                <div
+                  class="note"
+                  [class.note--me]="note.createBy.empCode === currentUserEmpCode"
+                  [class.note--they]="note.createBy.empCode !== currentUserEmpCode"
+                  [class.note--requester]="note.createBy.senderRole === 'requester'"
+                  [class.note--it-staff]="note.createBy.senderRole === 'it-staff'"
+                  [class.note--new-highlight]="i === 0 && highlightedTicketId === ticket.ticketId"
+                >
+                  <div class="note__top">
+                    <div class="note__who">
+                      <div class="avatar">
+                        <app-avatar-preview-modal
+                          [src]="
+                            'https://empimg.oneeclick.co:8048/employeeimage/' +
+                            note.createBy.empCode +
+                            '.jpg'
+                          "
+                          [name]="note.createBy.nickName"
+                        />
+                      </div>
+                      <b>{{ note.createBy.nickName }}</b>
+                    </div>
+                    <div class="muted">
+                      @if (isToday(note.createdDate)) {
+                        {{ note.createdDate | date: 'HH:mm' }}
+                      } @else {
+                        {{ note.createdDate | date: 'EEE dd, HH:mm' : '' : 'en' }}
+                      }
+                    </div>
+                  </div>
+                  <div class="note__msg">
+                    @if (note.referred_title === '[REFERRED]') {
+                      <span class="refer_tag" [class.last]="!note.isReferred">{{
+                        note.referred_title
+                      }}</span>
+                    }
+                    @if (note.referred_title === '[REJECTED]') {
+                      <span class="refer_tag last">{{ note.referred_title }}</span>
+                    }
+                    {{ note.message }}
+                  </div>
+                  @if (getImages(note.attachments).length) {
+                    <div class="image-grid">
+                      @for (file of getImages(note.attachments); track file.name) {
+                        <img
+                          class="chat-image"
+                          [src]="file.previewUrl"
+                          [alt]="file.name"
+                          (click)="attachmentView.emit(file)"
+                        />
+                      }
+                    </div>
+                  }
+                  @if (getFiles(note.attachments).length) {
+                    <div class="attachment-list">
+                      @for (file of getFiles(note.attachments); track file.name) {
+                        <div class="attachment-item" (click)="attachmentView.emit(file)">
+                          <div class="file-icon-box"><i class="far fa-file-alt"></i></div>
+                          <span class="file-name">{{ file.name }}</span>
+                          <i class="fas fa-download download-small"></i>
+                        </div>
+                      }
+                    </div>
+                  }
+                  @if (
+                    last &&
+                    note.createBy.empCode === currentUserEmpCode &&
+                    readersForNote(note).length > 0
+                  ) {
+                    <div
+                      class="read-receipt"
+                      [class.read-receipt--me]="note.createBy.empCode === currentUserEmpCode"
+                    >
+                      <span class="read-receipt__label">Seen</span>
+                      <div class="read-receipt__avatars">
+                        @for (reader of readersForNote(note); track reader.userCodeempid) {
+                          <div class="read-receipt__avatar" [title]="reader.nickName">
+                            <img
+                              [src]="
+                                'https://empimg.oneeclick.co:8048/employeeimage/' +
+                                reader.userCodeempid +
+                                '.jpg'
+                              "
+                              [alt]="reader.nickName"
+                              (error)="onImageError($event)"
+                            />
+                          </div>
+                        }
+                      </div>
+                    </div>
+                  }
+                </div>
+              }
+            </div>
+          } @else {
+            <div class="tk-empty">ยังไม่มีข้อความ</div>
+          }
+        </div>
+
+        @if (mentionVisible && canSend) {
+          <div class="floating-chat__mention-list" role="listbox">
+            @for (employee of mentionResults; track employee.CODEEMPID; let i = $index) {
+              <button
+                class="floating-chat__mention-item"
+                [class.is-active]="i === mentionActiveIndex"
+                [class.is-all]="employee.CODEEMPID === '__all__'"
+                type="button"
+                role="option"
+                (mousedown)="$event.preventDefault()"
+                (click)="selectMention(employee)"
+              >
+                @if (employee.CODEEMPID === '__all__') {
+                  <div class="mention-avatar mention-avatar--all"><i class="fas fa-users"></i></div>
+                } @else {
+                  <img
+                    class="mention-avatar"
+                    [src]="
+                      'https://empimg.oneeclick.co:8048/employeeimage/' +
+                      (employee.CODEEMPID || employee.codeempid) +
+                      '.jpg'
+                    "
+                    [alt]="employee.Nickname || employee.FullNameThai"
+                    (error)="onImageError($event)"
+                  />
+                }
+                <div class="mention-info">
+                  <span class="mention-name">{{ employee.Nickname || employee.FullNameThai }}</span>
+                  @if (employee.FullNameThai && employee.CODEEMPID !== '__all__') {
+                    <span class="mention-sub">{{ employee.FullNameThai }}</span>
+                  }
+                </div>
+              </button>
+            }
+          </div>
+        }
+
+        @if (canSend) {
+          <div class="floating-chat__composer">
+            <input type="file" multiple hidden #fileInput (change)="onFileSelected($event)" />
+            <button
+              class="floating-chat__attach"
+              type="button"
+              title="แนบไฟล์"
+              (click)="fileInput.click()"
+              [disabled]="attachments.length >= fileConfig.maxFiles"
+            >
+              <i class="fa-solid fa-paperclip"></i>
+            </button>
+            <div class="floating-chat__emoji-wrap">
+              <button
+                class="floating-chat__emoji-btn"
+                type="button"
+                title="อิโมจิ"
+                (click)="emojiPickerOpen = !emojiPickerOpen; $event.stopPropagation()"
+              >
+                😊
+              </button>
+              @if (emojiPickerOpen) {
+                <div class="emoji-backdrop" (click)="emojiPickerOpen = false"></div>
+                <div class="emoji-picker" (click)="$event.stopPropagation()">
+                  <div class="emoji-picker__tabs">
+                    @for (tab of emojiTabs; track $index) {
+                      <button
+                        type="button"
+                        class="emoji-picker__tab"
+                        [class.active]="emojiPickerTab === $index"
+                        (click)="emojiPickerTab = $index"
+                      >
+                        {{ tab.label }}
+                      </button>
+                    }
+                  </div>
+                  <div class="emoji-picker__grid">
+                    @for (emoji of emojiTabs[emojiPickerTab]?.emojis ?? []; track emoji) {
+                      <button type="button" class="emoji-picker__item" (click)="selectEmoji(emoji)">
+                        {{ emoji }}
+                      </button>
+                    }
+                  </div>
+                </div>
+              }
+            </div>
+            <textarea
+              #chatTextarea
+              [ngModel]="message"
+              (ngModelChange)="updateMessage($event)"
+              rows="1"
+              placeholder="พิมพ์ @ เพื่อ mention"
+              aria-label="พิมพ์ข้อความ"
+              (keydown)="handleKeydown($event)"
+              (paste)="onPaste($event)"
+              (click)="emojiPickerOpen = false"
+            ></textarea>
+            <button
+              class="floating-chat__send"
+              type="button"
+              title="ส่งข้อความ"
+              [disabled]="!message.trim()"
+              (click)="submit()"
+            >
+              <i class="fa-solid fa-paper-plane"></i>
+            </button>
+          </div>
+        }
+        @if (showServiceHours) {
+          <div class="floating-chat__service-hours">
+            เวลาให้บริการวันจันทร์ – ศุกร์ 09:00 – 18:00 น. หยุดเสาร์ อาทิตย์ และนักขัตฤกษ์
+          </div>
+        }
+        @if (attachments.length > 0 && canSend) {
+          <div class="floating-chat__files">
+            @for (file of attachments; track file.name; let i = $index) {
+              <button
+                class="floating-chat__file"
+                type="button"
+                (click)="pendingAttachmentView.emit(file)"
+              >
+                <i [class]="getFileIcon(file.name)"></i><span>{{ file.name }}</span>
+                <i class="fas fa-times" (click)="removeAttachment(i); $event.stopPropagation()"></i>
+              </button>
+            }
+          </div>
+        }
+      </section>
+    }
+    @if (!hideButtonForNewTicket || ticket.status?.toLowerCase() !== 'new') {
+      <button class="floating-chat__button" type="button" title="เปิดแชท" (click)="toggle.emit()">
+        <i class="fa-solid" [ngClass]="isOpen ? 'fa-times' : 'fa-comments'"></i>
+        @if (!isOpen && unreadCount > 0) {
+          <span class="floating-chat__badge">{{ unreadCount }}</span>
+        }
+      </button>
+    }
+  </div>
+}

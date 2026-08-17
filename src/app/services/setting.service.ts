@@ -100,6 +100,7 @@ export class SettingService {
     head_codeempid: string;
     reason?: string;
     created_by?: string;
+    updated_by?: string;
   }): Observable<any> {
     console.log(payload);
     return this._http.put(`${this.baseUrl}/dept-heads/employee-overrides`, payload);

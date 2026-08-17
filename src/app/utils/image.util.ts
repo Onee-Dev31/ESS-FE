@@ -1,4 +1,5 @@
-export const FALLBACK_AVATAR = 'assets/images/user.png';
+export const FALLBACK_AVATAR = 'user.png';
+// export const FALLBACK_AVATAR = 'assets/images/user.png';
 
 export function onImgError(event: Event): void {
   const img = event.target as HTMLImageElement;

@@ -19,6 +19,11 @@ import { ItServiceService } from '../../services/it-service.service';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../environments/environment';
 import { switchMap } from 'rxjs';
+import {
+  FilePreviewModalComponent,
+  FilePreviewItem,
+} from '../../components/modals/file-preview-modal/file-preview-modal';
+import { FileConverterService } from '../../services/file-converter';
 
 export type TicketType = 'repair' | 'service';
 
@@ -29,7 +34,7 @@ export interface MockRequestData {
   phone: string;
   ticketType: TicketType;
   detail?: string;
-  attachments?: string[];
+  attachments?: any[];
 
   // Fields for 'service' (ขอใช้บริการ)
   requestCategory?: string;
@@ -48,36 +53,10 @@ export interface MockRequestData {
 // http://localhost:4200/it-request-signature?requestNo=REQ-RP-2603-0006
 // http://localhost:4200/it-request-signature // เป็นขแใช้บริการ
 
-const MOCK_REQUESTS: MockRequestData[] = [
-  {
-    requestNo: 'REQ-SR-2603-0004',
-    requestDate: '26/03/2025',
-    requestFor: 'นาง สมบูรณ์ หูนสุข',
-    phone: '081-000-0000',
-    ticketType: 'service',
-    requestCategory: 'Account & Password (ขอรีเซ็ตรหัสผ่าน)',
-    detail: 'ขอรีเซ็ตรหัสผ่านเนื่องจากลืมรหัสผ่าน ไม่ได้เข้าใช้งานนาน',
-    basicSystems: ['ห้องประชุม'],
-    specificSystems: ['Oracle', 'BMS'],
-  },
-  {
-    requestNo: 'REQ-RP-2603-0006',
-    requestDate: '26/03/2025',
-    requestFor: 'น.ส. แจ้ง ซ่อม',
-    phone: '089-999-9999',
-    ticketType: 'repair',
-    device: 'Notebook',
-    brand: 'Dell',
-    model: 'Latitude 3420',
-    symptom: 'จอฟ้า เครื่องเปิดไม่ติด',
-    attachments: ['bsod.jpg'],
-  },
-];
-
 @Component({
   selector: 'app-it-request-signature',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, FilePreviewModalComponent],
   templateUrl: './it-request-signature.html',
   styleUrl: './it-request-signature.scss',
 })
@@ -89,6 +68,7 @@ export class ItRequestSignature implements OnInit, AfterViewInit, OnDestroy {
   private authService = inject(AuthService);
   private itServiceService = inject(ItServiceService);
   private http = inject(HttpClient);
+  private fileConverter = inject(FileConverterService);
   private baseUrl = environment.api_url;
 
   loginUser = computed(() => this.authService.userData());
@@ -101,6 +81,8 @@ export class ItRequestSignature implements OnInit, AfterViewInit, OnDestroy {
   signerName = signal<string>('');
   signatureImage = signal<string | null>(null);
   approvalStatus = signal<string>('');
+  isPreviewModalOpen = signal<boolean>(false);
+  previewFiles = signal<FilePreviewItem[]>([]);
 
   private ctx: CanvasRenderingContext2D | null = null;
   private isDrawing = false;
@@ -164,6 +146,7 @@ export class ItRequestSignature implements OnInit, AfterViewInit, OnDestroy {
   loadTicket(ticketNumber: string) {
     this.ticketService.getTicket(ticketNumber).subscribe({
       next: (ticket) => {
+        console.log('ticket loaded:', ticket);
         if (ticket.NameApprover) {
           this.signerName.set(ticket.NameApprover);
         }
@@ -186,8 +169,17 @@ export class ItRequestSignature implements OnInit, AfterViewInit, OnDestroy {
           requestCategory: ticket.TicketTypeName,
           basicSystems: ticket.basic,
           specificSystems: ticket.specific,
-          attachments: ticket.attachments?.map((a: any) => a.file_name),
-          ticketId: ticket.ticketID,
+          attachments: ticket.attachments?.map((attachment: any) => ({
+            ...attachment,
+            name: attachment.file_name || attachment.FILE_NAME || attachment.name,
+            fileName: attachment.file_name || attachment.FILE_NAME || attachment.fileName,
+            filePath:
+              attachment.file_path ||
+              attachment.FILE_DIR ||
+              attachment.file_url ||
+              attachment.filePath,
+          })),
+          ticketId: ticket.ticketID || ticket.ticket_number,
         };
 
         this.requestData.set(data);
@@ -217,6 +209,15 @@ export class ItRequestSignature implements OnInit, AfterViewInit, OnDestroy {
 
   formatDetail(text: string) {
     return text ? text.replace(/\n/g, '<br>') : '-';
+  }
+
+  viewAttachment(file: any) {
+    this.previewFiles.set([this.fileConverter.buildPreviewFile(file)]);
+    this.isPreviewModalOpen.set(true);
+  }
+
+  closePreview() {
+    this.isPreviewModalOpen.set(false);
   }
 
   private resizeCanvas() {
@@ -330,6 +331,8 @@ export class ItRequestSignature implements OnInit, AfterViewInit, OnDestroy {
 
     const base64 = this.getSignatureBase64();
     const ticketId = this.requestData()?.ticketId;
+
+    console.log('Submitting signature for ticketId:', this.requestData(), 'empId:', empId);
 
     this.itServiceService
       .updateTicket(ticketId, formData)

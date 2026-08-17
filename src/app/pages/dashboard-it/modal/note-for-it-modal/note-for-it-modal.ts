@@ -19,6 +19,9 @@ export class NoteForItModal {
 
   isPreviewModalOpen = signal<boolean>(false);
   previewFiles = signal<FilePreviewItem[]>([]);
+  isEditing = signal<boolean>(false);
+
+  private originalMessage = '';
 
   noteForm = {
     message: '',
@@ -26,9 +29,10 @@ export class NoteForItModal {
   };
 
   ngOnChanges(changes: SimpleChanges) {
-    if (changes['ticket']?.currentValue?.noteForIt) {
-      console.log(this.ticket);
-      this.noteForm.message = this.ticket.noteForIt;
+    if (changes['ticket']?.currentValue) {
+      this.originalMessage = this.ticket.noteForIt ?? '';
+      this.noteForm.message = this.originalMessage;
+      this.isEditing.set(false);
     }
   }
 
@@ -41,6 +45,15 @@ export class NoteForItModal {
 
   close() {
     this.closeModal.emit();
+  }
+
+  edit() {
+    this.isEditing.set(true);
+  }
+
+  cancelEdit() {
+    this.noteForm.message = this.originalMessage;
+    this.isEditing.set(false);
   }
 
   save() {

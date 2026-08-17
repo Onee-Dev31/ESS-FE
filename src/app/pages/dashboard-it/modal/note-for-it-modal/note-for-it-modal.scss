@@ -98,11 +98,27 @@
   .content-card {
     flex: 1;
     padding: 20px 24px;
-    background: var(--bg-card);
-    border-radius: 12px;
+    background: var(--bg-page);
+    // border-radius: 12px;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
     overflow-y: auto;
     max-height: calc(100vh - 180px);
+
+    .note-preview {
+      min-height: 260px;
+      padding: 16px 20px;
+      border-radius: 16px;
+      color: var(--text);
+      line-height: 1.6;
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+
+      &.is-empty {
+        color: var(--text-muted);
+        background: var(--input-disabled-bg);
+        font-style: italic;
+      }
+    }
 
     .selection-placeholder {
       margin: 2.5rem 0;
@@ -178,8 +194,12 @@
   }
 
   .modal-container {
-    width: 50% !important;
-    max-width: 600px;
+    width: min(80%, 900px) !important;
+    max-width: 900px;
+
+    @include mobile {
+      width: calc(100% - 24px) !important;
+    }
   }
 
   // ==========================================
@@ -250,11 +270,11 @@
     box-shadow: 0 0 0 4px rgba(167, 139, 250, 0.1) !important;
   }
 
-  &.note:focus {
-    outline: none;
-    border-color: var(--status-progress-text) !important;
-    box-shadow: 0 0 0 4px rgba(167, 139, 250, 0.1) !important;
-  }
+  // &.note:focus {
+  //   outline: none;
+  //   border-color: var(--status-progress-text) !important;
+  //   box-shadow: 0 0 0 4px rgba(167, 139, 250, 0.1) !important;
+  // }
 
   &.deny:focus {
     outline: none;
@@ -277,7 +297,7 @@ textarea.form-input {
   height: auto !important;
   padding: 16px 20px !important;
   resize: vertical;
-  min-height: 100px;
+  min-height: 260px;
   line-height: 1.6;
   border-radius: 16px !important;
 }
