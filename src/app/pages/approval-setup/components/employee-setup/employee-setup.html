@@ -104,6 +104,7 @@
               <input
                 type="checkbox"
                 class="employee-row-checkbox"
+                aria-label="Select all employees"
                 [checked]="areAllEmployeesSelected()"
                 [indeterminate]="areSomeEmployeesSelected()"
                 (change)="toggleAllEmployees()"
@@ -121,6 +122,7 @@
                 <input
                   type="checkbox"
                   class="employee-row-checkbox"
+                  [attr.aria-label]="'Select ' + employee.emp_name"
                   [checked]="isEmployeeSelected(employee.emp_code)"
                   (change)="toggleEmployeeSelection(employee.emp_code)"
                 />
