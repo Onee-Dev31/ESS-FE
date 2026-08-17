@@ -3,9 +3,11 @@
 }
 
 .avatar-wrapper {
+  width: 100%;
+  height: 100%;
   cursor: pointer;
   transition: opacity 0.2s;
-  display: inline-block;
+  display: block;
 
   &:hover {
     opacity: 0.85;

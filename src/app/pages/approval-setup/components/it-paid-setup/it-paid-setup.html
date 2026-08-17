@@ -112,9 +112,9 @@
                   @if (row.ApproverCode && row.ApproverName) {
                     <div class="approver-item">
                       <div class="approver-avatar">
-                        <img
+                        <app-avatar-preview-modal
                           [src]="getEmployeeImage(row.ApproverCode)"
-                          (error)="onImgError($event)"
+                          [name]="row.ApproverName || ''"
                         />
                       </div>
                       <div class="approver-info">

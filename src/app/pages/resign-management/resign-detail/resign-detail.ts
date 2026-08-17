@@ -232,7 +232,6 @@ export class ResignDetail {
 
       this.resignService.updateADManagementResign(payload).subscribe({
         next: (res) => {
-          console.log(res);
           this.swalService.success('สำเร็จ', '');
           this.loadInitialData();
         },
@@ -521,7 +520,7 @@ export class ResignDetail {
 
   // Function
   private mapApiData(items: any[]): EmployeeFormData[] {
-    // console.log("items >> ", items)
+    // console.log('items >> ', items);
     return items.map((item: any) => ({
       empCode: item.CODEMPID,
       firstNameTh: item.NAMFIRSTT,
@@ -629,7 +628,6 @@ export class ResignDetail {
   }
 
   viewReportResign(command: 'fulltime' | 'freelance') {
-    console.log(command);
     window.open(`/resign-management/report?type=${command}`, '_blank');
     //  window.open(`/it-dashboard/report-detail?id=${encodeURIComponent(encryptedId)}`, '_blank');
   }

@@ -3,6 +3,7 @@ import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { NzSelectModule } from 'ng-zorro-antd/select';
 import { debounceTime, distinctUntilChanged, Subject, switchMap } from 'rxjs';
+import { AvatarPreviewModal } from '../../../../components/modals/avatar-preview-modal/avatar-preview-modal';
 import { SkeletonComponent } from '../../../../components/shared/skeleton/skeleton';
 import { ApprovalSetupService } from '../../../../services/approval-setup.service';
 import { AuthService } from '../../../../services/auth.service';
@@ -32,7 +33,7 @@ interface EmployeeSearchResult {
 @Component({
   selector: 'app-it-paid-setup',
   standalone: true,
-  imports: [CommonModule, FormsModule, NzSelectModule, SkeletonComponent],
+  imports: [CommonModule, FormsModule, NzSelectModule, SkeletonComponent, AvatarPreviewModal],
   templateUrl: './it-paid-setup.html',
   styleUrl: './it-paid-setup.scss',
 })

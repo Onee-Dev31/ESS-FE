@@ -127,7 +127,12 @@
               </td>
               <td>
                 <div class="employee-person">
-                  <img [src]="getEmployeeImage(employee.emp_code)" (error)="onImgError($event)" />
+                  <div class="employee-avatar">
+                    <app-avatar-preview-modal
+                      [src]="getEmployeeImage(employee.emp_code)"
+                      [name]="employee.emp_name"
+                    />
+                  </div>
                   <div>
                     <strong>{{ employee.emp_name }}</strong>
                     <small>{{ employee.emp_code }}</small>
@@ -139,9 +144,9 @@
                   <div class="approver-cell">
                     <div class="approver-item">
                       <div class="approver-avatar">
-                        <img
+                        <app-avatar-preview-modal
                           [src]="getEmployeeImage(approver1.empNo)"
-                          (error)="onImgError($event)"
+                          [name]="approver1.empName"
                         />
                       </div>
                       <div class="approver-info">
@@ -159,9 +164,9 @@
                   <div class="approver-cell">
                     <div class="approver-item">
                       <div class="approver-avatar">
-                        <img
+                        <app-avatar-preview-modal
                           [src]="getEmployeeImage(approver2.empNo)"
-                          (error)="onImgError($event)"
+                          [name]="approver2.empName"
                         />
                       </div>
                       <div class="approver-info">

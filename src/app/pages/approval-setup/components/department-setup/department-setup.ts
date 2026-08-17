@@ -3,6 +3,7 @@ import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { debounceTime, distinctUntilChanged, Subject, switchMap } from 'rxjs';
 import { NzSelectModule } from 'ng-zorro-antd/select';
+import { AvatarPreviewModal } from '../../../../components/modals/avatar-preview-modal/avatar-preview-modal';
 import { SkeletonComponent } from '../../../../components/shared/skeleton/skeleton';
 import {
   ApprovalSetupGroup,
@@ -18,7 +19,7 @@ import { environment } from '../../../../../environments/environment';
 @Component({
   selector: 'app-department-setup',
   standalone: true,
-  imports: [CommonModule, FormsModule, NzSelectModule, SkeletonComponent],
+  imports: [CommonModule, FormsModule, NzSelectModule, SkeletonComponent, AvatarPreviewModal],
   templateUrl: './department-setup.html',
   styleUrl: './department-setup.scss',
 })

@@ -75,6 +75,14 @@
   }
 }
 
+.employee-avatar {
+  width: 38px;
+  height: 38px;
+  flex-shrink: 0;
+  overflow: hidden;
+  border-radius: 50%;
+}
+
 .employee-empty,
 .employee-empty-row {
   padding: 42px 20px;

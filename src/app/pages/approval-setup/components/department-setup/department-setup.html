@@ -116,9 +116,9 @@
               <div class="approver-cell" *ngIf="!row.isSkipSecretary && row.secretaryEmpNo">
                 <div class="approver-item">
                   <div class="approver-avatar">
-                    <img
+                    <app-avatar-preview-modal
                       [src]="getEmployeeImage(row.secretaryEmpNo)"
-                      (error)="$any($event.target).src = 'user.png'"
+                      [name]="row.secretaryEmpName || ''"
                     />
                   </div>
                   <div class="approver-info">
@@ -134,9 +134,9 @@
               <div class="approver-cell" *ngIf="row.approve1EmpNo">
                 <div class="approver-item">
                   <div class="approver-avatar">
-                    <img
+                    <app-avatar-preview-modal
                       [src]="getEmployeeImage(row.approve1EmpNo)"
-                      (error)="$any($event.target).src = 'user.png'"
+                      [name]="row.approve1EmpName || ''"
                     />
                   </div>
                   <div class="approver-info">
@@ -153,9 +153,9 @@
               <div class="approver-cell" *ngIf="row.approve2EmpNo">
                 <div class="approver-item">
                   <div class="approver-avatar">
-                    <img
+                    <app-avatar-preview-modal
                       [src]="getEmployeeImage(row.approve2EmpNo)"
-                      (error)="$any($event.target).src = 'user.png'"
+                      [name]="row.approve2EmpName || ''"
                     />
                   </div>
                   <div class="approver-info">
@@ -173,7 +173,10 @@
                 @for (emp of row.hrApprovers; track emp.empNo) {
                   <div class="approver-item">
                     <div class="approver-avatar">
-                      <img [src]="getEmployeeImage(emp.empNo)" (error)="onImgError($event)" />
+                      <app-avatar-preview-modal
+                        [src]="getEmployeeImage(emp.empNo)"
+                        [name]="emp.empName"
+                      />
                     </div>
                     <div class="approver-info">
                       <span class="approver-name">{{ emp.empName }}</span>
@@ -190,9 +193,9 @@
               <div class="approver-cell" *ngIf="row.itDirectorEmpNo">
                 <div class="approver-item">
                   <div class="approver-avatar">
-                    <img
+                    <app-avatar-preview-modal
                       [src]="getEmployeeImage(row.itDirectorEmpNo)"
-                      (error)="onImgError($event)"
+                      [name]="row.itDirectorEmpName || ''"
                     />
                   </div>
                   <div class="approver-info">
