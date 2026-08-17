@@ -135,7 +135,6 @@ export class ItService implements OnInit {
     );
   });
 
-
   @HostListener('window:resize')
   onResize() {
     this.checkScreen();
@@ -540,7 +539,6 @@ export class ItService implements OnInit {
       // && ticket?.status_user !== 'Hold'
     );
   }
-
 
   private clearChatDraft() {
     this.ticketChat?.clearDraft();
