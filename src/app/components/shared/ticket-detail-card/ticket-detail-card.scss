@@ -149,6 +149,11 @@
   overflow-wrap: anywhere;
 }
 
+.description ::ng-deep th {
+  text-align: start;
+  padding-right: 16px;
+}
+
 :host ::ng-deep .description img,
 :host ::ng-deep .description video,
 :host ::ng-deep .description iframe,
