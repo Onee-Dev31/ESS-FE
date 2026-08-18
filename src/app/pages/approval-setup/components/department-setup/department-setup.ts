@@ -153,7 +153,6 @@ export class DepartmentSetup implements OnInit {
         };
       })
       .filter((group) => group.departments.length > 0);
-
     this.groupedList.set(filtered);
   }
 
@@ -164,7 +163,6 @@ export class DepartmentSetup implements OnInit {
       next: (res) => {
         const mapped = (res?.data ?? []).map((emp: any) => this.mapSetupRow(emp));
         const grouped = this.groupByCompany(mapped);
-
         this.originalGroupedList.set(grouped);
         this.groupedList.set(grouped);
 
@@ -179,11 +177,17 @@ export class DepartmentSetup implements OnInit {
 
   // ===== Open Drawer =====
   openEdit(row: any) {
-    console.log(row);
     this.editingRow.set({ ...row });
     this.skipSecretary.set(row.isSkipSecretary);
     this.selectedSecretary.set(
-      row.secretaryEmpNo ? { empNo: row.secretaryEmpNo, empName: row.secretaryEmpName } : null,
+      row.secretaryEmpNo
+        ? {
+            empNo: row.secretaryEmpNo,
+            empName: row.secretaryEmpName,
+            positionName: row.secretaryPost,
+            departmentName: row.secretaryDept,
+          }
+        : null,
     );
     this.employeeResults.set([]);
     this.empSearchKeyword = '';
@@ -221,6 +225,7 @@ export class DepartmentSetup implements OnInit {
             positionName: emp.Position,
             email: emp.EMAIL,
           }));
+
           this.employeeResults.set(mapped);
           this.isSearching.set(false);
         },
@@ -283,7 +288,12 @@ export class DepartmentSetup implements OnInit {
   }
 
   // MAP
-  private mapHrApprovers(empNos: string | null, empNames: string | null): HrApproverEmp[] {
+  private mapHrApprovers(
+    empNos: string | null,
+    empNames: string | null,
+    empPosts: string | null,
+    empDept: string | null,
+  ): HrApproverEmp[] {
     const nos = empNos
       ? empNos
           .split(',')
@@ -297,9 +307,14 @@ export class DepartmentSetup implements OnInit {
           .filter(Boolean)
       : [];
 
+    const posts = empPosts ? empPosts.split(',').map((s) => s.trim()) : [];
+    const depts = empDept ? empDept.split(',').map((s) => s.trim()) : [];
+
     return nos.map((empNo, i) => ({
       empNo,
       empName: names[i] ?? '',
+      empPost: posts[i] ?? '',
+      empDept: depts[i] ?? '',
     }));
   }
 
@@ -311,13 +326,21 @@ export class DepartmentSetup implements OnInit {
       companyName: emp.COMPANY_NAME,
       secretaryEmpNo: emp.SecretaryEmpNo,
       secretaryEmpName: emp.SecretaryName,
+      secretaryPost: emp.SecretaryPost,
+      secretaryDept: emp.SecretaryDepartment,
       approve1EmpNo: emp.Approver1EmpNo || emp.Approve1EmpNo,
       approve1EmpName: emp.Approver1Name || emp.Approve1Name,
+      approve1Post: emp.Approver1Post,
+      approve1Dept: emp.Approver1Department,
       approve2EmpNo: emp.HeadOfApprover1EmpNo || emp.Approve2EmpNo,
       approve2EmpName: emp.HeadOfApprover1Name || emp.Approve2Name,
-      hrApprovers: this.mapHrApprovers(emp.HREmpNo, emp.HRUsers),
+      approve2Post: emp.HeadOfApprover1Post,
+      approve2Dept: emp.HeadOfApprover1Department,
+      hrApprovers: this.mapHrApprovers(emp.HREmpNo, emp.HRUsers, emp.HRPosts, emp.HRDepartments),
       itDirectorEmpNo: emp.ITDirectorEmpNo,
       itDirectorEmpName: emp.ITDirectorName,
+      itDirectorPost: emp.ITDirectorPost,
+      itDirectorDept: emp.ITDirectorDepartment,
       isSkipSecretary: emp.ConfigMode === 'AutoSkip',
       modifiedDate: emp.ModifiedDate,
       modifiedBy: emp.ModifiedBy,

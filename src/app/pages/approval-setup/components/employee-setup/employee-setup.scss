@@ -112,6 +112,10 @@
   align-items: center;
   gap: 10px;
 
+  > div:last-child {
+    min-width: 0;
+  }
+
   img {
     width: 38px;
     height: 38px;
@@ -128,6 +132,12 @@
     color: var(--text-muted);
     margin-top: 2px;
   }
+
+  .employee-post {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
 }
 
 .employee-avatar {
@@ -136,6 +146,16 @@
   flex-shrink: 0;
   overflow: hidden;
   border-radius: 50%;
+}
+
+.employee-approver-post {
+  display: block;
+  width: 100%;
+  overflow: hidden;
+  color: var(--text-muted);
+  font-size: 11px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 
 .employee-empty,

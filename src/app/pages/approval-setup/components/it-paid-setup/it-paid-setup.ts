@@ -19,6 +19,8 @@ interface ItPaidApproverRow {
   COMPANY_NAME: string;
   ApproverCode: string | null;
   ApproverName: string | null;
+  Department: string | null;
+  POST: string | null;
   CreatedDate: string;
   ModifiedBy: string | null;
   ModifiedDate: string | null;
@@ -82,7 +84,9 @@ export class ItPaidSetup implements OnInit {
         row.COSTCENT?.toLowerCase().includes(keyword) ||
         row.NAMECOSTCENT?.toLowerCase().includes(keyword) ||
         row.ApproverCode?.toLowerCase().includes(keyword) ||
-        row.ApproverName?.toLowerCase().includes(keyword);
+        row.ApproverName?.toLowerCase().includes(keyword) ||
+        row.Department?.toLowerCase().includes(keyword) ||
+        row.POST?.toLowerCase().includes(keyword);
       return matchesCompany && matchesDepartment && matchesKeyword;
     });
   });

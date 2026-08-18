@@ -3,6 +3,16 @@
 @use '../../../../../styles/mixins' as *;
 @use '../../approval-setup-shared';
 
+.approver-post {
+  display: block;
+  width: 100%;
+  overflow: hidden;
+  color: var(--text-muted);
+  font-size: 11px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
 .it-paid-content-card {
   padding: 20px;
   border: 1px solid var(--border-color);
