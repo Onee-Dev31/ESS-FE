@@ -200,7 +200,10 @@
                 <img [src]="getEmployeeImage(employee.code)" (error)="onImgError($event)" />
                 <span>
                   <strong>{{ employee.name }}</strong>
-                  <small>{{ employee.code }} · {{ employee.department }}</small>
+                  <small
+                    >{{ employee.code }} · {{ employee.position }} ·
+                    {{ employee.department }}</small
+                  >
                 </span>
               </button>
             }
@@ -213,7 +216,7 @@
             <span>
               <small>ผู้อนุมัติที่เลือก</small>
               <strong>{{ approver.name }}</strong>
-              <span>{{ approver.code }} · {{ approver.department }}</span>
+              <span>{{ approver.code }} · {{ approver.position }} · {{ approver.department }}</span>
             </span>
             <i class="fas fa-circle-check"></i>
           </div>
