@@ -115,11 +115,17 @@
                         <app-avatar-preview-modal
                           [src]="getEmployeeImage(row.ApproverCode)"
                           [name]="row.ApproverName || ''"
+                          [empNo]="row.ApproverCode || ''"
+                          [post]="row.POST || ''"
+                          [department]="row.Department || ''"
                         />
                       </div>
                       <div class="approver-info">
                         <span class="approver-name">{{ row.ApproverName }}</span>
                         <span class="approver-code">{{ row.ApproverCode }}</span>
+                        <span class="approver-post" *ngIf="row.POST" [attr.title]="row.POST">
+                          {{ row.POST }}
+                        </span>
                       </div>
                     </div>
                   } @else {
