@@ -9,6 +9,9 @@ import { Component, Input } from '@angular/core';
 export class AvatarPreviewModal {
   @Input() src = '';
   @Input() name = '';
+  @Input() empNo = '';
+  @Input() post = '';
+  @Input() department = '';
 
   isOpen = false;
 

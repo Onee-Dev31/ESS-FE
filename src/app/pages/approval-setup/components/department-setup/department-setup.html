@@ -119,11 +119,20 @@
                     <app-avatar-preview-modal
                       [src]="getEmployeeImage(row.secretaryEmpNo)"
                       [name]="row.secretaryEmpName || ''"
+                      [empNo]="row.secretaryEmpNo || ''"
+                      [post]="row.secretaryPost || ''"
                     />
                   </div>
                   <div class="approver-info">
                     <span class="approver-name">{{ row.secretaryEmpName }}</span>
                     <span class="approver-code">{{ row.secretaryEmpNo }}</span>
+                    <span
+                      class="approver-post"
+                      *ngIf="row.secretaryPost"
+                      [attr.title]="row.secretaryPost"
+                    >
+                      {{ row.secretaryPost }}
+                    </span>
                   </div>
                 </div>
               </div>
@@ -137,11 +146,20 @@
                     <app-avatar-preview-modal
                       [src]="getEmployeeImage(row.approve1EmpNo)"
                       [name]="row.approve1EmpName || ''"
+                      [empNo]="row.approve1EmpNo || ''"
+                      [post]="row.approve1Post || ''"
                     />
                   </div>
                   <div class="approver-info">
                     <span class="approver-name">{{ row.approve1EmpName }}</span>
                     <span class="approver-code">{{ row.approve1EmpNo }}</span>
+                    <span
+                      class="approver-post"
+                      *ngIf="row.approve1Post"
+                      [attr.title]="row.approve1Post"
+                    >
+                      {{ row.approve1Post }}
+                    </span>
                   </div>
                 </div>
               </div>
@@ -156,11 +174,20 @@
                     <app-avatar-preview-modal
                       [src]="getEmployeeImage(row.approve2EmpNo)"
                       [name]="row.approve2EmpName || ''"
+                      [empNo]="row.approve2EmpNo || ''"
+                      [post]="row.approve2Post || ''"
                     />
                   </div>
                   <div class="approver-info">
                     <span class="approver-name">{{ row.approve2EmpName }}</span>
                     <span class="approver-code">{{ row.approve2EmpNo }}</span>
+                    <span
+                      class="approver-post"
+                      *ngIf="row.approve2Post"
+                      [attr.title]="row.approve2Post"
+                    >
+                      {{ row.approve2Post }}
+                    </span>
                   </div>
                 </div>
               </div>
@@ -176,11 +203,16 @@
                       <app-avatar-preview-modal
                         [src]="getEmployeeImage(emp.empNo)"
                         [name]="emp.empName"
+                        [empNo]="emp.empNo"
+                        [post]="emp.empPost"
                       />
                     </div>
                     <div class="approver-info">
                       <span class="approver-name">{{ emp.empName }}</span>
                       <span class="approver-code">{{ emp.empNo }}</span>
+                      <span class="approver-post" *ngIf="emp.empPost" [attr.title]="emp.empPost">
+                        {{ emp.empPost }}
+                      </span>
                     </div>
                   </div>
                 }
@@ -196,11 +228,20 @@
                     <app-avatar-preview-modal
                       [src]="getEmployeeImage(row.itDirectorEmpNo)"
                       [name]="row.itDirectorEmpName || ''"
+                      [empNo]="row.itDirectorEmpNo || ''"
+                      [post]="row.itDirectorPost || ''"
                     />
                   </div>
                   <div class="approver-info">
                     <span class="approver-name">{{ row.itDirectorEmpName }}</span>
                     <span class="approver-code">{{ row.itDirectorEmpNo }}</span>
+                    <span
+                      class="approver-post"
+                      *ngIf="row.itDirectorPost"
+                      [attr.title]="row.itDirectorPost"
+                    >
+                      {{ row.itDirectorPost }}
+                    </span>
                   </div>
                 </div>
               </div>
@@ -268,6 +309,13 @@
               <span class="step-role">เลขานุการ</span>
               <span class="step-name">{{ editingRow()?.secretaryEmpName }}</span>
               <span class="step-code">{{ editingRow()?.secretaryEmpNo }}</span>
+              <span
+                class="step-post"
+                *ngIf="editingRow()?.secretaryPost"
+                [attr.title]="editingRow()?.secretaryPost"
+              >
+                {{ editingRow()?.secretaryPost }}
+              </span>
             </div>
           </div>
           <div class="flow-step skip-step" *ngIf="editingRow()?.isSkipSecretary">
@@ -290,6 +338,13 @@
               <span class="step-role">ผู้อนุมัติระดับ 1</span>
               <span class="step-name">{{ editingRow()?.approve1EmpName || '-' }}</span>
               <span class="step-code">{{ editingRow()?.approve1EmpNo || 'ไม่มีข้อมูล' }}</span>
+              <span
+                class="step-post"
+                *ngIf="editingRow()?.approve1Post"
+                [attr.title]="editingRow()?.approve1Post"
+              >
+                {{ editingRow()?.approve1Post }}
+              </span>
             </div>
           </div>
           <div class="flow-arrow" *ngIf="editingRow()?.approve2EmpNo">
@@ -301,6 +356,13 @@
               <span class="step-role">ผู้อนุมัติระดับ 2</span>
               <span class="step-name">{{ editingRow()?.approve2EmpName || '-' }}</span>
               <span class="step-code">{{ editingRow()?.approve2EmpNo || 'ไม่มีข้อมูล' }}</span>
+              <span
+                class="step-post"
+                *ngIf="editingRow()?.approve2Post"
+                [attr.title]="editingRow()?.approve2Post"
+              >
+                {{ editingRow()?.approve2Post }}
+              </span>
             </div>
           </div>
           <div class="flow-arrow" *ngIf="editingRow()?.hrApprovers?.length">
@@ -313,6 +375,9 @@
               @for (emp of editingRow()?.hrApprovers; track emp.empNo) {
                 <span class="step-name">{{ emp.empName }}</span>
                 <span class="step-code">{{ emp.empNo }}</span>
+                <span class="step-post" *ngIf="emp.empPost" [attr.title]="emp.empPost">
+                  {{ emp.empPost }}
+                </span>
               }
             </div>
           </div>
@@ -325,6 +390,13 @@
               <span class="step-role">IT Director</span>
               <span class="step-name">{{ editingRow()?.itDirectorEmpName || '-' }}</span>
               <span class="step-code">{{ editingRow()?.itDirectorEmpNo || 'ไม่มีข้อมูล' }}</span>
+              <span
+                class="step-post"
+                *ngIf="editingRow()?.itDirectorPost"
+                [attr.title]="editingRow()?.itDirectorPost"
+              >
+                {{ editingRow()?.itDirectorPost }}
+              </span>
             </div>
           </div>
         </div>
@@ -372,7 +444,8 @@
             </div>
             <div class="emp-info">
               <span class="emp-name">{{ emp.empName }}</span>
-              <span class="emp-meta">{{ emp.empNo }} · {{ emp.departmentName }}</span>
+              <span class="emp-meta">{{ emp.empNo }} · {{ emp.positionName }}</span>
+              <!-- <span class="emp-meta">{{ emp.empNo }} · {{ emp.departmentName }} · {{ emp.positionName }}</span> -->
             </div>
           </div>
         </div>
@@ -387,9 +460,10 @@
           </div>
           <div class="selected-emp__info">
             <span class="selected-emp__name">{{ selectedSecretary()?.empName }}</span>
-            <span class="selected-emp__meta">
-              {{ selectedSecretary()?.empNo }} · {{ selectedSecretary()?.departmentName }}
-            </span>
+            <span class="selected-emp__meta"
+              >{{ selectedSecretary()?.empNo }} · {{ selectedSecretary()?.positionName }}</span
+            >
+            <!-- <span class="selected-emp__meta">{{ selectedSecretary()?.empNo }} · {{ selectedSecretary()?.departmentName }} · {{ selectedSecretary()?.positionName }}</span> -->
           </div>
           <button class="btn-clear-emp" (click)="clearSecretary()">
             <i class="fas fa-times"></i>

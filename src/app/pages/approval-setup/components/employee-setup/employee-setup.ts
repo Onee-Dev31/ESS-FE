@@ -159,6 +159,7 @@ export class EmployeeSetup implements OnInit {
     this.isEmployeeListLoading.set(true);
     this.settingService.getDeptHeads().subscribe({
       next: (res) => {
+        console.log(res);
         this.departmentItems.set(res?.data ?? []);
         this.isEmployeeListLoading.set(false);
       },
@@ -372,7 +373,11 @@ export class EmployeeSetup implements OnInit {
       : null;
   }
 
-  private mapHrApprovers(empNos: string | null, empNames: string | null): HrApproverEmp[] {
+  private mapHrApprovers(
+    empNos: string | null,
+    empNames: string | null,
+    empPosts: string | null,
+  ): HrApproverEmp[] {
     const nos = empNos
       ? empNos
           .split(',')
@@ -385,10 +390,12 @@ export class EmployeeSetup implements OnInit {
           .map((s) => s.trim())
           .filter(Boolean)
       : [];
+    const posts = empPosts ? empPosts.split(',').map((s) => s.trim()) : [];
 
     return nos.map((empNo, i) => ({
       empNo,
       empName: names[i] ?? '',
+      empPost: posts[i] ?? '',
     }));
   }
 
@@ -400,13 +407,18 @@ export class EmployeeSetup implements OnInit {
       companyName: emp.COMPANY_NAME,
       secretaryEmpNo: emp.SecretaryEmpNo,
       secretaryEmpName: emp.SecretaryName,
+      secretaryPost: emp.SecretaryPost,
+      secretaryDept: emp.SecretaryDepartment,
       approve1EmpNo: emp.Approver1EmpNo || emp.Approve1EmpNo,
       approve1EmpName: emp.Approver1Name || emp.Approve1Name,
+      approve1Post: emp.Approver1Post,
       approve2EmpNo: emp.HeadOfApprover1EmpNo || emp.Approve2EmpNo,
       approve2EmpName: emp.HeadOfApprover1Name || emp.Approve2Name,
-      hrApprovers: this.mapHrApprovers(emp.HREmpNo, emp.HRUsers),
+      approve2Post: emp.HeadOfApprover1Post,
+      hrApprovers: this.mapHrApprovers(emp.HREmpNo, emp.HRUsers, emp.HRPosts),
       itDirectorEmpNo: emp.ITDirectorEmpNo,
       itDirectorEmpName: emp.ITDirectorName,
+      itDirectorPost: emp.ITDirectorPost,
       isSkipSecretary: emp.ConfigMode === 'AutoSkip',
       modifiedDate: emp.ModifiedDate,
       modifiedBy: emp.ModifiedBy,

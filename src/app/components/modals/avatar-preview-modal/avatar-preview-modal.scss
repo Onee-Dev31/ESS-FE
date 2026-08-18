@@ -67,10 +67,36 @@ img.preview-img {
   }
 }
 
+.avatar-details {
+  max-width: min(360px, calc(100vw - 40px));
+  color: #fff;
+  text-align: center;
+}
+
 .avatar-name {
   color: #fff;
   font-size: 16px;
   font-weight: 600;
+}
+
+.avatar-emp-no {
+  margin-top: 2px;
+  font-size: 13px;
+  opacity: 0.85;
+}
+
+.avatar-post {
+  margin-top: 4px;
+  font-size: 13px;
+  line-height: 1.4;
+  opacity: 0.85;
+}
+
+.avatar-department {
+  margin-top: 3px;
+  font-size: 12px;
+  line-height: 1.4;
+  opacity: 0.7;
 }
 
 .avatar-close-btn {

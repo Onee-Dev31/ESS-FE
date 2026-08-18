@@ -409,7 +409,23 @@
 
 .step-code {
   font-size: 11px;
+  color: var(--text-table-head);
+}
+
+.approver-code {
+  color: var(--text-table-head);
+}
+
+.approver-post,
+.step-post {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  font-size: 11px;
   color: var(--text-muted);
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 
 .flow-arrow {
