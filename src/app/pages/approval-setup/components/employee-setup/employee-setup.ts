@@ -169,7 +169,6 @@ export class EmployeeSetup implements OnInit {
     this.isEmployeeListLoading.set(true);
     this.settingService.getDeptHeads().subscribe({
       next: (res) => {
-        console.log(res);
         this.departmentItems.set(res?.data ?? []);
         this.isEmployeeListLoading.set(false);
       },
@@ -202,7 +201,7 @@ export class EmployeeSetup implements OnInit {
       departmentDefault: this.approvalService.getApprovalSetupByCostCenter(costCent),
     }).subscribe({
       next: ({ overrides, departmentDefault }) => {
-        console.log('[EmployeeSetup] Search API responses', { overrides, departmentDefault });
+        // console.log('[EmployeeSetup] Search API responses', { overrides, departmentDefault });
         this.employeeOverrides.set(overrides?.data ?? []);
         const rawDefault = Array.isArray(departmentDefault?.data)
           ? departmentDefault.data[0]
