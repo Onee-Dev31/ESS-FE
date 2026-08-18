@@ -30,6 +30,7 @@ interface EmployeeSearchResult {
   code: string;
   name: string;
   department: string;
+  position?: string;
 }
 
 @Component({
@@ -150,7 +151,12 @@ export class ItPaidSetup implements OnInit {
     this.employeeSearchText.set(row.ApproverName ?? '');
     this.selectedApprover.set(
       row.ApproverCode && row.ApproverName
-        ? { code: row.ApproverCode, name: row.ApproverName, department: row.NAMECOSTCENT }
+        ? {
+            code: row.ApproverCode,
+            name: row.ApproverName,
+            department: row.NAMECOSTCENT,
+            position: row.POST ?? '',
+          }
         : null,
     );
   }
@@ -188,13 +194,13 @@ export class ItPaidSetup implements OnInit {
     const user = this.authService.userData();
     this.isSaving.set(true);
 
-    console.log('Saving approver:', {
-      itReqApproverPaidID: row.ITReqApproverPaidID,
-      costcent: row.COSTCENT,
-      approverCode: approver.code,
-      approverName: approver.name,
-      modifiedBy: user?.AD_USER ?? user?.CODEMPID ?? '',
-    });
+    // console.log('Saving approver:', {
+    //   itReqApproverPaidID: row.ITReqApproverPaidID,
+    //   costcent: row.COSTCENT,
+    //   approverCode: approver.code,
+    //   approverName: approver.name,
+    //   modifiedBy: user?.AD_USER ?? user?.CODEMPID ?? '',
+    // });
     this.approvalService
       .updateApproverItWithPaid({
         itReqApproverPaidID: row.ITReqApproverPaidID,
@@ -238,6 +244,7 @@ export class ItPaidSetup implements OnInit {
               code: employee.EmpNo,
               name: employee.FullName,
               department: employee.Department,
+              position: employee.Position,
             })),
           );
           this.isSearchingEmployee.set(false);
@@ -251,7 +258,7 @@ export class ItPaidSetup implements OnInit {
     this.approvalService.getApproverItWithPaid().subscribe({
       next: (response) => {
         const data = Array.isArray(response) ? response : (response?.data ?? []);
-        console.log('IT Paid Approver Data:', data);
+        // console.log('IT Paid Approver Data:', data);
         this.rows.set(data);
         this.isLoading.set(false);
       },
