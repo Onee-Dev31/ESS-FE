@@ -153,9 +153,6 @@ export class DepartmentSetup implements OnInit {
         };
       })
       .filter((group) => group.departments.length > 0);
-
-    console.log(filtered);
-
     this.groupedList.set(filtered);
   }
 
@@ -180,7 +177,6 @@ export class DepartmentSetup implements OnInit {
 
   // ===== Open Drawer =====
   openEdit(row: any) {
-    console.log(row);
     this.editingRow.set({ ...row });
     this.skipSecretary.set(row.isSkipSecretary);
     this.selectedSecretary.set(
@@ -242,7 +238,6 @@ export class DepartmentSetup implements OnInit {
   }
 
   selectEmployee(emp: any) {
-    console.log('selectEmployee', emp);
     this.selectedSecretary.set(emp);
     this.empSearchKeyword = emp.empName ?? emp.empNo;
     this.employeeResults.set([]);
@@ -297,6 +292,7 @@ export class DepartmentSetup implements OnInit {
     empNos: string | null,
     empNames: string | null,
     empPosts: string | null,
+    empDept: string | null,
   ): HrApproverEmp[] {
     const nos = empNos
       ? empNos
@@ -312,11 +308,13 @@ export class DepartmentSetup implements OnInit {
       : [];
 
     const posts = empPosts ? empPosts.split(',').map((s) => s.trim()) : [];
+    const depts = empDept ? empDept.split(',').map((s) => s.trim()) : [];
 
     return nos.map((empNo, i) => ({
       empNo,
       empName: names[i] ?? '',
       empPost: posts[i] ?? '',
+      empDept: depts[i] ?? '',
     }));
   }
 
@@ -333,13 +331,16 @@ export class DepartmentSetup implements OnInit {
       approve1EmpNo: emp.Approver1EmpNo || emp.Approve1EmpNo,
       approve1EmpName: emp.Approver1Name || emp.Approve1Name,
       approve1Post: emp.Approver1Post,
+      approve1Dept: emp.Approver1Department,
       approve2EmpNo: emp.HeadOfApprover1EmpNo || emp.Approve2EmpNo,
       approve2EmpName: emp.HeadOfApprover1Name || emp.Approve2Name,
       approve2Post: emp.HeadOfApprover1Post,
-      hrApprovers: this.mapHrApprovers(emp.HREmpNo, emp.HRUsers, emp.HRPosts),
+      approve2Dept: emp.HeadOfApprover1Department,
+      hrApprovers: this.mapHrApprovers(emp.HREmpNo, emp.HRUsers, emp.HRPosts, emp.HRDepartments),
       itDirectorEmpNo: emp.ITDirectorEmpNo,
       itDirectorEmpName: emp.ITDirectorName,
       itDirectorPost: emp.ITDirectorPost,
+      itDirectorDept: emp.ITDirectorDepartment,
       isSkipSecretary: emp.ConfigMode === 'AutoSkip',
       modifiedDate: emp.ModifiedDate,
       modifiedBy: emp.ModifiedBy,

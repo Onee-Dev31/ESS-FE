@@ -133,11 +133,19 @@
                     <app-avatar-preview-modal
                       [src]="getEmployeeImage(employee.emp_code)"
                       [name]="employee.emp_name"
+                      [empNo]="employee.emp_code"
+                      [post]="employee.Post || ''"
+                      [department]="employee.Dept || ''"
                     />
                   </div>
                   <div>
                     <strong>{{ employee.emp_name }}</strong>
                     <small>{{ employee.emp_code }}</small>
+                    @if (employee.Post) {
+                      <small class="employee-post" [attr.title]="employee.Post">
+                        {{ employee.Post }}
+                      </small>
+                    }
                   </div>
                 </div>
               </td>
@@ -149,11 +157,21 @@
                         <app-avatar-preview-modal
                           [src]="getEmployeeImage(approver1.empNo)"
                           [name]="approver1.empName"
+                          [empNo]="approver1.empNo"
+                          [post]="approver1.post"
+                          [department]="approver1.department"
                         />
                       </div>
                       <div class="approver-info">
                         <span class="approver-name">{{ approver1.empName }}</span>
                         <span class="approver-code">{{ approver1.empNo }}</span>
+                        <span
+                          class="employee-approver-post"
+                          *ngIf="approver1.post"
+                          [attr.title]="approver1.post"
+                        >
+                          {{ approver1.post }}
+                        </span>
                       </div>
                     </div>
                   </div>
@@ -169,11 +187,21 @@
                         <app-avatar-preview-modal
                           [src]="getEmployeeImage(approver2.empNo)"
                           [name]="approver2.empName"
+                          [empNo]="approver2.empNo"
+                          [post]="approver2.post"
+                          [department]="approver2.department"
                         />
                       </div>
                       <div class="approver-info">
                         <span class="approver-name">{{ approver2.empName }}</span>
                         <span class="approver-code">{{ approver2.empNo }}</span>
+                        <span
+                          class="employee-approver-post"
+                          *ngIf="approver2.post"
+                          [attr.title]="approver2.post"
+                        >
+                          {{ approver2.post }}
+                        </span>
                       </div>
                     </div>
                   </div>

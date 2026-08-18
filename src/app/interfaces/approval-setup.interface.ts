@@ -16,13 +16,16 @@ export interface ApprovalSetupRow {
   approve1EmpNo: string | null;
   approve1EmpName: string | null;
   approve1Post: string | null;
+  approve1Dept: string | null;
   approve2EmpNo: string | null;
   approve2EmpName: string | null;
   approve2Post: string | null;
+  approve2Dept: string | null;
   hrApprovers: HrApproverEmp[];
   itDirectorEmpNo: string | null;
   itDirectorEmpName: string | null;
   itDirectorPost: string | null;
+  itDirectorDept: string | null;
   isSkipSecretary: boolean;
   modifiedDate: string | null;
   modifiedBy: string | null;

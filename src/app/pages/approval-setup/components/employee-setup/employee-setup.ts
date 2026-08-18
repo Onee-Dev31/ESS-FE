@@ -18,6 +18,8 @@ interface ApprovalSetupEmployee {
   emp_name: string;
   nickname: string | null;
   numlvl: number;
+  Dept: string | null;
+  Post: string | null;
 }
 
 interface ApprovalSetupDepartment {
@@ -33,12 +35,16 @@ interface EmployeeApprovalOverride {
   level: number;
   head_codeempid: string;
   head_name: string;
+  head_department?: string | null;
+  head_post?: string | null;
   reason?: string;
 }
 
 interface DisplayApprover {
   empNo: string;
   empName: string;
+  department: string;
+  post: string;
   isOverride: boolean;
 }
 
@@ -102,13 +108,17 @@ export class EmployeeSetup implements OnInit {
     if (!department) return [];
 
     const keyword = this.appliedEmployeeSearchText().toLowerCase().trim();
-    if (!keyword) return department.employees ?? [];
+    const employees = department.employees ?? [];
 
-    return (department.employees ?? []).filter(
+    if (!keyword) return employees;
+
+    return employees.filter(
       (employee) =>
         employee.emp_name.toLowerCase().includes(keyword) ||
         employee.emp_code.toLowerCase().includes(keyword) ||
-        (employee.nickname ?? '').toLowerCase().includes(keyword),
+        (employee.nickname ?? '').toLowerCase().includes(keyword) ||
+        (employee.Dept ?? '').toLowerCase().includes(keyword) ||
+        (employee.Post ?? '').toLowerCase().includes(keyword),
     );
   });
 
@@ -192,9 +202,8 @@ export class EmployeeSetup implements OnInit {
       departmentDefault: this.approvalService.getApprovalSetupByCostCenter(costCent),
     }).subscribe({
       next: ({ overrides, departmentDefault }) => {
-        // console.log('overrides >>> ', overrides, departmentDefault);
+        console.log('[EmployeeSetup] Search API responses', { overrides, departmentDefault });
         this.employeeOverrides.set(overrides?.data ?? []);
-
         const rawDefault = Array.isArray(departmentDefault?.data)
           ? departmentDefault.data[0]
           : departmentDefault?.data;
@@ -341,6 +350,8 @@ export class EmployeeSetup implements OnInit {
       return {
         empNo: override.head_codeempid,
         empName: override.head_name,
+        department: override.head_department ?? '',
+        post: override.head_post ?? '',
         isOverride: true,
       };
     }
@@ -349,11 +360,16 @@ export class EmployeeSetup implements OnInit {
     const empNo = level === 1 ? departmentDefault?.approve1EmpNo : departmentDefault?.approve2EmpNo;
     const empName =
       level === 1 ? departmentDefault?.approve1EmpName : departmentDefault?.approve2EmpName;
+    const department =
+      level === 1 ? departmentDefault?.approve1Dept : departmentDefault?.approve2Dept;
+    const post = level === 1 ? departmentDefault?.approve1Post : departmentDefault?.approve2Post;
 
     return empNo
       ? {
           empNo,
           empName: empName ?? '',
+          department: department ?? '',
+          post: post ?? '',
           isOverride: false,
         }
       : null;
@@ -363,11 +379,15 @@ export class EmployeeSetup implements OnInit {
     const setup = this.employeeDepartmentDefault();
     const empNo = level === 1 ? setup?.approve1EmpNo : setup?.approve2EmpNo;
     const empName = level === 1 ? setup?.approve1EmpName : setup?.approve2EmpName;
+    const department = level === 1 ? setup?.approve1Dept : setup?.approve2Dept;
+    const post = level === 1 ? setup?.approve1Post : setup?.approve2Post;
 
     return empNo
       ? {
           empNo,
           empName: empName ?? '',
+          department: department ?? '',
+          post: post ?? '',
           isOverride: false,
         }
       : null;
@@ -377,6 +397,7 @@ export class EmployeeSetup implements OnInit {
     empNos: string | null,
     empNames: string | null,
     empPosts: string | null,
+    empDept: string | null,
   ): HrApproverEmp[] {
     const nos = empNos
       ? empNos
@@ -391,11 +412,13 @@ export class EmployeeSetup implements OnInit {
           .filter(Boolean)
       : [];
     const posts = empPosts ? empPosts.split(',').map((s) => s.trim()) : [];
+    const depts = empDept ? empDept.split(',').map((s) => s.trim()) : [];
 
     return nos.map((empNo, i) => ({
       empNo,
       empName: names[i] ?? '',
       empPost: posts[i] ?? '',
+      empDept: depts[i] ?? '',
     }));
   }
 
@@ -412,13 +435,16 @@ export class EmployeeSetup implements OnInit {
       approve1EmpNo: emp.Approver1EmpNo || emp.Approve1EmpNo,
       approve1EmpName: emp.Approver1Name || emp.Approve1Name,
       approve1Post: emp.Approver1Post,
+      approve1Dept: emp.Approver1Department,
       approve2EmpNo: emp.HeadOfApprover1EmpNo || emp.Approve2EmpNo,
       approve2EmpName: emp.HeadOfApprover1Name || emp.Approve2Name,
       approve2Post: emp.HeadOfApprover1Post,
-      hrApprovers: this.mapHrApprovers(emp.HREmpNo, emp.HRUsers, emp.HRPosts),
+      approve2Dept: emp.HeadOfApprover1Department,
+      hrApprovers: this.mapHrApprovers(emp.HREmpNo, emp.HRUsers, emp.HRPosts, emp.HRDepartments),
       itDirectorEmpNo: emp.ITDirectorEmpNo,
       itDirectorEmpName: emp.ITDirectorName,
       itDirectorPost: emp.ITDirectorPost,
+      itDirectorDept: emp.ITDirectorDepartment,
       isSkipSecretary: emp.ConfigMode === 'AutoSkip',
       modifiedDate: emp.ModifiedDate,
       modifiedBy: emp.ModifiedBy,

@@ -121,6 +121,7 @@
                       [name]="row.secretaryEmpName || ''"
                       [empNo]="row.secretaryEmpNo || ''"
                       [post]="row.secretaryPost || ''"
+                      [department]="row.secretaryDept || ''"
                     />
                   </div>
                   <div class="approver-info">
@@ -132,6 +133,7 @@
                       [attr.title]="row.secretaryPost"
                     >
                       {{ row.secretaryPost }}
+                      {{ row.secretary }}
                     </span>
                   </div>
                 </div>
@@ -148,6 +150,7 @@
                       [name]="row.approve1EmpName || ''"
                       [empNo]="row.approve1EmpNo || ''"
                       [post]="row.approve1Post || ''"
+                      [department]="row.approve1Dept || ''"
                     />
                   </div>
                   <div class="approver-info">
@@ -176,6 +179,7 @@
                       [name]="row.approve2EmpName || ''"
                       [empNo]="row.approve2EmpNo || ''"
                       [post]="row.approve2Post || ''"
+                      [department]="row.approve2Dept || ''"
                     />
                   </div>
                   <div class="approver-info">
@@ -205,6 +209,7 @@
                         [name]="emp.empName"
                         [empNo]="emp.empNo"
                         [post]="emp.empPost"
+                        [department]="emp.empDept || ''"
                       />
                     </div>
                     <div class="approver-info">
@@ -230,6 +235,7 @@
                       [name]="row.itDirectorEmpName || ''"
                       [empNo]="row.itDirectorEmpNo || ''"
                       [post]="row.itDirectorPost || ''"
+                      [department]="row.itDirectorDept || ''"
                     />
                   </div>
                   <div class="approver-info">
