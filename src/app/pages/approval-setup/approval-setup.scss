@@ -127,18 +127,13 @@
   padding: 8px 16px;
   border: 1px solid var(--border-table-head);
   border-radius: 10px;
-  background: var(--bg-card);
-  color: var(--text-sub);
+  background: var(--primary);
+  color: #fff;
   font-size: 0.875rem;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s;
   white-space: nowrap;
-
-  i {
-    color: var(--primary);
-    font-size: 0.9rem;
-  }
 
   &:hover {
     border-color: var(--primary);
