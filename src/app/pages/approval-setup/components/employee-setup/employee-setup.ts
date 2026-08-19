@@ -110,6 +110,8 @@ export class EmployeeSetup implements OnInit {
     const keyword = this.appliedEmployeeSearchText().toLowerCase().trim();
     const employees = department.employees ?? [];
 
+    // console.log(employees);
+
     if (!keyword) return employees;
 
     return employees.filter(
