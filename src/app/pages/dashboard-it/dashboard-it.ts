@@ -1350,7 +1350,7 @@ export class DashboardIT implements OnInit {
       })
       .subscribe({
         next: (res) => {
-          console.log(res);
+          // console.log('res', res);
           this.summaryRes.set(res);
 
           const mapped = res.data.map((ticket: any) => {
@@ -1372,7 +1372,8 @@ export class DashboardIT implements OnInit {
               createdDate: new Date(ticket.created_at).toISOString(),
               requesterEmpId: ticket.requester_code,
               subject: ticket.subject,
-              elapsed_hours: formatElapsedTime(ticket.hours_elapsed),
+              elapsed_hours: ticket.elapsed_time,
+              // elapsed_hours: formatElapsedTime(ticket.hours_elapsed),
             };
           });
           this.Tickets.set(mapped);
