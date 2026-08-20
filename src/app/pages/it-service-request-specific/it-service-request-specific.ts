@@ -26,6 +26,7 @@ import { SignalrService } from '../../services/signalr.service';
 import { MasterDataService } from '../../services/master-data.service';
 import { formatText } from '../../utils/formatText';
 import { SettingService } from '../../services/setting.service';
+import { PageLoaderComponent } from '../../components/shared/page-loader/page-loader';
 
 type SpecificSystemKey = 'bms' | 'oracle' | 'onee' | 'onePortal';
 
@@ -93,7 +94,7 @@ interface SpecificPersonRequest {
 @Component({
   selector: 'app-it-service-request',
   standalone: true,
-  imports: [CommonModule, FormsModule, PageHeaderComponent, NzSelectModule],
+  imports: [CommonModule, FormsModule, PageHeaderComponent, NzSelectModule, PageLoaderComponent],
   templateUrl: './it-service-request-specific.html',
   styleUrl: './it-service-request-specific.scss',
 })
@@ -159,6 +160,12 @@ export class ITServiceRequestSpecificComponent implements OnInit {
   onePortalResponseTypes: any;
   onePortalRole: any;
   openForOptions_noFreelance = signal<any[]>([]);
+  private initialLoadsPending = signal(5);
+  isPageLoading = computed(() => this.initialLoadsPending() > 0);
+
+  private completeInitialLoad() {
+    this.initialLoadsPending.update((count) => Math.max(0, count - 1));
+  }
 
   ngOnInit() {
     this.getOpenFor();
@@ -1546,7 +1553,10 @@ export class ITServiceRequestSpecificComponent implements OnInit {
 
   // MASTER
   getMasterPermission() {
-    this.masterService.MasterPermission().subscribe({
+    this.masterService
+      .MasterPermission()
+      .pipe(finalize(() => this.completeInitialLoad()))
+      .subscribe({
       next: (data) => {
         this.oracleModules = data.Modules;
         this.oraclePermissions = [{ ID: 0, RoleName: '-' }, ...data.Roles];
@@ -1562,7 +1572,10 @@ export class ITServiceRequestSpecificComponent implements OnInit {
   }
 
   getCompanies() {
-    this.masterService.getCompanyMaster().subscribe({
+    this.masterService
+      .getCompanyMaster()
+      .pipe(finalize(() => this.completeInitialLoad()))
+      .subscribe({
       next: (data) => {
         console.log(data);
         this.companyList = data.map((item: any) => ({
@@ -1596,7 +1609,10 @@ export class ITServiceRequestSpecificComponent implements OnInit {
   }
 
   getDepartments() {
-    this.masterService.getDepartmentMaster().subscribe({
+    this.masterService
+      .getDepartmentMaster()
+      .pipe(finalize(() => this.completeInitialLoad()))
+      .subscribe({
       next: (data) => {
         this.departmentList = data;
       },
@@ -1609,6 +1625,7 @@ export class ITServiceRequestSpecificComponent implements OnInit {
   getOpenFor() {
     this.itServiceService
       .getOpenFor({ currentEmpId: this.authService.userData().CODEMPID })
+      .pipe(finalize(() => this.completeInitialLoad()))
       .subscribe({
         next: (res) => {
           console.log(res);
@@ -1637,6 +1654,7 @@ export class ITServiceRequestSpecificComponent implements OnInit {
               ),
             );
           }
+
         },
         error: (error) => {
           console.error('Error fetching data:', error);
@@ -1644,7 +1662,10 @@ export class ITServiceRequestSpecificComponent implements OnInit {
       });
   }
   getDeptHeads() {
-    this.settingService.getDeptHeads().subscribe({
+    this.settingService
+      .getDeptHeads()
+      .pipe(finalize(() => this.completeInitialLoad()))
+      .subscribe({
       next: (res) => {
         console.log(res);
         this.deptHeads = res.data;

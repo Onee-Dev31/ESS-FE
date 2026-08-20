@@ -33,6 +33,7 @@ import { MasterDataService } from '../../services/master-data.service';
 import { NzModalModule } from 'ng-zorro-antd/modal';
 import { EmpAdForm } from '../dashboard-it/empployee-ad-management/emp-ad-form/emp-ad-form';
 import { IT_ATTACHMENT_FILE_CONFIG } from '../../constants/it-attachment-file.constant';
+import { PageLoaderComponent } from '../../components/shared/page-loader/page-loader';
 
 @Component({
   selector: 'app-it-service-request',
@@ -46,6 +47,7 @@ import { IT_ATTACHMENT_FILE_CONFIG } from '../../constants/it-attachment-file.co
     FilePreviewModalComponent,
     NzModalModule,
     EmpAdForm,
+    PageLoaderComponent,
   ],
   templateUrl: './it-service-request.html',
   styleUrl: './it-service-request.scss',
@@ -73,9 +75,16 @@ export class ITServiceRequestComponent implements OnInit {
   requestDetails = signal('');
   attachments = signal<{ name: string; size: number; file: File }[]>([]);
   isPreviewModalOpen = signal<boolean>(false);
+  formErrors = signal<Record<string, string>>({});
+  private initialLoadsPending = signal(2);
+  isPageLoading = computed(() => this.initialLoadsPending() > 0);
   previewFiles = signal<FilePreviewItem[]>([]);
 
   readonly FILE_CONFIG = IT_ATTACHMENT_FILE_CONFIG;
+
+  private completeInitialLoad() {
+    this.initialLoadsPending.update((count) => Math.max(0, count - 1));
+  }
 
   // CONDITION
   @Input() openBy!: string;
@@ -174,6 +183,7 @@ export class ITServiceRequestComponent implements OnInit {
   onOpenForChange(value: string) {
     const option = this.openForOptions().find((opt) => opt.value === value);
     this.selectedOpenFor.set({ value, label: option?.label ?? '' });
+    if (value) this.clearFormError('openFor');
     if (value === '__FREELANCE__') {
       this.isAnnounceChooseFreelance.set(true);
 
@@ -215,6 +225,7 @@ export class ITServiceRequestComponent implements OnInit {
       this.phoneError = 'เบอร์โทรศัพท์ต้องมี 4 หรือ 10 หลักเท่านั้น';
     } else {
       this.phoneError = '';
+      this.clearFormError('phone');
     }
   }
 
@@ -415,6 +426,9 @@ export class ITServiceRequestComponent implements OnInit {
       .filter((s) => s.checked)
       .map((s) => s.value);
     this.syncBasicSystemSelection();
+    if (this.serviceOptions().some((service) => service.checked)) {
+      this.clearFormError('services');
+    }
     this.isSystemCategorySelected.set(
       selectedValues.includes('requser') || this.isBasicSystemServiceSelected(),
     );
@@ -463,6 +477,17 @@ export class ITServiceRequestComponent implements OnInit {
   showSummaryModal = signal(false);
 
   submit() {
+    if (!this.isFormValid()) {
+      this.markSubmitErrors();
+      this.swalService
+        .warning('ข้อมูลไม่ครบ', 'กรุณาตรวจสอบช่องที่มีข้อความแจ้งเตือน')
+        .then(() => {
+          (document.activeElement as HTMLElement | null)?.blur();
+          setTimeout(() => this.focusFirstInvalidField(), 300);
+        });
+      return;
+    }
+
     const selectedServices = this.serviceOptions().filter((s) => s.checked);
 
     if (selectedServices.length === 0) {
@@ -504,11 +529,85 @@ export class ITServiceRequestComponent implements OnInit {
     this.showSummaryModal.set(true);
   }
 
+  private markSubmitErrors() {
+    const errors: Record<string, string> = {};
+    const services = this.serviceOptions();
+    const selectedServices = services.filter((service) => service.checked);
+
+    if (!this.IsOneeJob && !this.selectedOpenFor().value) {
+      errors['openFor'] = 'กรุณาเลือกผู้ขอใช้บริการ';
+    }
+
+    const phoneDigits = this.phoneNumber().replace(/\D/g, '');
+    if (phoneDigits.length !== 4 && phoneDigits.length !== 10) {
+      errors['phone'] = 'กรุณากรอกเบอร์โทรศัพท์ 4 หรือ 10 หลัก';
+    }
+
+    if (!selectedServices.length) {
+      errors['services'] = 'กรุณาเลือกบริการอย่างน้อย 1 รายการ';
+    } else {
+      const requiresSystem = selectedServices.some(
+        (service) =>
+          service.id === this.BASIC_SYSTEM_SERVICE_ID || service.value === 'requser',
+      );
+      if (requiresSystem && !this.hasValidSystemSelection()) {
+        errors['services'] = 'กรุณาเลือกข้อมูลระบบที่ต้องการให้ครบ';
+      }
+    }
+
+    if (!this.requestDetails().trim()) {
+      errors['details'] = 'กรุณากรอกรายละเอียด';
+    }
+
+    this.formErrors.set(errors);
+  }
+
+  private hasValidSystemSelection() {
+    const types = this.selectedSystemTypes();
+    if (!types.length) return false;
+
+    return (
+      (!types.includes('user') || this.userSubOptions().some((option) => option.checked)) &&
+      (!types.includes('system') || this.systemSubOptions().some((option) => option.checked))
+    );
+  }
+
+  private focusFirstInvalidField() {
+    const firstInvalid = document.querySelector<HTMLElement>(
+      '.it-request-page .input-error, .it-request-page .validation-section-error, .it-request-page .validation-error',
+    );
+    if (!firstInvalid) return;
+
+    const field = firstInvalid.closest<HTMLElement>('.form-field, .form-group') ?? firstInvalid;
+    field.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+    setTimeout(() => {
+      field
+        .querySelector<HTMLElement>(
+          'input:not([disabled]), textarea:not([disabled]), button:not([disabled]), [tabindex]:not([tabindex="-1"])',
+        )
+        ?.focus({ preventScroll: true });
+    }, 400);
+  }
+
+  onRequestDetailsChange(value: string) {
+    this.requestDetails.set(value);
+    if (value.trim()) this.clearFormError('details');
+  }
+
+  private clearFormError(key: string) {
+    if (!this.formErrors()[key]) return;
+    const errors = { ...this.formErrors() };
+    delete errors[key];
+    this.formErrors.set(errors);
+  }
+
   closeSummaryModal() {
     this.showSummaryModal.set(false);
   }
 
   clearForm() {
+    this.formErrors.set({});
     this.serviceOptions.update((items) => items.map((i) => ({ ...i, checked: false })));
     this.isSystemCategorySelected.set(false);
     this.userSubOptions.update((items) => items.map((i) => ({ ...i, checked: false })));
@@ -763,7 +862,10 @@ export class ITServiceRequestComponent implements OnInit {
 
   // GET MASTER
   getServiceType() {
-    this.itServiceService.getServiceType().subscribe({
+    this.itServiceService
+      .getServiceType()
+      .pipe(finalize(() => this.completeInitialLoad()))
+      .subscribe({
       next: (res) => {
         console.log(res.data);
         const mappedServices_main = res.data.mainServices
@@ -801,6 +903,7 @@ export class ITServiceRequestComponent implements OnInit {
   getOpenFor() {
     this.itServiceService
       .getOpenFor({ currentEmpId: this.authService.userData().CODEMPID })
+      .pipe(finalize(() => this.completeInitialLoad()))
       .subscribe({
         next: (res) => {
           const mapped = res.data.map((item: any) => ({

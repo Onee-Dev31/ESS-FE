@@ -32,6 +32,7 @@ import Quill from 'quill';
 import { TextEditorImageService } from '../../services/text-editor-image.service';
 import { TextEditorComponent } from '../../components/shared/text-editor/text-editor';
 import { IT_ATTACHMENT_FILE_CONFIG } from '../../constants/it-attachment-file.constant';
+import { PageLoaderComponent } from '../../components/shared/page-loader/page-loader';
 
 @Component({
   selector: 'app-it-problem-report',
@@ -44,6 +45,7 @@ import { IT_ATTACHMENT_FILE_CONFIG } from '../../constants/it-attachment-file.co
     NzSelectModule,
     QuillModule,
     TextEditorComponent,
+    PageLoaderComponent,
   ],
   templateUrl: './it-problem-report.html',
   styleUrl: './it-problem-report.scss',
@@ -92,6 +94,13 @@ export class ItProblemReportComponent implements OnInit {
   textEditor!: TextEditorComponent;
 
   readonly FILE_CONFIG = IT_ATTACHMENT_FILE_CONFIG;
+  formErrors = signal<Record<string, string>>({});
+  private initialLoadsPending = signal(2);
+  isPageLoading = computed(() => this.initialLoadsPending() > 0);
+
+  private completeInitialLoad() {
+    this.initialLoadsPending.update((count) => Math.max(0, count - 1));
+  }
 
   ngOnInit() {
     this.getSubProblem();
@@ -141,6 +150,7 @@ export class ItProblemReportComponent implements OnInit {
       this.phoneError = 'เบอร์โทรศัพท์ต้องมี 4 หรือ 10 หลักเท่านั้น';
     } else {
       this.phoneError = '';
+      this.clearFormError('phone');
     }
   }
 
@@ -151,11 +161,12 @@ export class ItProblemReportComponent implements OnInit {
 
   isFormValid = computed(() => {
     const { topic, detail, categories, phoneNumber } = this.problemFormData();
+    const phoneDigits = phoneNumber.replace(/\D/g, '');
     return (
       topic?.trim().length > 0 &&
-      detail?.length > 0 &&
+      this.hasText(detail) &&
       categories.length > 0 &&
-      phoneNumber !== '' &&
+      (phoneDigits.length === 4 || phoneDigits.length === 10) &&
       !this.phoneError
     );
   });
@@ -171,6 +182,7 @@ export class ItProblemReportComponent implements OnInit {
       ...current,
       categories: isSelected ? [] : [cat],
     });
+    if (!isSelected) this.clearFormError('categories');
   }
 
   onDragOver(event: DragEvent) {
@@ -346,9 +358,14 @@ export class ItProblemReportComponent implements OnInit {
   submit() {
     // console.log('problemFormData', this.problemFormData());
     // console.log('detail', this.problemFormData().detail);
-    const data = this.problemFormData();
-    if (!data.topic.trim() || !data.detail.trim()) {
-      this.swalService.warning('แจ้งเตือน', 'กรุณากรอกข้อมูลให้ครบทุกช่อง');
+    if (!this.isFormValid() || (this.openBy === 'IT' && !this.selectedOpenFor())) {
+      this.markSubmitErrors();
+      this.swalService
+        .warning('ข้อมูลไม่ครบ', 'กรุณาตรวจสอบช่องที่มีข้อความแจ้งเตือน')
+        .then(() => {
+          (document.activeElement as HTMLElement | null)?.blur();
+          setTimeout(() => this.focusFirstInvalidField(), 300);
+        });
       return;
     }
     this.problemFormData.update((data) => ({ ...data, phoneNumber: this.phoneModel }));
@@ -356,6 +373,7 @@ export class ItProblemReportComponent implements OnInit {
   }
 
   clearForm() {
+    this.formErrors.set({});
     this.textEditor.clear();
     const original = this.authData.employee.TELOFF;
     this.phoneModel = '';
@@ -473,7 +491,10 @@ export class ItProblemReportComponent implements OnInit {
 
   // GET MASTER
   getSubProblem() {
-    this.itServiceService.getSubProblem().subscribe({
+    this.itServiceService
+      .getSubProblem()
+      .pipe(finalize(() => this.completeInitialLoad()))
+      .subscribe({
       next: (res) => {
         // console.log(res);
         this.availableCategories = (res.data ?? []).sort(
@@ -490,6 +511,7 @@ export class ItProblemReportComponent implements OnInit {
   getOpenFor() {
     this.itServiceService
       .getOpenFor({ currentEmpId: this.authService.userData().CODEMPID })
+      .pipe(finalize(() => this.completeInitialLoad()))
       .subscribe({
         next: (res) => {
           this.openForOptions.set(res.data);
@@ -504,4 +526,57 @@ export class ItProblemReportComponent implements OnInit {
     const { categories } = this.problemFormData();
     return categories.some((cat) => this.CC_CATEGORIES.includes(cat.sub_category_name));
   });
+
+  onOpenForChange(value: string) {
+    this.selectedOpenFor.set(value);
+    if (value) this.clearFormError('openFor');
+  }
+
+  onTopicChange(value: string) {
+    this.problemFormData.update((data) => ({ ...data, topic: value }));
+    if (value.trim()) this.clearFormError('topic');
+  }
+
+  onDetailChange(value: string) {
+    this.problemFormData.update((data) => ({ ...data, detail: value }));
+    if (this.hasText(value)) this.clearFormError('detail');
+  }
+
+  private markSubmitErrors() {
+    const data = this.problemFormData();
+    const phoneDigits = (data.phoneNumber || this.phoneModel).replace(/\D/g, '');
+    const errors: Record<string, string> = {};
+
+    if (this.openBy === 'IT' && !this.selectedOpenFor()) errors['openFor'] = 'กรุณาเลือกผู้ขอใช้บริการ';
+    if (!data.topic.trim()) errors['topic'] = 'กรุณากรอกหัวข้อปัญหา';
+    if (!data.categories.length) errors['categories'] = 'กรุณาเลือกหมวดหมู่ปัญหา';
+    if (!this.hasText(data.detail)) errors['detail'] = 'กรุณากรอกรายละเอียดปัญหา';
+    if (phoneDigits.length !== 4 && phoneDigits.length !== 10) {
+      errors['phone'] = 'กรุณากรอกเบอร์โทรศัพท์ 4 หรือ 10 หลัก';
+    }
+
+    this.formErrors.set(errors);
+  }
+
+  private hasText(value: string) {
+    return value.replace(/<[^>]*>/g, '').replace(/&nbsp;/g, ' ').trim().length > 0;
+  }
+
+  private clearFormError(key: string) {
+    if (!this.formErrors()[key]) return;
+    const errors = { ...this.formErrors() };
+    delete errors[key];
+    this.formErrors.set(errors);
+  }
+
+  private focusFirstInvalidField() {
+    const invalid = document.querySelector<HTMLElement>('.it-request-page .validation-row-error');
+    if (!invalid) return;
+    invalid.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    setTimeout(() => {
+      invalid
+        .querySelector<HTMLElement>('input, textarea, button, [contenteditable="true"], nz-select')
+        ?.focus({ preventScroll: true });
+    }, 400);
+  }
 }

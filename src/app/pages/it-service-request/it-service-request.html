@@ -1,3 +1,6 @@
+@if (isPageLoading()) {
+  <app-page-loader message="กำลังเตรียมข้อมูลคำขอ..." />
+} @else {
 <div class="it-request-page" [class.it-request-page--it]="openBy === 'IT'">
   <app-page-header
     *ngIf="openBy !== 'IT'"
@@ -58,11 +61,15 @@
           (ngModelChange)="onOpenForChange($event)"
           name="openFor"
           class="form-input"
+          [class.input-error]="formErrors()['openFor']"
         >
           @for (opt of openForOptions(); track opt.value) {
             <nz-option [nzLabel]="opt.label" [nzValue]="opt.value" />
           }
         </nz-select>
+        @if (formErrors()['openFor']) {
+          <span class="error validation-error">{{ formErrors()['openFor'] }}</span>
+        }
       </div>
 
       <!-- Phone -->
@@ -75,12 +82,15 @@
         <input
           type="text"
           class="form-input"
+          [class.input-error]="formErrors()['phone']"
           [value]="phoneModel"
           (input)="onPhoneInput($event)"
           placeholder="ระบุเบอร์โทรศัพท์ที่สามารถติดต่อได้..."
         />
         @if (phoneError) {
           <span class="error">{{ phoneError }}</span>
+        } @else if (formErrors()['phone']) {
+          <span class="error validation-error">{{ formErrors()['phone'] }}</span>
         }
       </div>
     </div>
@@ -91,7 +101,10 @@
           <i class="fas fa-laptop-medical field-icon"></i>
           ประเภทบริการ (Service Type) <span class="required-badge">*</span>
         </label>
-        <div class="checkbox-grid">
+        <div
+          class="checkbox-grid"
+          [class.validation-section-error]="formErrors()['services']"
+        >
           @for (service of serviceOptions(); track service.value; let i = $index) {
             <label
               class="checkbox-item"
@@ -109,6 +122,9 @@
             </label>
           }
         </div>
+        @if (formErrors()['services']) {
+          <span class="error validation-error">{{ formErrors()['services'] }}</span>
+        }
       </div>
       @if (selectedSystemTypes().includes('user') || isBasicSystemServiceSelected()) {
         <div class="basic-system">
@@ -137,12 +153,16 @@
         <textarea
           #detailTextarea
           class="form-control"
+          [class.input-error]="formErrors()['details']"
           rows="6"
           [class.blink]="isAnnounceChooseFreelance()"
           placeholder="กรอกรายละเอียดความต้องการ..."
           [ngModel]="requestDetails()"
-          (ngModelChange)="requestDetails.set($event)"
+          (ngModelChange)="onRequestDetailsChange($event)"
         ></textarea>
+        @if (formErrors()['details']) {
+          <span class="error validation-error">{{ formErrors()['details'] }}</span>
+        }
       </div>
     </div>
 
@@ -207,8 +227,6 @@
       <button
         class="btn-primary-action"
         (click)="submit()"
-        [disabled]="!isFormValid()"
-        [class.disabled-btn]="!isFormValid()"
       >
         <i class="fas fa-paper-plane mr-2"></i> ส่งคำขอ
       </button>
@@ -568,3 +586,4 @@
     </app-emp-ad-form>
   </ng-container>
 </nz-modal>
+}

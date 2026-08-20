@@ -943,6 +943,30 @@ $table-label-bg: var(--border-toolbar);
   }
 }
 
+.validation-section-error {
+  border: 1px solid #ff4d4f;
+  border-radius: 12px;
+  box-shadow: 0 0 0 3px rgba(255, 77, 79, 0.15);
+  padding: 8px;
+}
+
+.form-control.input-error {
+  border-color: #ff4d4f !important;
+  box-shadow: 0 0 0 3px rgba(255, 77, 79, 0.15) !important;
+}
+
+:host ::ng-deep nz-select.form-input.input-error .ant-select-selector {
+  border-color: #ff4d4f !important;
+  box-shadow: 0 0 0 3px rgba(255, 77, 79, 0.15) !important;
+}
+
+.validation-error {
+  display: block;
+  margin-top: 6px;
+  color: #ff4d4f !important;
+  font-size: $font-size-hint;
+}
+
 /* ==========================================================================
    7. REPAIR & PROBLEM SUMMARY CARDS
    ========================================================================== */

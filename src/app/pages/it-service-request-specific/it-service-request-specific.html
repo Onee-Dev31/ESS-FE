@@ -1,3 +1,6 @@
+@if (isPageLoading()) {
+  <app-page-loader message="กำลังเตรียมข้อมูลคำขอ..." />
+} @else {
 <div class="it-request-page" [class.it-request-page--it]="openBy === 'IT'">
   <app-page-header
     *ngIf="openBy !== 'IT'"
@@ -31,7 +34,7 @@
             </span>
             <span class="user-divider"> | </span>
             <span class="user-email-inline">aduser : {{ authData.employee.AD_USER }}</span>
-            <span class="user-divider" *ngIf="authData.employee.EMAIL"> • </span>
+            <span class="user-divider" *ngIf="authData.employee.EMAIL"> | </span>
             <span class="user-email-inline">{{ authData.employee.EMAIL }}</span>
           </span>
         </label>
@@ -324,7 +327,7 @@
               </label>
               <div
                 class="specific-system-buttons"
-                [class.system-selection-error]="person.errors?.['systems']"
+                [class.validation-section-error]="person.errors?.['systems']"
               >
                 @for (system of specificSystemChoices; track system.key) {
                   <button
@@ -784,3 +787,4 @@
     </div>
   }
 </div>
+}

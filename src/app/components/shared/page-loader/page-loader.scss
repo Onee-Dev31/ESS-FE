@@ -1,0 +1,50 @@
+.loading-overlay {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 14px;
+  background: var(--bg-card);
+}
+
+.loader {
+  width: 40px;
+  height: 30px;
+  border-radius: 3px;
+  --c: no-repeat linear-gradient(var(--primary) 0 0);
+  background:
+    var(--c) 0 100%/8px 30px,
+    var(--c) 50% 100%/8px 20px,
+    var(--c) 100% 100%/8px 10px;
+  position: relative;
+  clip-path: inset(-100% 0);
+}
+
+.loader::before {
+  content: '';
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--primary);
+  left: -16px;
+  top: 0;
+  animation:
+    loader-move 2s linear infinite,
+    loader-bounce 0.5s cubic-bezier(0, 200, 0.8, 200) infinite;
+}
+
+.loading-message {
+  color: var(--text-sub);
+  font-weight: 700;
+}
+
+@keyframes loader-move {
+  0% { left: -16px; transform: translateY(-8px); }
+  100% { left: calc(100% + 8px); transform: translateY(22px); }
+}
+
+@keyframes loader-bounce {
+  100% { top: -0.1px; }
+}

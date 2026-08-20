@@ -1,3 +1,6 @@
+@if (isPageLoading()) {
+  <app-page-loader message="กำลังเตรียมข้อมูลแจ้งปัญหา..." />
+} @else {
 <div class="it-request-page" [class.it-request-page--it]="openBy === 'IT'">
   <app-page-header
     *ngIf="openBy !== 'IT'"
@@ -20,7 +23,7 @@
     </div>
 
     <!-- Field: เปิดสิทธิ์ให้ -->
-    <div class="form-field-row" *ngIf="openBy === 'IT'">
+    <div class="form-field-row" *ngIf="openBy === 'IT'" [class.validation-row-error]="formErrors()['openFor']">
       <div class="field-label-col">
         <label class="field-label">
           <i class="fa-solid fa-book-open-reader field-icon"></i>
@@ -34,18 +37,21 @@
           nzAllowClear
           nzPlaceHolder=""
           [ngModel]="selectedOpenFor()"
-          (ngModelChange)="selectedOpenFor.set($event)"
+          (ngModelChange)="onOpenForChange($event)"
           name="openFor"
         >
           @for (opt of openForOptions(); track opt.value) {
             <nz-option [nzLabel]="opt.label" [nzValue]="opt.value" />
           }
         </nz-select>
+        @if (formErrors()['openFor']) {
+          <span class="validation-error">{{ formErrors()['openFor'] }}</span>
+        }
       </div>
     </div>
 
     <!-- Field: หัวข้อ -->
-    <div class="form-field-row">
+    <div class="form-field-row" [class.validation-row-error]="formErrors()['topic']">
       <div class="field-label-col">
         <label class="field-label">
           <i class="fas fa-heading field-icon"></i>
@@ -57,15 +63,21 @@
         <input
           type="text"
           [ngModel]="problemFormData().topic"
-          (ngModelChange)="problemFormData.set({ ...problemFormData(), topic: $event })"
+          (ngModelChange)="onTopicChange($event)"
           class="styled-input"
           placeholder="ระบุหัวข้อปัญหาสั้นๆ..."
         />
+        @if (formErrors()['topic']) {
+          <span class="validation-error">{{ formErrors()['topic'] }}</span>
+        }
       </div>
     </div>
 
     <!-- Field: หมวดหมู่ -->
-    <div class="form-field-row">
+    <div
+      class="form-field-row"
+      [class.validation-row-error]="formErrors()['categories']"
+    >
       <div class="field-label-col">
         <label class="field-label">
           <i class="fas fa-tags field-icon"></i>
@@ -75,7 +87,10 @@
         <!-- <p class="field-hint">กดเพื่อเพิ่มหมวดหมู่เข้าในช่องรายละเอียด</p> -->
       </div>
       <div class="field-input-col">
-        <div class="category-tags">
+        <div
+          class="category-tags"
+          [class.category-validation-error]="formErrors()['categories']"
+        >
           @for (cat of availableCategories; track cat.id) {
             <button
               type="button"
@@ -88,11 +103,14 @@
             </button>
           }
         </div>
+        @if (formErrors()['categories']) {
+          <span class="validation-error">{{ formErrors()['categories'] }}</span>
+        }
       </div>
     </div>
 
     <!-- Field: รายละเอียด -->
-    <div class="form-field-row">
+    <div class="form-field-row" [class.validation-row-error]="formErrors()['detail']">
       <div class="field-label-col">
         <label class="field-label">
           <i class="fas fa-align-left field-icon"></i>
@@ -114,15 +132,13 @@
         </quill-editor> -->
         <app-text-editor
           [value]="problemFormData().detail"
-          (valueChange)="
-            problemFormData.set({
-              ...problemFormData(),
-              detail: $event,
-            })
-          "
+          (valueChange)="onDetailChange($event)"
           placeholder="อธิบายรายละเอียดปัญหาที่พบ..."
         >
         </app-text-editor>
+        @if (formErrors()['detail']) {
+          <span class="validation-error">{{ formErrors()['detail'] }}</span>
+        }
         <!-- <textarea
           [ngModel]="problemFormData().detail"
           (ngModelChange)="problemFormData.set({ ...problemFormData(), detail: $event })"
@@ -223,7 +239,7 @@
     }
 
     <!-- Field: เบอร์โทรติดต่อ -->
-    <div class="form-field-row">
+    <div class="form-field-row" [class.validation-row-error]="formErrors()['phone'] || phoneError">
       <div class="field-label-col">
         <label class="field-label">
           <i class="fas fa-phone-alt field-icon"></i>
@@ -236,12 +252,14 @@
           type="text"
           [value]="phoneModel"
           (input)="onPhoneInput($event)"
-          [class.input-error]="phoneError"
+          [class.input-error]="phoneError || formErrors()['phone']"
           class="styled-input"
           placeholder="ระบุเบอร์โทรศัพท์ที่สามารถติดต่อได้..."
         />
         @if (phoneError) {
           <span class="error-text">{{ phoneError }}</span>
+        } @else if (formErrors()['phone']) {
+          <span class="validation-error">{{ formErrors()['phone'] }}</span>
         }
       </div>
     </div>
@@ -254,8 +272,6 @@
       <button
         class="btn-primary-action"
         (click)="submit()"
-        [disabled]="!isFormValid()"
-        [class.disabled-btn]="!isFormValid()"
       >
         <i class="fas fa-paper-plane mr-2"></i> ส่งคำร้อง
       </button>
@@ -453,3 +469,4 @@
   >
   </app-file-preview-modal>
 </div>
+}
