@@ -1597,6 +1597,14 @@ $table-label-bg: var(--border-toolbar);
   gap: 10px;
 }
 
+.system-selection-message {
+  display: block;
+  margin-top: 6px;
+  color: #ff4d4f !important;
+  font-size: $font-size-hint !important;
+  line-height: 1.4;
+}
+
 .system-choice {
   display: inline-flex;
   align-items: center;
@@ -1798,6 +1806,18 @@ $table-label-bg: var(--border-toolbar);
   }
 
   .form-input.input-error {
+    border-color: #ff4d4f !important;
+    box-shadow: 0 0 0 3px rgba(255, 77, 79, 0.15) !important;
+  }
+
+  .specific-system-buttons.system-selection-error {
+    border: 1px solid #ff4d4f;
+    border-radius: 12px;
+    box-shadow: 0 0 0 3px rgba(255, 77, 79, 0.15);
+    padding: 8px;
+  }
+
+  :host ::ng-deep nz-select.form-input.input-error .ant-select-selector {
     border-color: #ff4d4f !important;
     box-shadow: 0 0 0 3px rgba(255, 77, 79, 0.15) !important;
   }

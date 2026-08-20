@@ -29,9 +29,9 @@
                 authData.employee.CODEMPID
               }})
             </span>
-            <span class="user-divider"> • </span>
+            <span class="user-divider"> | </span>
             <span class="user-email-inline">aduser : {{ authData.employee.AD_USER }}</span>
-            <span class="user-divider"> • </span>
+            <span class="user-divider" *ngIf="authData.employee.EMAIL"> • </span>
             <span class="user-email-inline">{{ authData.employee.EMAIL }}</span>
           </span>
         </label>
@@ -72,14 +72,14 @@
                 [ngModel]="person.openFor"
                 (ngModelChange)="onSpecificOpenForChange(person, $event)"
                 [name]="'openFor' + person.id"
-                [class.input-error]="!person.openFor"
+                [class.input-error]="person.errors?.['openFor']"
               >
                 @for (opt of getAvailableOpenForOptions(person); track opt.value) {
                   <nz-option [nzLabel]="opt.label" [nzValue]="opt" />
                 }
               </nz-select>
-              @if (!person.openFor) {
-                <span class="error"> กรุณาเลือกพนักงาน </span>
+              @if (person.errors?.['openFor']) {
+                <span class="error">{{ person.errors?.['openFor'] }}</span>
               }
             </div>
 
@@ -93,11 +93,11 @@
                 (input)="onSpecificPhoneInput($event, person)"
                 (ngModelChange)="touchSpecificPeople()"
                 [name]="'phone' + person.id"
-                [class.input-error]="!person.phone || person.phoneError"
+                [class.input-error]="person.errors?.['phone'] || person.phoneError"
               />
-              @if (!person.phone || person.phoneError) {
+              @if (person.errors?.['phone'] || person.phoneError) {
                 <span class="error-text">
-                  {{ person.phoneError || 'กรุณากรอกเบอร์โทรศัพท์' }}
+                  {{ person.phoneError || person.errors?.['phone'] }}
                 </span>
               }
             </div>
@@ -106,13 +106,14 @@
             <div class="freelance-section">
               <div class="form-section two-col">
                 <div class="form-field">
-                  <label>ชื่อภาษาไทย</label>
+                  <label>ชื่อภาษาไทย <span class="required-badge">*</span></label>
 
                   <input
                     nz-input
                     class="form-input"
                     [(ngModel)]="person.freelance.firstNameTh"
                     [name]="'firstNameTh' + person.id"
+                    [class.input-error]="person.errors?.['firstNameTh']"
                     (input)="validateThaiField($event, person, 'firstNameTh', 'ชื่อภาษาไทย')"
                     (focus)="validateThaiField($event, person, 'firstNameTh', 'ชื่อภาษาไทย')"
                   />
@@ -124,13 +125,14 @@
                 </div>
 
                 <div class="form-field">
-                  <label>นามสกุลภาษาไทย</label>
+                  <label>นามสกุลภาษาไทย <span class="required-badge">*</span></label>
 
                   <input
                     nz-input
                     class="form-input"
                     [(ngModel)]="person.freelance.lastNameTh"
                     [name]="'lastNameTh' + person.id"
+                    [class.input-error]="person.errors?.['lastNameTh']"
                     (input)="validateThaiField($event, person, 'lastNameTh', 'นามสกุลภาษาไทย')"
                     (focus)="validateThaiField($event, person, 'lastNameTh', 'นามสกุลภาษาไทย')"
                   />
@@ -142,13 +144,14 @@
                 </div>
 
                 <div class="form-field">
-                  <label>ชื่อภาษาอังกฤษ</label>
+                  <label>ชื่อภาษาอังกฤษ <span class="required-badge">*</span></label>
 
                   <input
                     nz-input
                     class="form-input"
                     [(ngModel)]="person.freelance.firstNameEn"
                     [name]="'firstNameEn' + person.id"
+                    [class.input-error]="person.errors?.['firstNameEn']"
                     (input)="validateEnglishField($event, person, 'firstNameEn', 'ชื่อภาษาอังกฤษ')"
                     (focus)="validateEnglishField($event, person, 'firstNameEn', 'ชื่อภาษาอังกฤษ')"
                   />
@@ -160,13 +163,14 @@
                 </div>
 
                 <div class="form-field">
-                  <label>นามสกุลภาษาอังกฤษ</label>
+                  <label>นามสกุลภาษาอังกฤษ <span class="required-badge">*</span></label>
 
                   <input
                     nz-input
                     class="form-input"
                     [(ngModel)]="person.freelance.lastNameEn"
                     [name]="'lastNameEn' + person.id"
+                    [class.input-error]="person.errors?.['lastNameEn']"
                     (input)="
                       validateEnglishField($event, person, 'lastNameEn', 'นามสกุลภาษาอังกฤษ')
                     "
@@ -193,7 +197,7 @@
                 </div> -->
 
                 <div class="form-field">
-                  <label>บริษัท</label>
+                  <label>บริษัท <span class="required-badge">*</span></label>
                   <nz-select
                     nzShowSearch
                     nzAllowClear
@@ -201,6 +205,7 @@
                     [(ngModel)]="person.freelance.company"
                     [name]="'company' + person.id"
                     class="form-input"
+                    [class.input-error]="person.errors?.['company']"
                     (ngModelChange)="
                       validateSelectField($event, person, 'company', 'บริษัท');
                       onCompanyChange(person, $event)
@@ -223,7 +228,7 @@
                 </div>
 
                 <div class="form-field">
-                  <label>แผนก</label>
+                  <label>แผนก <span class="required-badge">*</span></label>
 
                   <nz-select
                     nzShowSearch
@@ -232,6 +237,7 @@
                     [(ngModel)]="person.freelance.department"
                     [name]="'department' + person.id"
                     class="form-input"
+                    [class.input-error]="person.errors?.['department']"
                     (ngModelChange)="validateSelectField($event, person, 'department', 'แผนก')"
                     (nzBlur)="
                       validateSelectField(person.freelance.department, person, 'department', 'แผนก')
@@ -251,13 +257,14 @@
                 </div>
 
                 <div class="form-field">
-                  <label>ตำแหน่ง</label>
+                  <label>ตำแหน่ง <span class="required-badge">*</span></label>
 
                   <input
                     nz-input
                     class="form-input"
                     [(ngModel)]="person.freelance.position"
                     [name]="'position' + person.id"
+                    [class.input-error]="person.errors?.['position']"
                     (input)="validateRequiredField($event, person, 'position', 'ตำแหน่ง')"
                     (focus)="validateRequiredField($event, person, 'position', 'ตำแหน่ง')"
                   />
@@ -269,13 +276,14 @@
                 </div>
 
                 <div class="form-field">
-                  <label>อีเมล</label>
+                  <label>อีเมล <span class="required-badge">*</span></label>
 
                   <input
                     nz-input
                     class="form-input"
                     [(ngModel)]="person.freelance.email"
                     [name]="'email' + person.id"
+                    [class.input-error]="person.errors?.['email']"
                     (input)="validateEmail($event, person)"
                     (focus)="validateEmail($event, person)"
                   />
@@ -314,7 +322,10 @@
                   >กรุณาทำการ <span class="">ขอ user</span> ที่ขอใช้บริการ (พื้นฐาน)</span
                 >
               </label>
-              <div class="specific-system-buttons">
+              <div
+                class="specific-system-buttons"
+                [class.system-selection-error]="person.errors?.['systems']"
+              >
                 @for (system of specificSystemChoices; track system.key) {
                   <button
                     type="button"
@@ -341,6 +352,9 @@
                   </button>
                 }
               </div>
+              @if (person.errors?.['systems']) {
+                <span class="error system-selection-message">{{ person.errors?.['systems'] }}</span>
+              }
             </div>
 
             @if (person.systems.length) {
@@ -367,7 +381,9 @@
                         <div class="oracle-company-box">
                           <div class="oracle-company-header">
                             <div class="form-field oracle-company-select">
-                              <label>บริษัทที่รับผิดชอบ</label>
+                              <label
+                                >บริษัทที่รับผิดชอบ <span class="required-badge">*</span></label
+                              >
 
                               <nz-select
                                 nzShowSearch
@@ -415,7 +431,7 @@
                               </div>
 
                               <div class="form-field permission-field">
-                                <label>สิทธิ์</label>
+                                <label>สิทธิ์ <span class="required-badge">*</span></label>
                               </div>
                             </div>
 
@@ -475,7 +491,7 @@
                   <div class="system-detail-card">
                     <h6 class="form-label">BMS</h6>
                     <div class="form-field">
-                      <label>บริษัทที่ใช้</label>
+                      <label>บริษัทที่ใช้ <span class="required-badge">*</span></label>
                       <nz-select
                         nzShowSearch
                         nzAllowClear
@@ -505,7 +521,7 @@
                     </div>
 
                     <div class="form-field">
-                      <label>สิทธิ์เหมือนใคร</label>
+                      <label>สิทธิ์เหมือนใคร <span class="required-badge">*</span></label>
                       <!-- <input
                         class="form-input"
                         placeholder="สิทธิ์เหมือนใคร"
@@ -543,7 +559,7 @@
                   <div class="system-detail-card">
                     <h6 class="form-label">OneE Apps</h6>
                     <div class="form-field">
-                      <label>บริษัทที่รับผิดชอบ</label>
+                      <label>บริษัทที่รับผิดชอบ <span class="required-badge">*</span></label>
                       <nz-select
                         nzShowSearch
                         nzAllowClear
@@ -571,7 +587,7 @@
                       }
                     </div>
                     <div class="form-field">
-                      <label>สิทธิ์</label>
+                      <label>สิทธิ์ <span class="required-badge">*</span></label>
 
                       <nz-select
                         nzPlaceHolder="เลือกสิทธิ์"
@@ -598,35 +614,18 @@
                     </div>
 
                     <div class="form-field">
-                      <label>หัวหน้างาน</label>
-
-                      <!-- <input
-                        nz-input
+                      <label>หัวหน้างาน <span class="required-badge">*</span></label>
+                      <input
                         type="text"
-                        class="form-input"
-                        placeholder="กรอกชื่อหัวหน้างาน"
-                        [(ngModel)]="person.onee.supervisor"
-                        name="onee_supervisor"
-                        (input)="validateOneeSupervisor($event, person)"
-                        (focus)="validateOneeSupervisor($event, person)"
-                      /> -->
-                      <nz-select
-                        nzShowSearch
-                        nzAllowClear
-                        nzPlaceHolder="เลือกหัวหน้างาน"
+                        placeholder="กรอกหัวหน้างาน"
                         [(ngModel)]="person.onee.supervisor"
                         name="onee_supervisor"
                         class="form-input"
                         (ngModelChange)="validateOneeSupervisor($event, person)"
-                        (nzBlur)="validateOneeSupervisor(person.onee.supervisor, person)"
+                        (blur)="validateOneeSupervisor(person.onee.supervisor, person)"
+                        [disabled]="person.onee.supervisorLocked"
                         [class.input-error]="person.errors?.['onee_supervisor']"
-                      >
-                        <nz-option
-                          *ngFor="let opt of openForOptions_noFreelance()"
-                          [nzLabel]="opt.label"
-                          [nzValue]="opt"
-                        />
-                      </nz-select>
+                      />
                       @if (person.errors?.['onee_supervisor']) {
                         <span class="error">
                           {{ person.errors?.['onee_supervisor'] }}
@@ -640,7 +639,7 @@
                   <div class="system-detail-card">
                     <h6 class="form-label">OneE Portal</h6>
                     <div class="form-field">
-                      <label>บริษัทที่รับผิดชอบ</label>
+                      <label>บริษัทที่รับผิดชอบ <span class="required-badge">*</span></label>
                       <nz-select
                         nzShowSearch
                         nzAllowClear
@@ -669,7 +668,7 @@
                       }
                     </div>
                     <div class="form-field">
-                      <label>ประเภทสิทธิ์</label>
+                      <label>ประเภทสิทธิ์ <span class="required-badge">*</span></label>
 
                       <nz-select
                         nzPlaceHolder="เลือกประเภท"
@@ -694,7 +693,7 @@
                       }
                     </div>
                     <div class="form-field">
-                      <label>ประเภทรายการ</label>
+                      <label>ประเภทรายการ <span class="required-badge">*</span></label>
 
                       <nz-select
                         nzPlaceHolder="เลือกประเภท"
@@ -753,13 +752,7 @@
       <button class="btn-secondary-action" type="button" (click)="clearForm()">
         <i class="fas fa-eraser mr-2"></i> ล้างข้อมูล
       </button>
-      <button
-        class="btn-primary-action"
-        type="button"
-        (click)="submit()"
-        [disabled]="!isFormValid()"
-        [class.disabled-btn]="!isFormValid()"
-      >
+      <button class="btn-primary-action" type="button" (click)="submit()">
         <i class="fas fa-paper-plane mr-2"></i> ส่งคำขอ
       </button>
     </div>
@@ -777,10 +770,6 @@
         </div>
 
         <div class="modal-body">
-          <!-- <div
-            class="summary-preview"
-            [innerHTML]="formatText.getFormatTextHTML(summaryText())"
-          ></div> -->
           <div class="summary-preview html-detail" [innerHTML]="summaryText()"></div>
         </div>
 
