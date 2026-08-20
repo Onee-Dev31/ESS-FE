@@ -635,6 +635,9 @@ export class ITServiceRequestSpecificComponent implements OnInit {
   }
 
   clearForm() {
+    // Clear the existing people first so createSpecificPerson can select
+    // the logged-in user as the default first person again.
+    this.specificPeople.set([]);
     this.specificPeople.set([this.createSpecificPerson()]);
     this.setDefaultSpecificService();
     this.requestDetails.set('');
