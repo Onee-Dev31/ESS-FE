@@ -98,10 +98,7 @@
           </div>
           <div class="ticket-info">
             <div class="ticket-header">
-              <span class="ticket-number"
-                >{{ ticket.ticketNumber
-                }}<span class="ticket-elapsed"> ({{ ticket.elapsed_hours }}) </span>
-              </span>
+              <span class="ticket-number">{{ ticket.ticketNumber }} </span>
               <div class="ticket-meta-right">
                 <i class="fa-solid fa-paperclip" *ngIf="ticket.attachment_count > 0"></i>
                 <i
@@ -124,10 +121,10 @@
                 {{ ticket.subject }}
               </div>
               <span class="ticket-time">
-                @if (isToday(ticket.createdDate)) {
-                  {{ ticket.createdDate | date: 'HH:mm' }}
+                @if (isToday(ticket.updatedDate)) {
+                  {{ ticket.updatedDate | date: 'HH:mm' }}
                 } @else {
-                  {{ ticket.createdDate | date: 'EEE dd' : '' : 'en' }}
+                  {{ ticket.updatedDate | date: 'EEE dd' : '' : 'en' }}
                 }
               </span>
             </div>

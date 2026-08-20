@@ -6,6 +6,7 @@
     <span class="separator">•</span>
     <span><i class="far fa-calendar-alt"></i> {{ ticket.createdDate | date: 'dd MMMM yyyy' }}</span>
     <span><i class="far fa-clock"></i> {{ ticket.createdDate | date: 'HH:mm' }}</span>
+    <span class="ticket-elapsed"> ({{ ticket.elapsed_time }}) </span>
   </div>
 </section>
 
