@@ -679,7 +679,10 @@ export class DashboardIT implements OnInit {
         this.IS_CHAT_OPEN.set(true);
         setTimeout(() => this.ticketChat?.focusComposer(), 100);
       }
-      if (this.IS_CHAT_OPEN()) this.markChatAsRead();
+      if (this.IS_CHAT_OPEN()) {
+        this.markChatAsRead();
+        this.markLatestReplyRead(objectData.ticketId, objectData.itNotes ?? []);
+      }
       this.scrollToBottom();
 
       console.log(objectData);
@@ -690,12 +693,6 @@ export class DashboardIT implements OnInit {
           complete: () => this.signalrService.ticketReadTrigger.next({ ticketId }),
         });
 
-        const lastReply = itNotes[itNotes.length - 1];
-        if (lastReply) {
-          this.itServiceService
-            .markReplyRead(ticketId, codeempid, lastReply.id)
-            .subscribe({ error: () => {} });
-        }
         this.loadReplyReadStatus(ticketId);
         this.unreadTicketIds.update((s) => {
           const next = new Set(s);
@@ -748,6 +745,10 @@ export class DashboardIT implements OnInit {
       if (next) {
         this.scrollToBottom();
         this.markChatAsRead();
+        const ticket = this.selectedTicket();
+        if (ticket) {
+          this.markLatestReplyRead(ticket.ticketId, ticket.itNotes ?? []);
+        }
       }
       return next;
     });

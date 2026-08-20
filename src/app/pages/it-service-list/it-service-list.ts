@@ -476,7 +476,10 @@ export class ItService implements OnInit {
         this.IS_CHAT_OPEN.set(true);
         setTimeout(() => this.ticketChat?.focusComposer(), 100);
       }
-      if (this.IS_CHAT_OPEN()) this.markChatAsRead();
+      if (this.IS_CHAT_OPEN()) {
+        this.markChatAsRead();
+        this.markLatestReplyRead(objectData.ticketId, objectData.itNotes ?? []);
+      }
       this.scrollToBottom();
 
       const codeempid = this.authService.userData()?.CODEMPID;
@@ -484,12 +487,6 @@ export class ItService implements OnInit {
         this.itServiceService.markTicketRead(ticketId, codeempid).subscribe({
           complete: () => this.signalrService.ticketReadTrigger.next({ ticketId }),
         });
-        const lastReply = itNotes[itNotes.length - 1];
-        if (lastReply) {
-          this.itServiceService
-            .markReplyRead(ticketId, codeempid, lastReply.id)
-            .subscribe({ error: () => {} });
-        }
         this.loadReplyReadStatus(ticketId);
       }
 
@@ -522,6 +519,10 @@ export class ItService implements OnInit {
       if (next) {
         this.scrollToBottom();
         this.markChatAsRead();
+        const ticket = this.selectedTicket();
+        if (ticket) {
+          this.markLatestReplyRead(ticket.ticketId, ticket.itNotes ?? []);
+        }
       }
       return next;
     });
