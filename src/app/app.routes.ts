@@ -7,11 +7,13 @@ import { USER_ROLES } from './constants/user-roles.constant';
 import { ValidateLoginSso } from './pages/validate/validate-login-sso/validate-login-sso';
 import { LoginVersion1 } from './pages/login-version1/login-version1';
 import { LoginVersion2 } from './pages/login-version2/login-version2';
+import { LoginVersion3 } from './pages/login-version3/login-version3';
 
 export const routes: Routes = [
   { path: 'login-v2', component: LoginComponent },
   { path: 'login-v1', component: LoginVersion1 },
   { path: 'login', component: LoginVersion2 },
+  { path: 'login-v3', component: LoginVersion3 },
   { path: 'validate/loginSSO', component: ValidateLoginSso },
   {
     path: 'qr-confirm',
