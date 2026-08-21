@@ -1,3 +1,6 @@
+@if (isPageLoading()) {
+  <app-page-loader message="กำลังโหลดข้อมูล IT Dashboard..." />
+} @else {
 <div class="top-bar">
   <div>
     <button (click)="viewExport()" class="btn-report">
@@ -525,4 +528,5 @@
       </div>
     </div>
   </div>
+}
 }

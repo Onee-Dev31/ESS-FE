@@ -623,7 +623,7 @@ export class ITServiceRequestSpecificComponent implements OnInit {
     }
     if (person.systems.includes('bms')) {
       this.validateBmsCompanies(person);
-      this.validateBmsDetail(person.bms.detail, person);
+      delete person.errors?.['bms_detail'];
     }
     if (person.systems.includes('onee')) {
       this.validateOneeCompanies(person);
@@ -1000,7 +1000,7 @@ export class ITServiceRequestSpecificComponent implements OnInit {
     // =========================
 
     if (person.systems.includes('bms')) {
-      if (!person.bms.companies?.length || !person.bms.detail) {
+      if (!person.bms.companies?.length) {
         return false;
       }
     }
@@ -1236,7 +1236,7 @@ export class ITServiceRequestSpecificComponent implements OnInit {
           });
 
           if (person.bms.detail) {
-            html += `สิทธิ์เหมือน : ${person.bms.detail.label}`;
+            html += `สิทธิ์เหมือน : ${person.bms.detail.label ?? person.bms.detail}`;
           }
 
           html += `</ul>`;
@@ -1459,15 +1459,8 @@ export class ITServiceRequestSpecificComponent implements OnInit {
 
   validateBmsDetail(value: any, person: any) {
     person.bms.detail = value;
-
     person.errors ??= {};
-
-    if (!value) {
-      person.errors['bms_detail'] = 'กรุณาเลือกพนักงาน';
-    } else {
-      delete person.errors['bms_detail'];
-    }
-
+    delete person.errors['bms_detail'];
     this.touchSpecificPeople();
   }
   validateOneeCompanies(person: any) {

@@ -15,7 +15,7 @@ import {
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { EMPTY, interval, firstValueFrom } from 'rxjs';
-import { filter } from 'rxjs/operators';
+import { filter, finalize } from 'rxjs/operators';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { Attachment, StatusKey, TicketItem } from '../../interfaces/it-dashboard.interface';
@@ -70,6 +70,7 @@ import {
   isSameTicketId,
 } from '../../components/shared/ticket-chat/ticket-chat';
 import { formatElapsedTime } from '../../utils/time.util';
+import { PageLoaderComponent } from '../../components/shared/page-loader/page-loader';
 
 @Component({
   selector: 'app-dashboard-it',
@@ -100,6 +101,7 @@ import { formatElapsedTime } from '../../utils/time.util';
     TicketProgressCardComponent,
     TicketDetailCardComponent,
     TicketChatComponent,
+    PageLoaderComponent,
   ],
   templateUrl: './dashboard-it.html',
   styleUrl: './dashboard-it.scss',
@@ -364,6 +366,7 @@ export class DashboardIT implements OnInit {
   currentUserEmpCode = this.authService.userData().CODEMPID;
 
   Tickets = signal<any[]>([]);
+  isPageLoading = signal(true);
   summaryRes = signal<any>(null);
   selectedTicket = signal<any | undefined>(undefined);
   isPreviewModalOpen = signal<boolean>(false);
@@ -1339,6 +1342,9 @@ export class DashboardIT implements OnInit {
 
   // GET MASTER
   getAllTickets(trackNew = false) {
+    const showPageLoader = !this.initialized && this.Tickets().length === 0;
+    if (showPageLoader) this.isPageLoading.set(true);
+
     const searchText = this.keyword.trim();
     const [from, to] = this.filter.dateRange ?? [];
     const dateFrom = dayjs(from).format('YYYY-MM-DD');
@@ -1351,6 +1357,11 @@ export class DashboardIT implements OnInit {
         dateFrom,
         dateTo,
       })
+      .pipe(
+        finalize(() => {
+          if (showPageLoader) this.isPageLoading.set(false);
+        }),
+      )
       .subscribe({
         next: (res) => {
           // console.log('res', res);
