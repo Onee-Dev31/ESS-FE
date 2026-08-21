@@ -14,6 +14,7 @@ import { SwalService } from '../../../services/swal.service';
 import { AuthService } from '../../../services/auth.service';
 import { ItServiceService } from '../../../services/it-service.service';
 import { environment } from '../../../../environments/environment';
+import { SafeEmailHtmlPipe } from '../../../pipes/safe-email-html.pipe';
 
 export interface TicketChatReader {
   userCodeempid: string;
@@ -232,7 +233,7 @@ const EMOJI_TABS = [
 @Component({
   selector: 'app-ticket-chat',
   standalone: true,
-  imports: [CommonModule, FormsModule, AvatarPreviewModal],
+  imports: [CommonModule, FormsModule, AvatarPreviewModal, SafeEmailHtmlPipe],
   templateUrl: './ticket-chat.html',
   styleUrl: './ticket-chat.scss',
 })
@@ -309,6 +310,15 @@ export class TicketChatComponent {
     const date = new Date(value);
     const today = new Date();
     return date.toDateString() === today.toDateString();
+  }
+
+  isHtmlMessage(message: unknown): message is string {
+    return (
+      typeof message === 'string' &&
+      /<\/?(?:html|body|div|p|span|font|blockquote|table|thead|tbody|tr|td|th|ul|ol|li|a|br|img|hr)\b[^>]*>/i.test(
+        message,
+      )
+    );
   }
 
   getImages(files: any[] = []): any[] {

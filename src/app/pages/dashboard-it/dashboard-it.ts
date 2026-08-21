@@ -600,7 +600,7 @@ export class DashboardIT implements OnInit {
     const previousTicketId = this.selectedTicket()?.ticketId;
 
     this.getTicketById(ticketId).subscribe(async (res: any) => {
-      // console.log(res);
+      console.log(res);
       const ticketAttachments = res.attachments?.filter((f: any) => !f.reply_id) || [];
       const replyAttachments = res.attachments?.filter((f: any) => f.reply_id) || [];
       const convertedFiles = await this.fileConverter.convertUrlsToFiles(ticketAttachments);
@@ -687,7 +687,7 @@ export class DashboardIT implements OnInit {
       }
       this.scrollToBottom();
 
-      console.log(objectData);
+      // console.log(objectData);
 
       const codeempid = this.authService.userData()?.CODEMPID;
       if (ticketId && codeempid) {

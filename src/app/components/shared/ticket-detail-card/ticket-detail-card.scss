@@ -167,6 +167,17 @@
   object-fit: contain;
 }
 
+:host ::ng-deep .description .gmail_drive_chip {
+  box-sizing: content-box;
+  max-width: calc(100% - 22px) !important;
+}
+
+:host ::ng-deep .description .gmail_drive_chip img {
+  width: auto;
+  height: 20px !important;
+  max-height: 20px;
+}
+
 :host ::ng-deep .description pre,
 :host ::ng-deep .description code {
   max-width: 100%;

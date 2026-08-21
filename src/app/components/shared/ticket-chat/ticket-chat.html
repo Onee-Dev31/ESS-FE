@@ -81,7 +81,14 @@
                     @if (note.referred_title === '[REJECTED]') {
                       <span class="refer_tag last">{{ note.referred_title }}</span>
                     }
-                    {{ note.message }}
+                    @if (isHtmlMessage(note.message)) {
+                      <span
+                        class="note__email"
+                        [innerHTML]="note.message | safeEmailHtml"
+                      ></span>
+                    } @else {
+                      {{ note.message }}
+                    }
                   </div>
                   @if (getImages(note.attachments).length) {
                     <div class="image-grid">
