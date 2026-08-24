@@ -3,10 +3,16 @@
   <div class="ticket-meta">
     <span>Ticket</span>
     <strong>#{{ ticket.ticketNumber }}</strong>
-    <span class="separator">•</span>
+    <span class="separator">|</span>
     <span><i class="far fa-calendar-alt"></i> {{ ticket.createdDate | date: 'dd MMMM yyyy' }}</span>
     <span><i class="far fa-clock"></i> {{ ticket.createdDate | date: 'HH:mm' }}</span>
     <span class="ticket-elapsed"> ({{ ticket.elapsed_time }}) </span>
+    @if (ticket.viaEmail) {
+      <span class="source-badge email" [title]="'อีเมลผู้ส่ง: ' + ticket.viaEmail">
+        <i class="fa-solid fa-envelope"></i>
+        via Email
+      </span>
+    }
   </div>
 </section>
 
