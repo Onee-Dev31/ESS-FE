@@ -36,7 +36,7 @@ import { Router } from '@angular/router';
 
         h2 {
           margin: 0;
-          font-size: 1.25rem;
+          font-size: $font-size-title;
           font-weight: 700;
           color: var(--text-header);
           flex: 1;
@@ -67,27 +67,18 @@ import { Router } from '@angular/router';
       @include tablet {
         .top-header-strip {
           padding: 0.75rem 1rem;
-          h2 {
-            font-size: $font-size-body;
-          }
         }
       }
 
       @include mobile {
         .top-header-strip {
           padding: 0.5rem 0.7rem;
-          h2 {
-            font-size: $font-size-label;
-          }
         }
       }
 
       @media (max-width: 425px) {
         .top-header-strip {
           padding: 0.5rem 0.7rem;
-          h2 {
-            font-size: $font-size-hint;
-          }
         }
       }
     `,

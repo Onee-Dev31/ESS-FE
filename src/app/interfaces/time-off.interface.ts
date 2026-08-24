@@ -26,7 +26,7 @@ export interface LeaveQuotaRule {
   jobclass_min: number;
   jobclass_max: number;
   service_year_min: number;
-  service_year_max: number;
+  service_year_max: number | null;
   quota_days: number;
   leave_type_is_active: boolean;
 }
@@ -51,6 +51,8 @@ export interface UpsertLeaveQuotaRulePayload {
   service_year_min: number;
   service_year_max: number;
   quota_days: number;
+  isDelete?: boolean;
+  excuteBy?: string;
 }
 
 export interface LeaveType {

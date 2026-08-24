@@ -1,3 +1,5 @@
+@use '../../../styles/variables' as *;
+
 .page {
   min-height: 100%;
   padding: 20px;
@@ -5,8 +7,8 @@
 }
 .code {
   color: var(--primary);
-  font-size: 0.7rem;
-  font-weight: 800;
+  font-size: $font-size-label;
+  font-weight: 600;
   letter-spacing: 0.08em;
 }
 .master-detail {
@@ -32,12 +34,12 @@
 .panel-heading h2 {
   margin: 0;
   color: var(--text-header);
-  font-size: 0.95rem;
+  font-size: $font-size-header;
 }
 .panel-heading p {
   margin: 3px 0 0;
   color: var(--text-muted);
-  font-size: 0.7rem;
+  font-size: $font-size-hint;
 }
 .leave-list {
   display: flex;
@@ -90,8 +92,8 @@
   border-radius: 11px;
   background: color-mix(in srgb, var(--primary) 11%, var(--bg-card));
   color: var(--primary);
-  font-size: 0.68rem;
-  font-weight: 800;
+  font-size: $font-size-label;
+  font-weight: 600;
   text-transform: uppercase;
 }
 .leave-info {
@@ -108,11 +110,11 @@
 }
 .leave-info strong {
   color: var(--text-header);
-  font-size: 0.8rem;
+  font-size: $font-size-body;
 }
 .leave-info small {
   color: var(--text-muted);
-  font-size: 0.63rem;
+  font-size: $font-size-hint;
 }
 .rule-count {
   display: grid;
@@ -123,8 +125,8 @@
   border-radius: 7px;
   background: color-mix(in srgb, var(--primary) 11%, var(--bg-card));
   color: var(--primary);
-  font-size: 0.68rem;
-  font-weight: 750;
+  font-size: $font-size-hint;
+  font-weight: 600;
 }
 .rule-count.empty {
   background: var(--bg-table-head);
@@ -132,7 +134,7 @@
 }
 .arrow {
   color: var(--text-muted);
-  font-size: 0.58rem;
+  font-size: $font-size-mini;
 }
 .leave-item.active .arrow {
   color: var(--primary);
@@ -157,12 +159,12 @@
 .detail-heading h2 {
   margin: 3px 0;
   color: var(--text-header);
-  font-size: 1.25rem;
+  font-size: $font-size-title;
 }
 .detail-heading p {
   margin: 0;
   color: var(--text-muted);
-  font-size: 0.78rem;
+  font-size: $font-size-label;
 }
 .rule-summary {
   display: flex;
@@ -172,13 +174,13 @@
 }
 .rule-summary strong {
   color: var(--primary);
-  font-size: 1.45rem;
+  font-size: $font-size-title;
   line-height: 1;
 }
 .rule-summary span {
   margin-top: 5px;
   color: var(--text-muted);
-  font-size: 0.68rem;
+  font-size: $font-size-hint;
 }
 .rule-section-title {
   display: flex;
@@ -190,12 +192,12 @@
 .rule-section-title h3 {
   margin: 0;
   color: var(--text-header);
-  font-size: 0.88rem;
+  font-size: $font-size-header;
 }
 .rule-section-title p {
   margin: 3px 0 0;
   color: var(--text-muted);
-  font-size: 0.68rem;
+  font-size: $font-size-hint;
 }
 .table-wrap {
   overflow-x: auto;
@@ -208,7 +210,7 @@ th {
   padding: 12px 18px;
   background: var(--bg-table-head);
   color: var(--text-muted);
-  font-size: 0.68rem;
+  font-size: $font-size-label;
   text-align: left;
   white-space: nowrap;
 }
@@ -216,7 +218,7 @@ td {
   padding: 16px 18px;
   border-top: 1px solid var(--border-table-head);
   color: var(--text-sub);
-  font-size: 0.78rem;
+  font-size: $font-size-body;
 }
 tbody tr:hover {
   background: color-mix(in srgb, var(--primary) 3%, var(--bg-card));
@@ -229,24 +231,29 @@ tbody tr:hover {
   border-radius: 7px;
   background: var(--bg-table-head);
   color: var(--text-muted);
-  font-weight: 700;
+  font-weight: 600;
 }
 .quota {
   color: var(--primary);
-  font-weight: 800;
+  font-weight: 600;
   white-space: nowrap;
 }
 .action-column {
-  width: 52px;
+  width: 82px;
   text-align: center;
 }
+.row-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
 .add-rule-button,
-.edit-rule-button {
+.edit-rule-button,
+.delete-rule-button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   border: 0;
-  color: var(--primary);
   font: inherit;
   cursor: pointer;
 }
@@ -256,8 +263,9 @@ tbody tr:hover {
   padding: 7px 12px;
   border-radius: 9px;
   background: color-mix(in srgb, var(--primary) 11%, var(--bg-card));
-  font-size: 0.72rem;
-  font-weight: 700;
+  color: var(--primary);
+  font-size: $font-size-label;
+  font-weight: 600;
   white-space: nowrap;
 }
 .add-rule-button:hover {
@@ -268,9 +276,24 @@ tbody tr:hover {
   height: 31px;
   border-radius: 8px;
   background: var(--bg-table-head);
+  color: var(--primary);
 }
 .edit-rule-button:hover {
   background: color-mix(in srgb, var(--primary) 12%, var(--bg-card));
+}
+.delete-rule-button {
+  width: 31px;
+  height: 31px;
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--danger) 8%, var(--bg-card));
+  color: var(--danger);
+}
+.delete-rule-button:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--danger) 15%, var(--bg-card));
+}
+.delete-rule-button:disabled {
+  opacity: 0.55;
+  cursor: wait;
 }
 .no-rules {
   height: 250px;
@@ -284,14 +307,14 @@ tbody tr:hover {
   margin: 6px auto;
 }
 .no-rules i {
-  font-size: 1.5rem;
+  font-size: $font-size-title;
 }
 .no-rules strong {
   color: var(--text-sub);
 }
 .no-rules span {
   font-weight: 400;
-  font-size: 0.72rem;
+  font-size: $font-size-label;
 }
 
 .state-box {
@@ -308,7 +331,7 @@ tbody tr:hover {
   color: var(--text-muted);
 }
 .state-box > i {
-  font-size: 1.7rem;
+  font-size: $font-size-title;
 }
 .state-box.error > i {
   color: var(--danger);
@@ -320,14 +343,6 @@ tbody tr:hover {
   background: var(--primary);
   color: white;
   cursor: pointer;
-}
-.loader {
-  width: 34px;
-  height: 34px;
-  border: 3px solid var(--border-table-head);
-  border-top-color: var(--primary);
-  border-radius: 50%;
-  animation: spin 0.7s linear infinite;
 }
 .spin {
   animation: spin 0.7s linear infinite;
@@ -341,7 +356,7 @@ tbody tr:hover {
 .rule-modal-backdrop {
   position: fixed;
   inset: 0;
-  z-index: 1000;
+  z-index: 1040;
   display: grid;
   place-items: center;
   padding: 20px;
@@ -350,7 +365,7 @@ tbody tr:hover {
 }
 .rule-modal {
   width: min(560px, 100%);
-  max-height: calc(100vh - 40px);
+  max-height: calc(100dvh - 40px);
   overflow-y: auto;
   border-radius: 16px;
   background: var(--bg-card);
@@ -366,13 +381,13 @@ tbody tr:hover {
 }
 .rule-modal-header span {
   color: var(--primary);
-  font-size: 0.7rem;
-  font-weight: 750;
+  font-size: $font-size-label;
+  font-weight: 600;
 }
 .rule-modal-header h2 {
   margin: 3px 0 0;
   color: var(--text-header);
-  font-size: 1.1rem;
+  font-size: $font-size-header;
 }
 .modal-close {
   display: grid;
@@ -414,7 +429,7 @@ tbody tr:hover {
   display: block;
   min-width: 0;
   margin: 0;
-  padding: 14px 15px 16px;
+  padding: 16px 16px 18px;
   border: 1px solid color-mix(in srgb, var(--text-muted) 28%, var(--border-table-head));
   border-radius: 12px;
 }
@@ -423,46 +438,51 @@ tbody tr:hover {
   max-width: calc(100% - 16px);
   padding: 0 7px;
   color: var(--text-header);
-  font-size: 0.78rem;
-  font-weight: 700;
+  font-size: $font-size-label;
+  font-weight: 600;
   white-space: normal;
 }
 .range-fields {
   display: grid;
-  grid-template-columns: 1fr auto 1fr;
-  align-items: end;
+  grid-template-columns: minmax(0, 1fr) 24px minmax(0, 1fr);
+  align-items: start;
   gap: 12px;
 }
 .rule-form-body label {
   display: flex;
   min-width: 0;
   flex-direction: column;
-  gap: 6px;
+  gap: 8px;
 }
 .rule-form-body label > span {
   color: var(--text-sub);
-  font-size: 0.7rem;
-  font-weight: 600;
+  font-size: $font-size-label;
+  font-weight: 500;
 }
 .rule-form-body input {
   box-sizing: border-box;
   width: 100%;
-  height: 42px;
-  padding: 8px 12px;
+  height: 44px;
+  padding: 8px 14px;
   border: 1px solid color-mix(in srgb, var(--text-muted) 35%, var(--border-table-head));
   border-radius: 9px;
   outline: 0;
   background: var(--bg-card);
   color: var(--text);
   font: inherit;
-  font-size: 0.82rem;
+  font-size: $font-size-body;
 }
 .rule-form-body input:focus {
   border-color: var(--primary);
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary) 11%, transparent);
 }
+.rule-form-body input.input-invalid {
+  border-color: var(--danger) !important;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--danger) 10%, transparent) !important;
+}
 .rule-form-select {
   width: 100%;
+  height: 44px;
 }
 :host ::ng-deep .rule-form-select.ant-select {
   cursor: pointer;
@@ -471,19 +491,23 @@ tbody tr:hover {
   ::ng-deep
   .rule-form-select.ant-select-single.ant-select:not(.ant-select-customize-input)
   .ant-select-selector {
-  height: 42px !important;
-  padding: 7px 36px 7px 12px !important;
+  height: 44px !important;
+  padding: 8px 38px 8px 14px !important;
   display: flex !important;
   align-items: center !important;
   border-color: color-mix(in srgb, var(--primary) 24%, var(--border-table-head)) !important;
   border-radius: 9px !important;
   background: color-mix(in srgb, var(--primary) 4%, var(--bg-card)) !important;
 }
-:host ::ng-deep .rule-form-select.ant-select-single .ant-select-selection-item,
-:host ::ng-deep .rule-form-select.ant-select-single .ant-select-selection-placeholder {
-  line-height: 26px !important;
+:host ::ng-deep .rule-form-select.ant-select-single .ant-select-selection-item {
+  line-height: 28px !important;
   color: var(--text) !important;
-  font-size: 0.82rem;
+  font-size: $font-size-body;
+}
+:host ::ng-deep .rule-form-select.ant-select-single .ant-select-selection-placeholder {
+  line-height: 28px !important;
+  color: var(--text-muted) !important;
+  font-size: $font-size-body;
 }
 :host ::ng-deep .rule-form-select.ant-select .ant-select-arrow {
   top: 50% !important;
@@ -495,7 +519,7 @@ tbody tr:hover {
   place-items: center;
   color: var(--text-muted) !important;
   line-height: 1;
-  // transform: translateY(-50%);
+  transform: translateY(-50%);
 }
 :host ::ng-deep .rule-form-select.ant-select .ant-select-arrow .anticon > svg {
   color: var(--text-muted) !important;
@@ -505,10 +529,23 @@ tbody tr:hover {
   border-color: var(--primary) !important;
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary) 11%, transparent) !important;
 }
+:host ::ng-deep .rule-form-select.input-invalid .ant-select-selector {
+  border-color: var(--danger) !important;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--danger) 10%, transparent) !important;
+}
+.field-error {
+  display: block;
+  color: var(--danger);
+  margin-top: 3px;
+  font-size: $font-size-hint;
+  font-weight: 400;
+  line-height: 1.35;
+}
 .range-separator {
-  padding-bottom: 11px;
+  margin-top: 34px;
   color: var(--text-muted);
-  font-size: 0.68rem;
+  font-size: $font-size-label;
+  text-align: center;
 }
 .quota-field > div {
   display: flex;
@@ -520,7 +557,7 @@ tbody tr:hover {
 }
 .quota-field strong {
   color: var(--text-sub);
-  font-size: 0.78rem;
+  font-size: $font-size-label;
 }
 .rule-modal-footer {
   display: flex;
@@ -534,8 +571,8 @@ tbody tr:hover {
   padding: 8px 16px;
   border-radius: 9px;
   font: inherit;
-  font-size: 0.76rem;
-  font-weight: 700;
+  font-size: $font-size-label;
+  font-weight: 600;
   cursor: pointer;
 }
 .cancel-button {
@@ -576,8 +613,8 @@ tbody tr:hover {
     display: block;
     margin-bottom: 7px;
     color: var(--text-muted);
-    font-size: 0.7rem;
-    font-weight: 650;
+    font-size: $font-size-label;
+    font-weight: 600;
   }
   :host ::ng-deep .mobile-nz-select.ant-select {
     width: 100%;
@@ -599,7 +636,7 @@ tbody tr:hover {
   :host ::ng-deep .mobile-nz-select.ant-select-single .ant-select-selection-placeholder {
     line-height: 26px !important;
     color: var(--text) !important;
-    font-size: 0.8rem;
+    font-size: $font-size-body;
   }
   :host ::ng-deep .mobile-nz-select.ant-select .ant-select-arrow,
   :host ::ng-deep .mobile-nz-select.ant-select .ant-select-arrow .anticon > svg {
@@ -618,13 +655,17 @@ tbody tr:hover {
     padding: 14px 17px;
   }
   .range-fields {
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 14px;
   }
   .range-separator {
     display: none;
   }
   .rule-modal-backdrop {
-    padding: 10px;
+    padding: max(12px, env(safe-area-inset-top)) 10px max(12px, env(safe-area-inset-bottom));
+  }
+  .rule-modal {
+    max-height: calc(100dvh - 24px);
   }
   thead {
     display: none;
@@ -636,26 +677,81 @@ tbody tr:hover {
     display: block;
   }
   tbody {
-    padding: 9px;
+    display: grid;
+    gap: 10px;
+    padding: 10px;
   }
   tr {
-    margin-bottom: 9px;
-    padding: 12px;
+    position: relative;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 14px 16px;
+    padding: 14px;
     border: 1px solid var(--border-table-head);
-    border-radius: 11px;
+    border-radius: 12px;
+    background: var(--bg-card);
   }
   td {
     display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 7px 0;
+    min-width: 0;
+    align-items: flex-start;
+    justify-content: flex-start;
+    flex-direction: column;
+    gap: 4px;
+    padding: 0;
     border: 0;
-    text-align: right;
+    color: var(--text-header);
+    font-weight: 500;
+    text-align: left;
   }
   td::before {
     content: attr(data-label);
-    color: var(--text-muted);
-    font-size: 0.68rem;
+    color: var(--text-sub);
+    font-size: $font-size-label;
+    font-weight: 400;
+  }
+  td:first-child {
+    grid-column: 1 / -1;
+    flex-direction: row;
+    align-items: center;
+    gap: 6px;
+    min-height: 32px;
+    padding: 0 76px 10px 0;
+    border-bottom: 1px solid var(--border-table-head);
+  }
+  td:first-child::before {
+    content: 'เงื่อนไขที่';
+    color: var(--text-header);
+    font-size: $font-size-body;
+    font-weight: 600;
+  }
+  td:nth-child(2) {
+    grid-column: 1 / -1;
+  }
+  td:nth-child(4) {
+    align-items: flex-end;
+    text-align: right;
+  }
+  td.action-column {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    display: block;
+    width: auto;
+  }
+  td.action-column::before {
+    display: none;
+  }
+  .rule-number {
+    display: inline;
+    width: auto;
+    height: auto;
+    border-radius: 0;
+    background: transparent;
+    color: var(--text-header);
+  }
+  .quota {
+    font-size: $font-size-body;
   }
   td.no-rules {
     display: table-cell;

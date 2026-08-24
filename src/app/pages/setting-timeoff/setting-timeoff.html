@@ -2,9 +2,7 @@
   <app-page-header title="กำหนดสิทธิ์การลา" />
 
   @if (isLoading()) {
-    <section class="state-box">
-      <span class="loader"></span><strong>กำลังโหลดข้อมูลประเภทการลา...</strong>
-    </section>
+    <app-page-loader message="กำลังโหลดข้อมูลประเภทการลา..." />
   } @else if (errorMessage()) {
     <section class="state-box error">
       <i class="fa-solid fa-triangle-exclamation"></i><strong>{{ errorMessage() }}</strong
@@ -100,7 +98,7 @@
                       <span class="rule-number">{{ index + 1 }}</span>
                     </td>
                     <td data-label="ระดับพนักงาน">
-                      <strong>Job Class {{ rule.jobclass_min }}–{{ rule.jobclass_max }}</strong>
+                      Job Class {{ rule.jobclass_min }}–{{ rule.jobclass_max }}
                     </td>
                     <td data-label="อายุงาน">
                       {{ getServiceYearRangeLabel(rule.service_year_min, rule.service_year_max) }}
@@ -109,15 +107,37 @@
                       <span class="quota">{{ rule.quota_days }} วัน</span>
                     </td>
                     <td class="action-column">
-                      <button type="button" class="edit-rule-button" title="แก้ไขเงื่อนไข" (click)="openEditRule(rule)">
-                        <i class="fa-solid fa-pen"></i>
-                      </button>
+                      <div class="row-actions">
+                        <button
+                          type="button"
+                          class="edit-rule-button"
+                          title="แก้ไขเงื่อนไข"
+                          (click)="openEditRule(rule)"
+                        >
+                          <i class="fa-solid fa-pen"></i>
+                        </button>
+                        <button
+                          type="button"
+                          class="delete-rule-button"
+                          title="ลบเงื่อนไข"
+                          [disabled]="deletingRuleId() === rule.rule_id"
+                          (click)="deleteRule(rule)"
+                        >
+                          <i
+                            class="fa-solid"
+                            [class.fa-trash-can]="deletingRuleId() !== rule.rule_id"
+                            [class.fa-spinner]="deletingRuleId() === rule.rule_id"
+                            [class.spin]="deletingRuleId() === rule.rule_id"
+                          ></i>
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 } @empty {
                   <tr>
                     <td colspan="5" class="no-rules">
-                      <i class="fa-regular fa-clipboard"></i><strong>ยังไม่มีเงื่อนไขสิทธิ์ลา</strong
+                      <i class="fa-regular fa-clipboard"></i
+                      ><strong>ยังไม่มีเงื่อนไขสิทธิ์ลา</strong
                       ><span>ประเภทการลานี้ยังไม่มีการกำหนดเงื่อนไข</span>
                     </td>
                   </tr>
@@ -139,7 +159,13 @@
           <span>{{ editingRuleId() === null ? 'เพิ่มเงื่อนไข' : 'แก้ไขเงื่อนไข' }}</span>
           <h2>{{ selectedGroup()?.leave_name_th }}</h2>
         </div>
-        <button type="button" class="modal-close" aria-label="ปิด" [disabled]="isSavingRule()" (click)="closeRuleModal()">
+        <button
+          type="button"
+          class="modal-close"
+          aria-label="ปิด"
+          [disabled]="isSavingRule()"
+          (click)="closeRuleModal()"
+        >
           <i class="fa-solid fa-xmark"></i>
         </button>
       </header>
@@ -148,9 +174,43 @@
         <fieldset class="range-group">
           <legend>ระดับพนักงาน (Job Class)</legend>
           <div class="range-fields">
-            <label><span>ตั้งแต่</span><input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="3" autocomplete="off" name="jobclass_min" required [value]="ruleForm.jobclass_min < 0 ? '' : ruleForm.jobclass_min" (input)="onJobClassInput($event, 'jobclass_min')" /></label>
+            <label
+              ><span>ตั้งแต่</span
+              ><input
+                type="text"
+                inputmode="numeric"
+                pattern="[0-9]*"
+                maxlength="3"
+                autocomplete="off"
+                name="jobclass_min"
+                required
+                [class.input-invalid]="getRuleFieldError('jobclass_min')"
+                [value]="ruleForm.jobclass_min < 0 ? '' : ruleForm.jobclass_min"
+                (input)="onJobClassInput($event, 'jobclass_min')"
+              />
+              @if (getRuleFieldError('jobclass_min'); as error) {
+                <small class="field-error">{{ error }}</small>
+              }
+            </label>
             <span class="range-separator">ถึง</span>
-            <label><span>ไม่เกิน</span><input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="3" autocomplete="off" name="jobclass_max" required [value]="ruleForm.jobclass_max < 0 ? '' : ruleForm.jobclass_max" (input)="onJobClassInput($event, 'jobclass_max')" /></label>
+            <label
+              ><span>ไม่เกิน</span
+              ><input
+                type="text"
+                inputmode="numeric"
+                pattern="[0-9]*"
+                maxlength="3"
+                autocomplete="off"
+                name="jobclass_max"
+                required
+                [class.input-invalid]="getRuleFieldError('jobclass_max')"
+                [value]="ruleForm.jobclass_max < 0 ? '' : ruleForm.jobclass_max"
+                (input)="onJobClassInput($event, 'jobclass_max')"
+              />
+              @if (getRuleFieldError('jobclass_max'); as error) {
+                <small class="field-error">{{ error }}</small>
+              }
+            </label>
           </div>
         </fieldset>
 
@@ -159,35 +219,81 @@
           <div class="range-fields">
             <label>
               <span>ตั้งแต่</span>
-              <nz-select class="rule-form-select" name="service_year_min" nzShowSearch nzPlaceHolder="เลือกอายุงาน" [(ngModel)]="ruleForm.service_year_min">
+              <nz-select
+                class="rule-form-select"
+                [class.input-invalid]="getRuleFieldError('service_year_min')"
+                name="service_year_min"
+                nzShowSearch
+                nzPlaceHolder="เลือกอายุงาน"
+                [ngModel]="ruleForm.service_year_min"
+                (ngModelChange)="onServiceYearMinChange($event)"
+              >
                 @for (year of serviceYearMinOptions; track year) {
                   <nz-option [nzValue]="year" [nzLabel]="getServiceYearLabel(year)" />
                 }
               </nz-select>
+              @if (getRuleFieldError('service_year_min'); as error) {
+                <small class="field-error">{{ error }}</small>
+              }
             </label>
             <span class="range-separator">ถึง</span>
             <label>
               <span>ไม่เกิน</span>
-              <nz-select class="rule-form-select" name="service_year_max" nzShowSearch nzPlaceHolder="เลือกอายุงาน" [(ngModel)]="ruleForm.service_year_max">
-                @for (year of serviceYearMaxOptions; track year) {
+              <nz-select
+                class="rule-form-select"
+                [class.input-invalid]="getRuleFieldError('service_year_max')"
+                name="service_year_max"
+                nzShowSearch
+                nzPlaceHolder="เลือกอายุงาน"
+                [(ngModel)]="ruleForm.service_year_max"
+              >
+                @for (year of getServiceYearMaxOptions(); track year) {
                   <nz-option [nzValue]="year" [nzLabel]="getServiceYearLabel(year, true)" />
                 }
               </nz-select>
+              @if (getRuleFieldError('service_year_max'); as error) {
+                <small class="field-error">{{ error }}</small>
+              }
             </label>
           </div>
         </fieldset>
 
         <label class="quota-field">
           <span>จำนวนวันลาที่ได้รับ</span>
-          <div><input type="text" inputmode="numeric" pattern="[0-9]*" autocomplete="off" name="quota_days" required [value]="ruleForm.quota_days < 0 ? '' : ruleForm.quota_days" (input)="onQuotaDaysInput($event)" /><strong>วัน</strong></div>
+          <div>
+            <input
+              type="text"
+              inputmode="numeric"
+              pattern="[0-9]*"
+              autocomplete="off"
+              name="quota_days"
+              required
+              [class.input-invalid]="getRuleFieldError('quota_days')"
+              [value]="ruleForm.quota_days < 0 ? '' : ruleForm.quota_days"
+              (input)="onQuotaDaysInput($event)"
+            /><strong>วัน</strong>
+          </div>
+          @if (getRuleFieldError('quota_days'); as error) {
+            <small class="field-error">{{ error }}</small>
+          }
         </label>
-
       </div>
 
       <footer class="rule-modal-footer">
-        <button type="button" class="cancel-button" (click)="closeRuleModal()" [disabled]="isSavingRule()">ยกเลิก</button>
+        <button
+          type="button"
+          class="cancel-button"
+          (click)="closeRuleModal()"
+          [disabled]="isSavingRule()"
+        >
+          ยกเลิก
+        </button>
         <button type="submit" class="save-button" [disabled]="isSavingRule() || isConfirmingSave()">
-          @if (isSavingRule()) { <i class="fa-solid fa-spinner spin"></i> กำลังบันทึก... } @else { <i class="fa-solid fa-check"></i> บันทึก }
+          @if (isSavingRule()) {
+            <i class="fa-solid fa-spinner spin"></i> กำลังบันทึก...
+          } @else {
+            <i class="fa-solid fa-check"></i> บันทึก
+          }
         </button>
       </footer>
     </form>
