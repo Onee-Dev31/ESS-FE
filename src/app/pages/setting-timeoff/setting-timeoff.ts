@@ -37,6 +37,7 @@ export class SettingTimeoff implements OnInit {
   readonly errorMessage = signal<string | null>(null);
   readonly isRuleModalOpen = signal(false);
   readonly isSavingRule = signal(false);
+  readonly isConfirmingSave = signal(false);
   readonly editingRuleId = signal<number | null>(null);
   readonly serviceYearMinOptions = [
     0.3,
@@ -44,8 +45,6 @@ export class SettingTimeoff implements OnInit {
   ];
   readonly serviceYearMaxOptions = [...this.serviceYearMinOptions, 99];
   ruleForm: UpsertLeaveQuotaRulePayload = this.createEmptyRuleForm();
-  private initialRuleForm = '';
-  private isConfirmingClose = false;
 
   readonly quotaGroups = computed<LeaveQuotaGroup[]>(() => {
     return this.leaveTypes().map((leaveType) => {
@@ -121,7 +120,6 @@ export class SettingTimeoff implements OnInit {
 
     this.editingRuleId.set(null);
     this.ruleForm = this.createEmptyRuleForm(group.leave_type_id);
-    this.initialRuleForm = JSON.stringify(this.ruleForm);
     this.isRuleModalOpen.set(true);
   }
 
@@ -136,29 +134,32 @@ export class SettingTimeoff implements OnInit {
       service_year_max: rule.service_year_max,
       quota_days: rule.quota_days,
     };
-    this.initialRuleForm = JSON.stringify(this.ruleForm);
     this.isRuleModalOpen.set(true);
   }
 
   @HostListener('document:keydown.escape')
-  async closeRuleModal(): Promise<void> {
-    if (!this.isRuleModalOpen() || this.isSavingRule() || this.isConfirmingClose) return;
-
-    if (JSON.stringify(this.ruleForm) !== this.initialRuleForm) {
-      this.isConfirmingClose = true;
-      const result = await this.swalService.confirm(
-        'ยกเลิกการเปลี่ยนแปลง?',
-        'ข้อมูลที่แก้ไขจะไม่ถูกบันทึก',
-      );
-      this.isConfirmingClose = false;
-      if (!result.isConfirmed) return;
-    }
-
+  closeRuleModal(): void {
+    if (!this.isRuleModalOpen() || this.isSavingRule() || this.isConfirmingSave()) return;
     this.isRuleModalOpen.set(false);
   }
 
-  saveRule(): void {
-    if (this.isSavingRule() || !this.isRuleFormValid()) return;
+  async saveRule(): Promise<void> {
+    if (this.isSavingRule() || this.isConfirmingSave()) return;
+    if (!this.isRuleFormValid()) {
+      this.swalService.warning(
+        'ข้อมูลไม่ถูกต้อง',
+        'ค่าสูงสุดต้องไม่น้อยกว่าค่าตั้งต้น ทุกค่าต้องไม่ติดลบ และ Job Class ต้องไม่เกิน 999',
+      );
+      return;
+    }
+
+    this.isConfirmingSave.set(true);
+    const confirmation = await this.swalService.confirm(
+      this.editingRuleId() === null ? 'ยืนยันการเพิ่มเงื่อนไข?' : 'ยืนยันการแก้ไขเงื่อนไข?',
+      'กรุณาตรวจสอบข้อมูลก่อนยืนยัน',
+    );
+    this.isConfirmingSave.set(false);
+    if (!confirmation.isConfirmed) return;
 
     const payload: UpsertLeaveQuotaRulePayload = { ...this.ruleForm };
     if (this.editingRuleId() === null) delete payload.rule_id;
@@ -216,11 +217,11 @@ export class SettingTimeoff implements OnInit {
   private createEmptyRuleForm(leaveTypeId = 0): UpsertLeaveQuotaRulePayload {
     return {
       leave_type_id: leaveTypeId,
-      jobclass_min: 1,
-      jobclass_max: 999,
-      service_year_min: 0.3,
-      service_year_max: 99,
-      quota_days: 0,
+      jobclass_min: -1,
+      jobclass_max: -1,
+      service_year_min: -1,
+      service_year_max: -1,
+      quota_days: -1,
     };
   }
 

@@ -145,32 +145,36 @@
       </header>
 
       <div class="rule-form-body">
-        <fieldset>
+        <fieldset class="range-group">
           <legend>ระดับพนักงาน (Job Class)</legend>
-          <label><span>ตั้งแต่</span><input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="3" autocomplete="off" name="jobclass_min" required [value]="ruleForm.jobclass_min < 0 ? '' : ruleForm.jobclass_min" (input)="onJobClassInput($event, 'jobclass_min')" /></label>
-          <span class="range-separator">ถึง</span>
-          <label><span>ไม่เกิน</span><input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="3" autocomplete="off" name="jobclass_max" required [value]="ruleForm.jobclass_max < 0 ? '' : ruleForm.jobclass_max" (input)="onJobClassInput($event, 'jobclass_max')" /></label>
+          <div class="range-fields">
+            <label><span>ตั้งแต่</span><input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="3" autocomplete="off" name="jobclass_min" required [value]="ruleForm.jobclass_min < 0 ? '' : ruleForm.jobclass_min" (input)="onJobClassInput($event, 'jobclass_min')" /></label>
+            <span class="range-separator">ถึง</span>
+            <label><span>ไม่เกิน</span><input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="3" autocomplete="off" name="jobclass_max" required [value]="ruleForm.jobclass_max < 0 ? '' : ruleForm.jobclass_max" (input)="onJobClassInput($event, 'jobclass_max')" /></label>
+          </div>
         </fieldset>
 
-        <fieldset>
+        <fieldset class="range-group">
           <legend>อายุงาน (ปี)</legend>
-          <label>
-            <span>ตั้งแต่</span>
-            <nz-select class="rule-form-select" name="service_year_min" nzShowSearch nzPlaceHolder="เลือกอายุงาน" [(ngModel)]="ruleForm.service_year_min">
-              @for (year of serviceYearMinOptions; track year) {
-                <nz-option [nzValue]="year" [nzLabel]="getServiceYearLabel(year)" />
-              }
-            </nz-select>
-          </label>
-          <span class="range-separator">ถึง</span>
-          <label>
-            <span>ไม่เกิน</span>
-            <nz-select class="rule-form-select" name="service_year_max" nzShowSearch nzPlaceHolder="เลือกอายุงาน" [(ngModel)]="ruleForm.service_year_max">
-              @for (year of serviceYearMaxOptions; track year) {
-                <nz-option [nzValue]="year" [nzLabel]="getServiceYearLabel(year, true)" />
-              }
-            </nz-select>
-          </label>
+          <div class="range-fields">
+            <label>
+              <span>ตั้งแต่</span>
+              <nz-select class="rule-form-select" name="service_year_min" nzShowSearch nzPlaceHolder="เลือกอายุงาน" [(ngModel)]="ruleForm.service_year_min">
+                @for (year of serviceYearMinOptions; track year) {
+                  <nz-option [nzValue]="year" [nzLabel]="getServiceYearLabel(year)" />
+                }
+              </nz-select>
+            </label>
+            <span class="range-separator">ถึง</span>
+            <label>
+              <span>ไม่เกิน</span>
+              <nz-select class="rule-form-select" name="service_year_max" nzShowSearch nzPlaceHolder="เลือกอายุงาน" [(ngModel)]="ruleForm.service_year_max">
+                @for (year of serviceYearMaxOptions; track year) {
+                  <nz-option [nzValue]="year" [nzLabel]="getServiceYearLabel(year, true)" />
+                }
+              </nz-select>
+            </label>
+          </div>
         </fieldset>
 
         <label class="quota-field">
@@ -178,14 +182,11 @@
           <div><input type="text" inputmode="numeric" pattern="[0-9]*" autocomplete="off" name="quota_days" required [value]="ruleForm.quota_days < 0 ? '' : ruleForm.quota_days" (input)="onQuotaDaysInput($event)" /><strong>วัน</strong></div>
         </label>
 
-        @if (!isRuleFormValid()) {
-          <p class="validation-message"><i class="fa-solid fa-circle-exclamation"></i> ค่าสูงสุดต้องไม่น้อยกว่าค่าตั้งต้น ทุกค่าต้องไม่ติดลบ และ Job Class ต้องไม่เกิน 999</p>
-        }
       </div>
 
       <footer class="rule-modal-footer">
         <button type="button" class="cancel-button" (click)="closeRuleModal()" [disabled]="isSavingRule()">ยกเลิก</button>
-        <button type="submit" class="save-button" [disabled]="isSavingRule() || !isRuleFormValid()">
+        <button type="submit" class="save-button" [disabled]="isSavingRule() || isConfirmingSave()">
           @if (isSavingRule()) { <i class="fa-solid fa-spinner spin"></i> กำลังบันทึก... } @else { <i class="fa-solid fa-check"></i> บันทึก }
         </button>
       </footer>
