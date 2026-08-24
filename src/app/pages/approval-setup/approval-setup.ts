@@ -4,11 +4,19 @@ import { ApprovalSetupChainModal } from '../../components/modals/approval-setup-
 import { DepartmentSetup } from './components/department-setup/department-setup';
 import { EmployeeSetup } from './components/employee-setup/employee-setup';
 import { ItPaidSetup } from './components/it-paid-setup/it-paid-setup';
+import { PageHeaderComponent } from '../../components/shared/page-header/page-header';
 
 @Component({
   selector: 'app-approval-setup',
   standalone: true,
-  imports: [CommonModule, ApprovalSetupChainModal, DepartmentSetup, EmployeeSetup, ItPaidSetup],
+  imports: [
+    CommonModule,
+    ApprovalSetupChainModal,
+    DepartmentSetup,
+    EmployeeSetup,
+    ItPaidSetup,
+    PageHeaderComponent,
+  ],
   templateUrl: './approval-setup.html',
   styleUrl: './approval-setup.scss',
 })

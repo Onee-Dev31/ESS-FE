@@ -13,14 +13,34 @@
 }
 
 // ===== HEADER =====
+.approval-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.setup-toolbar {
+  display: flex;
+  justify-content: flex-end;
+}
+
 .page-header {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
+  gap: 16px;
+
+  &__left {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
 
   .page-title {
-    font-size: 20px;
-    font-weight: 800;
+    margin: 0;
+    font-size: $font-size-title;
+    font-weight: 600;
     color: var(--text-header);
     display: flex;
     align-items: center;
@@ -28,12 +48,12 @@
 
     i {
       color: var(--primary);
-      font-size: 18px;
+      font-size: $font-size-header;
     }
   }
 
   .page-subtitle {
-    font-size: 13px;
+    font-size: $font-size-label;
     color: var(--text-muted);
     margin-top: 4px;
   }
@@ -48,7 +68,7 @@
   border: 1px solid var(--border-color);
   background: var(--bg-card);
   color: var(--text);
-  font-size: 13px;
+  font-size: $font-size-label;
   cursor: pointer;
   transition: all 0.2s;
 
@@ -129,7 +149,7 @@
   border-radius: 10px;
   background: var(--primary);
   color: #fff;
-  font-size: 0.875rem;
+  font-size: $font-size-label;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s;
@@ -149,26 +169,86 @@
 }
 
 @media (max-width: 767px) {
+  .page-wrapper {
+    padding: 14px;
+    gap: 12px;
+  }
+
   .tab-bar-scroll {
-    overflow-x: visible;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 6px;
+    overflow: visible;
   }
 
   .tab-btn {
-    flex: 1;
-    flex-shrink: 1;
+    min-width: 0;
+    min-height: 60px;
+    flex-direction: column;
     justify-content: center;
-    padding-inline: 8px;
-    font-size: 1rem;
+    gap: 5px;
+    padding: 8px 5px;
+    font-size: $font-size-label;
 
     .tab-label {
-      display: none;
+      display: block;
+      max-width: 100%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    i {
+      font-size: $font-size-header;
     }
   }
 }
 
-// responsive — ซ่อนข้อความบน mobile
 @media (max-width: 575.98px) {
+  :host ::ng-deep app-page-header .top-header-strip {
+    flex-wrap: wrap;
+  }
+
+  :host ::ng-deep app-page-header .header-actions {
+    width: 100%;
+  }
+
+  .approval-header-actions {
+    display: flex;
+    justify-content: flex-end;
+    width: 100%;
+
+    button {
+      justify-content: center;
+      min-height: 38px;
+    }
+  }
+
+  .page-header {
+    align-items: flex-start;
+
+    &__left {
+      min-width: 0;
+      gap: 9px;
+    }
+
+    .page-title {
+      font-size: $font-size-header;
+    }
+  }
+
+  .btn-refresh {
+    flex-shrink: 0;
+    padding: 7px 10px;
+  }
+
+  .btn-setup {
+    width: 100%;
+    justify-content: center;
+    padding: 7px 10px;
+    font-weight: 500;
+  }
+
   .btn-setup .btn-text {
-    display: none;
+    display: inline;
   }
 }
