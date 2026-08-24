@@ -1,9 +1,15 @@
-import { Component, DestroyRef, OnInit, computed, inject, signal } from '@angular/core';
+import { Component, DestroyRef, HostListener, OnInit, computed, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { LeaveQuotaRule, LeaveTypeMaster, TimeOffService } from '../../services/time-off.service';
+import {
+  LeaveQuotaRule,
+  LeaveTypeMaster,
+  TimeOffService,
+  UpsertLeaveQuotaRulePayload,
+} from '../../services/time-off.service';
 import { PageHeaderComponent } from '../../components/shared/page-header/page-header';
 import { FormsModule } from '@angular/forms';
 import { NzSelectModule } from 'ng-zorro-antd/select';
+import { SwalService } from '../../services/swal.service';
 
 interface LeaveQuotaGroup {
   leave_type_id: number;
@@ -22,12 +28,24 @@ interface LeaveQuotaGroup {
 export class SettingTimeoff implements OnInit {
   private readonly timeOffService = inject(TimeOffService);
   private readonly destroyRef = inject(DestroyRef);
+  private readonly swalService = inject(SwalService);
 
   readonly quotaRules = signal<LeaveQuotaRule[]>([]);
   readonly leaveTypes = signal<LeaveTypeMaster[]>([]);
   readonly selectedLeaveCode = signal<string | null>(null);
   readonly isLoading = signal(false);
   readonly errorMessage = signal<string | null>(null);
+  readonly isRuleModalOpen = signal(false);
+  readonly isSavingRule = signal(false);
+  readonly editingRuleId = signal<number | null>(null);
+  readonly serviceYearMinOptions = [
+    0.3,
+    ...Array.from({ length: 98 }, (_, index) => index + 1),
+  ];
+  readonly serviceYearMaxOptions = [...this.serviceYearMinOptions, 99];
+  ruleForm: UpsertLeaveQuotaRulePayload = this.createEmptyRuleForm();
+  private initialRuleForm = '';
+  private isConfirmingClose = false;
 
   readonly quotaGroups = computed<LeaveQuotaGroup[]>(() => {
     return this.leaveTypes().map((leaveType) => {
@@ -81,6 +99,129 @@ export class SettingTimeoff implements OnInit {
 
   openGroup(leaveCode: string): void {
     this.selectedLeaveCode.set(leaveCode);
+  }
+
+  onJobClassInput(event: Event, field: 'jobclass_min' | 'jobclass_max'): void {
+    const input = event.target as HTMLInputElement;
+    const digitsOnly = input.value.replace(/\D/g, '').slice(0, 3);
+    input.value = digitsOnly;
+    this.ruleForm[field] = digitsOnly ? Number(digitsOnly) : -1;
+  }
+
+  onQuotaDaysInput(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const digitsOnly = input.value.replace(/\D/g, '');
+    input.value = digitsOnly;
+    this.ruleForm.quota_days = digitsOnly ? Number(digitsOnly) : -1;
+  }
+
+  openCreateRule(): void {
+    const group = this.selectedGroup();
+    if (!group) return;
+
+    this.editingRuleId.set(null);
+    this.ruleForm = this.createEmptyRuleForm(group.leave_type_id);
+    this.initialRuleForm = JSON.stringify(this.ruleForm);
+    this.isRuleModalOpen.set(true);
+  }
+
+  openEditRule(rule: LeaveQuotaRule): void {
+    this.editingRuleId.set(rule.rule_id);
+    this.ruleForm = {
+      rule_id: rule.rule_id,
+      leave_type_id: rule.leave_type_id,
+      jobclass_min: rule.jobclass_min,
+      jobclass_max: rule.jobclass_max,
+      service_year_min: rule.service_year_min,
+      service_year_max: rule.service_year_max,
+      quota_days: rule.quota_days,
+    };
+    this.initialRuleForm = JSON.stringify(this.ruleForm);
+    this.isRuleModalOpen.set(true);
+  }
+
+  @HostListener('document:keydown.escape')
+  async closeRuleModal(): Promise<void> {
+    if (!this.isRuleModalOpen() || this.isSavingRule() || this.isConfirmingClose) return;
+
+    if (JSON.stringify(this.ruleForm) !== this.initialRuleForm) {
+      this.isConfirmingClose = true;
+      const result = await this.swalService.confirm(
+        'ยกเลิกการเปลี่ยนแปลง?',
+        'ข้อมูลที่แก้ไขจะไม่ถูกบันทึก',
+      );
+      this.isConfirmingClose = false;
+      if (!result.isConfirmed) return;
+    }
+
+    this.isRuleModalOpen.set(false);
+  }
+
+  saveRule(): void {
+    if (this.isSavingRule() || !this.isRuleFormValid()) return;
+
+    const payload: UpsertLeaveQuotaRulePayload = { ...this.ruleForm };
+    if (this.editingRuleId() === null) delete payload.rule_id;
+
+    this.isSavingRule.set(true);
+    this.timeOffService
+      .upsertQuotaRule(payload)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: () => {
+          this.isSavingRule.set(false);
+          this.isRuleModalOpen.set(false);
+          this.swalService.success(
+            this.editingRuleId() === null ? 'เพิ่มเงื่อนไขสำเร็จ' : 'แก้ไขเงื่อนไขสำเร็จ',
+          );
+          this.loadQuotaRules();
+        },
+        error: () => {
+          this.isSavingRule.set(false);
+          this.swalService.error('บันทึกไม่สำเร็จ', 'กรุณาลองใหม่อีกครั้ง');
+        },
+      });
+  }
+
+  isRuleFormValid(): boolean {
+    const form = this.ruleForm;
+    return (
+      form.leave_type_id > 0 &&
+      Number.isInteger(form.jobclass_min) &&
+      form.jobclass_min >= 0 &&
+      form.jobclass_min <= 999 &&
+      Number.isInteger(form.jobclass_max) &&
+      form.jobclass_max >= form.jobclass_min &&
+      form.jobclass_max <= 999 &&
+      form.service_year_min >= 0.3 &&
+      form.service_year_max >= form.service_year_min &&
+      Number.isInteger(form.quota_days) &&
+      form.quota_days >= 0
+    );
+  }
+
+  getServiceYearLabel(year: number, isMaximum = false): string {
+    if (year === 0.3) return 'ผ่านโปร';
+    if (year === 99 && isMaximum) return 'ขึ้นไป (ไม่จำกัด)';
+    return `${year} ปี`;
+  }
+
+  getServiceYearRangeLabel(minimum: number, maximum: number): string {
+    const minimumLabel = this.getServiceYearLabel(minimum);
+    return maximum === 99
+      ? `${minimumLabel}ขึ้นไป`
+      : `${minimumLabel}–${this.getServiceYearLabel(maximum)}`;
+  }
+
+  private createEmptyRuleForm(leaveTypeId = 0): UpsertLeaveQuotaRulePayload {
+    return {
+      leave_type_id: leaveTypeId,
+      jobclass_min: 1,
+      jobclass_max: 999,
+      service_year_min: 0.3,
+      service_year_max: 99,
+      quota_days: 0,
+    };
   }
 
 }

@@ -3,12 +3,22 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Observable, map } from 'rxjs';
 import { environment } from '../../environments/environment';
-import { LeaveQuotaData, TimeOffRequest } from '../interfaces/time-off.interface';
+import {
+  LeaveQuotaData,
+  TimeOffRequest,
+  UpsertLeaveQuotaRulePayload,
+} from '../interfaces/time-off.interface';
 import { TimeOffMock } from '../mocks/time-off.mock';
 import { STORAGE_KEYS } from '../constants/storage.constants';
 import { BaseRequestService } from './base-request.service';
 
-export type { LeaveQuotaData, LeaveQuotaRule, LeaveTypeMaster, TimeOffRequest } from '../interfaces/time-off.interface';
+export type {
+  LeaveQuotaData,
+  LeaveQuotaRule,
+  LeaveTypeMaster,
+  TimeOffRequest,
+  UpsertLeaveQuotaRulePayload,
+} from '../interfaces/time-off.interface';
 
 interface LeaveQuotaRulesResponse {
   success?: boolean;
@@ -32,5 +42,9 @@ export class TimeOffService extends BaseRequestService<TimeOffRequest> {
     return this.http
       .get<LeaveQuotaRulesResponse>(`${this.baseUrl}/leave/Get-quota-rules`)
       .pipe(map((response) => response.data ?? { master: [], rules: [] }));
+  }
+
+  upsertQuotaRule(payload: UpsertLeaveQuotaRulePayload): Observable<unknown> {
+    return this.http.post(`${this.baseUrl}/leave/Upsert-quota-rules`, payload);
   }
 }

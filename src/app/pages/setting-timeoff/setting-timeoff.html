@@ -74,8 +74,13 @@
             </div>
           </header>
           <div class="rule-section-title">
-            <h3>เงื่อนไขและโควตา</h3>
-            <p>แยกตามระดับพนักงานและอายุงาน</p>
+            <div>
+              <h3>เงื่อนไขสิทธิ์ลา</h3>
+              <p>แยกตามระดับพนักงานและอายุงาน</p>
+            </div>
+            <button type="button" class="add-rule-button" (click)="openCreateRule()">
+              <i class="fa-solid fa-plus"></i> เพิ่มเงื่อนไข
+            </button>
           </div>
           <div class="table-wrap">
             <table>
@@ -85,6 +90,7 @@
                   <th>ระดับพนักงาน</th>
                   <th>อายุงาน</th>
                   <th>โควตา</th>
+                  <th class="action-column"></th>
                 </tr>
               </thead>
               <tbody>
@@ -97,16 +103,21 @@
                       <strong>Job Class {{ rule.jobclass_min }}–{{ rule.jobclass_max }}</strong>
                     </td>
                     <td data-label="อายุงาน">
-                      {{ rule.service_year_min }}–{{ rule.service_year_max }} ปี
+                      {{ getServiceYearRangeLabel(rule.service_year_min, rule.service_year_max) }}
                     </td>
                     <td data-label="โควตา">
                       <span class="quota">{{ rule.quota_days }} วัน</span>
                     </td>
+                    <td class="action-column">
+                      <button type="button" class="edit-rule-button" title="แก้ไขเงื่อนไข" (click)="openEditRule(rule)">
+                        <i class="fa-solid fa-pen"></i>
+                      </button>
+                    </td>
                   </tr>
                 } @empty {
                   <tr>
-                    <td colspan="4" class="no-rules">
-                      <i class="fa-regular fa-clipboard"></i><strong>ยังไม่มีกฎโควตา</strong
+                    <td colspan="5" class="no-rules">
+                      <i class="fa-regular fa-clipboard"></i><strong>ยังไม่มีเงื่อนไขสิทธิ์ลา</strong
                       ><span>ประเภทการลานี้ยังไม่มีการกำหนดเงื่อนไข</span>
                     </td>
                   </tr>
@@ -119,3 +130,65 @@
     </section>
   }
 </main>
+
+@if (isRuleModalOpen()) {
+  <div class="rule-modal-backdrop">
+    <form class="rule-modal" (click)="$event.stopPropagation()" (ngSubmit)="saveRule()">
+      <header class="rule-modal-header">
+        <div>
+          <span>{{ editingRuleId() === null ? 'เพิ่มเงื่อนไข' : 'แก้ไขเงื่อนไข' }}</span>
+          <h2>{{ selectedGroup()?.leave_name_th }}</h2>
+        </div>
+        <button type="button" class="modal-close" aria-label="ปิด" [disabled]="isSavingRule()" (click)="closeRuleModal()">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </header>
+
+      <div class="rule-form-body">
+        <fieldset>
+          <legend>ระดับพนักงาน (Job Class)</legend>
+          <label><span>ตั้งแต่</span><input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="3" autocomplete="off" name="jobclass_min" required [value]="ruleForm.jobclass_min < 0 ? '' : ruleForm.jobclass_min" (input)="onJobClassInput($event, 'jobclass_min')" /></label>
+          <span class="range-separator">ถึง</span>
+          <label><span>ไม่เกิน</span><input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="3" autocomplete="off" name="jobclass_max" required [value]="ruleForm.jobclass_max < 0 ? '' : ruleForm.jobclass_max" (input)="onJobClassInput($event, 'jobclass_max')" /></label>
+        </fieldset>
+
+        <fieldset>
+          <legend>อายุงาน (ปี)</legend>
+          <label>
+            <span>ตั้งแต่</span>
+            <nz-select class="rule-form-select" name="service_year_min" nzShowSearch nzPlaceHolder="เลือกอายุงาน" [(ngModel)]="ruleForm.service_year_min">
+              @for (year of serviceYearMinOptions; track year) {
+                <nz-option [nzValue]="year" [nzLabel]="getServiceYearLabel(year)" />
+              }
+            </nz-select>
+          </label>
+          <span class="range-separator">ถึง</span>
+          <label>
+            <span>ไม่เกิน</span>
+            <nz-select class="rule-form-select" name="service_year_max" nzShowSearch nzPlaceHolder="เลือกอายุงาน" [(ngModel)]="ruleForm.service_year_max">
+              @for (year of serviceYearMaxOptions; track year) {
+                <nz-option [nzValue]="year" [nzLabel]="getServiceYearLabel(year, true)" />
+              }
+            </nz-select>
+          </label>
+        </fieldset>
+
+        <label class="quota-field">
+          <span>จำนวนวันลาที่ได้รับ</span>
+          <div><input type="text" inputmode="numeric" pattern="[0-9]*" autocomplete="off" name="quota_days" required [value]="ruleForm.quota_days < 0 ? '' : ruleForm.quota_days" (input)="onQuotaDaysInput($event)" /><strong>วัน</strong></div>
+        </label>
+
+        @if (!isRuleFormValid()) {
+          <p class="validation-message"><i class="fa-solid fa-circle-exclamation"></i> ค่าสูงสุดต้องไม่น้อยกว่าค่าตั้งต้น ทุกค่าต้องไม่ติดลบ และ Job Class ต้องไม่เกิน 999</p>
+        }
+      </div>
+
+      <footer class="rule-modal-footer">
+        <button type="button" class="cancel-button" (click)="closeRuleModal()" [disabled]="isSavingRule()">ยกเลิก</button>
+        <button type="submit" class="save-button" [disabled]="isSavingRule() || !isRuleFormValid()">
+          @if (isSavingRule()) { <i class="fa-solid fa-spinner spin"></i> กำลังบันทึก... } @else { <i class="fa-solid fa-check"></i> บันทึก }
+        </button>
+      </footer>
+    </form>
+  </div>
+}

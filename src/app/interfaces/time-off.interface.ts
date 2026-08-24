@@ -43,6 +43,16 @@ export interface LeaveQuotaData {
   rules: LeaveQuotaRule[];
 }
 
+export interface UpsertLeaveQuotaRulePayload {
+  rule_id?: number;
+  leave_type_id: number;
+  jobclass_min: number;
+  jobclass_max: number;
+  service_year_min: number;
+  service_year_max: number;
+  quota_days: number;
+}
+
 export interface LeaveType {
   id: string;
   label: string;
