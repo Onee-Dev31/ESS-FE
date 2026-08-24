@@ -17,6 +17,32 @@ export interface TimeOffRequest {
   requester?: Requester;
 }
 
+export interface LeaveQuotaRule {
+  rule_id: number;
+  leave_type_id: number;
+  leave_code: string;
+  leave_name_th: string;
+  leave_name_en: string;
+  jobclass_min: number;
+  jobclass_max: number;
+  service_year_min: number;
+  service_year_max: number;
+  quota_days: number;
+  leave_type_is_active: boolean;
+}
+
+export interface LeaveTypeMaster {
+  leave_type_id: number;
+  leave_code: string;
+  leave_name_th: string;
+  leave_name_en: string;
+}
+
+export interface LeaveQuotaData {
+  master: LeaveTypeMaster[];
+  rules: LeaveQuotaRule[];
+}
+
 export interface LeaveType {
   id: string;
   label: string;

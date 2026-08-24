@@ -187,6 +187,13 @@ export const routes: Routes = [
         data: { animation: 'Dashboard' },
       },
       {
+        path: 'timeoff-setting',
+        loadComponent: () =>
+          import('./pages/setting-timeoff/setting-timeoff').then((m) => m.SettingTimeoff),
+        // canActivate: [menuGuard],
+        data: { animation: 'Dashboard' },
+      },
+      {
         path: 'holiday-setting',
         loadComponent: () =>
           import('./pages/setting-holiday/setting-holiday').then((m) => m.SettingHoliday),

@@ -1,0 +1,121 @@
+<main class="page">
+  <app-page-header title="กำหนดสิทธิ์การลา" />
+
+  @if (isLoading()) {
+    <section class="state-box">
+      <span class="loader"></span><strong>กำลังโหลดข้อมูลประเภทการลา...</strong>
+    </section>
+  } @else if (errorMessage()) {
+    <section class="state-box error">
+      <i class="fa-solid fa-triangle-exclamation"></i><strong>{{ errorMessage() }}</strong
+      ><button type="button" (click)="loadQuotaRules()">ลองอีกครั้ง</button>
+    </section>
+  } @else if (quotaGroups().length === 0) {
+    <section class="state-box">
+      <i class="fa-regular fa-folder-open"></i><strong>ไม่พบข้อมูลประเภทการลา</strong>
+    </section>
+  } @else {
+    <section class="master-detail">
+      <aside class="master-panel">
+        <div class="panel-heading">
+          <h2>ประเภทการลา</h2>
+          <p>{{ quotaGroups().length }} ประเภท</p>
+        </div>
+        <nav class="leave-list" aria-label="ประเภทการลา">
+          @for (group of quotaGroups(); track group.leave_type_id) {
+            <button
+              type="button"
+              class="leave-item"
+              [class.active]="selectedLeaveCode() === group.leave_code"
+              (click)="openGroup(group.leave_code)"
+            >
+              <span class="leave-icon"><i class="fa-regular fa-calendar"></i></span>
+              <span class="leave-info"
+                ><strong>{{ group.leave_name_th }}</strong
+                ><small>{{ group.leave_name_en }}</small></span
+              >
+              <span class="rule-count" [class.empty]="group.rules.length === 0">{{
+                group.rules.length
+              }}</span>
+              <i class="fa-solid fa-chevron-right arrow"></i>
+            </button>
+          }
+        </nav>
+      </aside>
+
+      <article class="detail-panel">
+        <label class="mobile-leave-select">
+          <span>ประเภทการลา</span>
+          <nz-select
+            class="mobile-nz-select"
+            nzShowSearch
+            nzPlaceHolder="เลือกประเภทการลา"
+            [ngModel]="selectedLeaveCode()"
+            (ngModelChange)="openGroup($event)"
+          >
+            @for (group of quotaGroups(); track group.leave_type_id) {
+              <nz-option
+                [nzValue]="group.leave_code"
+                [nzLabel]="group.leave_name_th + ' (' + group.leave_name_en + ')'"
+              />
+            }
+          </nz-select>
+        </label>
+
+        @if (selectedGroup(); as group) {
+          <header class="detail-heading">
+            <div>
+              <span class="code">{{ group.leave_name_en }}</span>
+              <h2>{{ group.leave_name_th }}</h2>
+            </div>
+            <div class="rule-summary">
+              <strong>{{ group.rules.length }}</strong
+              ><span>เงื่อนไข</span>
+            </div>
+          </header>
+          <div class="rule-section-title">
+            <h3>เงื่อนไขและโควตา</h3>
+            <p>แยกตามระดับพนักงานและอายุงาน</p>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>ลำดับ</th>
+                  <th>ระดับพนักงาน</th>
+                  <th>อายุงาน</th>
+                  <th>โควตา</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (rule of group.rules; track rule.rule_id; let index = $index) {
+                  <tr>
+                    <td data-label="ลำดับ">
+                      <span class="rule-number">{{ index + 1 }}</span>
+                    </td>
+                    <td data-label="ระดับพนักงาน">
+                      <strong>Job Class {{ rule.jobclass_min }}–{{ rule.jobclass_max }}</strong>
+                    </td>
+                    <td data-label="อายุงาน">
+                      {{ rule.service_year_min }}–{{ rule.service_year_max }} ปี
+                    </td>
+                    <td data-label="โควตา">
+                      <span class="quota">{{ rule.quota_days }} วัน</span>
+                    </td>
+                  </tr>
+                } @empty {
+                  <tr>
+                    <td colspan="4" class="no-rules">
+                      <i class="fa-regular fa-clipboard"></i><strong>ยังไม่มีกฎโควตา</strong
+                      ><span>ประเภทการลานี้ยังไม่มีการกำหนดเงื่อนไข</span>
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        }
+      </article>
+    </section>
+  }
+</main>
