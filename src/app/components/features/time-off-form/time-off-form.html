@@ -1,4 +1,4 @@
-<div class="time-off-form-page">
+<div class="time-off-form-page" [class.readonly-mode]="requestStatus !== 'NEW'">
   <header class="top-header-strip">
     <h2>บันทึกข้อมูลการลา (Time Off)</h2>
     <div class="header-right-meta">
@@ -23,6 +23,7 @@
     </div>
   </header>
 
+  <fieldset class="form-content-fieldset" [disabled]="requestStatus !== 'NEW'">
   <main class="content-card">
     <section class="form-section-wrapper">
       <h4 class="section-heading">1. เลือกประเภทการลา</h4>
@@ -278,6 +279,7 @@
       </div>
     </div>
   </main>
+  </fieldset>
 
   <div class="form-actions-footer" *ngIf="requestStatus === 'NEW'">
     <button class="btn-back-custom" (click)="close()"><i class="fas fa-times"></i> ยกเลิก</button>

@@ -1,5 +1,5 @@
 <div class="timeoff-page">
-  <app-page-header title="รายการลา"></app-page-header>
+  <app-page-header title="รายการลา" subtitle="Time Off Requests" icon="fas fa-calendar-minus" />
   <div class="content-card">
     <div class="card-header-title">รายการลาของฉัน</div>
 
@@ -83,17 +83,8 @@
               </div>
 
               <div class="card-actions-top">
-                @if (request.attachments && request.attachments.length > 0) {
-                  <button
-                    class="action-btn folder"
-                    (click)="openPreview(request.attachments)"
-                    title="ดูเอกสาร"
-                  >
-                    <i class="far fa-folder-open"></i>
-                  </button>
-                }
-                <div class="status-badge" [ngClass]="getStatusClass(request.status)">
-                  {{ request.status | statusLabel }}
+                <div class="status-badge" [ngClass]="getStatusMeta(request.status).className">
+                  {{ getStatusMeta(request.status).label }}
                 </div>
               </div>
             </div>
@@ -101,11 +92,11 @@
             <div class="card-body">
               <div class="info-row request-id">
                 <span class="label">รหัสคำขอ:</span>
-                <span class="value">{{ request.id }}</span>
+                <span class="value">{{ getLeaveNumber(request) }}</span>
               </div>
               <div class="info-row">
                 <span class="label"><i class="far fa-clock"></i> วันที่ทำรายการ:</span>
-                <span class="value">{{ request.createDate }}</span>
+                <span class="value">{{ formatCreatedAt(getCreatedAt(request)) }}</span>
               </div>
               <div class="info-row">
                 <span class="label"><i class="fas fa-suitcase-rolling"></i> ประเภทการลา:</span>
@@ -137,10 +128,19 @@
               <div class="reason-box">
                 <strong>เหตุผล:</strong>
                 {{ request.reason }}
+                @if (request.attachments.length > 0) {
+                  <button
+                    class="attachment-link"
+                    type="button"
+                    (click)="openPreview(request.attachments)"
+                  >
+                    <i class="fas fa-paperclip"></i> เอกสารแนบ {{ request.attachments.length }} ไฟล์
+                  </button>
+                }
               </div>
 
               <div class="card-footer-actions">
-                @if (request.status === 'NEW' || request.status === 'คำขอใหม่') {
+                @if (isNewRequest(request.status)) {
                   <button class="btn-edit-sm" (click)="openForm(request.status)">
                     <i class="far fa-edit"></i> แก้ไข
                   </button>
@@ -173,115 +173,74 @@
         <table class="modern-table">
           <thead>
             <tr>
-              <th rowspan="2" class="w-px-100 sortable-header" (click)="toggleSort('id')">
-                <i class="fas fa-hashtag mr-1"></i> รหัสคำขอ
-                <i class="fas ml-1" [ngClass]="getSortIcon('id')"></i>
+              <th class="request-column sortable-header" (click)="toggleSort('createDate')">
+                วันที่ทำรายการ / เลขที่ใบลา
+                <i class="fas" [ngClass]="getSortIcon('createDate')"></i>
               </th>
-              <th colspan="2" class="w-px-250 text-center">
-                <i class="far fa-clock mr-1"></i> วัน-เวลา ที่ขอลา
+              <th class="date-column sortable-header" (click)="toggleSort('startDate')">
+                ตั้งแต่วันที่ <i class="fas" [ngClass]="getSortIcon('startDate')"></i>
               </th>
-              <th
-                rowspan="2"
-                class="text-center w-px-100 sortable-header"
-                (click)="toggleSort('days')"
-              >
-                <i class="fas fa-calendar-day mr-1"></i> จำนวน
-                <i class="fas ml-1" [ngClass]="getSortIcon('days')"></i>
+              <th class="date-column sortable-header" (click)="toggleSort('endDate')">
+                ถึงวันที่ <i class="fas" [ngClass]="getSortIcon('endDate')"></i>
               </th>
-              <th
-                rowspan="2"
-                class="text-center w-15 sortable-header"
-                (click)="toggleSort('leaveType')"
-              >
-                <i class="fas fa-suitcase-rolling mr-1"></i> ประเภทการลา
-                <i class="fas ml-1" [ngClass]="getSortIcon('leaveType')"></i>
+              <th class="time-column">ตั้งแต่เวลา</th>
+              <th class="time-column">ถึงเวลา</th>
+              <th class="leave-type-column sortable-header" (click)="toggleSort('leaveType')">
+                ประเภทการลา <i class="fas" [ngClass]="getSortIcon('leaveType')"></i>
               </th>
-              <th
-                rowspan="2"
-                class="text-center w-10 sortable-header"
-                (click)="toggleSort('leavePeriod')"
-              >
-                <i class="fas fa-hourglass-half mr-1"></i> ช่วงเวลา
-                <i class="fas ml-1" [ngClass]="getSortIcon('leavePeriod')"></i>
+              <th class="reason-column sortable-header" (click)="toggleSort('reason')">
+                เหตุผล <i class="fas" [ngClass]="getSortIcon('reason')"></i>
               </th>
-              <th
-                rowspan="2"
-                class="w-auto sortable-header text-center"
-                (click)="toggleSort('reason')"
-              >
-                <i class="fas fa-comment-alt mr-1"></i> เหตุผล
-                <i class="fas ml-1" [ngClass]="getSortIcon('reason')"></i>
+              <th class="status-column sortable-header" (click)="toggleSort('status')">
+                สถานะ <i class="fas" [ngClass]="getSortIcon('status')"></i>
               </th>
-              <th
-                rowspan="2"
-                class="text-center w-px-140 sortable-header"
-                (click)="toggleSort('status')"
-              >
-                <i class="fas fa-tasks mr-1"></i> สถานะ
-                <i class="fas ml-1" [ngClass]="getSortIcon('status')"></i>
-              </th>
-              <th rowspan="2" class="text-center w-px-160">Actions</th>
-            </tr>
-            <tr>
-              <th class="text-center w-px-120 sortable-header" (click)="toggleSort('startDate')">
-                <i class="fas fa-calendar-check mr-1"></i> จาก
-                <i class="fas ml-1" [ngClass]="getSortIcon('startDate')"></i>
-              </th>
-              <th class="text-center w-px-120 sortable-header" (click)="toggleSort('endDate')">
-                <i class="fas fa-calendar-times mr-1"></i> ถึง
-                <i class="fas ml-1" [ngClass]="getSortIcon('endDate')"></i>
-              </th>
+              <th class="actions-column">ดำเนินการ</th>
             </tr>
           </thead>
           @for (request of comps.paginatedData(); track request.id) {
             <tbody>
               <tr>
-                <td class="text-center merged-col">
-                  <span class="text-primary-link">{{ request.id }}</span>
+                <td class="request-meta-cell">
+                  <span class="created-at">{{ formatCreatedAt(getCreatedAt(request)) }}</span>
+                  <strong class="leave-number">{{ getLeaveNumber(request) }}</strong>
                 </td>
-                <td class="text-center">
-                  <div class="font-bold">{{ formatDate(request.startDate) }}</div>
-                  @if (request.shiftStartTime) {
-                    <div class="small text-muted">{{ request.shiftStartTime }}</div>
-                  }
-                </td>
-                <td class="text-center">
-                  <div class="font-bold">{{ formatDate(request.endDate) }}</div>
-                  @if (request.shiftEndTime) {
-                    <div class="small text-muted">{{ request.shiftEndTime }}</div>
-                  }
-                </td>
-                <td class="text-center">
-                  <span class="days-badge">{{ request.days }}</span>
-                </td>
-                <td class="text-center">
-                  <div class="leave-type-cell centered">
+                <td class="date-value">{{ dateUtil.formatDateToBE(request.startDate, 'DD/MM/YYYY') }}</td>
+                <td class="date-value">{{ dateUtil.formatDateToBE(request.endDate, 'DD/MM/YYYY') }}</td>
+                <td class="time-value">{{ request.shiftStartTime || '-' }}</td>
+                <td class="time-value">{{ request.shiftEndTime || '-' }}</td>
+                <td>
+                  <div class="leave-type-cell">
                     <i [class]="getLeaveTypeIcon(request.leaveType)"></i>
-                    {{ request.leaveType }}
+                    <div>
+                      <span>{{ request.leaveType }}</span>
+                      <small>
+                        {{ getPeriodLabel(request.leavePeriod) || 'เต็มวัน' }}
+                        @if (request.days) { · รวม {{ request.days }} วัน }
+                      </small>
+                    </div>
                   </div>
                 </td>
-                <td class="text-center">
-                  <span class="period-text">{{ getPeriodLabel(request.leavePeriod) }}</span>
+                <td class="reason-cell">
+                  <div>{{ request.reason || '-' }}</div>
+                  @if (request.attachments.length > 0) {
+                    <button
+                      class="attachment-link"
+                      type="button"
+                      (click)="openPreview(request.attachments)"
+                    >
+                      <i class="fas fa-paperclip"></i> เอกสารแนบ
+                      {{ request.attachments.length }} ไฟล์
+                    </button>
+                  }
                 </td>
-                <td class="reason-cell text-center">{{ request.reason }}</td>
-                <td class="text-center merged-col">
-                  <span class="status-badge" [ngClass]="getStatusClass(request.status)">
-                    {{ request.status | statusLabel }}
+                <td>
+                  <span class="status-badge" [ngClass]="getStatusMeta(request.status).className">
+                    {{ getStatusMeta(request.status).label }}
                   </span>
                 </td>
-                <td class="text-center merged-col">
+                <td>
                   <div class="action-btns">
-                    @if (request.attachments && request.attachments.length > 0) {
-                      <button
-                        class="btn-icon view"
-                        title="ดูเอกสารแนบ"
-                        (click)="openPreview(request.attachments)"
-                      >
-                        <i class="far fa-folder-open"></i>
-                      </button>
-                    }
-
-                    @if (request.status === 'NEW' || request.status === 'คำขอใหม่') {
+                    @if (isNewRequest(request.status)) {
                       <button
                         class="btn-icon edit"
                         title="แก้ไข"

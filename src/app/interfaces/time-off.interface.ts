@@ -3,6 +3,8 @@ import { Requester } from './core.interface';
 export interface TimeOffRequest {
   id: string;
   createDate: string;
+  leave_number?: string;
+  create_at?: string;
   status: string;
   employeeId: string;
   leaveType: string;

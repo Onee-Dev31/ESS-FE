@@ -294,6 +294,18 @@ $status-cancelled-text: var(--text-table-head);
     color: var(--status-pending-text);
     border-color: var(--border);
   }
+
+  &.status-referred {
+    background: var(--status-warning-bg);
+    color: var(--status-warning-text);
+    border-color: var(--border);
+  }
+
+  &.status-neutral {
+    background: var(--bg-table-head);
+    color: var(--text-sub);
+    border-color: var(--border);
+  }
 }
 
 @mixin content-card {
@@ -408,6 +420,8 @@ $status-cancelled-text: var(--text-table-head);
   }
 
   .table-responsive {
+    overflow-x: auto;
+
     @include large-tablet {
       display: none;
     }
@@ -416,6 +430,70 @@ $status-cancelled-text: var(--text-table-head);
   // ==================== TABLE STYLES ====================
   .modern-table {
     @include modern-table;
+    min-width: 1180px;
+
+    tbody + tbody td {
+      border-top: 1px solid
+        color-mix(in srgb, var(--text-muted) 22%, var(--border-table-head)) !important;
+    }
+
+    .request-column {
+      width: 190px;
+    }
+
+    .date-column {
+      width: 135px;
+      white-space: nowrap;
+    }
+
+    .time-column {
+      width: 105px;
+      white-space: nowrap;
+    }
+
+    .leave-type-column {
+      width: 160px;
+    }
+
+    .status-column {
+      width: 160px;
+    }
+
+    .actions-column {
+      width: 76px;
+      text-align: center;
+    }
+
+    .request-meta-cell {
+      .created-at,
+      .leave-number {
+        display: block;
+      }
+
+      .created-at {
+        color: var(--text-sub);
+        font-size: $font-size-label;
+        line-height: 1.45;
+      }
+
+      .leave-number {
+        margin-top: 4px;
+        color: var(--primary);
+        font-size: $font-size-body;
+        font-weight: 600;
+      }
+    }
+
+    .date-value,
+    .time-value {
+      color: var(--text-header);
+      font-weight: 500;
+      white-space: nowrap;
+    }
+
+    .time-value {
+      text-align: center;
+    }
 
     // Column widths are now handled by utility classes in HTML (e.g., .w-px-120, .w-auto)
 
@@ -427,6 +505,19 @@ $status-cancelled-text: var(--text-table-head);
       i {
         color: $primary;
         font-size: 1rem;
+      }
+
+      span,
+      small {
+        display: block;
+      }
+
+      small {
+        margin-top: 4px;
+        color: var(--text-sub);
+        font-size: $font-size-label;
+        font-weight: 400;
+        white-space: nowrap;
       }
 
       &.centered {
@@ -450,10 +541,10 @@ $status-cancelled-text: var(--text-table-head);
     }
 
     .reason-cell {
-      max-width: 250px;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
+      width: auto;
+      max-width: 300px;
+      color: var(--text-sub);
+      line-height: 1.5;
     }
   }
 
@@ -516,9 +607,34 @@ $status-cancelled-text: var(--text-table-head);
   gap: 6px;
 }
 
+.attachment-link {
+  display: flex;
+  width: fit-content;
+  align-items: center;
+  gap: 6px;
+  margin-top: 7px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--primary);
+  font: inherit;
+  font-size: $font-size-label;
+  cursor: pointer;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
 .btn-icon {
   &.view {
     @include icon-btn-ghost(var(--text-table-head)); // Slate
+    background: var(--bg-table-head);
+
+    &:hover {
+      background: color-mix(in srgb, var(--primary) 9%, var(--bg-card));
+      color: var(--primary);
+    }
   }
 
   &.edit {
@@ -528,6 +644,12 @@ $status-cancelled-text: var(--text-table-head);
   &.delete {
     @include icon-btn-ghost(var(--danger)); // Red
   }
+}
+
+.action-btns .btn-icon {
+  width: 34px;
+  height: 34px;
+  border-radius: 9px;
 }
 
 // Keep legacy classes for backward compatibility if needed, but override styling

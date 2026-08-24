@@ -10,8 +10,6 @@ import { TimeOffForm } from '../../components/features/time-off-form/time-off-fo
 import { FilePreviewModalComponent } from '../../components/modals/file-preview-modal/file-preview-modal';
 import { DateUtilityService } from '../../services/date-utility.service';
 
-import { StatusLabelPipe } from '../../pipes/status-label.pipe';
-import { StatusUtil } from '../../utils/status.util';
 import { COMMON_STATUS_OPTIONS } from '../../constants/request-status.constant';
 import {
   createListingState,
@@ -34,7 +32,6 @@ import { createAngularTable, getCoreRowModel, SortingState } from '@tanstack/ang
     FormsModule,
     TimeOffForm,
     FilePreviewModalComponent,
-    StatusLabelPipe,
     PaginationComponent,
     SkeletonComponent,
     EmptyStateComponent,
@@ -49,7 +46,7 @@ export class TimeoffComponent implements OnInit {
   private toastService = inject(ToastService);
   private dialogService = inject(DialogService);
   private errorService = inject(ErrorService);
-  private dateUtil = inject(DateUtilityService);
+  protected readonly dateUtil = inject(DateUtilityService);
 
   isLoading = this.loadingService.loading('timeoff-list');
 
@@ -145,6 +142,17 @@ export class TimeoffComponent implements OnInit {
 
   statuses = COMMON_STATUS_OPTIONS;
 
+  private readonly statusDisplay: Record<string, { label: string; className: string }> = {
+    NEW: { label: 'คำขอใหม่', className: 'status-new' },
+    VERIFIED: { label: 'ตรวจสอบแล้ว', className: 'status-verified' },
+    WAITING_CHECK: { label: 'รอตรวจสอบ', className: 'status-verified' },
+    PENDING_ACTION: { label: 'รอดำเนินการ', className: 'status-pending' },
+    PENDING_APPROVAL: { label: 'อยู่ระหว่างการอนุมัติ', className: 'status-pending' },
+    APPROVED: { label: 'อนุมัติแล้ว', className: 'status-approved' },
+    REJECTED: { label: 'ไม่อนุมัติ', className: 'status-rejected' },
+    REFERRED_BACK: { label: 'รอแก้ไข', className: 'status-referred' },
+  };
+
   ngOnInit() {
     this.loadRequests();
   }
@@ -225,8 +233,33 @@ export class TimeoffComponent implements OnInit {
     return TableSortHelper.getSortIcon(this.table, columnId);
   }
 
-  getStatusClass(status: string): string {
-    return StatusUtil.getStatusBadgeClass(status);
+  getStatusMeta(status: string): { label: string; className: string } {
+    const key = status === 'คำขอใหม่' ? 'NEW' : status?.trim();
+    return this.statusDisplay[key] ?? {
+      label: key || 'ไม่ระบุสถานะ',
+      className: 'status-neutral',
+    };
+  }
+
+  isNewRequest(status: string): boolean {
+    return status?.trim() === 'NEW' || status?.trim() === 'คำขอใหม่';
+  }
+
+  getCreatedAt(request: TimeOffRequest): string {
+    return request.create_at || request.createDate;
+  }
+
+  getLeaveNumber(request: TimeOffRequest): string {
+    return request.leave_number || request.id;
+  }
+
+  formatCreatedAt(dateStr: string): string {
+    if (!dateStr) return '-';
+    return this.dateUtil.formatDateToBE(dateStr, 'DD/MM/YYYY');
+  }
+
+  isSameLeaveDate(request: TimeOffRequest): boolean {
+    return request.startDate === request.endDate;
   }
 
   getLeaveTypeIcon(leaveType: string): string {

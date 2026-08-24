@@ -820,3 +820,22 @@ textarea.custom-form-control {
   border-radius: 6px;
   height: 40px;
 }
+// ล็อกข้อมูลทั้งหมดเมื่อเปิดจาก action "ดูรายละเอียด"
+.form-content-fieldset {
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.readonly-mode {
+  .leave-type-card,
+  .period-option,
+  .upload-area {
+    pointer-events: none;
+  }
+
+  .content-card {
+    cursor: default;
+  }
+}
