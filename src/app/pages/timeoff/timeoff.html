@@ -106,13 +106,13 @@
               </div>
               <div class="info-row">
                 <span class="label"><i class="far fa-calendar-check"></i> วันที่ลา:</span>
-                <span class="value" style="text-align: right">
-                  {{ formatDate(request.startDate) }} - {{ formatDate(request.endDate) }}
-                  @if (request.shiftStartTime) {
-                    <div class="text-muted small">
-                      ({{ request.shiftStartTime }} - {{ request.shiftEndTime }})
-                    </div>
-                  }
+                <span class="value leave-date-value">
+                  {{ dateUtil.formatDateToBE(request.startDate, 'DD/MM/YYYY') }} -
+                  {{ dateUtil.formatDateToBE(request.endDate, 'DD/MM/YYYY') }}
+                  <small>
+                    {{ dateUtil.formatDateToBE(request.startDate, 'HH:mm') }} -
+                    {{ dateUtil.formatDateToBE(request.endDate, 'HH:mm') }}
+                  </small>
                 </span>
               </div>
               @if (request.days) {
