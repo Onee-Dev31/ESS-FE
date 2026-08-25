@@ -220,13 +220,33 @@
     padding-right: 16px !important;
   }
 
-  .ant-select:not(.ant-select-disabled).ant-select-focused .ant-select-selector {
-    border-color: #40a9ff00;
-    box-shadow: 0 0 0 2px rgb(24 144 255 / 0%);
+  :host ::ng-deep .ant-select:not(.ant-select-disabled).ant-select-focused .ant-select-selector {
+    border-color: transparent !important;
+    box-shadow: none !important;
   }
 
-  .ant-select:not(.ant-select-customize-input) .ant-select-selector {
-    border: 1px solid #d9d9d900;
+  :host
+    ::ng-deep
+    nz-select.form-input.ant-select-single.ant-select:not(.ant-select-customize-input)
+    .ant-select-selector {
+    padding: 0 !important;
+    background-color: transparent !important;
+    border-color: transparent !important;
+    box-shadow: none !important;
+  }
+
+  :host ::ng-deep nz-select.form-input .ant-select-selection-item,
+  :host ::ng-deep nz-select.form-input .ant-select-selection-placeholder,
+  :host ::ng-deep nz-select.form-input .ant-select-selection-search {
+    padding: 0 !important;
+  }
+
+  :host ::ng-deep nz-select.form-input .ant-select-selection-search {
+    inset-inline: 0 !important;
+  }
+
+  nz-select.form-input.ant-select-focused {
+    border-color: var(--primary) !important;
   }
 
   .form-input.input-error {

@@ -1811,8 +1811,8 @@ $table-label-bg: var(--border-toolbar);
   }
 
   :host ::ng-deep nz-select.form-input.input-error .ant-select-selector {
-    border-color: #ff4d4f !important;
-    box-shadow: 0 0 0 3px rgba(255, 77, 79, 0.15) !important;
+    border-color: transparent !important;
+    box-shadow: none !important;
   }
 
   .error {
@@ -1891,6 +1891,35 @@ $table-label-bg: var(--border-toolbar);
     border-color: #a78bfa !important;
     box-shadow: 0 0 0 4px rgba(167, 139, 250, 0.1) !important;
   }
+}
+
+/* The form-input host owns the field border; keep Ant's inner selector borderless. */
+:host ::ng-deep nz-select.form-input .ant-select-selector,
+:host ::ng-deep nz-select.form-input:hover .ant-select-selector,
+:host ::ng-deep nz-select.form-input.ant-select-focused .ant-select-selector {
+  background-color: transparent !important;
+  border-color: transparent !important;
+  box-shadow: none !important;
+}
+
+nz-select.form-input:not(.ant-select-disabled):hover {
+  border-color: var(--input-border-hover) !important;
+}
+
+nz-select.form-input.ant-select-focused {
+  border-color: var(--primary) !important;
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--primary) 10%, transparent) !important;
+}
+
+// Scroll only the selected items so the clear-all button stays in place.
+nz-select.form-input.multiple {
+  overflow: visible !important;
+}
+
+:host ::ng-deep nz-select.form-input.multiple .ant-select-selector {
+  height: 100% !important;
+  padding-inline-end: 40px !important;
+  overflow-y: auto !important;
 }
 
 // :host ::ng-deep nz-select.form-input.ant-select {

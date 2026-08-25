@@ -99,10 +99,7 @@ export class TimeOffService {
     }
 
     if (payload.delete_file_ids !== undefined) {
-      const deletedFileIds = Array.isArray(payload.delete_file_ids)
-        ? payload.delete_file_ids
-        : [payload.delete_file_ids];
-      deletedFileIds.forEach((id) => formData.append('delete_file_ids', String(id)));
+      payload.delete_file_ids.forEach((id) => formData.append('delete_file_ids', String(id)));
     }
     payload.files?.forEach((file) => formData.append('files', file, file.name));
 
@@ -172,6 +169,7 @@ export class TimeOffService {
         typeof file === 'string'
           ? { name: file }
           : {
+              file_id: Number(file['file_id'] ?? file['id'] ?? 0) || undefined,
               name: String(file['file_name'] ?? file['name'] ?? ''),
               url: String(file['file_path'] ?? file['file_url'] ?? file['url'] ?? ''),
             },
