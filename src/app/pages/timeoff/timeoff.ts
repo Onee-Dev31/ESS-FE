@@ -29,7 +29,8 @@ import { createAngularTable, getCoreRowModel, SortingState } from '@tanstack/ang
 import { NzSelectModule } from 'ng-zorro-antd/select';
 
 type StatusDisplayMeta =
-  { label: string; className: string } | { labelTH: string; labelEN: string; className: string };
+  | { label: string; className: string }
+  | { labelTH: string; labelEN: string; className: string };
 
 /** หน้าแสดงรายการคำขอลา (Time Off Request List) พร้อมระบบกรองและค้นหา */
 @Component({
@@ -415,12 +416,13 @@ export class TimeoffComponent implements OnInit {
 
   getPeriodLabel(period: string | undefined): string {
     if (!period) return '';
-    const periodMap: { [key: string]: string } = {
-      'full-day': 'เต็มวัน',
-      morning: 'ครึ่งวันเช้า',
-      afternoon: 'ครึ่งวันบ่าย',
+    const periodMap: Record<string, string> = {
+      FULL: 'เต็มวัน',
+      '1ST': 'ครึ่งวันเช้า',
+      '2ND': 'ครึ่งวันบ่าย',
     };
-    return periodMap[period] || period;
+    const key = period.trim().toUpperCase().replace(/\s+/g, '_');
+    return periodMap[key] ?? period;
   }
 
   formatDate(dateStr: string): string {

@@ -21,6 +21,7 @@ import {
   TimeOffRequest,
 } from '../../../interfaces/time-off.interface';
 import { DateUtilityService } from '../../../services/date-utility.service';
+import { DialogService } from '../../../services/dialog';
 import { STORAGE_KEYS } from '../../../constants/storage.constants';
 import dayjs from 'dayjs';
 
@@ -62,6 +63,7 @@ export class TimeOffForm implements OnInit {
   private timeOffService = inject(TimeOffService);
   private toastService = inject(ToastService);
   private dateUtil = inject(DateUtilityService);
+  private dialogService = inject(DialogService);
 
   @Input() initialLeaveTypeId: string = '';
   @Input() requestStatus: string = 'NEW';
@@ -108,8 +110,16 @@ export class TimeOffForm implements OnInit {
 
   loadingTypes = signal(true);
   attachments = signal<
-    { id: number; name: string; description: string; file?: File; url?: string }[]
+    {
+      id: number;
+      fileId?: number;
+      name: string;
+      description: string;
+      file?: File;
+      url?: string;
+    }[]
   >([]);
+  deletedFileIds = signal<number[]>([]);
   constructor(
     private cdr: ChangeDetectorRef,
     private zone: NgZone,
@@ -240,6 +250,14 @@ export class TimeOffForm implements OnInit {
 
   deleteAttachment(id: number) {
     if (!this.isEditableRequest()) return;
+
+    const attachment = this.attachments().find((item) => item.id === id);
+    if (attachment?.fileId) {
+      this.deletedFileIds.update((current) =>
+        current.includes(attachment.fileId!) ? current : [...current, attachment.fileId!],
+      );
+    }
+
     this.attachments.update((current) => current.filter((a) => a.id !== id));
   }
 
@@ -253,7 +271,7 @@ export class TimeOffForm implements OnInit {
     if (input.files && input.files.length > 0) {
       const currentAttachments = this.attachments();
       const newAttachments = Array.from(input.files).map((file: File, index) => ({
-        id: currentAttachments.length + index + 1,
+        id: Date.now() + index,
         name: file.name,
         description: '',
         file,
@@ -285,7 +303,7 @@ export class TimeOffForm implements OnInit {
     this.isPreviewModalOpen.set(false);
   }
 
-  save() {
+  async save() {
     if (!this.selectedLeaveType()) {
       this.toastService.warning('กรุณาเลือกประเภทการลาก่อนดำเนินการต่อ');
       return;
@@ -327,6 +345,27 @@ export class TimeOffForm implements OnInit {
       return;
     }
 
+    const isExistingRequest = Number(this.requestId()) > 0;
+    const isResubmit = this.isSendbackStatus();
+    const actionLabel = isResubmit
+      ? 'ส่งคำขอลาอีกครั้ง'
+      : isExistingRequest
+        ? 'แก้ไขใบลา'
+        : 'ส่งใบลา';
+    const confirmed = await this.dialogService.confirm({
+      title: `ยืนยันการ${actionLabel}`,
+      message: `${this.getSelectedLeaveTypeLabel()} • ${this.formatThaiDate(this.startDate())} - ${this.formatThaiDate(this.endDate())} • ${this.calculatedDays()} วัน`,
+      confirmText: isResubmit
+        ? 'ยืนยันส่งอีกครั้ง'
+        : isExistingRequest
+          ? 'ยืนยันการแก้ไข'
+          : 'ยืนยันส่งใบลา',
+      cancelText: 'ยกเลิก',
+      type: 'info',
+    });
+
+    if (!confirmed) return;
+
     const startDate = this.toApiDateTime(this.startDate(), this.shiftStartTime());
     const endDate = this.toApiDateTime(this.endDate(), this.shiftEndTime());
     const isHalfDay = this.calculatedDays() % 1 === 0.5;
@@ -341,7 +380,7 @@ export class TimeOffForm implements OnInit {
       reason: this.reason(),
       is_half_day: isHalfDay,
       half_day_period: isHalfDay ? this.getHalfDayPeriod() : 'FULL',
-      delete_file_ids: 0,
+      delete_file_ids: this.deletedFileIds().length ? this.deletedFileIds() : undefined,
       files: this.attachments()
         .map((attachment) => attachment.file)
         .filter((file): file is File => file instanceof File),
@@ -462,6 +501,7 @@ export class TimeOffForm implements OnInit {
   }
 
   private populateRequest(request: TimeOffRequest): void {
+    this.deletedFileIds.set([]);
     this.requestId.set(String(request.request_id ?? 0));
     this.selectedLeaveType.set(String(request.leave_type_id ?? ''));
     this.reason.set(request.reason ?? '');
@@ -472,6 +512,7 @@ export class TimeOffForm implements OnInit {
     this.attachments.set(
       (request.attachments ?? []).map((file, index) => ({
         id: index + 1,
+        fileId: file.file_id,
         name: file.name,
         description: '',
         url: file.url,
