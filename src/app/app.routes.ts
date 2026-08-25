@@ -101,6 +101,12 @@ export const routes: Routes = [
         data: { category: 'medical', animation: 'ApprovalAllowance' },
       },
       {
+        path: 'approvals-timeoff',
+        loadComponent: () =>
+          import('./pages/approval-timeoff/approval-timeoff').then((m) => m.ApprovalTimeoff),
+        // canActivate: [menuGuard],
+      },
+      {
         path: 'medicalexpenses',
         loadComponent: () =>
           import('./pages/medicalexpenses/medicalexpenses').then((m) => m.MedicalexpensesComponent),
