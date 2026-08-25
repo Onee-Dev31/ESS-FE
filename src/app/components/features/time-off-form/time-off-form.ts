@@ -27,6 +27,7 @@ import {
 
 import { NzDatePickerModule } from 'ng-zorro-antd/date-picker';
 import { NzTimePickerModule } from 'ng-zorro-antd/time-picker';
+import { NzSelectModule } from 'ng-zorro-antd/select';
 
 @Component({
   selector: 'app-time-off-form',
@@ -37,11 +38,15 @@ import { NzTimePickerModule } from 'ng-zorro-antd/time-picker';
     FilePreviewModalComponent,
     NzDatePickerModule,
     NzTimePickerModule,
+    NzSelectModule,
   ],
   templateUrl: './time-off-form.html',
   styleUrl: './time-off-form.scss',
 })
 export class TimeOffForm implements OnInit {
+  private readonly breakMinutes = 60;
+  private readonly shiftStartMinutes = signal(9 * 60);
+  private readonly shiftEndMinutes = signal(18 * 60);
   private timeOffService = inject(TimeOffService);
   private toastService = inject(ToastService);
   private dateUtil = inject(DateUtilityService);
@@ -60,33 +65,30 @@ export class TimeOffForm implements OnInit {
   startDate = signal<string>('');
   endDate = signal<string>('');
   leavePeriod = signal<string>('full-day');
-  shiftStartTime = signal<Date | null>(null);
-  shiftEndTime = signal<Date | null>(null);
+  shiftStartTime = signal<Date | null>(this.timeFromMinutes(9 * 60));
+  shiftEndTime = signal<Date | null>(this.timeFromMinutes(18 * 60));
 
   startDatePickerValue = computed<Date | null>(() => this.toPickerDate(this.startDate()));
   endDatePickerValue = computed<Date | null>(() => this.toPickerDate(this.endDate()));
 
   calculatedDays = computed(() => {
-    const period = this.leavePeriod();
-    if (period === 'morning' || period === 'afternoon') {
-      return 0.5;
-    }
     if (this.startDate() && this.endDate()) {
-      if (period === 'custom') {
-        const calendarDays = this.dateUtil.diffInDays(this.startDate(), this.endDate());
-        if (calendarDays > 1) return calendarDays;
+      const calendarDays = this.dateUtil.diffInDays(this.startDate(), this.endDate());
+      const startTime = this.shiftStartTime();
+      const endTime = this.shiftEndTime();
+      if (!startTime || !endTime) return 0.5;
 
-        const startTime = this.shiftStartTime();
-        const endTime = this.shiftEndTime();
-        if (!startTime || !endTime) return 0.5;
+      const requestStart = this.minutesFromTime(startTime);
+      const requestEnd = this.minutesFromTime(endTime);
 
-        const durationMinutes =
-          endTime.getHours() * 60 +
-          endTime.getMinutes() -
-          (startTime.getHours() * 60 + startTime.getMinutes());
-        return durationMinutes >= 8 * 60 ? 1 : 0.5;
+      if (calendarDays > 1) {
+        const middleDays = Math.max(0, calendarDays - 2);
+        const firstDay = this.calculateDayFraction(requestStart, this.shiftEndMinutes());
+        const lastDay = this.calculateDayFraction(this.shiftStartMinutes(), requestEnd);
+        return firstDay + middleDays + lastDay;
       }
-      return this.dateUtil.diffInDays(this.startDate(), this.endDate());
+
+      return this.calculateDayFraction(requestStart, requestEnd);
     }
     return 1;
   });
@@ -200,6 +202,19 @@ export class TimeOffForm implements OnInit {
 
   onLeavePeriodChange(period: string) {
     this.leavePeriod.set(period);
+    const firstHalfEnd = this.getFirstHalfEndMinutes();
+    const secondHalfStart = firstHalfEnd + this.breakMinutes;
+
+    if (period === 'morning') {
+      this.shiftStartTime.set(this.timeFromMinutes(this.shiftStartMinutes()));
+      this.shiftEndTime.set(this.timeFromMinutes(firstHalfEnd));
+    } else if (period === 'afternoon') {
+      this.shiftStartTime.set(this.timeFromMinutes(secondHalfStart));
+      this.shiftEndTime.set(this.timeFromMinutes(this.shiftEndMinutes()));
+    } else {
+      this.shiftStartTime.set(this.timeFromMinutes(this.shiftStartMinutes()));
+      this.shiftEndTime.set(this.timeFromMinutes(this.shiftEndMinutes()));
+    }
     this.updateEndDate();
   }
 
@@ -303,16 +318,7 @@ export class TimeOffForm implements OnInit {
       year: dayjs(this.startDate()).year(),
       reason: this.reason(),
       is_half_day: isHalfDay,
-      half_day_period:
-        this.leavePeriod() === 'morning'
-          ? '1ST'
-          : this.leavePeriod() === 'afternoon'
-            ? '2ND'
-            : this.leavePeriod() === 'custom' && isHalfDay
-              ? (this.shiftStartTime()?.getHours() ?? 8) < 12
-                ? '1ST'
-                : '2ND'
-              : 'FULL',
+      half_day_period: isHalfDay ? this.getHalfDayPeriod() : 'FULL',
       delete_file_ids: 0,
       files: this.attachments().map((attachment) => attachment.file),
     };
@@ -344,6 +350,31 @@ export class TimeOffForm implements OnInit {
     const hours = time ? String(time.getHours()).padStart(2, '0') : '00';
     const minutes = time ? String(time.getMinutes()).padStart(2, '0') : '00';
     return `${date}T${hours}:${minutes}:00.000Z`;
+  }
+
+  private getFirstHalfEndMinutes(): number {
+    const netWorkMinutes = this.shiftEndMinutes() - this.shiftStartMinutes() - this.breakMinutes;
+    return this.shiftStartMinutes() + netWorkMinutes / 2;
+  }
+
+  private calculateDayFraction(requestStart: number, requestEnd: number): 0.5 | 1 {
+    const firstHalfEnd = this.getFirstHalfEndMinutes();
+    const secondHalfStart = firstHalfEnd + this.breakMinutes;
+    return requestStart < firstHalfEnd && requestEnd > secondHalfStart ? 1 : 0.5;
+  }
+
+  private minutesFromTime(time: Date): number {
+    return time.getHours() * 60 + time.getMinutes();
+  }
+
+  private timeFromMinutes(totalMinutes: number): Date {
+    return new Date(1970, 0, 1, Math.floor(totalMinutes / 60), totalMinutes % 60);
+  }
+
+  private getHalfDayPeriod(): '1ST' | '2ND' {
+    const endTime = this.shiftEndTime();
+    const secondHalfStart = this.getFirstHalfEndMinutes() + this.breakMinutes;
+    return endTime && this.minutesFromTime(endTime) <= secondHalfStart ? '1ST' : '2ND';
   }
 
   private getLeaveTypeIcon(code: string): string {
