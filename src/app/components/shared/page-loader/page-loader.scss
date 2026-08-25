@@ -41,10 +41,18 @@
 }
 
 @keyframes loader-move {
-  0% { left: -16px; transform: translateY(-8px); }
-  100% { left: calc(100% + 8px); transform: translateY(22px); }
+  0% {
+    left: -16px;
+    transform: translateY(-8px);
+  }
+  100% {
+    left: calc(100% + 8px);
+    transform: translateY(22px);
+  }
 }
 
 @keyframes loader-bounce {
-  100% { top: -0.1px; }
+  100% {
+    top: -0.1px;
+  }
 }

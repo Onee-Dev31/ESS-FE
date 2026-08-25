@@ -15,47 +15,53 @@
         <div class="toolbar-bottom-row">
           <div class="right-filters">
             <div class="filter-group">
-              <span class="filter-label">วันที่สร้างรายการ</span>
+              <span class="filter-label">ปีที่สร้างรายการ</span>
               <div class="date-input-group">
-                <input
-                  type="date"
-                  class="form-control"
-                  [ngModel]="listing.filterStartDate()"
-                  (ngModelChange)="listing.filterStartDate.set($event)"
-                />
+                <nz-select
+                  class="timeoff-filter-select year-filter-select"
+                  nzShowSearch
+                  [ngModel]="draftYearFrom()"
+                  (ngModelChange)="onCreatedDateFilterChange('start', $event)"
+                >
+                  @for (year of filterYears; track year) {
+                    <nz-option [nzValue]="year.toString()" [nzLabel]="year.toString()" />
+                  }
+                </nz-select>
               </div>
             </div>
 
             <div class="filter-group">
-              <span class="filter-label">ถึง</span>
+              <span class="filter-label">ถึงปี</span>
               <div class="date-input-group">
-                <input
-                  type="date"
-                  class="form-control"
-                  [ngModel]="listing.filterEndDate()"
-                  (ngModelChange)="listing.filterEndDate.set($event)"
-                />
+                <nz-select
+                  class="timeoff-filter-select year-filter-select"
+                  nzShowSearch
+                  [ngModel]="draftYearTo()"
+                  (ngModelChange)="onCreatedDateFilterChange('end', $event)"
+                >
+                  @for (year of filterYears; track year) {
+                    <nz-option [nzValue]="year.toString()" [nzLabel]="year.toString()" />
+                  }
+                </nz-select>
               </div>
             </div>
 
             <div class="filter-group">
               <span class="filter-label">สถานะ</span>
               <div class="select-input-group">
-                <select
-                  class="form-control select-status"
-                  [ngModel]="listing.filterStatus()"
-                  (ngModelChange)="listing.filterStatus.set($event)"
+                <nz-select
+                  class="timeoff-filter-select status-filter-select"
+                  nzShowSearch
+                  [ngModel]="draftStatus()"
+                  (ngModelChange)="onStatusFilterChange($event)"
                 >
-                  <option value="">ทั้งหมด</option>
-                  <!-- @for (status of statuses; track status.value) {
-                  <option [value]="status.value">{{ status.label }}</option>
-                } -->
-                </select>
+                  <nz-option nzValue="" nzLabel="ทั้งหมด" />
+                  @for (status of statuses; track status.value) {
+                    <nz-option [nzValue]="status.value" [nzLabel]="status.label" />
+                  }
+                </nz-select>
               </div>
             </div>
-            <button class="btn-clear" (click)="clearFilters()">
-              <i class="fas fa-sync-alt"></i> คืนค่า
-            </button>
           </div>
 
           <div class="search-input-group">
@@ -63,10 +69,22 @@
               type="text"
               class="form-control"
               placeholder="ค้นหา..."
-              [ngModel]="listing.searchText()"
-              (ngModelChange)="listing.searchText.set($event)"
+              [ngModel]="draftSearchText()"
+              (ngModelChange)="draftSearchText.set($event)"
+              (keyup.enter)="searchRequests()"
             />
-            <button class="btn-search"><i class="fas fa-search"></i> ค้นหา</button>
+            <button class="btn-search" (click)="searchRequests()">
+              <i class="fas fa-search"></i> ค้นหา
+            </button>
+            <button
+              type="button"
+              class="btn-clear btn-clear-icon"
+              title="คืนค่าตัวกรอง"
+              aria-label="คืนค่าตัวกรอง"
+              (click)="clearFilters()"
+            >
+              <i class="fas fa-sync-alt"></i>
+            </button>
           </div>
         </div>
       </div>
@@ -141,15 +159,15 @@
                 </div>
 
                 <div class="card-footer-actions">
-                @if (isEditableRequest(request.status)) {
-                  <button class="btn-edit-sm" (click)="openForm(request)">
+                  @if (isEditableRequest(request.status)) {
+                    <button class="btn-edit-sm" (click)="openForm(request)">
                       <i class="far fa-edit"></i> แก้ไข
                     </button>
                     <button class="btn-delete-sm" (click)="deleteRequest(request)">
                       <i class="far fa-trash-alt"></i> ลบ
                     </button>
                   } @else {
-                  <button class="btn-view-sm" (click)="openForm(request)">
+                    <button class="btn-view-sm" (click)="openForm(request)">
                       <i class="far fa-eye"></i> ดูรายละเอียด
                     </button>
                   }
@@ -240,12 +258,8 @@
                   </td>
                   <td>
                     <div class="action-btns">
-                    @if (isEditableRequest(request.status)) {
-                        <button
-                          class="btn-icon edit"
-                          title="แก้ไข"
-                        (click)="openForm(request)"
-                        >
+                      @if (isEditableRequest(request.status)) {
+                        <button class="btn-icon edit" title="แก้ไข" (click)="openForm(request)">
                           <i class="far fa-edit"></i>
                         </button>
                         <button class="btn-icon delete" title="ลบ" (click)="deleteRequest(request)">
@@ -255,7 +269,7 @@
                         <button
                           class="btn-icon view"
                           title="ดูรายละเอียด"
-                        (click)="openForm(request)"
+                          (click)="openForm(request)"
                         >
                           <i class="far fa-eye"></i>
                         </button>

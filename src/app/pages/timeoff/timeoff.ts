@@ -15,7 +15,6 @@ import { FilePreviewModalComponent } from '../../components/modals/file-preview-
 import { DateUtilityService } from '../../services/date-utility.service';
 import { AuthService } from '../../services/auth.service';
 
-import { COMMON_STATUS_OPTIONS } from '../../constants/request-status.constant';
 import {
   createListingState,
   createListingComputeds,
@@ -27,6 +26,7 @@ import { PageHeaderComponent } from '../../components/shared/page-header/page-he
 import { PageLoaderComponent } from '../../components/shared/page-loader/page-loader';
 import { EmptyStateComponent } from '../../components/shared/empty-state/empty-state';
 import { createAngularTable, getCoreRowModel, SortingState } from '@tanstack/angular-table';
+import { NzSelectModule } from 'ng-zorro-antd/select';
 
 type StatusDisplayMeta =
   | { label: string; className: string }
@@ -45,6 +45,7 @@ type StatusDisplayMeta =
     PageLoaderComponent,
     EmptyStateComponent,
     PageHeaderComponent,
+    NzSelectModule,
   ],
   templateUrl: './timeoff.html',
   styleUrl: './timeoff.scss',
@@ -66,6 +67,20 @@ export class TimeoffComponent implements OnInit {
   selectedRequest = signal<TimeOffRequest | null>(null);
 
   listing = createListingState();
+  readonly currentFilterYear = new Date().getFullYear();
+  readonly filterYears = Array.from({ length: 6 }, (_, index) => this.currentFilterYear - index);
+  readonly draftYearFrom = signal<string>('');
+  readonly draftYearTo = signal<string>('');
+  readonly draftStatus = signal<string>('');
+  readonly draftSearchText = signal<string>('');
+  readonly statuses = [
+    { value: 'NEW', label: 'คำขอใหม่' },
+    { value: 'PENDING', label: 'อยู่ระหว่างการอนุมัติ' },
+    { value: 'APPROVED', label: 'อนุมัติแล้ว' },
+    { value: 'REJECTED', label: 'ถูกปฏิเสธ' },
+    { value: 'SENDBACK', label: 'ถูกส่งกลับ' },
+    { value: 'CANCELLED', label: 'ยกเลิกคำขอ' },
+  ];
 
   sorting = signal<SortingState>([{ id: 'createDate', desc: true }]);
 
@@ -86,9 +101,11 @@ export class TimeoffComponent implements OnInit {
           req.reason.toLowerCase().includes(search) ||
           req.leaveType.toLowerCase().includes(search);
 
-        const matchStatus = !status || req.status === status;
-        const matchStart = !start || req.createDate >= start;
-        const matchEnd = !end || req.createDate <= end;
+        const matchStatus =
+          !status || this.normalizeStatusKey(req.status) === this.normalizeStatusKey(status);
+        const createdYear = this.toDateKey(this.getCreatedAt(req)).slice(0, 4);
+        const matchStart = !start || (!!createdYear && Number(createdYear) >= Number(start));
+        const matchEnd = !end || (!!createdYear && Number(createdYear) <= Number(end));
 
         return matchSearch && matchStatus && matchStart && matchEnd;
       });
@@ -174,6 +191,11 @@ export class TimeoffComponent implements OnInit {
   };
 
   ngOnInit() {
+    const currentYear = String(this.currentFilterYear);
+    this.draftYearFrom.set(currentYear);
+    this.draftYearTo.set(currentYear);
+    this.listing.filterStartDate.set(currentYear);
+    this.listing.filterEndDate.set(currentYear);
     this.loadRequests();
   }
 
@@ -181,6 +203,8 @@ export class TimeoffComponent implements OnInit {
   loadRequests() {
     const employeeCode = this.authService.userData()?.CODEMPID?.trim() ?? '';
     const currentYear = new Date().getFullYear();
+    const yearFrom = Number(this.listing.filterStartDate()) || currentYear;
+    const yearTo = Number(this.listing.filterEndDate()) || yearFrom;
 
     if (!employeeCode) {
       this.requests.set([]);
@@ -192,7 +216,7 @@ export class TimeoffComponent implements OnInit {
     }
 
     this.loadingService.start('timeoff-list');
-    this.timeoffService.getLeaveRequests(currentYear, currentYear, employeeCode).subscribe({
+    this.timeoffService.getLeaveRequests(yearFrom, yearTo, employeeCode).subscribe({
       next: (data: TimeOffRequest[]) => {
         this.requests.set(data);
         this.loadingService.stop('timeoff-list');
@@ -271,6 +295,50 @@ export class TimeoffComponent implements OnInit {
 
   clearFilters() {
     clearListingFilters(this.listing);
+    const currentYear = String(this.currentFilterYear);
+    this.draftYearFrom.set(currentYear);
+    this.draftYearTo.set(currentYear);
+    this.draftStatus.set('');
+    this.draftSearchText.set('');
+    this.listing.filterStartDate.set(currentYear);
+    this.listing.filterEndDate.set(currentYear);
+    this.loadRequests();
+  }
+
+  onCreatedDateFilterChange(type: 'start' | 'end', value: string | number | null): void {
+    const year = value == null ? '' : String(value).replace(/\D/g, '').slice(0, 4);
+    if (type === 'start') {
+      this.draftYearFrom.set(year);
+    } else {
+      this.draftYearTo.set(year);
+    }
+  }
+
+  onStatusFilterChange(status: string | null): void {
+    this.draftStatus.set(status ?? '');
+  }
+
+  searchRequests(): void {
+    const currentYear = new Date().getFullYear();
+    const yearFrom = Number(this.draftYearFrom()) || currentYear;
+    const yearTo = Number(this.draftYearTo()) || yearFrom;
+
+    if (yearFrom > yearTo) {
+      this.toastService.warning('ปีเริ่มต้นต้องไม่มากกว่าปีสิ้นสุด');
+      return;
+    }
+
+    this.listing.filterStartDate.set(String(yearFrom));
+    this.listing.filterEndDate.set(String(yearTo));
+    this.listing.filterStatus.set(this.draftStatus());
+    this.listing.searchText.set(this.draftSearchText().trim());
+    this.listing.currentPage.set(0);
+    this.loadRequests();
+  }
+
+  private toDateKey(value: string): string {
+    const match = value?.match(/^(\d{4}-\d{2}-\d{2})/);
+    return match?.[1] ?? '';
   }
 
   toggleSort(columnId: string) {
@@ -307,7 +375,15 @@ export class TimeoffComponent implements OnInit {
   private normalizeStatusKey(status: string): string {
     const value = status?.trim() ?? '';
     if (value === 'คำขอใหม่') return 'NEW';
-    return value.toUpperCase().replace(/[\s-]+/g, '_');
+    const key = value.toUpperCase().replace(/[\s-]+/g, '_');
+    const aliases: Record<string, string> = {
+      PENDING_APPROVAL: 'PENDING',
+      PENDING_ACTION: 'PENDING',
+      SEND_BACK: 'SENDBACK',
+      REFERRED_BACK: 'SENDBACK',
+      CANCELED: 'CANCELLED',
+    };
+    return aliases[key] ?? key;
   }
 
   getCreatedAt(request: TimeOffRequest): string {

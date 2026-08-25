@@ -1,9 +1,5 @@
 <div class="page">
-  <app-page-header
-    [title]="pageTitle()"
-    subtitle="Holiday Setting"
-    icon="fas fa-umbrella-beach"
-  />
+  <app-page-header [title]="pageTitle()" subtitle="Holiday Setting" icon="fas fa-umbrella-beach" />
   <div class="search-section">
     <div class="search-title">ค้นหา</div>
 
@@ -66,7 +62,9 @@
 
                 <!-- <td>{{ item.year }}</td> -->
 
-                <td data-label="วันที่">{{ dateUtil.formatDateToBE(item.holidayDate, 'DD/MM/YYYY') }}</td>
+                <td data-label="วันที่">
+                  {{ dateUtil.formatDateToBE(item.holidayDate, 'DD/MM/YYYY') }}
+                </td>
 
                 <td data-label="ชื่อวันหยุด">{{ item.holidayName }}</td>
               </tr>

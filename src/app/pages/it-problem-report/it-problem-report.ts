@@ -360,12 +360,10 @@ export class ItProblemReportComponent implements OnInit {
     // console.log('detail', this.problemFormData().detail);
     if (!this.isFormValid() || (this.openBy === 'IT' && !this.selectedOpenFor())) {
       this.markSubmitErrors();
-      this.swalService
-        .warning('ข้อมูลไม่ครบ', 'กรุณาตรวจสอบช่องที่มีข้อความแจ้งเตือน')
-        .then(() => {
-          (document.activeElement as HTMLElement | null)?.blur();
-          setTimeout(() => this.focusFirstInvalidField(), 300);
-        });
+      this.swalService.warning('ข้อมูลไม่ครบ', 'กรุณาตรวจสอบช่องที่มีข้อความแจ้งเตือน').then(() => {
+        (document.activeElement as HTMLElement | null)?.blur();
+        setTimeout(() => this.focusFirstInvalidField(), 300);
+      });
       return;
     }
     this.problemFormData.update((data) => ({ ...data, phoneNumber: this.phoneModel }));
@@ -495,17 +493,17 @@ export class ItProblemReportComponent implements OnInit {
       .getSubProblem()
       .pipe(finalize(() => this.completeInitialLoad()))
       .subscribe({
-      next: (res) => {
-        // console.log(res);
-        this.availableCategories = (res.data ?? []).sort(
-          (a: any, b: any) => Number(a.display_order ?? 0) - Number(b.display_order ?? 0),
-        );
-        this.cdr.detectChanges();
-      },
-      error: (error) => {
-        console.error('Error fetching data:', error);
-      },
-    });
+        next: (res) => {
+          // console.log(res);
+          this.availableCategories = (res.data ?? []).sort(
+            (a: any, b: any) => Number(a.display_order ?? 0) - Number(b.display_order ?? 0),
+          );
+          this.cdr.detectChanges();
+        },
+        error: (error) => {
+          console.error('Error fetching data:', error);
+        },
+      });
   }
 
   getOpenFor() {
@@ -547,7 +545,8 @@ export class ItProblemReportComponent implements OnInit {
     const phoneDigits = (data.phoneNumber || this.phoneModel).replace(/\D/g, '');
     const errors: Record<string, string> = {};
 
-    if (this.openBy === 'IT' && !this.selectedOpenFor()) errors['openFor'] = 'กรุณาเลือกผู้ขอใช้บริการ';
+    if (this.openBy === 'IT' && !this.selectedOpenFor())
+      errors['openFor'] = 'กรุณาเลือกผู้ขอใช้บริการ';
     if (!data.topic.trim()) errors['topic'] = 'กรุณากรอกหัวข้อปัญหา';
     if (!data.categories.length) errors['categories'] = 'กรุณาเลือกหมวดหมู่ปัญหา';
     if (!this.hasText(data.detail)) errors['detail'] = 'กรุณากรอกรายละเอียดปัญหา';
@@ -559,7 +558,12 @@ export class ItProblemReportComponent implements OnInit {
   }
 
   private hasText(value: string) {
-    return value.replace(/<[^>]*>/g, '').replace(/&nbsp;/g, ' ').trim().length > 0;
+    return (
+      value
+        .replace(/<[^>]*>/g, '')
+        .replace(/&nbsp;/g, ' ')
+        .trim().length > 0
+    );
   }
 
   private clearFormError(key: string) {

@@ -688,6 +688,107 @@ select.form-control {
   @include select-dropdown;
 }
 
+::ng-deep .timeoff-filter-select.ant-select {
+  position: relative;
+  width: 100%;
+  min-width: 100px;
+  height: 44px;
+  line-height: 44px;
+
+  @include tablet {
+    height: 42px;
+    line-height: 42px;
+  }
+
+  @include mobile {
+    min-width: 0;
+    height: 38px;
+    line-height: 38px;
+  }
+}
+
+::ng-deep
+  .timeoff-filter-select.ant-select.ant-select-single:not(.ant-select-customize-input)
+  .ant-select-selector {
+  display: flex !important;
+  height: 44px !important;
+  align-items: center !important;
+  padding-block: 0 !important;
+  padding-inline-start: 16px !important;
+  border: 1.5px solid var(--border-table-head) !important;
+  border-radius: 10px !important;
+  background: var(--bg-table-head) !important;
+  box-shadow: none !important;
+
+  @include tablet {
+    height: 42px !important;
+  }
+
+  @include mobile {
+    height: 38px !important;
+  }
+}
+
+::ng-deep
+  .timeoff-filter-select.ant-select.ant-select-single
+  .ant-select-selector
+  .ant-select-selection-item,
+::ng-deep
+  .timeoff-filter-select.ant-select.ant-select-single
+  .ant-select-selector
+  .ant-select-selection-placeholder {
+  overflow: hidden !important;
+  color: var(--text) !important;
+  line-height: 42px !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+
+  @include tablet {
+    line-height: 40px !important;
+  }
+
+  @include mobile {
+    line-height: 36px !important;
+  }
+}
+
+::ng-deep
+  .timeoff-filter-select.ant-select.ant-select-single
+  .ant-select-selector
+  .ant-select-selection-search {
+  inset-inline-start: 16px !important;
+  inset-inline-end: 44px !important;
+}
+
+::ng-deep .timeoff-filter-select.ant-select .ant-select-arrow {
+  top: 50% !important;
+  right: 16px !important;
+  margin-top: 0 !important;
+  color: var(--text-muted) !important;
+  transform: translateY(-50%) !important;
+  inset-inline-end: 16px !important;
+}
+
+::ng-deep .timeoff-filter-select.ant-select.ant-select-focused .ant-select-selector,
+::ng-deep .timeoff-filter-select.ant-select:hover .ant-select-selector {
+  border-color: var(--primary) !important;
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--primary) 10%, transparent) !important;
+}
+
+::ng-deep .year-filter-select.ant-select {
+  width: 100px;
+}
+
+::ng-deep .status-filter-select.ant-select {
+  width: 220px;
+  min-width: 220px;
+
+  @include tablet {
+    width: 100%;
+    min-width: 0;
+  }
+}
+
 // Search input group
 .search-input-group {
   display: flex;
@@ -711,6 +812,26 @@ select.form-control {
       width: auto;
       padding: 0 20px;
     }
+  }
+}
+
+.search-input-group .btn-clear-icon {
+  width: 44px;
+  min-width: 44px;
+  flex: 0 0 44px;
+  padding: 0;
+
+  @include tablet {
+    width: 42px;
+    min-width: 42px;
+    flex-basis: 42px;
+    padding: 0;
+  }
+
+  @include mobile {
+    width: 38px;
+    min-width: 38px;
+    flex-basis: 38px;
   }
 }
 

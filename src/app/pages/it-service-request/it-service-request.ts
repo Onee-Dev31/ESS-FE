@@ -479,12 +479,10 @@ export class ITServiceRequestComponent implements OnInit {
   submit() {
     if (!this.isFormValid()) {
       this.markSubmitErrors();
-      this.swalService
-        .warning('ข้อมูลไม่ครบ', 'กรุณาตรวจสอบช่องที่มีข้อความแจ้งเตือน')
-        .then(() => {
-          (document.activeElement as HTMLElement | null)?.blur();
-          setTimeout(() => this.focusFirstInvalidField(), 300);
-        });
+      this.swalService.warning('ข้อมูลไม่ครบ', 'กรุณาตรวจสอบช่องที่มีข้อความแจ้งเตือน').then(() => {
+        (document.activeElement as HTMLElement | null)?.blur();
+        setTimeout(() => this.focusFirstInvalidField(), 300);
+      });
       return;
     }
 
@@ -547,8 +545,7 @@ export class ITServiceRequestComponent implements OnInit {
       errors['services'] = 'กรุณาเลือกบริการอย่างน้อย 1 รายการ';
     } else {
       const requiresSystem = selectedServices.some(
-        (service) =>
-          service.id === this.BASIC_SYSTEM_SERVICE_ID || service.value === 'requser',
+        (service) => service.id === this.BASIC_SYSTEM_SERVICE_ID || service.value === 'requser',
       );
       if (requiresSystem && !this.hasValidSystemSelection()) {
         errors['services'] = 'กรุณาเลือกข้อมูลระบบที่ต้องการให้ครบ';
@@ -866,39 +863,39 @@ export class ITServiceRequestComponent implements OnInit {
       .getServiceType()
       .pipe(finalize(() => this.completeInitialLoad()))
       .subscribe({
-      next: (res) => {
-        console.log(res.data);
-        const mappedServices_main = res.data.mainServices
-          .filter((item: any) => item.id !== 6)
-          .map((item: any) => ({
+        next: (res) => {
+          console.log(res.data);
+          const mappedServices_main = res.data.mainServices
+            .filter((item: any) => item.id !== 6)
+            .map((item: any) => ({
+              ...item,
+              checked: false,
+              disabled: false,
+            }));
+
+          this.serviceOptions.set(mappedServices_main);
+
+          const mappedServices_user = res.data.userSubOptions.map((item: any) => ({
             ...item,
             checked: false,
-            disabled: false,
           }));
 
-        this.serviceOptions.set(mappedServices_main);
+          this.userSubOptions.set(mappedServices_user);
 
-        const mappedServices_user = res.data.userSubOptions.map((item: any) => ({
-          ...item,
-          checked: false,
-        }));
+          const mappedServices_system = res.data.systemSubOptions.map((item: any) => ({
+            ...item,
+            checked: false,
+          }));
 
-        this.userSubOptions.set(mappedServices_user);
+          this.systemSubOptions.set(mappedServices_system);
 
-        const mappedServices_system = res.data.systemSubOptions.map((item: any) => ({
-          ...item,
-          checked: false,
-        }));
-
-        this.systemSubOptions.set(mappedServices_system);
-
-        // this.availableCategories = res.data
-        // this.cdr.detectChanges();
-      },
-      error: (error) => {
-        console.error('Error fetching data:', error);
-      },
-    });
+          // this.availableCategories = res.data
+          // this.cdr.detectChanges();
+        },
+        error: (error) => {
+          console.error('Error fetching data:', error);
+        },
+      });
   }
   getOpenFor() {
     this.itServiceService

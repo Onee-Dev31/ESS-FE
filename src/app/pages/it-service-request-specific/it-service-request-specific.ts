@@ -522,15 +522,13 @@ export class ITServiceRequestSpecificComponent implements OnInit {
       this.specificPeople().forEach((person) => this.validatePersonForSubmit(person));
       this.touchSpecificPeople();
 
-      this.swalService
-        .warning('ข้อมูลไม่ครบ', 'กรุณาตรวจสอบช่องที่มีข้อความแจ้งเตือน')
-        .then(() => {
-          // SweetAlert restores focus to the submit button when it closes. Remove that
-          // focus first, then wait for the closing animation before scrolling.
-          (document.activeElement as HTMLElement | null)?.blur();
+      this.swalService.warning('ข้อมูลไม่ครบ', 'กรุณาตรวจสอบช่องที่มีข้อความแจ้งเตือน').then(() => {
+        // SweetAlert restores focus to the submit button when it closes. Remove that
+        // focus first, then wait for the closing animation before scrolling.
+        (document.activeElement as HTMLElement | null)?.blur();
 
-          setTimeout(() => this.scrollToFirstInvalidField(), 300);
-        });
+        setTimeout(() => this.scrollToFirstInvalidField(), 300);
+      });
       return;
     }
 
@@ -569,8 +567,7 @@ export class ITServiceRequestSpecificComponent implements OnInit {
 
     if (!firstInvalid) return;
 
-    const field =
-      firstInvalid.closest<HTMLElement>('.form-field, .form-group') ?? firstInvalid;
+    const field = firstInvalid.closest<HTMLElement>('.form-field, .form-group') ?? firstInvalid;
 
     field.scrollIntoView({ behavior: 'smooth', block: 'center' });
 
@@ -1550,18 +1547,18 @@ export class ITServiceRequestSpecificComponent implements OnInit {
       .MasterPermission()
       .pipe(finalize(() => this.completeInitialLoad()))
       .subscribe({
-      next: (data) => {
-        this.oracleModules = data.Modules;
-        this.oraclePermissions = [{ ID: 0, RoleName: '-' }, ...data.Roles];
-        this.oneePermissions = data.Permissions;
-        this.onePortalResponseTypes = data.ResponseTypes;
-        this.onePortalRole = data.Roles_bms;
-        this.specificPeople.set([this.createSpecificPerson()]);
-      },
-      error: (error) => {
-        console.error('Error fetching data:', error);
-      },
-    });
+        next: (data) => {
+          this.oracleModules = data.Modules;
+          this.oraclePermissions = [{ ID: 0, RoleName: '-' }, ...data.Roles];
+          this.oneePermissions = data.Permissions;
+          this.onePortalResponseTypes = data.ResponseTypes;
+          this.onePortalRole = data.Roles_bms;
+          this.specificPeople.set([this.createSpecificPerson()]);
+        },
+        error: (error) => {
+          console.error('Error fetching data:', error);
+        },
+      });
   }
 
   getCompanies() {
@@ -1569,36 +1566,36 @@ export class ITServiceRequestSpecificComponent implements OnInit {
       .getCompanyMaster()
       .pipe(finalize(() => this.completeInitialLoad()))
       .subscribe({
-      next: (data) => {
-        console.log(data);
-        this.companyList = data.map((item: any) => ({
-          ...item,
-          COMPANY_CODE: this.remapCompanyCode(item.COMPANY_CODE),
-        }));
+        next: (data) => {
+          console.log(data);
+          this.companyList = data.map((item: any) => ({
+            ...item,
+            COMPANY_CODE: this.remapCompanyCode(item.COMPANY_CODE),
+          }));
 
-        this.companyList_bms = [
-          ...data
-            .filter((item: any) =>
-              ['OTV', 'GCH', 'GTV', 'CHA', 'ATM', 'NMP'].includes(item.COMPANY_CODE),
-            )
-            .map((item: any) => ({
-              ...item,
-              COMPANY_CODE: this.remapCompanyCode(item.COMPANY_CODE),
-            })),
-          {
-            COMPANY_CODE: 'GCH',
-            COMPANY_NAME: 'บริษัท จีเอ็มเอ็ม แชนแนล โฮลดิ้ง จำกัด',
-          },
-          {
-            COMPANY_CODE: 'NMP',
-            COMPANY_NAME: 'บริษัท นางแมวป่า จำกัด',
-          },
-        ];
-      },
-      error: (error) => {
-        console.error('Error fetching data:', error);
-      },
-    });
+          this.companyList_bms = [
+            ...data
+              .filter((item: any) =>
+                ['OTV', 'GCH', 'GTV', 'CHA', 'ATM', 'NMP'].includes(item.COMPANY_CODE),
+              )
+              .map((item: any) => ({
+                ...item,
+                COMPANY_CODE: this.remapCompanyCode(item.COMPANY_CODE),
+              })),
+            {
+              COMPANY_CODE: 'GCH',
+              COMPANY_NAME: 'บริษัท จีเอ็มเอ็ม แชนแนล โฮลดิ้ง จำกัด',
+            },
+            {
+              COMPANY_CODE: 'NMP',
+              COMPANY_NAME: 'บริษัท นางแมวป่า จำกัด',
+            },
+          ];
+        },
+        error: (error) => {
+          console.error('Error fetching data:', error);
+        },
+      });
   }
 
   getDepartments() {
@@ -1606,13 +1603,13 @@ export class ITServiceRequestSpecificComponent implements OnInit {
       .getDepartmentMaster()
       .pipe(finalize(() => this.completeInitialLoad()))
       .subscribe({
-      next: (data) => {
-        this.departmentList = data;
-      },
-      error: (error) => {
-        console.error('Error fetching data:', error);
-      },
-    });
+        next: (data) => {
+          this.departmentList = data;
+        },
+        error: (error) => {
+          console.error('Error fetching data:', error);
+        },
+      });
   }
 
   getOpenFor() {
@@ -1647,7 +1644,6 @@ export class ITServiceRequestSpecificComponent implements OnInit {
               ),
             );
           }
-
         },
         error: (error) => {
           console.error('Error fetching data:', error);
@@ -1659,14 +1655,14 @@ export class ITServiceRequestSpecificComponent implements OnInit {
       .getDeptHeads()
       .pipe(finalize(() => this.completeInitialLoad()))
       .subscribe({
-      next: (res) => {
-        console.log(res);
-        this.deptHeads = res.data;
-        this.refreshOneeSupervisors();
-      },
-      error: (err) => {
-        console.error(err);
-      },
-    });
+        next: (res) => {
+          console.log(res);
+          this.deptHeads = res.data;
+          this.refreshOneeSupervisors();
+        },
+        error: (err) => {
+          console.error(err);
+        },
+      });
   }
 }

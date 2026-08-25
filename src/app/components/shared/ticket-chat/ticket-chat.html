@@ -82,10 +82,7 @@
                       <span class="refer_tag last">{{ note.referred_title }}</span>
                     }
                     @if (isHtmlMessage(note.message)) {
-                      <span
-                        class="note__email"
-                        [innerHTML]="note.message | safeEmailHtml"
-                      ></span>
+                      <span class="note__email" [innerHTML]="note.message | safeEmailHtml"></span>
                     } @else {
                       {{ note.message }}
                     }

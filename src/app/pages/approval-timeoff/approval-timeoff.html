@@ -73,7 +73,9 @@
                 <button
                   type="button"
                   class="btn-heading-toggle"
-                  [attr.aria-label]="isExpanded(item.request_id) ? 'ซ่อนรายละเอียด' : 'ดูรายละเอียด'"
+                  [attr.aria-label]="
+                    isExpanded(item.request_id) ? 'ซ่อนรายละเอียด' : 'ดูรายละเอียด'
+                  "
                   [attr.aria-expanded]="isExpanded(item.request_id)"
                   (click)="toggleDetails(item.request_id)"
                 >

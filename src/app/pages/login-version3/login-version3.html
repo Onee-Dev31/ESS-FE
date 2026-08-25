@@ -62,7 +62,12 @@
           <form class="login-form" [formGroup]="loginForm" (ngSubmit)="onLogin()" autocomplete="on">
             <div class="form-control">
               <label for="username">Username</label>
-              <div class="input-shell" [class.invalid]="loginForm.controls.username.touched && loginForm.controls.username.invalid">
+              <div
+                class="input-shell"
+                [class.invalid]="
+                  loginForm.controls.username.touched && loginForm.controls.username.invalid
+                "
+              >
                 <i class="far fa-user"></i>
                 <input
                   id="username"
@@ -77,7 +82,12 @@
 
             <div class="form-control">
               <label for="password">Password</label>
-              <div class="input-shell" [class.invalid]="loginForm.controls.password.touched && loginForm.controls.password.invalid">
+              <div
+                class="input-shell"
+                [class.invalid]="
+                  loginForm.controls.password.touched && loginForm.controls.password.invalid
+                "
+              >
                 <i class="fas fa-lock"></i>
                 <input
                   id="password"
@@ -93,7 +103,9 @@
                   aria-label="แสดงหรือซ่อนรหัสผ่าน"
                   (click)="togglePasswordVisibility()"
                 >
-                  <i [class]="passwordFieldType === 'password' ? 'far fa-eye' : 'far fa-eye-slash'"></i>
+                  <i
+                    [class]="passwordFieldType === 'password' ? 'far fa-eye' : 'far fa-eye-slash'"
+                  ></i>
                 </button>
               </div>
             </div>

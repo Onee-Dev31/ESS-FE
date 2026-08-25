@@ -302,7 +302,9 @@
 
   &.completed {
     color: var(--success);
-    &::after { background: var(--success); }
+    &::after {
+      background: var(--success);
+    }
     .step-marker {
       border-color: var(--success);
       background: var(--success);
@@ -355,7 +357,6 @@
 .request-approval-step:has(+ .request-approval-step.rejected)::after {
   background: var(--danger);
 }
-
 
 @include mobile {
   .request-approval-steps {
