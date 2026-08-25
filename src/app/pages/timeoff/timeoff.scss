@@ -390,7 +390,7 @@ $status-cancelled-text: var(--text-table-head);
   padding: 24px;
   padding-bottom: 24px;
   background-color: $bg-page;
-  min-height: 100vh;
+  // min-height: 100vh;
 
   @include large-tablet {
     padding: 12px;
@@ -433,8 +433,7 @@ $status-cancelled-text: var(--text-table-head);
     min-width: 1180px;
 
     tbody + tbody td {
-      border-top: 1px solid
-        color-mix(in srgb, var(--text-muted) 22%, var(--border-table-head)) !important;
+      border-top: 1px solid color-mix(in srgb, var(--text-muted) 22%, var(--border-table-head)) !important;
     }
 
     .request-column {
@@ -735,6 +734,14 @@ select.form-control {
 // Modal Styling
 .modal-overlay {
   @include modal-overlay-styles;
+
+  .modal-container {
+    height: 90vh;
+
+    @include mobile {
+      height: 100dvh;
+    }
+  }
 }
 
 // Pagination wrapper spacing

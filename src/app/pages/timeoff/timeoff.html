@@ -1,3 +1,6 @@
+@if (isLoading()) {
+  <app-page-loader message="กำลังโหลดรายการลา..." />
+} @else {
 <div class="timeoff-page">
   <app-page-header title="รายการลา" subtitle="Time Off Requests" icon="fas fa-calendar-minus" />
   <div class="content-card">
@@ -73,7 +76,6 @@
 
     <div class="card-list-view">
       @if (isLoading()) {
-        <app-skeleton type="card" [rows]="3"></app-skeleton>
       } @else {
         @for (request of comps.paginatedData(); track request.id) {
           <div class="mobile-card">
@@ -168,7 +170,6 @@
 
     <div class="table-responsive">
       @if (isLoading()) {
-        <app-skeleton type="table" [rows]="5"></app-skeleton>
       } @else {
         <table class="modern-table">
           <thead>
@@ -204,10 +205,16 @@
                   <span class="created-at">{{ formatCreatedAt(getCreatedAt(request)) }}</span>
                   <strong class="leave-number">{{ getLeaveNumber(request) }}</strong>
                 </td>
-                <td class="date-value">{{ dateUtil.formatDateToBE(request.startDate, 'DD/MM/YYYY') }}</td>
-                <td class="date-value">{{ dateUtil.formatDateToBE(request.endDate, 'DD/MM/YYYY') }}</td>
-                <td class="time-value">{{ request.shiftStartTime || '-' }}</td>
-                <td class="time-value">{{ request.shiftEndTime || '-' }}</td>
+                <td class="date-value">
+                  {{ dateUtil.formatDateToBE(request.startDate, 'DD/MM/YYYY') }}
+                </td>
+                <td class="date-value">
+                  {{ dateUtil.formatDateToBE(request.endDate, 'DD/MM/YYYY') }}
+                </td>
+                <td class="time-value">
+                  {{ dateUtil.formatDateToBE(request.startDate, 'HH:mm') }}
+                </td>
+                <td class="time-value">{{ dateUtil.formatDateToBE(request.endDate, 'HH:mm') }}</td>
                 <td>
                   <div class="leave-type-cell">
                     <i [class]="getLeaveTypeIcon(request.leaveType)"></i>
@@ -215,7 +222,9 @@
                       <span>{{ request.leaveType }}</span>
                       <small>
                         {{ getPeriodLabel(request.leavePeriod) || 'เต็มวัน' }}
-                        @if (request.days) { · รวม {{ request.days }} วัน }
+                        @if (request.days) {
+                          · รวม {{ request.days }} วัน
+                        }
                       </small>
                     </div>
                   </div>
@@ -293,6 +302,7 @@
     </div>
   </div>
 </div>
+}
 
 @if (isPreviewModalOpen()) {
   @defer {

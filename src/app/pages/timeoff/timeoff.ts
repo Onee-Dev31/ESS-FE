@@ -9,6 +9,7 @@ import { ErrorService } from '../../services/error';
 import { TimeOffForm } from '../../components/features/time-off-form/time-off-form';
 import { FilePreviewModalComponent } from '../../components/modals/file-preview-modal/file-preview-modal';
 import { DateUtilityService } from '../../services/date-utility.service';
+import { AuthService } from '../../services/auth.service';
 
 import { COMMON_STATUS_OPTIONS } from '../../constants/request-status.constant';
 import {
@@ -19,7 +20,7 @@ import {
 } from '../../utils/listing.util';
 import { PaginationComponent } from '../../components/shared/pagination/pagination';
 import { PageHeaderComponent } from '../../components/shared/page-header/page-header';
-import { SkeletonComponent } from '../../components/shared/skeleton/skeleton';
+import { PageLoaderComponent } from '../../components/shared/page-loader/page-loader';
 import { EmptyStateComponent } from '../../components/shared/empty-state/empty-state';
 import { createAngularTable, getCoreRowModel, SortingState } from '@tanstack/angular-table';
 
@@ -33,7 +34,7 @@ import { createAngularTable, getCoreRowModel, SortingState } from '@tanstack/ang
     TimeOffForm,
     FilePreviewModalComponent,
     PaginationComponent,
-    SkeletonComponent,
+    PageLoaderComponent,
     EmptyStateComponent,
     PageHeaderComponent,
   ],
@@ -46,6 +47,7 @@ export class TimeoffComponent implements OnInit {
   private toastService = inject(ToastService);
   private dialogService = inject(DialogService);
   private errorService = inject(ErrorService);
+  private authService = inject(AuthService);
   protected readonly dateUtil = inject(DateUtilityService);
 
   isLoading = this.loadingService.loading('timeoff-list');
@@ -118,7 +120,7 @@ export class TimeoffComponent implements OnInit {
   table = createAngularTable(() => ({
     data: this.comps.paginatedData(),
     columns: [
-      { accessorKey: 'id', header: 'รหัสคำขอ' },
+      { accessorKey: 'createDate', header: 'วันที่ทำรายการ / เลขที่ใบลา' },
       { accessorKey: 'startDate', header: 'วันที่เริ่มลา' },
       { accessorKey: 'endDate', header: 'วันที่สิ้นสุดลา' },
       { accessorKey: 'days', header: 'จำนวนวัน' },
@@ -159,8 +161,20 @@ export class TimeoffComponent implements OnInit {
 
   /** โหลดข้อมูลรายการคำขอลาผ่าน Service */
   loadRequests() {
+    const employeeCode = this.authService.userData()?.CODEMPID?.trim() ?? '';
+    const currentYear = new Date().getFullYear();
+
+    if (!employeeCode) {
+      this.requests.set([]);
+      this.errorService.handle(new Error('ไม่พบรหัสพนักงานของผู้ใช้งาน'), {
+        component: 'TimeOff',
+        action: 'load-requests',
+      });
+      return;
+    }
+
     this.loadingService.start('timeoff-list');
-    this.timeoffService.getRequests().subscribe({
+    this.timeoffService.getLeaveRequests(currentYear, currentYear, employeeCode).subscribe({
       next: (data: TimeOffRequest[]) => {
         this.requests.set(data);
         this.loadingService.stop('timeoff-list');
@@ -181,10 +195,34 @@ export class TimeoffComponent implements OnInit {
       confirmText: 'ลบรายการ',
     });
 
-    if (confirmed) {
-      this.requests.set(this.requests().filter((r) => r.id !== request.id));
-      this.toastService.success('ลบรายการสำเร็จ');
-    }
+    if (!confirmed) return;
+
+    this.loadingService.start('timeoff-list');
+    this.timeoffService
+      .saveLeaveRequest({
+        action: 'Cancel',
+        request_id: (request.request_id ?? Number(request.id)) || 0,
+        employee_code: request.employee_code || request.employeeId,
+        leave_type_id: request.leave_type_id ?? 0,
+        start_date: request.startDate,
+        end_date: request.endDate,
+        total_days: request.days ?? 0,
+        year: new Date(request.startDate).getFullYear(),
+        reason: request.reason,
+        is_half_day: request.leavePeriod === 'morning' || request.leavePeriod === 'afternoon',
+        half_day_period: request.leavePeriod ?? '',
+        delete_file_ids: 0,
+      })
+      .subscribe({
+        next: () => {
+          this.toastService.success('ลบรายการสำเร็จ');
+          this.loadRequests();
+        },
+        error: (error) => {
+          this.loadingService.stop('timeoff-list');
+          this.errorService.handle(error, { component: 'TimeOff', action: 'cancel-request' });
+        },
+      });
   }
 
   setPageSize(size: number) {
@@ -235,10 +273,12 @@ export class TimeoffComponent implements OnInit {
 
   getStatusMeta(status: string): { label: string; className: string } {
     const key = status === 'คำขอใหม่' ? 'NEW' : status?.trim();
-    return this.statusDisplay[key] ?? {
-      label: key || 'ไม่ระบุสถานะ',
-      className: 'status-neutral',
-    };
+    return (
+      this.statusDisplay[key] ?? {
+        label: key || 'ไม่ระบุสถานะ',
+        className: 'status-neutral',
+      }
+    );
   }
 
   isNewRequest(status: string): boolean {

@@ -9,11 +9,6 @@
           <span class="meta-value">{{ currentDate() }}</span>
         </div>
         <div class="meta-item">
-          <i class="fas fa-hashtag"></i>
-          <span class="meta-label">ลำดับที่ :</span>
-          <span class="meta-value">{{ requestId() }}</span>
-        </div>
-        <div class="meta-item">
           <i class="far fa-user"></i>
           <span class="meta-label">รหัสพนักงาน :</span>
           <span class="meta-value">{{ employeeId() }}</span>
@@ -42,7 +37,9 @@
             </div>
             <div class="info-col">
               <p class="leave-label">{{ type.label }}</p>
-              <div class="leave-remaining">คงเหลือ: {{ type.remaining }} วัน</div>
+              @if (type.remaining !== undefined) {
+                <div class="leave-remaining">คงเหลือ: {{ type.remaining }} วัน</div>
+              }
             </div>
           </div>
           <div
@@ -61,130 +58,105 @@
       <h4 class="section-heading">2. รายละเอียดการลา</h4>
 
       <div class="input-field-group mb-4">
-        <label>ประเภทการลา</label>
+        <label>ช่วงเวลาการลา</label>
         <div class="leave-period-options">
-          <label
+          <button
+            type="button"
             class="period-option"
             [class.active]="leavePeriod() === 'morning'"
-            [class.disabled]="isHalfDayDisabled()"
+            (click)="onLeavePeriodChange('morning')"
           >
-            <input
-              type="radio"
-              name="leavePeriod"
-              value="morning"
-              [checked]="leavePeriod() === 'morning'"
-              [disabled]="isHalfDayDisabled()"
-              (change)="onLeavePeriodChange('morning')"
-            />
             <span class="option-label">
               <i class="fas fa-sun"></i>
               ลาเช้า
             </span>
-          </label>
-          <label
+          </button>
+          <button
+            type="button"
             class="period-option"
             [class.active]="leavePeriod() === 'afternoon'"
-            [class.disabled]="isHalfDayDisabled()"
+            (click)="onLeavePeriodChange('afternoon')"
           >
-            <input
-              type="radio"
-              name="leavePeriod"
-              value="afternoon"
-              [checked]="leavePeriod() === 'afternoon'"
-              [disabled]="isHalfDayDisabled()"
-              (change)="onLeavePeriodChange('afternoon')"
-            />
             <span class="option-label">
               <i class="fas fa-cloud-sun"></i>
               ลาบ่าย
             </span>
-          </label>
-          <label class="period-option" [class.active]="leavePeriod() === 'full-day'">
-            <input
-              type="radio"
-              name="leavePeriod"
-              value="full-day"
-              [checked]="leavePeriod() === 'full-day'"
-              (change)="onLeavePeriodChange('full-day')"
-            />
+          </button>
+          <button
+            type="button"
+            class="period-option"
+            [class.active]="leavePeriod() === 'full-day'"
+            (click)="onLeavePeriodChange('full-day')"
+          >
             <span class="option-label">
               <i class="fas fa-calendar-day"></i>
               ลาเต็มวัน
             </span>
-          </label>
-          <label class="period-option" [class.active]="leavePeriod() === 'custom'">
-            <input
-              type="radio"
-              name="leavePeriod"
-              value="custom"
-              [checked]="leavePeriod() === 'custom'"
-              (change)="onLeavePeriodChange('custom')"
-            />
+          </button>
+          <button
+            type="button"
+            class="period-option"
+            [class.active]="leavePeriod() === 'custom'"
+            (click)="onLeavePeriodChange('custom')"
+          >
             <span class="option-label">
               <i class="fas fa-user-clock"></i>
               กำหนดเอง
             </span>
-          </label>
+          </button>
         </div>
       </div>
 
       <div class="details-grid">
         <div class="input-field-group left-half">
           <label>ตั้งแต่วันที่ <span class="required">*</span></label>
-          <div class="custom-input-wrapper">
-            <nz-date-picker
-              [ngModel]="startDate()"
-              nzFormat="dd/MM/yyyy"
-              (ngModelChange)="startDate.set($event)"
-              class="input-field custom-picker"
-              nzDropdownClassName="custom-picker-popup"
-            >
-            </nz-date-picker>
-          </div>
+          <nz-date-picker
+            class="input-field custom-picker"
+            nzDropdownClassName="custom-picker-popup"
+            nzFormat="dd/MM/yyyy"
+            nzPlaceHolder="เลือกวันที่เริ่มลา"
+            [nzAllowClear]="false"
+            [ngModel]="startDatePickerValue()"
+            (ngModelChange)="onStartDatePickerChange($event)"
+          />
         </div>
 
         <div class="input-field-group left-half">
           <label>ตั้งแต่เวลา</label>
-          <div class="custom-input-wrapper">
-            <input
-              type="time"
-              class="input-field"
-              [ngModel]="shiftStartTime()"
-              (ngModelChange)="shiftStartTime.set($event)"
-            />
-            <div class="icon-box">
-              <i class="far fa-clock"></i>
-            </div>
-          </div>
+          <nz-time-picker
+            class="input-field custom-picker"
+            nzFormat="HH:mm"
+            [nzMinuteStep]="30"
+            nzPlaceHolder="เลือกเวลาเริ่ม"
+            [ngModel]="shiftStartTime()"
+            (ngModelChange)="shiftStartTime.set($event)"
+          />
         </div>
 
         <div class="input-field-group left-half">
           <label>ถึงวันที่ <span class="required">*</span></label>
-          <div class="custom-input-wrapper">
-            <nz-date-picker
-              [ngModel]="endDate()"
-              nzFormat="dd/MM/yyyy"
-              (ngModelChange)="endDate.set($event)"
-              class="input-field custom-picker"
-              nzDropdownClassName="custom-picker-popup"
-            >
-            </nz-date-picker>
-          </div>
+          <nz-date-picker
+            class="input-field custom-picker"
+            nzDropdownClassName="custom-picker-popup"
+            nzFormat="dd/MM/yyyy"
+            nzPlaceHolder="เลือกวันที่สิ้นสุด"
+            [nzAllowClear]="false"
+            [nzDisabledDate]="disableEndDate"
+            [ngModel]="endDatePickerValue()"
+            (ngModelChange)="onEndDatePickerChange($event)"
+          />
         </div>
 
         <div class="input-field-group left-half">
           <label>ถึงเวลา</label>
-          <div class="custom-input-wrapper">
-            <input
-              type="time"
-              class="input-field"
-              [ngModel]="shiftEndTime()"
-              (ngModelChange)="shiftEndTime.set($event)"
-            />
-            <div class="icon-box">
-              <i class="far fa-clock"></i>
-            </div>
-          </div>
+          <nz-time-picker
+            class="input-field custom-picker"
+            nzFormat="HH:mm"
+            [nzMinuteStep]="30"
+            nzPlaceHolder="เลือกเวลาสิ้นสุด"
+            [ngModel]="shiftEndTime()"
+            (ngModelChange)="shiftEndTime.set($event)"
+          />
         </div>
 
         <div class="input-field-group left-half">

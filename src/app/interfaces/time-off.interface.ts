@@ -2,12 +2,15 @@ import { Requester } from './core.interface';
 
 export interface TimeOffRequest {
   id: string;
+  request_id?: number;
   createDate: string;
   leave_number?: string;
   create_at?: string;
   status: string;
   employeeId: string;
+  employee_code?: string;
   leaveType: string;
+  leave_type_id?: number;
   startDate: string;
   endDate: string;
   reason: string;
@@ -17,6 +20,24 @@ export interface TimeOffRequest {
   shiftStartTime?: string;
   shiftEndTime?: string;
   requester?: Requester;
+}
+
+export type LeaveRequestAction = 'Upsert' | 'Resubmit' | 'Cancel';
+
+export interface SaveLeaveRequestPayload {
+  action?: LeaveRequestAction;
+  request_id: number;
+  employee_code: string;
+  leave_type_id: number;
+  start_date: string;
+  end_date: string;
+  total_days: number;
+  year: number;
+  reason: string;
+  is_half_day: boolean;
+  half_day_period?: string;
+  delete_file_ids?: number | number[];
+  files?: File[];
 }
 
 export interface LeaveQuotaRule {
@@ -62,43 +83,6 @@ export interface LeaveType {
   label: string;
   icon: string;
   color: string;
-  remaining: number;
+  remaining?: number;
+  code?: string;
 }
-
-export const LEAVE_TYPES: LeaveType[] = [
-  {
-    id: 'vacation',
-    label: 'ลาพักร้อน',
-    icon: 'fas fa-plane-departure',
-    color: 'var(--danger)',
-    remaining: 10,
-  },
-  {
-    id: 'personal',
-    label: 'ลากิจ',
-    icon: 'fas fa-briefcase',
-    color: 'var(--primary)',
-    remaining: 6,
-  },
-  {
-    id: 'sick',
-    label: 'ลาป่วย',
-    icon: 'fas fa-stethoscope',
-    color: 'var(--primary)',
-    remaining: 30,
-  },
-  {
-    id: 'sterilization',
-    label: 'ลาทำหมัน',
-    icon: 'fas fa-user-md',
-    color: 'var(--warning)',
-    remaining: 1,
-  },
-  {
-    id: 'funeral',
-    label: 'ลาเพื่อจัดการงานศพ',
-    icon: 'fas fa-ribbon',
-    color: 'var(--success)',
-    remaining: 5,
-  },
-];
