@@ -100,8 +100,8 @@ export class FreelanceManagementComponent implements OnInit {
   isSaving = false;
 
   // MASTER
-  companyList: any[] = [];
-  departmentList: any[] = [];
+  companyList = signal<any[]>([]);
+  departmentList = signal<any[]>([]);
 
   // Modal state
   isFormOpen = signal<boolean>(false);
@@ -180,7 +180,7 @@ export class FreelanceManagementComponent implements OnInit {
 
     if (!company) return [];
 
-    return this.departmentList.filter((dep) => dep.COMPANY_CODE === company.COMPANY_CODE);
+    return this.departmentList().filter((dep) => dep.COMPANY_CODE === company.COMPANY_CODE);
   });
 
   activeTable = createAngularTable(() => ({
@@ -805,7 +805,7 @@ export class FreelanceManagementComponent implements OnInit {
     this.masterService.getCompanyMaster().subscribe({
       next: (data) => {
         // console.log(data);
-        this.companyList = data;
+        this.companyList.set(data);
       },
       error: (error) => {
         console.error('Error fetching data:', error);
@@ -817,7 +817,7 @@ export class FreelanceManagementComponent implements OnInit {
     this.masterService.getDepartmentMaster().subscribe({
       next: (data) => {
         // console.log(data);
-        this.departmentList = data;
+        this.departmentList.set(data);
       },
       error: (error) => {
         console.error('Error fetching data:', error);
