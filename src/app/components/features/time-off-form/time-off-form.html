@@ -1,4 +1,4 @@
-<div class="time-off-form-page" [class.readonly-mode]="requestStatus !== 'NEW'">
+<div class="time-off-form-page" [class.readonly-mode]="!isEditableRequest()">
   <header class="top-header-strip">
     <h2>บันทึกข้อมูลการลา (Time Off)</h2>
     <div class="header-right-meta">
@@ -6,14 +6,21 @@
     </div>
   </header>
 
-  <fieldset class="form-content-fieldset" [disabled]="requestStatus !== 'NEW'">
+  <fieldset class="form-content-fieldset" [disabled]="!isEditableRequest()">
     <main class="content-card">
-      <div class="request-meta-strip">
+      <div class="request-meta-strip" [class.has-request]="request?.leave_number">
         <div class="meta-item">
           <i class="far fa-calendar-alt"></i>
           <span class="meta-label">วันที่ขอ</span>
           <span class="meta-value">{{ currentDate() }}</span>
         </div>
+        @if (request?.leave_number) {
+          <div class="meta-item request-number-item">
+            <i class="fas fa-tag"></i>
+            <span class="meta-label">เลขที่ใบลา</span>
+            <span class="meta-value">{{ request?.leave_number }}</span>
+          </div>
+        }
         <div class="meta-item">
           <i class="far fa-user"></i>
           <span class="meta-label">รหัสพนักงาน</span>
@@ -21,23 +28,62 @@
         </div>
       </div>
 
+      @if (request) {
+        <div
+          class="request-approval-steps"
+          [class.two-steps]="getRequestApprovalSteps().length === 2"
+          [class.three-steps]="getRequestApprovalSteps().length === 3"
+        >
+          @for (step of getRequestApprovalSteps(); track $index) {
+            <div class="request-approval-step" [ngClass]="step.state">
+              <div class="step-marker">
+                @if (step.state === 'completed') {
+                  <i class="fas fa-check"></i>
+                } @else if (step.state === 'rejected') {
+                  <i class="fas fa-times"></i>
+                } @else if (step.state === 'sendback') {
+                  <i class="fas fa-undo-alt"></i>
+                } @else {
+                  <span>{{ $index + 1 }}</span>
+                }
+              </div>
+              <span class="step-label">{{ step.label }}</span>
+              @if (step.approverCode) {
+                <span class="step-approver-code">{{ step.approverCode }}</span>
+              }
+              @if (step.state === 'sendback') {
+                <span class="step-action-label sendback-label">Sendback</span>
+              } @else if (step.state === 'rejected') {
+                <span class="step-action-label rejected-label">Rejected</span>
+              }
+            </div>
+          }
+        </div>
+      }
+
       <section class="form-section-wrapper">
         <h4 class="section-heading">1. เลือกประเภทการลา</h4>
         <div class="leave-type-select-responsive">
           <label>ประเภทการลา</label>
           <div class="responsive-select-wrapper">
-            <nz-select
-              class="responsive-antd-select"
-              nzPlaceHolder="เลือกประเภทการลา"
-              [ngModel]="selectedLeaveType()"
-              (ngModelChange)="selectLeaveType($event)"
-            >
-              <nz-option
-                *ngFor="let type of leaveTypes"
-                [nzValue]="type.id"
-                [nzLabel]="type.label"
-              />
-            </nz-select>
+            @if (isEditableRequest()) {
+              <nz-select
+                class="responsive-antd-select"
+                nzPlaceHolder="เลือกประเภทการลา"
+                [ngModel]="selectedLeaveType()"
+                (ngModelChange)="selectLeaveType($event)"
+              >
+                <nz-option
+                  *ngFor="let type of leaveTypes"
+                  [nzValue]="type.id"
+                  [nzLabel]="type.label"
+                />
+              </nz-select>
+            } @else {
+              <div class="readonly-display-field readonly-leave-type">
+                {{ getSelectedLeaveTypeLabel() }}
+              </div>
+            }
           </div>
         </div>
         <div class="leave-type-grid">
@@ -78,7 +124,7 @@
 
         <div class="input-field-group mb-4">
           <label>ช่วงเวลาการลา</label>
-        <div class="leave-period-options">
+          <div class="leave-period-options">
             <button
               type="button"
               class="period-option"
@@ -129,68 +175,96 @@
         <div class="details-grid">
           <div class="input-field-group left-half">
             <label>ตั้งแต่วันที่ <span class="required">*</span></label>
-            <nz-date-picker
-              class="input-field custom-picker"
-              nzDropdownClassName="custom-picker-popup"
-              nzFormat="dd/MM/yyyy"
-              nzPlaceHolder="เลือกวันที่เริ่มลา"
-              [nzAllowClear]="false"
-              [ngModel]="startDatePickerValue()"
-              (ngModelChange)="onStartDatePickerChange($event)"
-            />
+            @if (isEditableRequest()) {
+              <nz-date-picker
+                class="input-field custom-picker"
+                nzDropdownClassName="custom-picker-popup"
+                nzFormat="dd/MM/yyyy"
+                nzPlaceHolder="เลือกวันที่เริ่มลา"
+                [nzAllowClear]="false"
+                [ngModel]="startDatePickerValue()"
+                (ngModelChange)="onStartDatePickerChange($event)"
+              />
+            } @else {
+              <div class="input-field readonly-display-field">
+                {{ formatThaiDate(startDate()) || '-' }}
+              </div>
+            }
           </div>
 
           <div class="input-field-group left-half">
             <label>ตั้งแต่เวลา</label>
-            <nz-time-picker
-              class="input-field custom-picker"
-              nzFormat="HH:mm"
-              [nzMinuteStep]="30"
-              nzPlaceHolder="เลือกเวลาเริ่ม"
-              [ngModel]="shiftStartTime()"
-              (ngModelChange)="shiftStartTime.set($event)"
-            />
+            @if (isEditableRequest()) {
+              <nz-time-picker
+                class="input-field custom-picker"
+                nzFormat="HH:mm"
+                [nzMinuteStep]="30"
+                nzPlaceHolder="เลือกเวลาเริ่ม"
+                [ngModel]="shiftStartTime()"
+                (ngModelChange)="shiftStartTime.set($event)"
+              />
+            } @else {
+              <div class="input-field readonly-display-field">
+                {{ formatTimeValue(shiftStartTime()) }}
+              </div>
+            }
           </div>
 
           <div class="input-field-group left-half">
             <label>ถึงวันที่ <span class="required">*</span></label>
-            <nz-date-picker
-              class="input-field custom-picker"
-              nzDropdownClassName="custom-picker-popup"
-              nzFormat="dd/MM/yyyy"
-              nzPlaceHolder="เลือกวันที่สิ้นสุด"
-              [nzAllowClear]="false"
-              [nzDisabledDate]="disableEndDate"
-              [ngModel]="endDatePickerValue()"
-              (ngModelChange)="onEndDatePickerChange($event)"
-            />
+            @if (isEditableRequest()) {
+              <nz-date-picker
+                class="input-field custom-picker"
+                nzDropdownClassName="custom-picker-popup"
+                nzFormat="dd/MM/yyyy"
+                nzPlaceHolder="เลือกวันที่สิ้นสุด"
+                [nzAllowClear]="false"
+                [nzDisabledDate]="disableEndDate"
+                [ngModel]="endDatePickerValue()"
+                (ngModelChange)="onEndDatePickerChange($event)"
+              />
+            } @else {
+              <div class="input-field readonly-display-field">
+                {{ formatThaiDate(endDate()) || '-' }}
+              </div>
+            }
           </div>
 
           <div class="input-field-group left-half">
             <label>ถึงเวลา</label>
-            <nz-time-picker
-              class="input-field custom-picker"
-              nzFormat="HH:mm"
-              [nzMinuteStep]="30"
-              nzPlaceHolder="เลือกเวลาสิ้นสุด"
-              [ngModel]="shiftEndTime()"
-              (ngModelChange)="shiftEndTime.set($event)"
-            />
+            @if (isEditableRequest()) {
+              <nz-time-picker
+                class="input-field custom-picker"
+                nzFormat="HH:mm"
+                [nzMinuteStep]="30"
+                nzPlaceHolder="เลือกเวลาสิ้นสุด"
+                [ngModel]="shiftEndTime()"
+                (ngModelChange)="shiftEndTime.set($event)"
+              />
+            } @else {
+              <div class="input-field readonly-display-field">
+                {{ formatTimeValue(shiftEndTime()) }}
+              </div>
+            }
           </div>
 
           <div class="leave-days-summary">
             <div class="leave-days-icon"><i class="fas fa-calculator"></i></div>
             <div class="leave-days-copy">
-            <span class="leave-days-label">จำนวนวันลา</span>
+              <span class="leave-days-label">จำนวนวันลา</span>
               <small>คำนวณอัตโนมัติจากวันที่และช่วงเวลาที่เลือก</small>
             </div>
             <div class="leave-days-total">
-              <input
-                type="text"
-                class="readonly-highlight leave-days-value"
-                [value]="calculatedDays()"
-                readonly
-              />
+              @if (isEditableRequest()) {
+                <input
+                  type="text"
+                  class="readonly-highlight leave-days-value"
+                  [value]="calculatedDays()"
+                  readonly
+                />
+              } @else {
+                <strong class="leave-days-value readonly-days-value">{{ calculatedDays() }}</strong>
+              }
               <span>วัน</span>
             </div>
           </div>
@@ -198,13 +272,19 @@
 
         <div class="input-field-group full-width mt-4">
           <label>เหตุผลการลา</label>
-          <textarea
-            class="custom-form-control"
-            rows="3"
-            placeholder="ระบุเหตุผลการลา..."
-            [ngModel]="reason()"
-            (ngModelChange)="reason.set($event)"
-          ></textarea>
+          @if (isEditableRequest()) {
+            <textarea
+              class="custom-form-control"
+              rows="3"
+              placeholder="ระบุเหตุผลการลา..."
+              [ngModel]="reason()"
+              (ngModelChange)="reason.set($event)"
+            ></textarea>
+          } @else {
+            <div class="custom-form-control readonly-display-field readonly-reason">
+              {{ reason() || '-' }}
+            </div>
+          }
         </div>
       </section>
 
@@ -214,29 +294,36 @@
             <h4 class="section-heading">3. เอกสารแนบ</h4>
             <p class="section-hint">แนบเอกสารประกอบการลา (ถ้ามี)</p>
           </div>
-          <button type="button" class="btn-upload-file" (click)="triggerFileInput(fileInput)">
-            <i class="fas fa-plus"></i> เพิ่มไฟล์
-          </button>
+          @if (isEditableRequest()) {
+            <button type="button" class="btn-upload-file" (click)="triggerFileInput(fileInput)">
+              <i class="fas fa-plus"></i> เพิ่มไฟล์
+            </button>
+          }
           <input
             #fileInput
             type="file"
             class="hidden-input"
+            [disabled]="!isEditableRequest()"
             (change)="onFileSelected($event)"
             multiple
           />
         </div>
-        <button
-          *ngIf="attachments().length === 0"
-          type="button"
-          class="upload-empty-state"
-          (click)="triggerFileInput(fileInput)"
-        >
-          <span class="upload-empty-icon"><i class="fas fa-cloud-upload-alt"></i></span>
-          <span class="upload-empty-copy">
-            <strong>คลิกเพื่อเลือกเอกสาร</strong>
-            <small>สามารถเลือกได้มากกว่า 1 ไฟล์</small>
-          </span>
-        </button>
+        @if (attachments().length === 0) {
+          @if (isEditableRequest()) {
+            <button type="button" class="upload-empty-state" (click)="triggerFileInput(fileInput)">
+              <span class="upload-empty-icon"><i class="fas fa-cloud-upload-alt"></i></span>
+              <span class="upload-empty-copy">
+                <strong>คลิกเพื่อเลือกเอกสาร</strong>
+                <small>สามารถเลือกได้มากกว่า 1 ไฟล์</small>
+              </span>
+            </button>
+          } @else {
+            <div class="readonly-empty-attachments">
+              <i class="far fa-folder-open"></i>
+              <span>ไม่มีเอกสารแนบ</span>
+            </div>
+          }
+        }
         <div class="attachment-table-container" *ngIf="attachments().length > 0">
           <table class="excel-table">
             <thead>
@@ -244,7 +331,9 @@
                 <th class="w-px-50 text-center">#</th>
                 <th class="w-35">ชื่อไฟล์</th>
                 <th class="w-auto">รายละเอียด</th>
-                <th class="w-px-50 text-center"></th>
+                @if (isEditableRequest()) {
+                  <th class="w-px-50 text-center"></th>
+                }
               </tr>
             </thead>
             <tbody>
@@ -258,24 +347,30 @@
                 </td>
                 <td>
                   <div class="desc-input-wrapper">
-                    <input
-                      type="text"
-                      class="desc-control"
-                      [(ngModel)]="file.description"
-                      placeholder="ระบุรายละเอียด (ถ้ามี)"
-                    />
+                    @if (isEditableRequest()) {
+                      <input
+                        type="text"
+                        class="desc-control"
+                        [(ngModel)]="file.description"
+                        placeholder="ระบุรายละเอียด (ถ้ามี)"
+                      />
+                    } @else {
+                      <span>{{ file.description || '-' }}</span>
+                    }
                   </div>
                 </td>
-                <td class="text-center">
-                  <button
-                    type="button"
-                    class="btn-delete-row"
-                    title="ลบไฟล์"
-                    (click)="deleteAttachment(file.id)"
-                  >
-                    <i class="far fa-trash-alt"></i>
-                  </button>
-                </td>
+                @if (isEditableRequest()) {
+                  <td class="text-center">
+                    <button
+                      type="button"
+                      class="btn-delete-row"
+                      title="ลบไฟล์"
+                      (click)="deleteAttachment(file.id)"
+                    >
+                      <i class="far fa-trash-alt"></i>
+                    </button>
+                  </td>
+                }
               </tr>
             </tbody>
           </table>
@@ -294,7 +389,7 @@
     </main>
   </fieldset>
 
-  <div class="form-actions-footer" *ngIf="requestStatus === 'NEW'">
+  <div class="form-actions-footer" *ngIf="isEditableRequest()">
     <button class="btn-back-custom" (click)="close()"><i class="fas fa-times"></i> ยกเลิก</button>
     <button class="btn-save-custom" (click)="save()">
       <i class="fas fa-paper-plane"></i> ส่งใบลา

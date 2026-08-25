@@ -15,7 +15,11 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ToastService } from '../../../services/toast';
 import { TimeOffService } from '../../../services/time-off.service';
-import { LeaveType, SaveLeaveRequestPayload } from '../../../interfaces/time-off.interface';
+import {
+  LeaveType,
+  SaveLeaveRequestPayload,
+  TimeOffRequest,
+} from '../../../interfaces/time-off.interface';
 import { DateUtilityService } from '../../../services/date-utility.service';
 import { STORAGE_KEYS } from '../../../constants/storage.constants';
 import dayjs from 'dayjs';
@@ -28,6 +32,14 @@ import {
 import { NzDatePickerModule } from 'ng-zorro-antd/date-picker';
 import { NzTimePickerModule } from 'ng-zorro-antd/time-picker';
 import { NzSelectModule } from 'ng-zorro-antd/select';
+
+type ApprovalStepState = 'completed' | 'active' | 'pending' | 'rejected' | 'sendback';
+
+interface ApprovalStep {
+  label: string;
+  state: ApprovalStepState;
+  approverCode?: string;
+}
 
 @Component({
   selector: 'app-time-off-form',
@@ -53,6 +65,7 @@ export class TimeOffForm implements OnInit {
 
   @Input() initialLeaveTypeId: string = '';
   @Input() requestStatus: string = 'NEW';
+  @Input() request: TimeOffRequest | null = null;
   @Input() selectedDate: string = '';
   @Output() onClose = new EventEmitter<void>();
 
@@ -94,7 +107,9 @@ export class TimeOffForm implements OnInit {
   });
 
   loadingTypes = signal(true);
-  attachments = signal<{ id: number; name: string; description: string; file: File }[]>([]);
+  attachments = signal<
+    { id: number; name: string; description: string; file?: File; url?: string }[]
+  >([]);
   constructor(
     private cdr: ChangeDetectorRef,
     private zone: NgZone,
@@ -124,6 +139,9 @@ export class TimeOffForm implements OnInit {
         this.loadingTypes.set(false);
         if (this.initialLeaveTypeId) {
           this.selectLeaveType(this.initialLeaveTypeId);
+        }
+        if (this.request) {
+          this.populateRequest(this.request);
         }
 
         this.cdr.markForCheck();
@@ -170,6 +188,7 @@ export class TimeOffForm implements OnInit {
   }
 
   selectLeaveType(id: string) {
+    if (!this.isEditableRequest()) return;
     this.selectedLeaveType.set(id);
     this.cdr.detectChanges();
   }
@@ -201,6 +220,7 @@ export class TimeOffForm implements OnInit {
   };
 
   onLeavePeriodChange(period: string) {
+    if (!this.isEditableRequest()) return;
     this.leavePeriod.set(period);
     const firstHalfEnd = this.getFirstHalfEndMinutes();
     const secondHalfStart = firstHalfEnd + this.breakMinutes;
@@ -219,10 +239,12 @@ export class TimeOffForm implements OnInit {
   }
 
   deleteAttachment(id: number) {
+    if (!this.isEditableRequest()) return;
     this.attachments.update((current) => current.filter((a) => a.id !== id));
   }
 
   triggerFileInput(input: HTMLInputElement) {
+    if (!this.isEditableRequest()) return;
     input.click();
   }
 
@@ -248,11 +270,12 @@ export class TimeOffForm implements OnInit {
     this.onClose.emit();
   }
 
-  openPreview(file: { name: string }) {
+  openPreview(file: { name: string; url?: string }) {
     this.previewFiles.set([
       {
         fileName: file.name,
         date: this.currentDate(),
+        url: file.url,
       },
     ]);
     this.isPreviewModalOpen.set(true);
@@ -308,7 +331,7 @@ export class TimeOffForm implements OnInit {
     const endDate = this.toApiDateTime(this.endDate(), this.shiftEndTime());
     const isHalfDay = this.calculatedDays() % 1 === 0.5;
     const payload: SaveLeaveRequestPayload = {
-      action: 'Upsert',
+      action: this.isSendbackStatus() ? 'Resubmit' : 'Upsert',
       request_id: Number(this.requestId()) || 0,
       employee_code: employeeCode,
       leave_type_id: Number(this.selectedLeaveType()),
@@ -320,7 +343,9 @@ export class TimeOffForm implements OnInit {
       is_half_day: isHalfDay,
       half_day_period: isHalfDay ? this.getHalfDayPeriod() : 'FULL',
       delete_file_ids: 0,
-      files: this.attachments().map((attachment) => attachment.file),
+      files: this.attachments()
+        .map((attachment) => attachment.file)
+        .filter((file): file is File => file instanceof File),
     };
 
     console.log('[Time Off] Save payload:', payload);
@@ -344,6 +369,123 @@ export class TimeOffForm implements OnInit {
     } catch {
       return localStorage.getItem(STORAGE_KEYS.EMPLOYEE_ID)?.trim() ?? '';
     }
+  }
+
+  isEditableRequest(): boolean {
+    const status = this.normalizeStatus(this.requestStatus);
+    return ['NEW', 'SENDBACK', 'SEND_BACK', 'REFERRED_BACK'].includes(status);
+  }
+
+  getRequestApprovalSteps(): ApprovalStep[] {
+    const request = this.request;
+    const overallStatus = this.normalizeStatus(
+      request?.overall_status || this.requestStatus || request?.status || '',
+    );
+    const approver1Action = this.normalizeStatus(request?.approver1_action || 'PENDING');
+    const approver2Action = this.normalizeStatus(request?.approver2_action || 'PENDING');
+    const hasSecondApprover = Boolean(request?.approver2_code?.trim());
+    const isComplete = overallStatus === 'APPROVED';
+
+    const firstApproverState: ApprovalStepState = isComplete
+      ? 'completed'
+      : approver1Action === 'APPROVED'
+        ? 'completed'
+        : approver1Action === 'REJECTED'
+          ? 'rejected'
+          : ['SENDBACK', 'SEND_BACK'].includes(approver1Action)
+            ? 'sendback'
+            : 'active';
+
+    const steps: ApprovalStep[] = [
+      { label: 'คำขอใหม่', state: 'completed' },
+      {
+        label: 'ผู้อนุมัติคนที่ 1',
+        state: firstApproverState,
+        approverCode: request?.approver1_code || undefined,
+      },
+    ];
+
+    if (hasSecondApprover) {
+      steps.push({
+        label: 'ผู้อนุมัติคนที่ 2',
+        approverCode: request?.approver2_code || undefined,
+        state: isComplete
+          ? 'completed'
+          : approver2Action === 'APPROVED'
+            ? 'completed'
+            : approver2Action === 'REJECTED'
+              ? 'rejected'
+              : ['SENDBACK', 'SEND_BACK'].includes(approver2Action)
+                ? 'sendback'
+                : approver1Action === 'APPROVED'
+                  ? 'active'
+                  : 'pending',
+      });
+    }
+
+    steps.push({
+      label: 'อนุมัติแล้ว',
+      state: isComplete ? 'completed' : 'pending',
+    });
+    return steps;
+  }
+
+  getSelectedLeaveTypeLabel(): string {
+    return this.leaveTypes.find((type) => type.id === this.selectedLeaveType())?.label ?? '-';
+  }
+
+  formatTimeValue(value: Date | null): string {
+    if (!value || Number.isNaN(value.getTime())) return '-';
+    const hours = String(value.getHours()).padStart(2, '0');
+    const minutes = String(value.getMinutes()).padStart(2, '0');
+    return `${hours}:${minutes}`;
+  }
+
+  private isSendbackStatus(): boolean {
+    return ['SENDBACK', 'SEND_BACK', 'REFERRED_BACK'].includes(
+      this.normalizeStatus(this.requestStatus),
+    );
+  }
+
+  private normalizeStatus(status: string): string {
+    return (status ?? '')
+      .trim()
+      .toUpperCase()
+      .replace(/[\s-]+/g, '_');
+  }
+
+  private populateRequest(request: TimeOffRequest): void {
+    this.requestId.set(String(request.request_id ?? 0));
+    this.selectedLeaveType.set(String(request.leave_type_id ?? ''));
+    this.reason.set(request.reason ?? '');
+    this.startDate.set(request.startDate.slice(0, 10));
+    this.endDate.set(request.endDate.slice(0, 10));
+    this.shiftStartTime.set(this.timeFromApiDate(request.startDate));
+    this.shiftEndTime.set(this.timeFromApiDate(request.endDate));
+    this.attachments.set(
+      (request.attachments ?? []).map((file, index) => ({
+        id: index + 1,
+        name: file.name,
+        description: '',
+        url: file.url,
+      })),
+    );
+
+    const period = (request.leavePeriod ?? '').toUpperCase();
+    this.leavePeriod.set(
+      period === '1ST' || period === 'MORNING'
+        ? 'morning'
+        : period === '2ND' || period === 'AFTERNOON'
+          ? 'afternoon'
+          : 'full-day',
+    );
+  }
+
+  private timeFromApiDate(value: string): Date {
+    const match = value?.match(/T(\d{2}):(\d{2})/);
+    const result = new Date();
+    result.setHours(Number(match?.[1] ?? 9), Number(match?.[2] ?? 0), 0, 0);
+    return result;
   }
 
   private toApiDateTime(date: string, time: Date | null): string {

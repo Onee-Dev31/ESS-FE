@@ -24,6 +24,10 @@ import { PageLoaderComponent } from '../../components/shared/page-loader/page-lo
 import { EmptyStateComponent } from '../../components/shared/empty-state/empty-state';
 import { createAngularTable, getCoreRowModel, SortingState } from '@tanstack/angular-table';
 
+type StatusDisplayMeta =
+  | { label: string; className: string }
+  | { labelTH: string; labelEN: string; className: string };
+
 /** หน้าแสดงรายการคำขอลา (Time Off Request List) พร้อมระบบกรองและค้นหา */
 @Component({
   selector: 'app-timeoff',
@@ -55,6 +59,7 @@ export class TimeoffComponent implements OnInit {
   requests = signal<TimeOffRequest[]>([]);
   isFormOpen = signal<boolean>(false);
   selectedRequestStatus = signal<string>('คำขอใหม่');
+  selectedRequest = signal<TimeOffRequest | null>(null);
 
   listing = createListingState();
 
@@ -142,17 +147,26 @@ export class TimeoffComponent implements OnInit {
   isPreviewModalOpen = signal<boolean>(false);
   previewFiles = signal<{ fileName: string; date: string }[]>([]);
 
-  statuses = COMMON_STATUS_OPTIONS;
-
-  private readonly statusDisplay: Record<string, { label: string; className: string }> = {
-    NEW: { label: 'คำขอใหม่', className: 'status-new' },
-    VERIFIED: { label: 'ตรวจสอบแล้ว', className: 'status-verified' },
-    WAITING_CHECK: { label: 'รอตรวจสอบ', className: 'status-verified' },
-    PENDING_ACTION: { label: 'รอดำเนินการ', className: 'status-pending' },
-    PENDING_APPROVAL: { label: 'อยู่ระหว่างการอนุมัติ', className: 'status-pending' },
-    APPROVED: { label: 'อนุมัติแล้ว', className: 'status-approved' },
-    REJECTED: { label: 'ไม่อนุมัติ', className: 'status-rejected' },
-    REFERRED_BACK: { label: 'รอแก้ไข', className: 'status-referred' },
+  // statuses = COMMON_STATUS_OPTIONS;
+  private readonly statusDisplay: Record<string, StatusDisplayMeta> = {
+    NEW: { labelTH: 'คำขอใหม่', labelEN: 'New', className: 'status-new' },
+    PENDING: {
+      labelTH: 'อยู่ระหว่างการอนุมัติ',
+      labelEN: 'Pending',
+      className: 'status-pending',
+    },
+    APPROVED: { labelTH: 'อนุมัติแล้ว', labelEN: 'Approved', className: 'status-approved' },
+    REJECTED: { labelTH: 'ถูกปฏิเสธ', labelEN: 'Rejected', className: 'status-rejected' },
+    SENDBACK: {
+      labelTH: 'ถูกส่งกลับ',
+      labelEN: 'Sendback',
+      className: 'status-referred',
+    },
+    CANCELLED: {
+      labelTH: 'ยกเลอกคำขอ',
+      labelEN: 'Cancelled',
+      className: 'status-cancelled',
+    },
   };
 
   ngOnInit() {
@@ -235,13 +249,15 @@ export class TimeoffComponent implements OnInit {
   }
 
   /** เปิดฟอร์มสำหรับยื่นคำขอลาใหม่ */
-  openForm(status: string = 'NEW') {
-    this.selectedRequestStatus.set(status);
+  openForm(request?: TimeOffRequest) {
+    this.selectedRequest.set(request ?? null);
+    this.selectedRequestStatus.set(request?.status ?? 'NEW');
     this.isFormOpen.set(true);
   }
 
   closeForm() {
     this.isFormOpen.set(false);
+    this.selectedRequest.set(null);
     this.loadRequests();
   }
 
@@ -272,17 +288,32 @@ export class TimeoffComponent implements OnInit {
   }
 
   getStatusMeta(status: string): { label: string; className: string } {
-    const key = status === 'คำขอใหม่' ? 'NEW' : status?.trim();
-    return (
-      this.statusDisplay[key] ?? {
+    const key = this.normalizeStatusKey(status);
+    const meta = this.statusDisplay[key];
+
+    if (!meta) {
+      return {
         label: key || 'ไม่ระบุสถานะ',
         className: 'status-neutral',
-      }
+      };
+    }
+
+    return {
+      label: 'label' in meta ? meta.label : meta.labelTH,
+      className: meta.className,
+    };
+  }
+
+  isEditableRequest(status: string): boolean {
+    return ['NEW', 'SENDBACK', 'SEND_BACK', 'REFERRED_BACK'].includes(
+      this.normalizeStatusKey(status),
     );
   }
 
-  isNewRequest(status: string): boolean {
-    return status?.trim() === 'NEW' || status?.trim() === 'คำขอใหม่';
+  private normalizeStatusKey(status: string): string {
+    const value = status?.trim() ?? '';
+    if (value === 'คำขอใหม่') return 'NEW';
+    return value.toUpperCase().replace(/[\s-]+/g, '_');
   }
 
   getCreatedAt(request: TimeOffRequest): string {

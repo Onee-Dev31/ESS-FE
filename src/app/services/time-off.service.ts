@@ -57,15 +57,42 @@ export class TimeOffService {
     const formData = new FormData();
     formData.append('Action', payload.action ?? 'Upsert');
     formData.append('request_id', String(payload.request_id));
-    formData.append('employee_code', payload.employee_code);
-    formData.append('leave_type_id', String(payload.leave_type_id));
-    formData.append('start_date', payload.start_date);
-    formData.append('end_date', payload.end_date);
-    formData.append('total_days', String(payload.total_days));
-    formData.append('year', String(payload.year));
-    formData.append('reason', payload.reason);
-    formData.append('is_half_day', String(payload.is_half_day));
-    formData.append('half_day_period', payload.half_day_period ?? '');
+
+    if (payload.employee_code !== undefined) {
+      formData.append('employee_code', payload.employee_code);
+    }
+
+    if (payload.leave_type_id !== undefined) {
+      formData.append('leave_type_id', String(payload.leave_type_id));
+    }
+
+    if (payload.start_date !== undefined) {
+      formData.append('start_date', payload.start_date);
+    }
+
+    if (payload.end_date !== undefined) {
+      formData.append('end_date', payload.end_date);
+    }
+
+    if (payload.total_days !== undefined) {
+      formData.append('total_days', String(payload.total_days));
+    }
+
+    if (payload.year !== undefined) {
+      formData.append('year', String(payload.year));
+    }
+
+    if (payload.reason !== undefined) {
+      formData.append('reason', payload.reason);
+    }
+
+    if (payload.is_half_day !== undefined) {
+      formData.append('is_half_day', String(payload.is_half_day));
+    }
+
+    if (payload.half_day_period !== undefined) {
+      formData.append('half_day_period', payload.half_day_period);
+    }
 
     const deletedFileIds = Array.isArray(payload.delete_file_ids)
       ? payload.delete_file_ids
@@ -140,13 +167,18 @@ export class TimeOffService {
           ? { name: file }
           : {
               name: String(file['file_name'] ?? file['name'] ?? ''),
-              url: String(file['file_url'] ?? file['url'] ?? ''),
+              url: String(file['file_path'] ?? file['file_url'] ?? file['url'] ?? ''),
             },
       ),
       days: Number(row['total_days'] ?? row['days'] ?? 0),
       leavePeriod: String(row['half_day_period'] ?? row['leavePeriod'] ?? 'full-day'),
       shiftStartTime: String(row['start_time'] ?? row['shiftStartTime'] ?? ''),
       shiftEndTime: String(row['end_time'] ?? row['shiftEndTime'] ?? ''),
+      approver1_code: String(row['approver1_code'] ?? '') || null,
+      approver1_action: String(row['approver1_action'] ?? '') || null,
+      approver2_code: String(row['approver2_code'] ?? '') || null,
+      approver2_action: String(row['approver2_action'] ?? '') || null,
+      overall_status: String(row['overall_status'] ?? row['status'] ?? '') || null,
     };
   }
 }

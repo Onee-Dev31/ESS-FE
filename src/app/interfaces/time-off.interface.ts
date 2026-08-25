@@ -19,6 +19,11 @@ export interface TimeOffRequest {
   leavePeriod?: string;
   shiftStartTime?: string;
   shiftEndTime?: string;
+  approver1_code?: string | null;
+  approver1_action?: string | null;
+  approver2_code?: string | null;
+  approver2_action?: string | null;
+  overall_status?: string | null;
   requester?: Requester;
 }
 
@@ -81,14 +86,14 @@ export type LeaveRequestAction = 'Upsert' | 'Resubmit' | 'Cancel';
 export interface SaveLeaveRequestPayload {
   action?: LeaveRequestAction;
   request_id: number;
-  employee_code: string;
-  leave_type_id: number;
-  start_date: string;
-  end_date: string;
-  total_days: number;
-  year: number;
-  reason: string;
-  is_half_day: boolean;
+  employee_code?: string;
+  leave_type_id?: number;
+  start_date?: string;
+  end_date?: string;
+  total_days?: number;
+  year?: number;
+  reason?: string;
+  is_half_day?: boolean;
   half_day_period?: string;
   delete_file_ids?: number | number[];
   files?: File[];
