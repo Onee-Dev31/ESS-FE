@@ -33,7 +33,13 @@ import { NzDatePickerModule } from 'ng-zorro-antd/date-picker';
 import { NzTimePickerModule } from 'ng-zorro-antd/time-picker';
 import { NzSelectModule } from 'ng-zorro-antd/select';
 
-type ApprovalStepState = 'completed' | 'active' | 'pending' | 'rejected' | 'sendback';
+type ApprovalStepState =
+  | 'completed'
+  | 'active'
+  | 'pending'
+  | 'rejected'
+  | 'sendback'
+  | 'cancelled';
 
 interface ApprovalStep {
   label: string;
@@ -384,9 +390,12 @@ export class TimeOffForm implements OnInit {
     const approver1Action = this.normalizeStatus(request?.approver1_action || 'PENDING');
     const approver2Action = this.normalizeStatus(request?.approver2_action || 'PENDING');
     const hasSecondApprover = Boolean(request?.approver2_code?.trim());
+    const isCancelled = ['CANCELLED', 'CANCELED', 'ยกเลิกคำขอ', 'ถูกยกเลิก'].includes(overallStatus);
     const isComplete = overallStatus === 'APPROVED';
 
-    const firstApproverState: ApprovalStepState = isComplete
+    const firstApproverState: ApprovalStepState = isCancelled
+      ? 'pending'
+      : isComplete
       ? 'completed'
       : approver1Action === 'APPROVED'
         ? 'completed'
@@ -397,7 +406,7 @@ export class TimeOffForm implements OnInit {
             : 'active';
 
     const steps: ApprovalStep[] = [
-      { label: 'คำขอใหม่', state: 'completed' },
+      { label: 'คำขอใหม่', state: isCancelled ? 'cancelled' : 'completed' },
       {
         label: 'ผู้อนุมัติคนที่ 1',
         state: firstApproverState,
@@ -409,7 +418,9 @@ export class TimeOffForm implements OnInit {
       steps.push({
         label: 'ผู้อนุมัติคนที่ 2',
         approverCode: request?.approver2_code || undefined,
-        state: isComplete
+        state: isCancelled
+          ? 'pending'
+          : isComplete
           ? 'completed'
           : approver2Action === 'APPROVED'
             ? 'completed'
@@ -425,7 +436,7 @@ export class TimeOffForm implements OnInit {
 
     steps.push({
       label: 'อนุมัติแล้ว',
-      state: isComplete ? 'completed' : 'pending',
+      state: !isCancelled && isComplete ? 'completed' : 'pending',
     });
     return steps;
   }

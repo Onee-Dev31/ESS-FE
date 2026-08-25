@@ -39,7 +39,7 @@
               <div class="step-marker">
                 @if (step.state === 'completed') {
                   <i class="fas fa-check"></i>
-                } @else if (step.state === 'rejected') {
+                } @else if (step.state === 'rejected' || step.state === 'cancelled') {
                   <i class="fas fa-times"></i>
                 } @else if (step.state === 'sendback') {
                   <i class="fas fa-undo-alt"></i>
@@ -55,6 +55,8 @@
                 <span class="step-action-label sendback-label">Sendback</span>
               } @else if (step.state === 'rejected') {
                 <span class="step-action-label rejected-label">Rejected</span>
+              } @else if (step.state === 'cancelled') {
+                <span class="step-action-label cancelled-label">ยกเลิกคำขอ</span>
               }
             </div>
           }

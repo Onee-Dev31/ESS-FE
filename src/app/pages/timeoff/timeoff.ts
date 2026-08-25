@@ -1,7 +1,11 @@
 import { Component, OnInit, signal, inject, computed, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { TimeOffService, TimeOffRequest } from '../../services/time-off.service';
+import {
+  TimeOffService,
+  TimeOffRequest,
+  SaveLeaveRequestPayload,
+} from '../../services/time-off.service';
 import { LoadingService } from '../../services/loading';
 import { ToastService } from '../../services/toast';
 import { DialogService } from '../../services/dialog';
@@ -163,7 +167,7 @@ export class TimeoffComponent implements OnInit {
       className: 'status-referred',
     },
     CANCELLED: {
-      labelTH: 'ยกเลอกคำขอ',
+      labelTH: 'ยกเลิกคำขอ',
       labelEN: 'Cancelled',
       className: 'status-cancelled',
     },
@@ -212,31 +216,21 @@ export class TimeoffComponent implements OnInit {
     if (!confirmed) return;
 
     this.loadingService.start('timeoff-list');
-    this.timeoffService
-      .saveLeaveRequest({
-        action: 'Cancel',
-        request_id: (request.request_id ?? Number(request.id)) || 0,
-        employee_code: request.employee_code || request.employeeId,
-        leave_type_id: request.leave_type_id ?? 0,
-        start_date: request.startDate,
-        end_date: request.endDate,
-        total_days: request.days ?? 0,
-        year: new Date(request.startDate).getFullYear(),
-        reason: request.reason,
-        is_half_day: request.leavePeriod === 'morning' || request.leavePeriod === 'afternoon',
-        half_day_period: request.leavePeriod ?? '',
-        delete_file_ids: 0,
-      })
-      .subscribe({
-        next: () => {
-          this.toastService.success('ลบรายการสำเร็จ');
-          this.loadRequests();
-        },
-        error: (error) => {
-          this.loadingService.stop('timeoff-list');
-          this.errorService.handle(error, { component: 'TimeOff', action: 'cancel-request' });
-        },
-      });
+    const payload: SaveLeaveRequestPayload = {
+      action: 'Cancel' as const,
+      request_id: (request.request_id ?? Number(request.id)) || 0,
+      employee_code: request.employee_code || request.employeeId,
+    };
+    this.timeoffService.saveLeaveRequest(payload).subscribe({
+      next: () => {
+        this.toastService.success('ลบรายการสำเร็จ');
+        this.loadRequests();
+      },
+      error: (error) => {
+        this.loadingService.stop('timeoff-list');
+        this.errorService.handle(error, { component: 'TimeOff', action: 'cancel-request' });
+      },
+    });
   }
 
   setPageSize(size: number) {

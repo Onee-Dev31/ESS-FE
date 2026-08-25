@@ -62,6 +62,10 @@ export class TimeOffService {
       formData.append('employee_code', payload.employee_code);
     }
 
+    if (payload.action === 'Cancel') {
+      return this.http.post(`${this.baseUrl}/leave/LeaveRequests`, formData);
+    }
+
     if (payload.leave_type_id !== undefined) {
       formData.append('leave_type_id', String(payload.leave_type_id));
     }
@@ -94,10 +98,12 @@ export class TimeOffService {
       formData.append('half_day_period', payload.half_day_period);
     }
 
-    const deletedFileIds = Array.isArray(payload.delete_file_ids)
-      ? payload.delete_file_ids
-      : [payload.delete_file_ids ?? 0];
-    deletedFileIds.forEach((id) => formData.append('delete_file_ids', String(id)));
+    if (payload.delete_file_ids !== undefined) {
+      const deletedFileIds = Array.isArray(payload.delete_file_ids)
+        ? payload.delete_file_ids
+        : [payload.delete_file_ids];
+      deletedFileIds.forEach((id) => formData.append('delete_file_ids', String(id)));
+    }
     payload.files?.forEach((file) => formData.append('files', file, file.name));
 
     return this.http.post(`${this.baseUrl}/leave/LeaveRequests`, formData);

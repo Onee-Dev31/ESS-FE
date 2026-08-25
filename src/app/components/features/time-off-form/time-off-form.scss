@@ -295,6 +295,11 @@
     color: var(--status-rejected-text);
   }
 
+  .cancelled-label {
+    background: var(--bg-table-head);
+    color: var(--text-muted);
+  }
+
   &.completed {
     color: var(--success);
     &::after { background: var(--success); }
@@ -328,6 +333,16 @@
     .step-marker {
       border-color: var(--warning);
       background: var(--warning);
+      color: var(--text-reverse);
+    }
+  }
+
+  &.cancelled {
+    color: var(--text-muted);
+
+    .step-marker {
+      border-color: var(--text-muted);
+      background: var(--text-muted);
       color: var(--text-reverse);
     }
   }
