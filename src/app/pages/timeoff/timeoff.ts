@@ -219,7 +219,7 @@ export class TimeoffComponent implements OnInit {
     const payload: SaveLeaveRequestPayload = {
       action: 'Cancel' as const,
       request_id: (request.request_id ?? Number(request.id)) || 0,
-      employee_code: request.employee_code || request.employeeId,
+      request_by: request.employee_code || request.employeeId,
     };
     this.timeoffService.saveLeaveRequest(payload).subscribe({
       next: () => {

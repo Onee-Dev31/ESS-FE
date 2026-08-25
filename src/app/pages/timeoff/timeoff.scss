@@ -395,6 +395,23 @@ $status-cancelled-text: var(--text-table-head);
     @include card-header-title;
   }
 
+  .card-title-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+    gap: 12px;
+
+    .card-header-title {
+      margin-bottom: 0;
+    }
+
+    .btn-create {
+      flex: 0 0 auto;
+      white-space: nowrap;
+    }
+  }
+
   .toolbar-container {
     @include toolbar-container;
 

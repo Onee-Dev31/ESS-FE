@@ -86,7 +86,6 @@ export type LeaveRequestAction = 'Upsert' | 'Resubmit' | 'Cancel';
 export interface SaveLeaveRequestPayload {
   action?: LeaveRequestAction;
   request_id: number;
-  employee_code?: string;
   leave_type_id?: number;
   start_date?: string;
   end_date?: string;
@@ -97,6 +96,7 @@ export interface SaveLeaveRequestPayload {
   half_day_period?: string;
   delete_file_ids?: number | number[];
   files?: File[];
+  request_by?: string;
 }
 
 export interface LeaveQuotaRule {

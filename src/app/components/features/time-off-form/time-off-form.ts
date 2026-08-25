@@ -33,13 +33,7 @@ import { NzDatePickerModule } from 'ng-zorro-antd/date-picker';
 import { NzTimePickerModule } from 'ng-zorro-antd/time-picker';
 import { NzSelectModule } from 'ng-zorro-antd/select';
 
-type ApprovalStepState =
-  | 'completed'
-  | 'active'
-  | 'pending'
-  | 'rejected'
-  | 'sendback'
-  | 'cancelled';
+type ApprovalStepState = 'completed' | 'active' | 'pending' | 'rejected' | 'sendback' | 'cancelled';
 
 interface ApprovalStep {
   label: string;
@@ -339,7 +333,6 @@ export class TimeOffForm implements OnInit {
     const payload: SaveLeaveRequestPayload = {
       action: this.isSendbackStatus() ? 'Resubmit' : 'Upsert',
       request_id: Number(this.requestId()) || 0,
-      employee_code: employeeCode,
       leave_type_id: Number(this.selectedLeaveType()),
       start_date: startDate,
       end_date: endDate,
@@ -352,6 +345,7 @@ export class TimeOffForm implements OnInit {
       files: this.attachments()
         .map((attachment) => attachment.file)
         .filter((file): file is File => file instanceof File),
+      request_by: employeeCode,
     };
 
     console.log('[Time Off] Save payload:', payload);
@@ -390,20 +384,22 @@ export class TimeOffForm implements OnInit {
     const approver1Action = this.normalizeStatus(request?.approver1_action || 'PENDING');
     const approver2Action = this.normalizeStatus(request?.approver2_action || 'PENDING');
     const hasSecondApprover = Boolean(request?.approver2_code?.trim());
-    const isCancelled = ['CANCELLED', 'CANCELED', 'ยกเลิกคำขอ', 'ถูกยกเลิก'].includes(overallStatus);
+    const isCancelled = ['CANCELLED', 'CANCELED', 'ยกเลิกคำขอ', 'ถูกยกเลิก'].includes(
+      overallStatus,
+    );
     const isComplete = overallStatus === 'APPROVED';
 
     const firstApproverState: ApprovalStepState = isCancelled
       ? 'pending'
       : isComplete
-      ? 'completed'
-      : approver1Action === 'APPROVED'
         ? 'completed'
-        : approver1Action === 'REJECTED'
-          ? 'rejected'
-          : ['SENDBACK', 'SEND_BACK'].includes(approver1Action)
-            ? 'sendback'
-            : 'active';
+        : approver1Action === 'APPROVED'
+          ? 'completed'
+          : approver1Action === 'REJECTED'
+            ? 'rejected'
+            : ['SENDBACK', 'SEND_BACK'].includes(approver1Action)
+              ? 'sendback'
+              : 'active';
 
     const steps: ApprovalStep[] = [
       { label: 'คำขอใหม่', state: isCancelled ? 'cancelled' : 'completed' },
@@ -421,16 +417,16 @@ export class TimeOffForm implements OnInit {
         state: isCancelled
           ? 'pending'
           : isComplete
-          ? 'completed'
-          : approver2Action === 'APPROVED'
             ? 'completed'
-            : approver2Action === 'REJECTED'
-              ? 'rejected'
-              : ['SENDBACK', 'SEND_BACK'].includes(approver2Action)
-                ? 'sendback'
-                : approver1Action === 'APPROVED'
-                  ? 'active'
-                  : 'pending',
+            : approver2Action === 'APPROVED'
+              ? 'completed'
+              : approver2Action === 'REJECTED'
+                ? 'rejected'
+                : ['SENDBACK', 'SEND_BACK'].includes(approver2Action)
+                  ? 'sendback'
+                  : approver1Action === 'APPROVED'
+                    ? 'active'
+                    : 'pending',
       });
     }
 

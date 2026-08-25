@@ -4,17 +4,14 @@
   <div class="timeoff-page">
     <app-page-header title="รายการลา" subtitle="Time Off Requests" icon="fas fa-calendar-minus" />
     <div class="content-card">
-      <div class="card-header-title">รายการลาของฉัน</div>
+      <div class="card-title-row">
+        <div class="card-header-title">รายการลาของฉัน</div>
+        <button class="btn-create" (click)="openForm()">
+          <i class="fas fa-plus"></i> สร้างรายการลา
+        </button>
+      </div>
 
       <div class="toolbar-container">
-        <div class="toolbar-top-row">
-          <div class="left-action">
-            <button class="btn-create" (click)="openForm()">
-              <i class="fas fa-plus"></i> สร้างรายการลา
-            </button>
-          </div>
-        </div>
-
         <div class="toolbar-bottom-row">
           <div class="right-filters">
             <div class="filter-group">

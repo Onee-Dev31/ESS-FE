@@ -58,8 +58,8 @@ export class TimeOffService {
     formData.append('Action', payload.action ?? 'Upsert');
     formData.append('request_id', String(payload.request_id));
 
-    if (payload.employee_code !== undefined) {
-      formData.append('employee_code', payload.employee_code);
+    if (payload.request_by !== undefined) {
+      formData.append('request_by', payload.request_by);
     }
 
     if (payload.action === 'Cancel') {
