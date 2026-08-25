@@ -1,5 +1,7 @@
 @use './variables' as *;
 
+// Shared Ant Design overrides.
+
 /*
   ANTD : SELECT
 */
@@ -55,6 +57,13 @@
   background-color: transparent;
   color: var(--input-text) !important;
   font-size: 15px;
+}
+
+// Keep the clear-all button vertically centered when a multiple select grows.
+.ant-select-multiple .ant-select-clear {
+  top: 50%;
+  margin-top: 0;
+  transform: translateY(-50%);
 }
 
 // option

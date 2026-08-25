@@ -649,7 +649,7 @@
 .tk-left__filter-col {
   display: flex;
   flex-direction: column;
-  align-items: end;
+  align-items: flex-end;
   gap: 10px;
 }
 
@@ -922,13 +922,15 @@
 
 .tk-left__top {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
-  padding: 14px 14px 10px;
+  gap: 12px;
+  padding: 14px;
   border-bottom: 1px solid rgba(15, 23, 42, 0.06);
 }
 
 .tk-left__title {
+  padding-top: 6px;
   font-weight: 800;
   font-size: 18px;
   color: var(--text-header);
@@ -937,10 +939,12 @@
 ::ng-deep .checkbox-my-ticket {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  padding: 2px 4px;
+  justify-content: center;
+  width: 130px;
+  min-height: 30px;
+  padding: 4px 12px;
   border-radius: 999px;
-  border: 1.5px solid var(--border-color);
+  border: 1px solid var(--border-color);
   background: var(--bg-table-head);
   font-size: 13px;
   font-weight: 600;
@@ -956,7 +960,7 @@
   &:hover {
     border-color: var(--primary);
     color: var(--primary);
-    background: var(--bg-card);
+    background: color-mix(in srgb, var(--primary) 6%, var(--bg-card));
   }
 
   // ตอน checked
@@ -968,13 +972,143 @@
 }
 
 .tk-left__select {
-  border-radius: 10px;
   width: 130px;
-  text-align: right;
+  height: 34px;
+  flex: 0 0 34px;
 }
 
-::ng-deep .ant-select-arrow .anticon > svg {
+:host ::ng-deep .tk-left__select.ant-select .ant-select-selector {
+  height: 34px !important;
+  padding: 0 34px 0 12px !important;
+  background: var(--input-bg) !important;
+  border: 1px solid var(--input-border) !important;
+  border-radius: 10px !important;
+  box-shadow: none !important;
+}
+
+:host ::ng-deep .tk-left__select.ant-select:hover .ant-select-selector,
+:host ::ng-deep .tk-left__select.ant-select-focused .ant-select-selector {
+  border-color: var(--primary) !important;
+}
+
+:host ::ng-deep .tk-left__select .ant-select-selection-item,
+:host ::ng-deep .tk-left__select .ant-select-selection-placeholder {
   color: var(--text);
+  font-weight: 500;
+  line-height: 32px !important;
+  text-align: left;
+  padding-inline-end: 0 !important;
+}
+
+:host ::ng-deep .tk-left__select .ant-select-selection-search {
+  inset-inline-end: 34px !important;
+  padding-inline-end: 0 !important;
+}
+
+:host ::ng-deep .tk-left__select .ant-select-arrow {
+  top: 0;
+  right: 12px;
+  margin-top: 0;
+  color: var(--text-muted);
+  transform: translateY(11px);
+}
+
+.status-option {
+  display: inline-flex;
+  min-width: 0;
+  align-items: center;
+  gap: 7px;
+  overflow: hidden;
+  color: var(--text);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+
+  &::before {
+    width: 7px;
+    height: 7px;
+    flex: 0 0 7px;
+    background-color: var(--text-muted);
+    border-radius: 50%;
+    content: '';
+  }
+
+  &--open {
+    color: var(--status-open-text);
+
+    &::before {
+      background-color: var(--status-open-text);
+    }
+  }
+
+  &--reopen {
+    color: var(--status-reopen-text);
+
+    &::before {
+      background-color: var(--status-reopen-text);
+    }
+  }
+
+  &--assigned {
+    color: var(--status-progress-text);
+
+    &::before {
+      background-color: var(--status-progress-text);
+    }
+  }
+
+  &--done {
+    color: var(--status-closed-text);
+
+    &::before {
+      background-color: var(--status-closed-text);
+    }
+  }
+
+  &--hold {
+    color: var(--status-hold-text);
+
+    &::before {
+      background-color: var(--status-hold-text);
+    }
+  }
+
+  &--denied {
+    color: var(--status-deny-text);
+
+    &::before {
+      background-color: var(--status-deny-text);
+    }
+  }
+}
+
+:host ::ng-deep .tk-left__select.status-select--open .ant-select-selector {
+  background-color: var(--status-open-bg) !important;
+  border-color: color-mix(in srgb, var(--status-open-text), transparent 70%) !important;
+}
+
+:host ::ng-deep .tk-left__select.status-select--reopen .ant-select-selector {
+  background-color: var(--status-reopen-bg) !important;
+  border-color: color-mix(in srgb, var(--status-reopen-text), transparent 70%) !important;
+}
+
+:host ::ng-deep .tk-left__select.status-select--assigned .ant-select-selector {
+  background-color: var(--status-progress-bg) !important;
+  border-color: color-mix(in srgb, var(--status-progress-text), transparent 70%) !important;
+}
+
+:host ::ng-deep .tk-left__select.status-select--done .ant-select-selector {
+  background-color: var(--status-closed-bg) !important;
+  border-color: color-mix(in srgb, var(--status-closed-text), transparent 70%) !important;
+}
+
+:host ::ng-deep .tk-left__select.status-select--hold .ant-select-selector {
+  background-color: var(--status-hold-bg) !important;
+  border-color: color-mix(in srgb, var(--status-hold-text), transparent 70%) !important;
+}
+
+:host ::ng-deep .tk-left__select.status-select--denied .ant-select-selector {
+  background-color: var(--status-deny-bg) !important;
+  border-color: color-mix(in srgb, var(--status-deny-text), transparent 70%) !important;
 }
 
 .tk-left__search {

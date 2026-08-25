@@ -1156,22 +1156,31 @@ $border: var(--border);
 //     border-radius: 10% !important;
 // }
 
-// // SELECT (antd)
-// ::ng-deep .ant-select:not(.ant-select-disabled).ant-select-focused .ant-select-selector {
-//     border-color: #40a9ff00;
-//     box-shadow: 0 0 0 2px rgb(24 144 255 / 0%);
-// }
+// The form-control host owns the field border; keep Ant's inner selector borderless.
+:host
+  ::ng-deep
+  nz-select.form-control.ant-select-single.ant-select:not(.ant-select-customize-input)
+  .ant-select-selector,
+:host ::ng-deep nz-select.form-control.ant-select-focused .ant-select-selector {
+  padding: 0 !important;
+  background-color: transparent !important;
+  border-color: transparent !important;
+  box-shadow: none !important;
+}
 
-// ::ng-deep .ant-select:not(.ant-select-disabled):hover .ant-select-selector {
-//     border-color: #40a9ff00;
-//     box-shadow: 0 0 0 2px rgb(24 144 255 / 0%);
-// }
+:host ::ng-deep nz-select.form-control .ant-select-selection-item,
+:host ::ng-deep nz-select.form-control .ant-select-selection-placeholder,
+:host ::ng-deep nz-select.form-control .ant-select-selection-search {
+  padding: 0 !important;
+}
 
-// ::ng-deep .ant-select:not(.ant-select-customize-input) .ant-select-selector {
-//     position: relative;
-//     background-color: #ffffff;
-//     border: 1px solid #cfcfcf00;
-// }
+:host ::ng-deep nz-select.form-control .ant-select-selection-search {
+  inset-inline: 0 !important;
+}
+
+nz-select.form-control.ant-select-focused {
+  border-color: var(--primary) !important;
+}
 
 /* =========================================================
    SIGNATURE BUTTON
