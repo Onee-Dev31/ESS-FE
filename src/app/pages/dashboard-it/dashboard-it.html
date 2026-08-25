@@ -1,246 +1,251 @@
-<div class="top-bar">
-  <div>
-    <button (click)="viewExport()" class="btn-report">
-      <i class="fa-solid fa-folder-open"></i>report
-    </button>
+@if (isPageLoading()) {
+  <app-page-loader message="กำลังโหลดข้อมูล IT Dashboard..." />
+} @else {
+  <div class="top-bar">
+    <div>
+      <button (click)="viewExport()" class="btn-report">
+        <i class="fa-solid fa-folder-open"></i>report
+      </button>
+    </div>
+
+    <div class="btn-command">
+      <button class="btn-type employeeInfo" (click)="viewEmployeeInfo()">
+        <i class="fa-solid fa-address-card"></i> employee Info
+      </button>
+      <button class="btn-type approve-out" (click)="viewApproveResign()">
+        <i class="fa-solid fa-person-walking-arrow-right"></i> อนุมัติพนักงานลาออก
+      </button>
+      <button class="btn-type problem" (click)="this.IS_OPEN_IT_SERVICE.set(2)">
+        <i class="fas fa-exclamation-triangle"></i> แจ้งปัญหา
+      </button>
+      <button class="btn-type repair" (click)="this.IS_OPEN_IT_SERVICE.set(1)">
+        <i class="fas fa-tools"></i> แจ้งซ่อม
+      </button>
+      <button class="btn-type service" (click)="this.IS_OPEN_IT_SERVICE.set(3)">
+        <i class="fas fa-concierge-bell"></i> แจ้งขอใช้บริการ
+      </button>
+    </div>
   </div>
 
-  <div class="btn-command">
-    <button class="btn-type employeeInfo" (click)="viewEmployeeInfo()">
-      <i class="fa-solid fa-address-card"></i> employee Info
-    </button>
-    <button class="btn-type approve-out" (click)="viewApproveResign()">
-      <i class="fa-solid fa-person-walking-arrow-right"></i> อนุมัติพนักงานลาออก
-    </button>
-    <button class="btn-type problem" (click)="this.IS_OPEN_IT_SERVICE.set(2)">
-      <i class="fas fa-exclamation-triangle"></i> แจ้งปัญหา
-    </button>
-    <button class="btn-type repair" (click)="this.IS_OPEN_IT_SERVICE.set(1)">
-      <i class="fas fa-tools"></i> แจ้งซ่อม
-    </button>
-    <button class="btn-type service" (click)="this.IS_OPEN_IT_SERVICE.set(3)">
-      <i class="fas fa-concierge-bell"></i> แจ้งขอใช้บริการ
-    </button>
-  </div>
-</div>
+  <app-it-dashboard-summary
+    [externalStatus]="filterStatus"
+    (statusChange)="onStatusChange($event)"
+    [summaryData]="summaryRes()"
+  ></app-it-dashboard-summary>
 
-<app-it-dashboard-summary
-  [externalStatus]="filterStatus"
-  (statusChange)="onStatusChange($event)"
-  [summaryData]="summaryRes()"
-></app-it-dashboard-summary>
-
-<div class="tk-page">
-  <!-- LEFT -->
-  <aside class="tk-left" id="tickets-zone" tabindex="-1">
-    <div class="tk-left__top">
-      <div class="tk-left__title">Tickets</div>
-      <div class="tk-left__filter-col">
-        <nz-select
-          class="tk-left__select"
-          [(ngModel)]="filterStatus"
-          (ngModelChange)="onFilterStatusChange($event)"
-          nzBorderless
-          nzSize="small"
-        >
-          <nz-option nzValue="all" nzLabel="All Tickets"></nz-option>
-          <nz-option nzValue="open" nzLabel="New"></nz-option>
-          <nz-option nzValue="reopen" nzLabel="Re-Opend"></nz-option>
-          <nz-option nzValue="assigned" nzLabel="In Progress"></nz-option>
-          <nz-option nzValue="done" nzLabel="Closed"></nz-option>
-          <nz-option nzValue="hold" nzLabel="Hold"></nz-option>
-          <nz-option nzValue="denied" nzLabel="Denied"></nz-option>
-        </nz-select>
-        <label
-          nz-checkbox
-          class="checkbox-my-ticket"
-          [(ngModel)]="myTicket"
-          (ngModelChange)="onMyTicketChange()"
-        >
-          My Ticket
-        </label>
+  <div class="tk-page">
+    <!-- LEFT -->
+    <aside class="tk-left" id="tickets-zone" tabindex="-1">
+      <div class="tk-left__top">
+        <div class="tk-left__title">Tickets</div>
+        <div class="tk-left__filter-col">
+          <nz-select
+            class="tk-left__select"
+            [(ngModel)]="filterStatus"
+            (ngModelChange)="onFilterStatusChange($event)"
+            nzBorderless
+            nzSize="small"
+          >
+            <nz-option nzValue="all" nzLabel="All Tickets"></nz-option>
+            <nz-option nzValue="open" nzLabel="New"></nz-option>
+            <nz-option nzValue="reopen" nzLabel="Re-Opend"></nz-option>
+            <nz-option nzValue="assigned" nzLabel="In Progress"></nz-option>
+            <nz-option nzValue="done" nzLabel="Closed"></nz-option>
+            <nz-option nzValue="hold" nzLabel="Hold"></nz-option>
+            <nz-option nzValue="denied" nzLabel="Denied"></nz-option>
+          </nz-select>
+          <label
+            nz-checkbox
+            class="checkbox-my-ticket"
+            [(ngModel)]="myTicket"
+            (ngModelChange)="onMyTicketChange()"
+          >
+            My Ticket
+          </label>
+        </div>
       </div>
-    </div>
 
-    <div class="tk-left__search">
-      <span class="material-symbols-outlined ic">search</span>
-      <input
-        [(ngModel)]="keyword"
-        (ngModelChange)="onKeywordChange($event)"
-        placeholder="Search by Ticket Number and Name"
-      />
-    </div>
+      <div class="tk-left__search">
+        <span class="material-symbols-outlined ic">search</span>
+        <input
+          [(ngModel)]="keyword"
+          (ngModelChange)="onKeywordChange($event)"
+          placeholder="Search by Ticket Number and Name"
+        />
+      </div>
 
-    <div class="ticket-list" #ticketList>
-      <div
-        class="ticket-item"
-        *ngFor="let ticket of filteredTickets()"
-        [class.active]="selectedTicket()?.ticketId === ticket.ticketId"
-        [class.is-new]="newTicketIds().has(ticket.ticketId)"
-        [id]="'ticket-' + ticket.ticketId"
-        (click)="onTicketClick(ticket.ticketId)"
-      >
-        @if (newNoteTicketIds().has(ticket.ticketId)) {
-          <div class="new-note-wrapper">
-            <span class="new-note-badge"> <i class="fas fa-comment-dots"></i> ข้อความใหม่ </span>
-          </div>
-        }
-        <div class="ticket-item-2">
-          <div class="avatar">
-            <img
-              [src]="
-                'https://empimg.oneeclick.co:8048/employeeimage/' + ticket.requesterEmpId + '.jpg'
-              "
-              alt="รูปโปรไฟล์ของ {{ ticket.requesterName || ticket.ticketNumber }}"
-              title="รูปโปรไฟล์ของ {{ ticket.requesterName || ticket.ticketNumber }}"
-              (error)="onImgError($event)"
-            />
-          </div>
-          <div class="ticket-info">
-            <div class="ticket-header">
-              <span class="ticket-number"
-                >{{ ticket.ticketNumber
-                }}<span class="ticket-elapsed"> ({{ ticket.elapsed_hours }}) </span>
-              </span>
-              <div class="ticket-meta-right">
-                <i class="fa-solid fa-paperclip" *ngIf="ticket.attachment_count > 0"></i>
-                <i
-                  class="fas text-icon"
-                  [ngClass]="
-                    unreadTicketIds().has(ticket.ticketId) ? 'fa-envelope' : 'fa-envelope-open'
-                  "
-                  [style.color]="
-                    unreadTicketIds().has(ticket.ticketId) ? 'var(--primary)' : 'var(--text-muted)'
-                  "
+      <div class="ticket-list" #ticketList>
+        <div
+          class="ticket-item"
+          *ngFor="let ticket of filteredTickets()"
+          [class.active]="selectedTicket()?.ticketId === ticket.ticketId"
+          [class.is-new]="newTicketIds().has(ticket.ticketId)"
+          [id]="'ticket-' + ticket.ticketId"
+          (click)="onTicketClick(ticket.ticketId)"
+        >
+          @if (newNoteTicketIds().has(ticket.ticketId)) {
+            <div class="new-note-wrapper">
+              <span class="new-note-badge"> <i class="fas fa-comment-dots"></i> ข้อความใหม่ </span>
+            </div>
+          }
+          <div class="ticket-item-2">
+            <div class="avatar">
+              <img
+                [src]="
+                  'https://empimg.oneeclick.co:8048/employeeimage/' + ticket.requesterEmpId + '.jpg'
+                "
+                alt="รูปโปรไฟล์ของ {{ ticket.requesterName || ticket.ticketNumber }}"
+                title="รูปโปรไฟล์ของ {{ ticket.requesterName || ticket.ticketNumber }}"
+                (error)="onImgError($event)"
+              />
+            </div>
+            <div class="ticket-info">
+              <div class="ticket-header">
+                <span class="ticket-number">{{ ticket.ticketNumber }} </span>
+                <div class="ticket-meta-right">
+                  <i class="fa-solid fa-paperclip" *ngIf="ticket.attachment_count > 0"></i>
+                  <i
+                    class="fas text-icon"
+                    [ngClass]="
+                      unreadTicketIds().has(ticket.ticketId) ? 'fa-envelope' : 'fa-envelope-open'
+                    "
+                    [style.color]="
+                      unreadTicketIds().has(ticket.ticketId)
+                        ? 'var(--primary)'
+                        : 'var(--text-muted)'
+                    "
+                  >
+                  </i>
+                </div>
+              </div>
+              <div class="ticket-title-row">
+                <div
+                  class="ticket-title"
+                  [class.is-new-text]="unreadTicketIds().has(ticket.ticketId)"
                 >
-                </i>
+                  {{ ticket.subject }}
+                </div>
+                <span class="ticket-time">
+                  @if (isToday(ticket.updatedDate)) {
+                    {{ ticket.updatedDate | date: 'HH:mm' }}
+                  } @else {
+                    {{ ticket.updatedDate | date: 'EEE dd' : '' : 'en' }}
+                  }
+                </span>
               </div>
-            </div>
-            <div class="ticket-title-row">
-              <div
-                class="ticket-title"
-                [class.is-new-text]="unreadTicketIds().has(ticket.ticketId)"
-              >
-                {{ ticket.subject }}
+              <div class="ticket-footer">
+                <span class="badge badge-outline ticket-type">{{ ticket.ticketType }}</span>
+                <span
+                  class="ticket-status-inline"
+                  [ngStyle]="StatusColor.getStyle(ticket.IT_Status)"
+                >
+                  <i class="fas fa-sync-alt"></i> {{ ticket.IT_Status }}
+                </span>
               </div>
-              <span class="ticket-time">
-                @if (isToday(ticket.createdDate)) {
-                  {{ ticket.createdDate | date: 'HH:mm' }}
-                } @else {
-                  {{ ticket.createdDate | date: 'EEE dd' : '' : 'en' }}
-                }
-              </span>
-            </div>
-            <div class="ticket-footer">
-              <span class="badge badge-outline ticket-type">{{ ticket.ticketType }}</span>
-              <span class="ticket-status-inline" [ngStyle]="StatusColor.getStyle(ticket.IT_Status)">
-                <i class="fas fa-sync-alt"></i> {{ ticket.IT_Status }}
-              </span>
             </div>
           </div>
         </div>
       </div>
-    </div>
-  </aside>
+    </aside>
 
-  <!-- DESKTOP: CENTER + RIGHT -->
-  @if (!isMobile) {
-    <ng-container *ngIf="selectedTicket() as t; else emptyState">
-      <main class="tk-center">
-        <ng-container *ngTemplateOutlet="ticketCenter; context: { t: t }"></ng-container>
-      </main>
-      <aside class="tk-right">
-        <ng-container *ngTemplateOutlet="ticketRight; context: { t: t }"></ng-container>
-      </aside>
-    </ng-container>
+    <!-- DESKTOP: CENTER + RIGHT -->
+    @if (!isMobile) {
+      <ng-container *ngIf="selectedTicket() as t; else emptyState">
+        <main class="tk-center">
+          <ng-container *ngTemplateOutlet="ticketCenter; context: { t: t }"></ng-container>
+        </main>
+        <aside class="tk-right">
+          <ng-container *ngTemplateOutlet="ticketRight; context: { t: t }"></ng-container>
+        </aside>
+      </ng-container>
+    }
+
+    <!-- Empty State -->
+    <ng-template #emptyState>
+      <div class="empty-selection-placeholder hide-on-mobile">
+        <div class="empty-content">
+          <div class="empty-icon-wrapper"><i class="fas fa-ticket-alt"></i></div>
+          <h3>กรุณาเลือก Ticket</h3>
+          <p>โปรดเลือกรายการ Ticket จากทางด้านซ้ายเพื่อดูรายละเอียด</p>
+        </div>
+      </div>
+    </ng-template>
+  </div>
+
+  <!-- TABLET: replace-tk-right -->
+  @if (!isMobile && isTablet) {
+    <div
+      class="replace-tk-right"
+      [class.has-open-for]="selectedTicket()?.openFor"
+      *ngIf="selectedTicket() as t"
+    >
+      <ng-container *ngTemplateOutlet="ticketRight; context: { t: t }"></ng-container>
+    </div>
   }
 
-  <!-- Empty State -->
-  <ng-template #emptyState>
-    <div class="empty-selection-placeholder hide-on-mobile">
-      <div class="empty-content">
-        <div class="empty-icon-wrapper"><i class="fas fa-ticket-alt"></i></div>
-        <h3>กรุณาเลือก Ticket</h3>
-        <p>โปรดเลือกรายการ Ticket จากทางด้านซ้ายเพื่อดูรายละเอียด</p>
+  <!-- MOBILE: popup -->
+  @if (isMobile && isTicketDetailOpen()) {
+    <div class="mobile-detail-overlay" (click)="closeTicketDetail()">
+      <div class="mobile-detail-panel" (click)="$event.stopPropagation()">
+        <div class="mobile-detail-header">
+          <button
+            class="btn-back"
+            type="button"
+            title="ย้อนกลับ"
+            aria-label="ย้อนกลับ"
+            (click)="closeTicketDetail()"
+          >
+            <i class="fas fa-arrow-left"></i>
+          </button>
+          <span>รายละเอียด Ticket</span>
+          <span></span>
+        </div>
+        <div class="mobile-detail-body">
+          <ng-container *ngIf="selectedTicket() as t">
+            <ng-container *ngTemplateOutlet="ticketCenter; context: { t: t }"></ng-container>
+            <div class="replace-tk-right" [class.has-open-for]="t.openFor">
+              <ng-container *ngTemplateOutlet="ticketRight; context: { t: t }"></ng-container>
+            </div>
+          </ng-container>
+        </div>
       </div>
     </div>
-  </ng-template>
-</div>
+  }
 
-<!-- TABLET: replace-tk-right -->
-@if (!isMobile && isTablet) {
-  <div
-    class="replace-tk-right"
-    [class.has-open-for]="selectedTicket()?.openFor"
-    *ngIf="selectedTicket() as t"
-  >
-    <ng-container *ngTemplateOutlet="ticketRight; context: { t: t }"></ng-container>
-  </div>
-}
+  <!-- ============================================================ -->
+  <!-- TEMPLATES                                                    -->
+  <!-- ============================================================ -->
 
-<!-- MOBILE: popup -->
-@if (isMobile && isTicketDetailOpen()) {
-  <div class="mobile-detail-overlay" (click)="closeTicketDetail()">
-    <div class="mobile-detail-panel" (click)="$event.stopPropagation()">
-      <div class="mobile-detail-header">
-        <button
-          class="btn-back"
-          type="button"
-          title="ย้อนกลับ"
-          aria-label="ย้อนกลับ"
-          (click)="closeTicketDetail()"
-        >
-          <i class="fas fa-arrow-left"></i>
-        </button>
-        <span>รายละเอียด Ticket</span>
-        <span></span>
+  <!-- CENTER TEMPLATE -->
+  <ng-template #ticketCenter let-t="t">
+    <app-ticket-detail-card
+      [ticket]="t"
+      audience="it"
+      [copied]="copiedTicketId === t.id"
+      [serviceLimit]="isSmallMobile ? 1 : isMobile ? 2 : 3"
+      (attachmentClick)="openAllAttachments($event)"
+      (servicesClick)="showAll($event)"
+      (copyClick)="copyDescription(t.id, t.description)"
+      (detailClick)="openDetail(t.ticketId, t.description)"
+    />
+
+    <!-- REASON [Denied] -->
+    <section class="tk-card reason" *ngIf="t.status === 'Denied'">
+      <div class="tk-card__head">
+        <div class="tk-card__title">
+          เหตุผลในการ
+          <span class="tk-pill" [ngStyle]="StatusColor_text.getStyle(t.status)">
+            {{ statusLabel(t.status) }}
+          </span>
+        </div>
       </div>
-      <div class="mobile-detail-body">
-        <ng-container *ngIf="selectedTicket() as t">
-          <ng-container *ngTemplateOutlet="ticketCenter; context: { t: t }"></ng-container>
-          <div class="replace-tk-right" [class.has-open-for]="t.openFor">
-            <ng-container *ngTemplateOutlet="ticketRight; context: { t: t }"></ng-container>
-          </div>
-        </ng-container>
+      <div class="tk-card__body">
+        <div class="tk-text html-detail" [innerHTML]="t.rejection_reason"></div>
       </div>
-    </div>
-  </div>
-}
+    </section>
 
-<!-- ============================================================ -->
-<!-- TEMPLATES                                                    -->
-<!-- ============================================================ -->
-
-<!-- CENTER TEMPLATE -->
-<ng-template #ticketCenter let-t="t">
-  <app-ticket-detail-card
-    [ticket]="t"
-    audience="it"
-    [copied]="copiedTicketId === t.id"
-    [serviceLimit]="isSmallMobile ? 1 : isMobile ? 2 : 3"
-    (attachmentClick)="openAllAttachments($event)"
-    (servicesClick)="showAll($event)"
-    (copyClick)="copyDescription(t.id, t.description)"
-    (detailClick)="openDetail(t.ticketId, t.description)"
-  />
-
-  <!-- REASON [Denied] -->
-  <section class="tk-card reason" *ngIf="t.status === 'Denied'">
-    <div class="tk-card__head">
-      <div class="tk-card__title">
-        เหตุผลในการ
-        <span class="tk-pill" [ngStyle]="StatusColor_text.getStyle(t.status)">
-          {{ statusLabel(t.status) }}
-        </span>
-      </div>
-    </div>
-    <div class="tk-card__body">
-      <div class="tk-text html-detail" [innerHTML]="t.rejection_reason"></div>
-    </div>
-  </section>
-
-  <!-- ATTACHMENTS -->
-  <!-- <section class="tk-card">
+    <!-- ATTACHMENTS -->
+    <!-- <section class="tk-card">
     <div class="tk-card__head">
       <div class="tk-card__title">เอกสารแนบ</div>
     </div>
@@ -264,8 +269,8 @@
     </div>
   </section> -->
 
-  <!-- ACTIONS -->
-  <!-- <section class="tk-actions" *ngIf="t.status !== 'Closed' && t.status !== 'Denied'">
+    <!-- ACTIONS -->
+    <!-- <section class="tk-actions" *ngIf="t.status !== 'Closed' && t.status !== 'Denied'">
     <div class="btn-group">
       <button class="btn btn-onhold" (click)="resumeTicket()" *ngIf="t.status === 'Hold'">
         <i class="fa-solid fa-play btn-action-icon"></i> Resume
@@ -298,210 +303,212 @@
     </div>
   </section> -->
 
-  <section class="tk-actions" *ngIf="t.status !== 'Closed' && t.status !== 'Denied'">
-    <!-- LEFT -->
-    <div class="btn-group">
-      @for (btn of currentActions.left; track btn.label) {
-        <button class="btn" [ngClass]="btn.class" (click)="btn.action()">
-          <i class="fa-solid btn-action-icon" [ngClass]="btn.icon"></i>
+    <section class="tk-actions" *ngIf="t.status !== 'Closed' && t.status !== 'Denied'">
+      <!-- LEFT -->
+      <div class="btn-group">
+        @for (btn of currentActions.left; track btn.label) {
+          <button class="btn" [ngClass]="btn.class" (click)="btn.action()">
+            <i class="fa-solid btn-action-icon" [ngClass]="btn.icon"></i>
 
-          {{ btn.label }}
-        </button>
-      }
-      <div *ngIf="t.status === 'Assigned' && t.repair_cost_type === 'paid'" class="warning-text">
-        รอ user ส่งข้อมูลเพิ่มเติม
+            {{ btn.label }}
+          </button>
+        }
+        <div *ngIf="t.status === 'Assigned' && t.repair_cost_type === 'paid'" class="warning-text">
+          รอ user ส่งข้อมูลเพิ่มเติม
+        </div>
       </div>
-    </div>
 
-    <!-- RIGHT -->
-    <div class="btn-group">
-      @for (btn of currentActions.right; track btn.label) {
-        <button class="btn" [ngClass]="btn.class" (click)="btn.action()">
-          <i class="fa-solid btn-action-icon" [ngClass]="btn.icon"></i>
+      <!-- RIGHT -->
+      <div class="btn-group">
+        @for (btn of currentActions.right; track btn.label) {
+          <button class="btn" [ngClass]="btn.class" (click)="btn.action()">
+            <i class="fa-solid btn-action-icon" [ngClass]="btn.icon"></i>
 
-          {{ btn.label }}
+            {{ btn.label }}
+          </button>
+        }
+      </div>
+    </section>
+    <section class="tk-actions" *ngIf="t.status === 'Closed'">
+      <ng-container>
+        <button class="btn btn-send" (click)="ReOpen()">
+          <i class="fas fa-history"></i> Reopen
         </button>
-      }
-    </div>
-  </section>
-  <section class="tk-actions" *ngIf="t.status === 'Closed'">
-    <ng-container>
-      <button class="btn btn-send" (click)="ReOpen()"><i class="fas fa-history"></i> Reopen</button>
-    </ng-container>
-  </section>
-</ng-template>
+      </ng-container>
+    </section>
+  </ng-template>
 
-@if (selectedTicket(); as t) {
-  <app-ticket-chat
-    [ticket]="t"
-    [visible]="!isMobile || isTicketDetailOpen()"
-    [isOpen]="IS_CHAT_OPEN()"
-    [canSend]="t.status !== 'Closed' && isAssigned()"
-    mode="it-dashboard"
-    [unreadCount]="unreadChatCount()"
-    [readers]="replyReaders()"
-    (toggle)="toggleChat()"
-    (close)="closeChat()"
-    (submitMessage)="submitNote($event, { silent: true })"
-    (attachmentView)="viewFile($event)"
-    (pendingAttachmentView)="viewFileChat($event)"
-    (attachmentsOpen)="openChatAttachments(t)"
-    (export)="exportChatHistory(t)"
-  />
-}
+  @if (selectedTicket(); as t) {
+    <app-ticket-chat
+      [ticket]="t"
+      [visible]="!isMobile || isTicketDetailOpen()"
+      [isOpen]="IS_CHAT_OPEN()"
+      [canSend]="t.status !== 'Closed' && isAssigned()"
+      mode="it-dashboard"
+      [unreadCount]="unreadChatCount()"
+      [readers]="replyReaders()"
+      (toggle)="toggleChat()"
+      (close)="closeChat()"
+      (submitMessage)="submitNote($event, { silent: true })"
+      (attachmentView)="viewFile($event)"
+      (pendingAttachmentView)="viewFileChat($event)"
+      (attachmentsOpen)="openChatAttachments(t)"
+      (export)="exportChatHistory(t)"
+    />
+  }
 
-<!-- RIGHT TEMPLATE -->
-<ng-template #ticketRight let-t="t">
-  <!-- Requester -->
-  <app-ticket-requester-card
-    *ngIf="t.requester as requester"
-    [requester]="requester"
-    [ccCount]="t.ccList?.length || 0"
-    (ccClick)="openCcModal()"
-  />
-  <!-- Open For -->
-  <app-ticket-open-for-card *ngIf="t.openFor as openFor" [openFor]="openFor" />
-  <!-- Progress / Timeline -->
-  <app-ticket-progress-card
-    [ticket]="t"
-    audience="it"
-    [showNoteButton]="
-      allDataUserLogin.permission.Role.includes('it-staff') ||
-      allDataUserLogin.permission.Role.includes('system-admin')
-    "
-    (noteClick)="openNoteForItModal()"
-  />
-</ng-template>
+  <!-- RIGHT TEMPLATE -->
+  <ng-template #ticketRight let-t="t">
+    <!-- Requester -->
+    <app-ticket-requester-card
+      *ngIf="t.requester as requester"
+      [requester]="requester"
+      [ccCount]="t.ccList?.length || 0"
+      (ccClick)="openCcModal()"
+    />
+    <!-- Open For -->
+    <app-ticket-open-for-card *ngIf="t.openFor as openFor" [openFor]="openFor" />
+    <!-- Progress / Timeline -->
+    <app-ticket-progress-card
+      [ticket]="t"
+      audience="it"
+      [showNoteButton]="
+        allDataUserLogin.permission.Role.includes('it-staff') ||
+        allDataUserLogin.permission.Role.includes('system-admin')
+      "
+      (noteClick)="openNoteForItModal()"
+    />
+  </ng-template>
 
-<!-- ============================================================ -->
-<!-- MODALS                                                         -->
-<!-- ============================================================ -->
+  <!-- ============================================================ -->
+  <!-- MODALS                                                         -->
+  <!-- ============================================================ -->
 
-@if (IS_OPEN_IT_SERVICE()) {
-  <div class="modal-overlay OPEN">
-    <div class="modal-container">
-      <div>
-        <header class="top-header-strip">
-          <h2>
-            {{
-              IS_OPEN_IT_SERVICE() === 2
-                ? 'IT Problem Report (แจ้งปัญหาการใช้งาน)'
-                : IS_OPEN_IT_SERVICE() === 1
-                  ? 'IT Repair Request (แจ้งซ่อมอุปกรณ์)'
-                  : IS_OPEN_IT_SERVICE() === 3
-                    ? 'IT Service Request (ขอรับบริการ IT)'
-                    : ''
-            }}
-          </h2>
-          <div class="header-right-meta">
-            <button
-              class="btn-close-modal"
-              type="button"
-              title="ปิดหน้าต่าง"
-              aria-label="ปิดหน้าต่าง"
-              (click)="close()"
-            >
-              <i class="fas fa-times"></i>
-            </button>
+  @if (IS_OPEN_IT_SERVICE()) {
+    <div class="modal-overlay OPEN">
+      <div class="modal-container">
+        <div>
+          <header class="top-header-strip">
+            <h2>
+              {{
+                IS_OPEN_IT_SERVICE() === 2
+                  ? 'IT Problem Report (แจ้งปัญหาการใช้งาน)'
+                  : IS_OPEN_IT_SERVICE() === 1
+                    ? 'IT Repair Request (แจ้งซ่อมอุปกรณ์)'
+                    : IS_OPEN_IT_SERVICE() === 3
+                      ? 'IT Service Request (ขอรับบริการ IT)'
+                      : ''
+              }}
+            </h2>
+            <div class="header-right-meta">
+              <button
+                class="btn-close-modal"
+                type="button"
+                title="ปิดหน้าต่าง"
+                aria-label="ปิดหน้าต่าง"
+                (click)="close()"
+              >
+                <i class="fas fa-times"></i>
+              </button>
+            </div>
+          </header>
+          <div class="content-card">
+            @if (IS_OPEN_IT_SERVICE() === 2) {
+              <app-it-problem-report openBy="IT"></app-it-problem-report>
+            } @else if (IS_OPEN_IT_SERVICE() === 1) {
+              <app-it-repair-request openBy="IT"></app-it-repair-request>
+            } @else if (IS_OPEN_IT_SERVICE() === 3) {
+              <app-it-service-request openBy="IT"></app-it-service-request>
+            }
           </div>
-        </header>
-        <div class="content-card">
-          @if (IS_OPEN_IT_SERVICE() === 2) {
-            <app-it-problem-report openBy="IT"></app-it-problem-report>
-          } @else if (IS_OPEN_IT_SERVICE() === 1) {
-            <app-it-repair-request openBy="IT"></app-it-repair-request>
-          } @else if (IS_OPEN_IT_SERVICE() === 3) {
-            <app-it-service-request openBy="IT"></app-it-service-request>
-          }
         </div>
       </div>
     </div>
-  </div>
-}
+  }
 
-@if (IS_NOTE_TICKET()) {
-  <app-note-modal
-    [ticket]="selectedTicket()"
-    (closeModal)="closeAddNoteModal()"
-    (submitModal)="submitNote($event)"
-  >
-  </app-note-modal>
-}
+  @if (IS_NOTE_TICKET()) {
+    <app-note-modal
+      [ticket]="selectedTicket()"
+      (closeModal)="closeAddNoteModal()"
+      (submitModal)="submitNote($event)"
+    >
+    </app-note-modal>
+  }
 
-@if (IS_DENY_TICKET()) {
-  <app-deny-modal
-    [ticket]="selectedTicket()"
-    (closeModal)="closeDenyModal()"
-    (submitModal)="submitDeny($event)"
-  >
-  </app-deny-modal>
-}
+  @if (IS_DENY_TICKET()) {
+    <app-deny-modal
+      [ticket]="selectedTicket()"
+      (closeModal)="closeDenyModal()"
+      (submitModal)="submitDeny($event)"
+    >
+    </app-deny-modal>
+  }
 
-@if (IS_ACKNOWLEDGE_TICKET()) {
-  <app-acknowledge-modal
-    [ticket]="selectedTicket()"
-    (closeModal)="closeAcknowledgeModal()"
-    (submitModal)="submitAcknowledge($event)"
-  >
-  </app-acknowledge-modal>
-}
+  @if (IS_ACKNOWLEDGE_TICKET()) {
+    <app-acknowledge-modal
+      [ticket]="selectedTicket()"
+      (closeModal)="closeAcknowledgeModal()"
+      (submitModal)="submitAcknowledge($event)"
+    >
+    </app-acknowledge-modal>
+  }
 
-@if (IS_ASSIGN_TICKET()) {
-  <app-assign-modal
-    [assigneeGroups]="assigneeGroups"
-    [ticket]="selectedTicket()"
-    (closeModal)="closeAssignModal()"
-    (submitModal)="submitAssign($event)"
-  >
-  </app-assign-modal>
-}
+  @if (IS_ASSIGN_TICKET()) {
+    <app-assign-modal
+      [assigneeGroups]="assigneeGroups"
+      [ticket]="selectedTicket()"
+      (closeModal)="closeAssignModal()"
+      (submitModal)="submitAssign($event)"
+    >
+    </app-assign-modal>
+  }
 
-@if (showAllServices) {
-  <app-services-detail-modal [services]="selectedServices" (onClose)="closeModal_showAll()">
-  </app-services-detail-modal>
-}
+  @if (showAllServices) {
+    <app-services-detail-modal [services]="selectedServices" (onClose)="closeModal_showAll()">
+    </app-services-detail-modal>
+  }
 
-@if (isPreviewModalOpen()) {
-  <app-file-preview-modal
-    [files]="previewFiles()"
-    (onClose)="closePreview()"
-    (click)="$event.stopPropagation()"
-  >
-  </app-file-preview-modal>
-}
+  @if (isPreviewModalOpen()) {
+    <app-file-preview-modal
+      [files]="previewFiles()"
+      (onClose)="closePreview()"
+      (click)="$event.stopPropagation()"
+    >
+    </app-file-preview-modal>
+  }
 
-@if (newTicketCount() > 0) {
-  <div class="new-ticket-banner" (click)="refreshTickets()">
-    <i class="fas fa-bell"></i>
-    มี {{ newTicketCount() }} Ticket ใหม่ — คลิกเพื่อโหลด
-  </div>
-}
+  @if (newTicketCount() > 0) {
+    <div class="new-ticket-banner" (click)="refreshTickets()">
+      <i class="fas fa-bell"></i>
+      มี {{ newTicketCount() }} Ticket ใหม่ — คลิกเพื่อโหลด
+    </div>
+  }
 
-@if (isCcModalVisible) {
-  <app-cc-modal [ticket]="selectedTicket()" [isItDashboard]="true" (closeModal)="handleCancel()">
-  </app-cc-modal>
-}
+  @if (isCcModalVisible) {
+    <app-cc-modal [ticket]="selectedTicket()" [isItDashboard]="true" (closeModal)="handleCancel()">
+    </app-cc-modal>
+  }
 
-@if (IS_NOTEFORIT_TICKET()) {
-  <app-note-for-it-modal
-    [ticket]="selectedTicket()"
-    (closeModal)="closeNoteForItModal()"
-    (submitModal)="submitNoteForIt($event)"
-  ></app-note-for-it-modal>
-}
+  @if (IS_NOTEFORIT_TICKET()) {
+    <app-note-for-it-modal
+      [ticket]="selectedTicket()"
+      (closeModal)="closeNoteForItModal()"
+      (submitModal)="submitNoteForIt($event)"
+    ></app-note-for-it-modal>
+  }
 
-@if (isDetailModalOpen()) {
-  <div class="modal-overlay expandDetail" (click)="isDetailModalOpen.set(false)">
-    <div class="modal" (click)="$event.stopPropagation()">
-      <div class="modal-header">
-        <h2 class="request-title">รายละเอียด</h2>
-        <button class="btn-close-modal" aria-label="ปิด" (click)="isDetailModalOpen.set(false)">
-          <i class="fas fa-times"></i>
-        </button>
-      </div>
-      <div class="content-card">
-        <div class="html-detail" [innerHTML]="selectedDetail()"></div>
-        <!-- <div
+  @if (isDetailModalOpen()) {
+    <div class="modal-overlay expandDetail" (click)="isDetailModalOpen.set(false)">
+      <div class="modal" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <h2 class="request-title">รายละเอียด</h2>
+          <button class="btn-close-modal" aria-label="ปิด" (click)="isDetailModalOpen.set(false)">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+        <div class="content-card">
+          <div class="html-detail" [innerHTML]="selectedDetail()"></div>
+          <!-- <div
           type="button"
           class="btn-copy-detail expand"
           (click)="copyDescription(selectedTicketId(), selectedDetail())"
@@ -514,18 +521,19 @@
 
           {{ copiedTicketId === selectedTicketId() ? 'คัดลอกแล้ว' : 'คัดลอก' }}
         </div> -->
-      </div>
-      <div class="form-actions-footer">
-        <div class="action-btn" (click)="copyDescription(selectedTicketId(), selectedDetail())">
-          <i
-            class="fa-solid"
-            [class.fa-copy]="copiedTicketId !== selectedTicketId()"
-            [class.fa-check]="copiedTicketId === selectedTicketId()"
-          ></i>
+        </div>
+        <div class="form-actions-footer">
+          <div class="action-btn" (click)="copyDescription(selectedTicketId(), selectedDetail())">
+            <i
+              class="fa-solid"
+              [class.fa-copy]="copiedTicketId !== selectedTicketId()"
+              [class.fa-check]="copiedTicketId === selectedTicketId()"
+            ></i>
 
-          {{ copiedTicketId === selectedTicketId() ? 'คัดลอกแล้ว' : 'คัดลอก' }}
+            {{ copiedTicketId === selectedTicketId() ? 'คัดลอกแล้ว' : 'คัดลอก' }}
+          </div>
         </div>
       </div>
     </div>
-  </div>
+  }
 }

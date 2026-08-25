@@ -437,6 +437,7 @@ export class ItService implements OnInit {
         ticketNumber: ticket.ticket_number,
         subject: ticket.subject,
         description: ticket.description,
+        viaEmail: ticket.is_from_email,
         ticketType: ticket.ticket_type_name_th,
         ticketTypeId: ticket.ticket_type_id,
         status: status,
@@ -445,6 +446,7 @@ export class ItService implements OnInit {
         priority: ticket.priority,
         source: ticket.source,
         createdDate: new Date(ticket.created_at).toISOString(),
+        elapsed_time: ticket.elapsed_time,
         requesterCode: ticket.requester_code,
         requesterAduser: ticket.requester_aduser,
         requesterName: ticket.requester_name,
@@ -476,7 +478,10 @@ export class ItService implements OnInit {
         this.IS_CHAT_OPEN.set(true);
         setTimeout(() => this.ticketChat?.focusComposer(), 100);
       }
-      if (this.IS_CHAT_OPEN()) this.markChatAsRead();
+      if (this.IS_CHAT_OPEN()) {
+        this.markChatAsRead();
+        this.markLatestReplyRead(objectData.ticketId, objectData.itNotes ?? []);
+      }
       this.scrollToBottom();
 
       const codeempid = this.authService.userData()?.CODEMPID;
@@ -484,12 +489,6 @@ export class ItService implements OnInit {
         this.itServiceService.markTicketRead(ticketId, codeempid).subscribe({
           complete: () => this.signalrService.ticketReadTrigger.next({ ticketId }),
         });
-        const lastReply = itNotes[itNotes.length - 1];
-        if (lastReply) {
-          this.itServiceService
-            .markReplyRead(ticketId, codeempid, lastReply.id)
-            .subscribe({ error: () => {} });
-        }
         this.loadReplyReadStatus(ticketId);
       }
 
@@ -522,6 +521,10 @@ export class ItService implements OnInit {
       if (next) {
         this.scrollToBottom();
         this.markChatAsRead();
+        const ticket = this.selectedTicket();
+        if (ticket) {
+          this.markLatestReplyRead(ticket.ticketId, ticket.itNotes ?? []);
+        }
       }
       return next;
     });

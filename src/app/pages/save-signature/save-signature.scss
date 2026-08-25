@@ -2,10 +2,9 @@
 @use '../../../styles/mixins' as *;
 
 :host {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  overflow: hidden;
+  display: block;
+  min-height: 100%;
+  overflow: visible;
 }
 
 // ============================================
@@ -20,6 +19,11 @@
   @media (max-width: 768px) {
     padding: 16px;
   }
+}
+
+.save-sig-wrapper app-page-header {
+  display: block;
+  margin-bottom: 20px;
 }
 
 // ==================== PAGE HEADER ====================
@@ -51,21 +55,21 @@
     align-items: center;
     justify-content: center;
     color: #fff;
-    font-size: 1.4rem;
+    font-size: $font-size-header;
     box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15);
     flex-shrink: 0;
   }
 
   .page-title {
     margin: 0;
-    font-size: 1.5rem;
+    font-size: $font-size-title;
     font-weight: 700;
     color: var(--text);
   }
 
   .page-subtitle {
     margin: 2px 0 0;
-    font-size: 0.85rem;
+    font-size: $font-size-label;
     color: var(--text-sub);
   }
 }
@@ -131,18 +135,18 @@
   background: var(--bg-slate);
   border-bottom: 1px solid var(--border-color);
   font-weight: 600;
-  font-size: 0.95rem;
+  font-size: $font-size-body;
   color: var(--text);
 
   i {
     color: var(--primary);
-    font-size: 1rem;
+    font-size: $font-size-header;
   }
 
   .sub {
     font-weight: 400;
     color: var(--text-sub);
-    font-size: 0.82rem;
+    font-size: $font-size-label;
     margin-left: 2px;
   }
 }
@@ -164,7 +168,7 @@
     .info-label {
       width: 140px;
       flex-shrink: 0;
-      font-size: 0.85rem;
+      font-size: $font-size-label;
       font-weight: 500;
       color: var(--text-sub);
     }
@@ -180,7 +184,7 @@
       border-radius: 8px;
       background: var(--bg-card);
       color: var(--text);
-      font-size: 0.9rem;
+      font-size: $font-size-body;
       font-weight: 500;
       outline: none;
       transition:
@@ -200,7 +204,7 @@
     }
 
     .text-value {
-      font-size: 0.88rem;
+      font-size: $font-size-body;
       color: var(--text);
       font-weight: 500;
       word-break: break-word;
@@ -233,7 +237,7 @@
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
 
     i {
-      font-size: 1.6rem;
+      font-size: $font-size-title;
       color: #fff;
     }
   }
@@ -243,7 +247,7 @@
     min-width: 0;
 
     .login-name-th {
-      font-size: 1rem;
+      font-size: $font-size-header;
       font-weight: 700;
       color: var(--text);
       white-space: nowrap;
@@ -252,7 +256,7 @@
     }
 
     .login-name-en {
-      font-size: 0.82rem;
+      font-size: $font-size-label;
       color: var(--text-sub);
       margin-top: 1px;
       white-space: nowrap;
@@ -262,7 +266,7 @@
 
     .login-ad {
       margin-top: 4px;
-      font-size: 0.78rem;
+      font-size: $font-size-hint;
       color: var(--primary);
       font-weight: 500;
       display: flex;
@@ -270,7 +274,7 @@
       gap: 4px;
 
       i {
-        font-size: 0.7rem;
+        font-size: $font-size-mini;
         opacity: 0.8;
       }
     }
@@ -286,7 +290,7 @@
 
       i {
         color: var(--primary);
-        font-size: 0.78rem;
+        font-size: $font-size-hint;
         opacity: 0.7;
         width: 14px;
         text-align: center;
@@ -310,7 +314,7 @@
   }
 
   .preview-meta {
-    font-size: 0.85rem;
+    font-size: $font-size-label;
     color: var(--text-sub);
     display: flex;
     align-items: center;
@@ -390,12 +394,12 @@
   user-select: none;
 
   i {
-    font-size: 2rem;
+    font-size: $font-size-title;
     opacity: 0.35;
   }
 
   span {
-    font-size: 0.9rem;
+    font-size: $font-size-body;
     opacity: 0.5;
   }
 }
@@ -414,7 +418,7 @@
     gap: 8px;
     padding: 10px 20px;
     border-radius: 8px;
-    font-size: 0.9rem;
+    font-size: $font-size-label;
     font-weight: 600;
     cursor: pointer;
     transition: all 0.2s;
@@ -464,7 +468,7 @@
 
 .signature-note {
   margin: 0 20px 20px;
-  font-size: 0.78rem;
+  font-size: $font-size-hint;
   color: var(--text-muted);
   display: flex;
   align-items: center;
@@ -474,5 +478,79 @@
     color: var(--success);
     opacity: 0.7;
     flex-shrink: 0;
+  }
+}
+
+@include mobile {
+  .section-content {
+    padding: 16px;
+
+    .info-row {
+      display: grid;
+      grid-template-columns: 96px minmax(0, 1fr);
+      align-items: start;
+      gap: 10px;
+      margin-bottom: 12px;
+
+      .info-label {
+        width: auto;
+        font-size: $font-size-hint;
+        line-height: 1.5;
+      }
+
+      .text-value {
+        min-width: 0;
+        font-size: $font-size-label;
+        line-height: 1.5;
+      }
+    }
+  }
+
+  .signature-panel {
+    min-height: 0;
+  }
+
+  .signature-panel > .section-header {
+    padding: 13px 16px;
+    font-size: $font-size-body;
+
+    .sub {
+      font-size: $font-size-label;
+    }
+  }
+
+  .canvas-wrapper {
+    min-height: 190px;
+    margin: 16px;
+    border-radius: 10px;
+  }
+
+  .signature-actions {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 10px;
+    padding: 0 16px 14px;
+
+    button {
+      width: 100%;
+      min-width: 0;
+      min-height: 44px;
+      padding: 9px 12px;
+      font-size: $font-size-body;
+      font-weight: 500;
+      line-height: 1.35;
+      white-space: nowrap;
+    }
+
+    .btn-save {
+      grid-column: 1 / -1;
+    }
+  }
+
+  .signature-note {
+    margin: 0 16px 16px;
+    align-items: flex-start;
+    font-size: $font-size-hint;
+    line-height: 1.45;
   }
 }

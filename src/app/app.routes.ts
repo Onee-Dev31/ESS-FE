@@ -7,11 +7,13 @@ import { USER_ROLES } from './constants/user-roles.constant';
 import { ValidateLoginSso } from './pages/validate/validate-login-sso/validate-login-sso';
 import { LoginVersion1 } from './pages/login-version1/login-version1';
 import { LoginVersion2 } from './pages/login-version2/login-version2';
+import { LoginVersion3 } from './pages/login-version3/login-version3';
 
 export const routes: Routes = [
   { path: 'login-v2', component: LoginComponent },
   { path: 'login-v1', component: LoginVersion1 },
   { path: 'login', component: LoginVersion2 },
+  { path: 'login-v3', component: LoginVersion3 },
   { path: 'validate/loginSSO', component: ValidateLoginSso },
   {
     path: 'qr-confirm',
@@ -99,6 +101,12 @@ export const routes: Routes = [
         data: { category: 'medical', animation: 'ApprovalAllowance' },
       },
       {
+        path: 'approvals-timeoff',
+        loadComponent: () =>
+          import('./pages/approval-timeoff/approval-timeoff').then((m) => m.ApprovalTimeoff),
+        // canActivate: [menuGuard],
+      },
+      {
         path: 'medicalexpenses',
         loadComponent: () =>
           import('./pages/medicalexpenses/medicalexpenses').then((m) => m.MedicalexpensesComponent),
@@ -181,6 +189,13 @@ export const routes: Routes = [
         path: 'employee-setting',
         loadComponent: () =>
           import('./pages/setting-employee/setting-employee').then((m) => m.SettingEmployee),
+        // canActivate: [menuGuard],
+        data: { animation: 'Dashboard' },
+      },
+      {
+        path: 'timeoff-setting',
+        loadComponent: () =>
+          import('./pages/setting-timeoff/setting-timeoff').then((m) => m.SettingTimeoff),
         // canActivate: [menuGuard],
         data: { animation: 'Dashboard' },
       },

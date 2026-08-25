@@ -1,0 +1,283 @@
+@if (isLoading()) {
+  <app-page-loader message="กำลังโหลดรายการอนุมัติการลา..." />
+} @else {
+  <div class="approval-timeoff-page">
+    <app-page-header
+      title="อนุมัติการลา"
+      subtitle="Time Off Approvals"
+      icon="fas fa-calendar-check"
+    >
+      <button
+        type="button"
+        class="btn-refresh"
+        [disabled]="isRefreshing()"
+        (click)="loadApprovals(true)"
+      >
+        <i [class]="isRefreshing() ? 'fas fa-spinner fa-spin' : 'fas fa-sync-alt'"></i>
+        <span>รีเฟรช</span>
+      </button>
+    </app-page-header>
+
+    <section class="approval-card">
+      <div class="approval-controls">
+        <div class="search-box">
+          <i class="fas fa-search"></i>
+          <input
+            type="search"
+            placeholder="ค้นหาเลขที่ใบลา รหัสพนักงาน ประเภท หรือเหตุผล"
+            [ngModel]="listing.searchText()"
+            (ngModelChange)="listing.searchText.set($event); listing.currentPage.set(0)"
+          />
+        </div>
+
+        <div class="status-tabs">
+          @for (tab of tabs; track tab.value) {
+            <button
+              type="button"
+              [class.active]="listing.filterStatus() === tab.value"
+              (click)="setActiveTab(tab.value)"
+            >
+              {{ tab.label }} <span>{{ getTabCount(tab.value) }}</span>
+            </button>
+          }
+        </div>
+      </div>
+
+      <div class="approval-list">
+        @for (item of comps.paginatedData(); track item.request_id) {
+          <article class="leave-approval-item">
+            <div class="item-heading">
+              <div class="leave-identity">
+                <div class="leave-icon"><i class="fas fa-calendar-minus"></i></div>
+                <div>
+                  <h3>
+                    {{ item.employee_full_name || item.employee_code }}
+                    @if (item.employee_nickname) {
+                      <small class="employee-nickname">({{ item.employee_nickname }})</small>
+                    }
+                  </h3>
+                  <div class="request-meta">
+                    <span>
+                      {{ item.employee_department || '-' }}
+                      @if (item.employee_company_code) {
+                        ({{ item.employee_company_code }})
+                      }
+                    </span>
+                  </div>
+                </div>
+              </div>
+              <div class="heading-actions">
+                <span class="status-badge" [ngClass]="getStatusClass(item)">
+                  {{ getStatusLabel(item) }}
+                </span>
+                <button
+                  type="button"
+                  class="btn-heading-toggle"
+                  [attr.aria-label]="
+                    isExpanded(item.request_id) ? 'ซ่อนรายละเอียด' : 'ดูรายละเอียด'
+                  "
+                  [attr.aria-expanded]="isExpanded(item.request_id)"
+                  (click)="toggleDetails(item.request_id)"
+                >
+                  <i
+                    [class]="
+                      isExpanded(item.request_id) ? 'fas fa-chevron-up' : 'fas fa-chevron-down'
+                    "
+                  ></i>
+                </button>
+              </div>
+            </div>
+
+            @if (!isExpanded(item.request_id)) {
+              <div class="compact-summary">
+                <div>
+                  <span class="summary-label">ประเภทการลา</span>
+                  {{ item.leave_name_th }}
+                </div>
+                <div>
+                  <span class="summary-label">วันที่ลา</span>
+                  {{ dateUtil.formatDateToBE(item.start_date, 'DD/MM/YYYY') }} –
+                  {{ dateUtil.formatDateToBE(item.end_date, 'DD/MM/YYYY') }}
+                </div>
+                <div class="compact-days">
+                  <strong>{{ item.total_days }}</strong
+                  ><span>วัน</span>
+                </div>
+              </div>
+            }
+
+            @if (isExpanded(item.request_id)) {
+              <div class="approval-steps" [class.three-steps]="!item.approver2_code">
+                @for (step of getApprovalSteps(item); track $index) {
+                  <div class="approval-step" [ngClass]="step.state">
+                    <div class="step-marker">
+                      @if (step.state === 'completed') {
+                        <i class="fas fa-check"></i>
+                      } @else if (step.state === 'rejected' || step.state === 'sendback') {
+                        <i class="fas fa-times"></i>
+                      } @else {
+                        <span>{{ $index + 1 }}</span>
+                      }
+                    </div>
+                    <span class="step-label">{{ step.label }}</span>
+                  </div>
+                }
+              </div>
+
+              <div class="item-content">
+                <div class="leave-period">
+                  <div class="date-block">
+                    <span class="field-label">ตั้งแต่</span>
+                    <strong>
+                      {{ getWeekday(item.start_date) }}
+                      {{ dateUtil.formatDateToBE(item.start_date, 'DD/MM/YYYY') }}
+                    </strong>
+                    <small>{{ dateUtil.formatDateToBE(item.start_date, 'HH:mm') }} น.</small>
+                  </div>
+                  <i class="fas fa-arrow-right period-arrow"></i>
+                  <div class="date-block">
+                    <span class="field-label">ถึง</span>
+                    <strong>
+                      {{ getWeekday(item.end_date) }}
+                      {{ dateUtil.formatDateToBE(item.end_date, 'DD/MM/YYYY') }}
+                    </strong>
+                    <small>{{ dateUtil.formatDateToBE(item.end_date, 'HH:mm') }} น.</small>
+                  </div>
+                  <div class="days-summary">
+                    <strong>{{ item.total_days }}</strong>
+                    <span>วัน</span>
+                  </div>
+                </div>
+
+                <div class="reason-block">
+                  <span class="field-label">เหตุผลการลา</span>
+                  <p>{{ item.reason || '-' }}</p>
+                </div>
+              </div>
+            }
+
+            @if (
+              isExpanded(item.request_id) &&
+              actionRequestId() === item.request_id &&
+              pendingAction()
+            ) {
+              <div class="action-comment-panel" [class.reject]="pendingAction() === 'Rejected'">
+                <div class="comment-heading">
+                  <i [class]="pendingAction() === 'Rejected' ? 'fas fa-times' : 'fas fa-undo'"></i>
+                  <label>
+                    เหตุผล{{ pendingAction() === 'Rejected' ? 'ที่ไม่อนุมัติ' : 'ที่ส่งกลับแก้ไข' }}
+                    <span>*</span>
+                  </label>
+                </div>
+                <textarea
+                  rows="2"
+                  placeholder="กรุณาระบุเหตุผล..."
+                  [ngModel]="actionComment()"
+                  (ngModelChange)="actionComment.set($event)"
+                ></textarea>
+                <div class="comment-actions">
+                  <button type="button" class="btn-cancel-action" (click)="cancelAction()">
+                    ยกเลิก
+                  </button>
+                  <button
+                    type="button"
+                    class="btn-confirm-action"
+                    [class.reject]="pendingAction() === 'Rejected'"
+                    [disabled]="isSubmittingAction()"
+                    (click)="submitPendingAction(item)"
+                  >
+                    @if (isSubmittingAction()) {
+                      <i class="fas fa-spinner fa-spin"></i>
+                    }
+                    ยืนยัน {{ pendingAction() }}
+                  </button>
+                </div>
+              </div>
+            }
+
+            <div class="item-footer">
+              <div class="request-footer-meta">
+                <span class="request-number">{{ item.leave_number }}</span>
+                <small>
+                  ยื่น {{ dateUtil.formatDateToBE(item.created_at, 'DD/MM/YYYY') }}
+                  @if (getRequestTiming(item)) {
+                    • {{ getRequestTiming(item) }}
+                  }
+                </small>
+              </div>
+              <div class="item-actions">
+                <div class="secondary-actions">
+                  @if (isExpanded(item.request_id) && item.files.length) {
+                    <button
+                      type="button"
+                      class="btn-files"
+                      (click)="openAllAttachments(item.files)"
+                    >
+                      <i class="fas fa-paperclip"></i>
+                      เอกสาร {{ item.files.length }} ไฟล์
+                    </button>
+                  }
+                </div>
+
+                @if (
+                  isExpanded(item.request_id) &&
+                  getMyAction(item).toLowerCase() === 'pending' &&
+                  actionRequestId() !== item.request_id
+                ) {
+                  <div class="approval-actions-row">
+                    <button
+                      type="button"
+                      class="approval-action approve"
+                      [disabled]="isSubmittingAction()"
+                      (click)="submitApproval(item, 'Approved')"
+                    >
+                      <i class="fas fa-check"></i> Approved
+                    </button>
+                    <button
+                      type="button"
+                      class="approval-action reject"
+                      [disabled]="isSubmittingAction()"
+                      (click)="openCommentAction(item, 'Rejected')"
+                    >
+                      <i class="fas fa-times"></i> Rejected
+                    </button>
+                    <button
+                      type="button"
+                      class="approval-action sendback"
+                      [disabled]="isSubmittingAction()"
+                      (click)="openCommentAction(item, 'Sendback')"
+                    >
+                      <i class="fas fa-undo"></i> Sendback
+                    </button>
+                  </div>
+                }
+              </div>
+            </div>
+          </article>
+        } @empty {
+          <app-empty-state
+            title="ไม่พบรายการอนุมัติการลา"
+            description="ไม่มีรายการที่ตรงกับสถานะหรือคำค้นหาที่เลือก"
+            icon="fas fa-inbox"
+          />
+        }
+      </div>
+
+      @if (comps.totalItems() > 0) {
+        <div class="pagination-wrapper">
+          <app-pagination
+            [currentPage]="listing.currentPage()"
+            [pageSize]="listing.pageSize()"
+            [totalItems]="comps.totalItems()"
+            (onPageChange)="goToPage($event)"
+            (onPageSizeChange)="setPageSize($event)"
+          />
+        </div>
+      }
+    </section>
+  </div>
+}
+
+@if (isPreviewModalOpen()) {
+  <app-file-preview-modal [files]="previewFiles()" (onClose)="closePreview()" />
+}

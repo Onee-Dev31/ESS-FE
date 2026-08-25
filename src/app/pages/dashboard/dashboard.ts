@@ -26,6 +26,7 @@ import { TooltipModalComponent } from '../../components/modals/tooltip-modal/too
 import { TimeOffForm } from '../../components/features/time-off-form/time-off-form';
 import { AuthService } from '../../services/auth.service';
 import { SkeletonComponent } from '../../components/shared/skeleton/skeleton';
+import { PageLoaderComponent } from '../../components/shared/page-loader/page-loader';
 
 import dayjs from 'dayjs';
 import 'dayjs/locale/th';
@@ -71,6 +72,7 @@ dayjs.locale('th');
     MedicalPolicyModalComponent,
     TooltipModalComponent,
     TimeOffForm,
+    PageLoaderComponent,
   ],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.scss',

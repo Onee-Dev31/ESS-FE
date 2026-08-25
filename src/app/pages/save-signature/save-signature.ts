@@ -15,11 +15,12 @@ import { ToastService } from '../../services/toast';
 import { AuthService } from '../../services/auth.service';
 import { environment } from '../../../environments/environment';
 import { HttpClient } from '@angular/common/http';
+import { PageHeaderComponent } from '../../components/shared/page-header/page-header';
 
 @Component({
   selector: 'app-save-signature',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, PageHeaderComponent],
   templateUrl: './save-signature.html',
   styleUrl: './save-signature.scss',
 })

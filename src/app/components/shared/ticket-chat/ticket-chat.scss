@@ -165,6 +165,27 @@
   white-space: pre-wrap;
   overflow-wrap: anywhere;
 }
+:host ::ng-deep .note__email img {
+  max-width: 100%;
+  height: auto;
+}
+:host ::ng-deep .note__email blockquote {
+  max-width: 100%;
+  margin-right: 0 !important;
+  overflow-wrap: anywhere;
+}
+:host ::ng-deep .note__email a {
+  overflow-wrap: anywhere;
+}
+:host ::ng-deep .note__email .gmail_drive_chip {
+  box-sizing: content-box;
+  max-width: calc(100% - 22px) !important;
+}
+:host ::ng-deep .note__email .gmail_drive_chip img {
+  width: auto;
+  height: 20px !important;
+  max-height: 20px;
+}
 .refer_tag {
   display: inline-block;
   margin-right: 4px;

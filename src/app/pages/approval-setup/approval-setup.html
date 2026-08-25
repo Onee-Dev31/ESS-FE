@@ -1,21 +1,18 @@
 <div class="page-wrapper">
-  <div class="page-header">
-    <div class="page-header__left">
-      <h1 class="page-title">
-        <i class="fas fa-route"></i>
-        ตั้งค่าการอนุมัติ
-      </h1>
-      <button type="button" class="btn-outline btn-setup" (click)="openSetupModal()">
-        <i class="fa-solid fa-code-compare"></i>
-        <span class="btn-text">ตั้งค่าลำดับการอนุมัติ</span>
-      </button>
-    </div>
-    <div class="page-header__right">
+  <app-page-header title="ตั้งค่าการอนุมัติ" subtitle="Approval Setup" icon="fas fa-route">
+    <div class="approval-header-actions">
       <button class="btn-refresh" (click)="refreshCurrentTab()">
         <i class="fas fa-sync-alt"></i>
         รีเฟรช
       </button>
     </div>
+  </app-page-header>
+
+  <div class="setup-toolbar">
+    <button type="button" class="btn-outline btn-setup" (click)="openSetupModal()">
+      <i class="fa-solid fa-code-compare"></i>
+      <span class="btn-text">ตั้งค่าลำดับการอนุมัติ</span>
+    </button>
   </div>
 
   <div class="tab-bar">

@@ -1,5 +1,5 @@
 <div class="page">
-  <app-page-header [title]="pageTitle()"> </app-page-header>
+  <app-page-header [title]="pageTitle()" subtitle="Holiday Setting" icon="fas fa-umbrella-beach" />
   <div class="search-section">
     <div class="search-title">ค้นหา</div>
 
@@ -58,13 +58,15 @@
           @for (item of holidays(); track item.id; let i = $index) {
             <tbody>
               <tr>
-                <td>{{ i + 1 }}</td>
+                <td data-label="วันหยุดที่">{{ i + 1 }}</td>
 
                 <!-- <td>{{ item.year }}</td> -->
 
-                <td>{{ dateUtil.formatDateToBE(item.holidayDate, 'DD/MM/YYYY') }}</td>
+                <td data-label="วันที่">
+                  {{ dateUtil.formatDateToBE(item.holidayDate, 'DD/MM/YYYY') }}
+                </td>
 
-                <td>{{ item.holidayName }}</td>
+                <td data-label="ชื่อวันหยุด">{{ item.holidayName }}</td>
               </tr>
             </tbody>
           } @empty {
@@ -73,8 +75,8 @@
                 <td colspan="10" class="no-data-cell">
                   <app-empty-state
                     title="ไม่พบข้อมูล"
-                    description="ไม่พบรายชื่อพนักงานฟรีแลนซ์"
-                    icon="fas fa-users-slash"
+                    description="ไม่พบข้อมูลวันหยุดตามเงื่อนไขที่เลือก"
+                    icon="fas fa-calendar-xmark"
                   ></app-empty-state>
                 </td>
               </tr>

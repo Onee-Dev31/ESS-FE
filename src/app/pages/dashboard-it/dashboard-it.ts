@@ -15,7 +15,7 @@ import {
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { EMPTY, interval, firstValueFrom } from 'rxjs';
-import { filter } from 'rxjs/operators';
+import { filter, finalize } from 'rxjs/operators';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { Attachment, StatusKey, TicketItem } from '../../interfaces/it-dashboard.interface';
@@ -70,6 +70,7 @@ import {
   isSameTicketId,
 } from '../../components/shared/ticket-chat/ticket-chat';
 import { formatElapsedTime } from '../../utils/time.util';
+import { PageLoaderComponent } from '../../components/shared/page-loader/page-loader';
 
 @Component({
   selector: 'app-dashboard-it',
@@ -100,6 +101,7 @@ import { formatElapsedTime } from '../../utils/time.util';
     TicketProgressCardComponent,
     TicketDetailCardComponent,
     TicketChatComponent,
+    PageLoaderComponent,
   ],
   templateUrl: './dashboard-it.html',
   styleUrl: './dashboard-it.scss',
@@ -364,6 +366,7 @@ export class DashboardIT implements OnInit {
   currentUserEmpCode = this.authService.userData().CODEMPID;
 
   Tickets = signal<any[]>([]);
+  isPageLoading = signal(true);
   summaryRes = signal<any>(null);
   selectedTicket = signal<any | undefined>(undefined);
   isPreviewModalOpen = signal<boolean>(false);
@@ -600,7 +603,7 @@ export class DashboardIT implements OnInit {
     const previousTicketId = this.selectedTicket()?.ticketId;
 
     this.getTicketById(ticketId).subscribe(async (res: any) => {
-      // console.log(res);
+      console.log(res);
       const ticketAttachments = res.attachments?.filter((f: any) => !f.reply_id) || [];
       const replyAttachments = res.attachments?.filter((f: any) => f.reply_id) || [];
       const convertedFiles = await this.fileConverter.convertUrlsToFiles(ticketAttachments);
@@ -639,6 +642,7 @@ export class DashboardIT implements OnInit {
         ticketNumber: ticket.ticket_number,
         subject: ticket.subject,
         description: ticket.description,
+        viaEmail: ticket.is_from_email,
         noteForIt: ticket.noteForIt,
         ticketType: ticket.ticket_type_name_th,
         ticketTypeId: ticket.ticket_type_id,
@@ -646,6 +650,8 @@ export class DashboardIT implements OnInit {
         priority: ticket.priority,
         source: ticket.source,
         createdDate: new Date(ticket.created_at).toISOString(),
+        elapsed_time: ticket.elapsed_time,
+        // updatedDate: new Date(ticket.updated_at).toISOString(),
         requesterCode: ticket.requester_code,
         requesterAduser: ticket.requester_aduser,
         requesterName: ticket.requester_name,
@@ -679,10 +685,13 @@ export class DashboardIT implements OnInit {
         this.IS_CHAT_OPEN.set(true);
         setTimeout(() => this.ticketChat?.focusComposer(), 100);
       }
-      if (this.IS_CHAT_OPEN()) this.markChatAsRead();
+      if (this.IS_CHAT_OPEN()) {
+        this.markChatAsRead();
+        this.markLatestReplyRead(objectData.ticketId, objectData.itNotes ?? []);
+      }
       this.scrollToBottom();
 
-      console.log(objectData);
+      // console.log(objectData);
 
       const codeempid = this.authService.userData()?.CODEMPID;
       if (ticketId && codeempid) {
@@ -690,12 +699,6 @@ export class DashboardIT implements OnInit {
           complete: () => this.signalrService.ticketReadTrigger.next({ ticketId }),
         });
 
-        const lastReply = itNotes[itNotes.length - 1];
-        if (lastReply) {
-          this.itServiceService
-            .markReplyRead(ticketId, codeempid, lastReply.id)
-            .subscribe({ error: () => {} });
-        }
         this.loadReplyReadStatus(ticketId);
         this.unreadTicketIds.update((s) => {
           const next = new Set(s);
@@ -748,6 +751,10 @@ export class DashboardIT implements OnInit {
       if (next) {
         this.scrollToBottom();
         this.markChatAsRead();
+        const ticket = this.selectedTicket();
+        if (ticket) {
+          this.markLatestReplyRead(ticket.ticketId, ticket.itNotes ?? []);
+        }
       }
       return next;
     });
@@ -1336,6 +1343,9 @@ export class DashboardIT implements OnInit {
 
   // GET MASTER
   getAllTickets(trackNew = false) {
+    const showPageLoader = !this.initialized && this.Tickets().length === 0;
+    if (showPageLoader) this.isPageLoading.set(true);
+
     const searchText = this.keyword.trim();
     const [from, to] = this.filter.dateRange ?? [];
     const dateFrom = dayjs(from).format('YYYY-MM-DD');
@@ -1348,9 +1358,14 @@ export class DashboardIT implements OnInit {
         dateFrom,
         dateTo,
       })
+      .pipe(
+        finalize(() => {
+          if (showPageLoader) this.isPageLoading.set(false);
+        }),
+      )
       .subscribe({
         next: (res) => {
-          console.log(res);
+          // console.log('res', res);
           this.summaryRes.set(res);
 
           const mapped = res.data.map((ticket: any) => {
@@ -1369,10 +1384,12 @@ export class DashboardIT implements OnInit {
               ticketType: ticket.ticket_type_name_th,
               status: ticket.status,
               IT_Status: getStatusLabel(status_for_it),
-              createdDate: new Date(ticket.created_at).toISOString(),
               requesterEmpId: ticket.requester_code,
               subject: ticket.subject,
-              elapsed_hours: formatElapsedTime(ticket.hours_elapsed),
+              createdDate: new Date(ticket.created_at).toISOString(),
+              updatedDate: new Date(ticket.updated_at).toISOString(),
+              elapsed_hours: ticket.elapsed_time,
+              // elapsed_hours: formatElapsedTime(ticket.hours_elapsed),
             };
           });
           this.Tickets.set(mapped);
