@@ -22,6 +22,60 @@ export interface TimeOffRequest {
   requester?: Requester;
 }
 
+export interface LeaveApprovalFile {
+  file_id: number;
+  request_id: number;
+  file_name: string;
+  file_path: string;
+  file_size: number;
+  content_type: string;
+  uploaded_at: string;
+}
+
+export interface LeaveApprovalRequest {
+  request_id: number;
+  leave_number: string;
+  employee_code: string;
+  employee_first_name?: string | null;
+  employee_last_name?: string | null;
+  employee_full_name?: string | null;
+  employee_nickname?: string | null;
+  employee_department?: string | null;
+  employee_company_code?: string | null;
+  employee_company_name?: string | null;
+  leave_type_id: number;
+  leave_code: string;
+  leave_name_th: string;
+  leave_name_en: string;
+  year: string;
+  start_date: string;
+  end_date: string;
+  total_days: number;
+  is_half_day: boolean;
+  half_day_period: string;
+  reason: string;
+  status: string;
+  created_at: string;
+  approver1_code: string;
+  approver1_action: string | null;
+  approver1_action_date: string | null;
+  approver2_code: string | null;
+  approver2_action: string | null;
+  approver2_action_date: string | null;
+  overall_status: string;
+  MySlot: number;
+  files: LeaveApprovalFile[];
+}
+
+export type LeaveApprovalAction = 'Approved' | 'Rejected' | 'Sendback';
+
+export interface LeaveApprovalActionPayload {
+  request_id: number;
+  approver_code: string;
+  status: LeaveApprovalAction;
+  comment: string;
+}
+
 export type LeaveRequestAction = 'Upsert' | 'Resubmit' | 'Cancel';
 
 export interface SaveLeaveRequestPayload {

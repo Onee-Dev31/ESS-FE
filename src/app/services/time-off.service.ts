@@ -5,12 +5,18 @@ import { Observable, map } from 'rxjs';
 import { environment } from '../../environments/environment';
 import {
   LeaveQuotaData,
+  LeaveApprovalRequest,
+  LeaveApprovalActionPayload,
   SaveLeaveRequestPayload,
   TimeOffRequest,
   UpsertLeaveQuotaRulePayload,
 } from '../interfaces/time-off.interface';
 
 export type {
+  LeaveApprovalFile,
+  LeaveApprovalAction,
+  LeaveApprovalActionPayload,
+  LeaveApprovalRequest,
   LeaveQuotaData,
   LeaveQuotaRule,
   LeaveTypeMaster,
@@ -23,6 +29,11 @@ export type {
 interface LeaveQuotaRulesResponse {
   success?: boolean;
   data: LeaveQuotaData;
+}
+
+interface LeaveApprovalsResponse {
+  success: boolean;
+  data: LeaveApprovalRequest[];
 }
 
 @Injectable({
@@ -92,6 +103,18 @@ export class TimeOffService {
         return rows.map((row) => this.mapLeaveRequest(row as Record<string, unknown>));
       }),
     );
+  }
+
+  getApprovalsListByEmpCode(approverCode: string): Observable<LeaveApprovalRequest[]> {
+    const params = new HttpParams().set('approver_code', approverCode.trim());
+
+    return this.http
+      .get<LeaveApprovalsResponse>(`${this.baseUrl}/leave/GetApprovalsListByEmpCode`, { params })
+      .pipe(map((response) => (Array.isArray(response.data) ? response.data : [])));
+  }
+
+  approveLeaveRequest(payload: LeaveApprovalActionPayload): Observable<unknown> {
+    return this.http.post(`${this.baseUrl}/leave/requests/approve`, payload);
   }
 
   private mapLeaveRequest(row: Record<string, unknown>): TimeOffRequest {
