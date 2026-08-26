@@ -24,6 +24,11 @@ import { DateUtilityService } from '../../../services/date-utility.service';
 import { DialogService } from '../../../services/dialog';
 import { STORAGE_KEYS } from '../../../constants/storage.constants';
 import {
+  TIME_OFF_ATTACHMENT_ACCEPT,
+  TIME_OFF_ATTACHMENT_FILE_CONFIG,
+} from '../../../constants/time-off-attachment-file.constant';
+import { validateFiles } from '../../../utils/file-validation.util';
+import {
   ApprovalStep,
   ApprovalStepState,
   ApprovalStepsComponent,
@@ -55,6 +60,7 @@ import { NzSelectModule } from 'ng-zorro-antd/select';
   styleUrl: './time-off-form.scss',
 })
 export class TimeOffForm implements OnInit {
+  readonly attachmentAccept = TIME_OFF_ATTACHMENT_ACCEPT;
   private readonly breakMinutes = 60;
   private readonly shiftStartMinutes = signal(9 * 60);
   private readonly shiftEndMinutes = signal(18 * 60);
@@ -266,15 +272,31 @@ export class TimeOffForm implements OnInit {
 
   onFileSelected(event: Event) {
     const input = event.target as HTMLInputElement;
-    if (input.files && input.files.length > 0) {
-      const currentAttachments = this.attachments();
-      const newAttachments = Array.from(input.files).map((file: File, index) => ({
+    if (input.files?.length) {
+      const { validFiles, errors } = validateFiles(
+        input.files,
+        TIME_OFF_ATTACHMENT_FILE_CONFIG,
+        this.attachments().length,
+      );
+
+      const newAttachments = validFiles.map((file, index) => ({
         id: Date.now() + index,
         name: file.name,
         description: '',
         file,
       }));
-      this.attachments.update((current) => [...current, ...newAttachments]);
+
+      if (newAttachments.length) {
+        this.attachments.update((current) => [...current, ...newAttachments]);
+      }
+      if (errors.length) {
+        void this.dialogService.alert({
+          title: 'ไฟล์ไม่ถูกต้อง',
+          message: errors.join('\n'),
+          confirmText: 'OK',
+          type: 'warning',
+        });
+      }
     }
     input.value = '';
   }

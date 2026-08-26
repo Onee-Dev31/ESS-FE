@@ -1973,6 +1973,14 @@ $balance: $status-success-text;
 
 .modal-overlay {
   @include modal-overlay-styles;
+
+  .modal-container {
+    height: 90vh;
+
+    @include mobile {
+      height: 100dvh;
+    }
+  }
 }
 
 // ── Profile image lightbox ─────────────────────────────────

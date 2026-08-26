@@ -274,26 +274,17 @@
             #fileInput
             type="file"
             class="hidden-input"
+            [accept]="attachmentAccept"
             [disabled]="!isEditableRequest()"
             (change)="onFileSelected($event)"
             multiple
           />
         </div>
-        @if (attachments().length === 0) {
-          @if (isEditableRequest()) {
-            <button type="button" class="upload-empty-state" (click)="triggerFileInput(fileInput)">
-              <span class="upload-empty-icon"><i class="fas fa-cloud-upload-alt"></i></span>
-              <span class="upload-empty-copy">
-                <strong>คลิกเพื่อเลือกเอกสาร</strong>
-                <small>สามารถเลือกได้มากกว่า 1 ไฟล์</small>
-              </span>
-            </button>
-          } @else {
-            <div class="readonly-empty-attachments">
-              <i class="far fa-folder-open"></i>
-              <span>ไม่มีเอกสารแนบ</span>
-            </div>
-          }
+        @if (attachments().length === 0 && !isEditableRequest()) {
+          <div class="readonly-empty-attachments">
+            <i class="far fa-folder-open"></i>
+            <span>ไม่มีเอกสารแนบ</span>
+          </div>
         }
         <div class="attachment-table-container" *ngIf="attachments().length > 0">
           <table class="excel-table">
