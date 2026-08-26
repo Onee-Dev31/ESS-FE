@@ -97,10 +97,10 @@ export class EmpAdService {
     });
   }
 
-  resetPassword(token: string, newPassword: string): Observable<any> {
+  resetPassword(SamAccountName: string, NewPassword: string): Observable<any> {
     return this._http.post(
-      `${this.baseUrl}/ActiveDirectory/ResetPassword`,
-      { token, newPassword },
+      `${this.baseUrl}/ActiveDirectory/ResetPasswordBySamAccountName`,
+      { SamAccountName, NewPassword },
       {
         responseType: 'text',
       },
