@@ -203,7 +203,9 @@ export class ApprovalTimeoff implements OnInit {
     const approver2Action = (item.approver2_action || 'Pending').toLowerCase();
     const overallStatus = (item.overall_status || item.status || '').toLowerCase();
     const hasSecondApprover = Boolean(item.approver2_code?.trim());
-    const isCancelled = ['cancelled', 'canceled', 'ยกเลิกคำขอ', 'ถูกยกเลิก'].includes(overallStatus);
+    const isCancelled = ['cancelled', 'canceled', 'ยกเลิกคำขอ', 'ถูกยกเลิก'].includes(
+      overallStatus,
+    );
     const isComplete = overallStatus === 'approved';
 
     const firstApproverState: ApprovalStepState = isCancelled
@@ -221,8 +223,7 @@ export class ApprovalTimeoff implements OnInit {
       {
         label: 'ผู้อนุมัติคนที่ 1',
         approverCode: item.approver1_code?.trim() || undefined,
-        actionReason:
-          item.approver1_comment?.trim() || item.approver1_reason?.trim() || undefined,
+        actionReason: item.approver1_comment?.trim() || item.approver1_reason?.trim() || undefined,
         state: firstApproverState,
       },
     ];
@@ -231,8 +232,7 @@ export class ApprovalTimeoff implements OnInit {
       steps.push({
         label: 'ผู้อนุมัติคนที่ 2',
         approverCode: item.approver2_code?.trim() || undefined,
-        actionReason:
-          item.approver2_comment?.trim() || item.approver2_reason?.trim() || undefined,
+        actionReason: item.approver2_comment?.trim() || item.approver2_reason?.trim() || undefined,
         state: isCancelled
           ? 'pending'
           : isComplete || approver2Action === 'approved'

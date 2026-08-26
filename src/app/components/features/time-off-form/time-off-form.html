@@ -62,7 +62,9 @@
                     </div>
                     <small>
                       <i
-                        [class]="isLeaveTypeUnavailable(type) ? 'fas fa-lock' : 'fas fa-check-circle'"
+                        [class]="
+                          isLeaveTypeUnavailable(type) ? 'fas fa-lock' : 'fas fa-check-circle'
+                        "
                       ></i>
                       {{ getLeaveTypeOptionStatus(type) }}
                     </small>
@@ -126,44 +128,44 @@
         <h4 class="section-heading">2. รายละเอียดการลา</h4>
 
         @if (!isFullDayOnlyLeaveType()) {
-        <div class="input-field-group mb-4">
-          <label>ช่วงเวลาการลา</label>
-          <div class="leave-period-options">
-            <button
-              type="button"
-              class="period-option"
-              [class.active]="leavePeriod() === 'morning'"
-              (click)="onLeavePeriodChange('morning')"
-            >
-              <span class="option-label">
-                <i class="fas fa-sun"></i>
-                ลาเช้า
-              </span>
-            </button>
-            <button
-              type="button"
-              class="period-option"
-              [class.active]="leavePeriod() === 'afternoon'"
-              (click)="onLeavePeriodChange('afternoon')"
-            >
-              <span class="option-label">
-                <i class="fas fa-cloud-sun"></i>
-                ลาบ่าย
-              </span>
-            </button>
-            <button
-              type="button"
-              class="period-option"
-              [class.active]="leavePeriod() === 'full-day'"
-              (click)="onLeavePeriodChange('full-day')"
-            >
-              <span class="option-label">
-                <i class="fas fa-calendar-day"></i>
-                ลาเต็มวัน
-              </span>
-            </button>
+          <div class="input-field-group mb-4">
+            <label>ช่วงเวลาการลา</label>
+            <div class="leave-period-options">
+              <button
+                type="button"
+                class="period-option"
+                [class.active]="leavePeriod() === 'morning'"
+                (click)="onLeavePeriodChange('morning')"
+              >
+                <span class="option-label">
+                  <i class="fas fa-sun"></i>
+                  ลาเช้า
+                </span>
+              </button>
+              <button
+                type="button"
+                class="period-option"
+                [class.active]="leavePeriod() === 'afternoon'"
+                (click)="onLeavePeriodChange('afternoon')"
+              >
+                <span class="option-label">
+                  <i class="fas fa-cloud-sun"></i>
+                  ลาบ่าย
+                </span>
+              </button>
+              <button
+                type="button"
+                class="period-option"
+                [class.active]="leavePeriod() === 'full-day'"
+                (click)="onLeavePeriodChange('full-day')"
+              >
+                <span class="option-label">
+                  <i class="fas fa-calendar-day"></i>
+                  ลาเต็มวัน
+                </span>
+              </button>
+            </div>
           </div>
-        </div>
         }
 
         <div class="details-grid">
@@ -187,23 +189,23 @@
           </div>
 
           @if (!isFullDayOnlyLeaveType()) {
-          <div class="input-field-group left-half">
-            <label>ตั้งแต่เวลา</label>
-            @if (isEditableRequest()) {
-              <nz-time-picker
-                class="input-field custom-picker"
-                nzFormat="HH:mm"
-                [nzMinuteStep]="30"
-                nzPlaceHolder="เลือกเวลาเริ่ม"
-                [ngModel]="shiftStartTime()"
-                (ngModelChange)="shiftStartTime.set($event)"
-              />
-            } @else {
-              <div class="input-field readonly-display-field">
-                {{ formatTimeValue(shiftStartTime()) }}
-              </div>
-            }
-          </div>
+            <div class="input-field-group left-half">
+              <label>ตั้งแต่เวลา</label>
+              @if (isEditableRequest()) {
+                <nz-time-picker
+                  class="input-field custom-picker"
+                  nzFormat="HH:mm"
+                  [nzMinuteStep]="30"
+                  nzPlaceHolder="เลือกเวลาเริ่ม"
+                  [ngModel]="shiftStartTime()"
+                  (ngModelChange)="shiftStartTime.set($event)"
+                />
+              } @else {
+                <div class="input-field readonly-display-field">
+                  {{ formatTimeValue(shiftStartTime()) }}
+                </div>
+              }
+            </div>
           }
 
           <div class="input-field-group left-half">
@@ -227,23 +229,23 @@
           </div>
 
           @if (!isFullDayOnlyLeaveType()) {
-          <div class="input-field-group left-half">
-            <label>ถึงเวลา</label>
-            @if (isEditableRequest()) {
-              <nz-time-picker
-                class="input-field custom-picker"
-                nzFormat="HH:mm"
-                [nzMinuteStep]="30"
-                nzPlaceHolder="เลือกเวลาสิ้นสุด"
-                [ngModel]="shiftEndTime()"
-                (ngModelChange)="shiftEndTime.set($event)"
-              />
-            } @else {
-              <div class="input-field readonly-display-field">
-                {{ formatTimeValue(shiftEndTime()) }}
-              </div>
-            }
-          </div>
+            <div class="input-field-group left-half">
+              <label>ถึงเวลา</label>
+              @if (isEditableRequest()) {
+                <nz-time-picker
+                  class="input-field custom-picker"
+                  nzFormat="HH:mm"
+                  [nzMinuteStep]="30"
+                  nzPlaceHolder="เลือกเวลาสิ้นสุด"
+                  [ngModel]="shiftEndTime()"
+                  (ngModelChange)="shiftEndTime.set($event)"
+                />
+              } @else {
+                <div class="input-field readonly-display-field">
+                  {{ formatTimeValue(shiftEndTime()) }}
+                </div>
+              }
+            </div>
           }
 
           <div class="leave-days-summary">

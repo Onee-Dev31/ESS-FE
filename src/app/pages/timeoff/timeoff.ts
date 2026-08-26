@@ -33,8 +33,7 @@ import { createAngularTable, getCoreRowModel, SortingState } from '@tanstack/ang
 import { NzSelectModule } from 'ng-zorro-antd/select';
 
 type StatusDisplayMeta =
-  | { label: string; className: string }
-  | { labelTH: string; labelEN: string; className: string };
+  { label: string; className: string } | { labelTH: string; labelEN: string; className: string };
 
 /** หน้าแสดงรายการคำขอลา (Time Off Request List) พร้อมระบบกรองและค้นหา */
 @Component({

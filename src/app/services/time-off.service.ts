@@ -229,8 +229,7 @@ export class TimeOffService {
       employee_code: String(row['employee_code'] ?? ''),
       leaveType: String(row['leave_name_th'] ?? row['leaveType'] ?? row['leave_type_name'] ?? ''),
       leave_type_id: Number(row['leave_type_id'] ?? 0),
-      leaveType_color:
-        String(row['leaveType_color'] ?? row['color_hex'] ?? '').trim() || undefined,
+      leaveType_color: String(row['leaveType_color'] ?? row['color_hex'] ?? '').trim() || undefined,
       leaveType_icon: String(row['leaveType_icon'] ?? row['icon_name'] ?? '').trim() || undefined,
       startDate: String(row['start_date'] ?? row['startDate'] ?? ''),
       endDate: String(row['end_date'] ?? row['endDate'] ?? ''),
