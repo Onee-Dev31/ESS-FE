@@ -11,9 +11,13 @@ import { ToastService } from '../../services/toast';
 import { DialogService } from '../../services/dialog';
 import { ErrorService } from '../../services/error';
 import { TimeOffForm } from '../../components/features/time-off-form/time-off-form';
-import { FilePreviewModalComponent } from '../../components/modals/file-preview-modal/file-preview-modal';
+import {
+  FilePreviewItem,
+  FilePreviewModalComponent,
+} from '../../components/modals/file-preview-modal/file-preview-modal';
 import { DateUtilityService } from '../../services/date-utility.service';
 import { AuthService } from '../../services/auth.service';
+import { FileConverterService } from '../../services/file-converter';
 
 import {
   createListingState,
@@ -56,6 +60,7 @@ export class TimeoffComponent implements OnInit {
   private dialogService = inject(DialogService);
   private errorService = inject(ErrorService);
   private authService = inject(AuthService);
+  private fileConverter = inject(FileConverterService);
   protected readonly dateUtil = inject(DateUtilityService);
 
   isLoading = this.loadingService.loading('timeoff-list');
@@ -165,7 +170,7 @@ export class TimeoffComponent implements OnInit {
   }));
 
   isPreviewModalOpen = signal<boolean>(false);
-  previewFiles = signal<{ fileName: string; date: string }[]>([]);
+  previewFiles = signal<FilePreviewItem[]>([]);
 
   // statuses = COMMON_STATUS_OPTIONS;
   private readonly statusDisplay: Record<string, StatusDisplayMeta> = {
@@ -215,8 +220,10 @@ export class TimeoffComponent implements OnInit {
     }
 
     this.loadingService.start('timeoff-list');
+    console.log('[getLeaveRequests] Response', { yearFrom, yearTo, employeeCode });
     this.timeoffService.getLeaveRequests(yearFrom, yearTo, employeeCode).subscribe({
       next: (data: TimeOffRequest[]) => {
+        console.log('[getLeaveRequests] Response', data);
         this.requests.set(data);
         this.loadingService.stop('timeoff-list');
       },
@@ -278,13 +285,9 @@ export class TimeoffComponent implements OnInit {
     this.loadRequests();
   }
 
-  openPreview(attachments: { name: string }[]) {
-    if (!attachments || attachments.length === 0) return;
-    const previewItems = attachments.map((att) => ({
-      fileName: att.name || 'Attachment',
-      date: '',
-    }));
-    this.previewFiles.set(previewItems);
+  openPreview(attachments: TimeOffRequest['attachments']): void {
+    if (!attachments?.length) return;
+    this.previewFiles.set(this.fileConverter.buildPreviewFiles(attachments));
     this.isPreviewModalOpen.set(true);
   }
 

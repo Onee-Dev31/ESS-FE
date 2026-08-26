@@ -396,6 +396,10 @@ export class TimeOffForm implements OnInit {
     const startDate = this.toApiDateTime(this.startDate(), this.shiftStartTime());
     const endDate = this.toApiDateTime(this.endDate(), this.shiftEndTime());
     const isHalfDay = this.calculatedDays() % 1 === 0.5;
+    const newAttachments = this.attachments().filter(
+      (attachment): attachment is typeof attachment & { file: File } =>
+        attachment.file instanceof File,
+    );
     const payload: SaveLeaveRequestPayload = {
       action: this.isSendbackStatus() ? 'Resubmit' : 'Upsert',
       request_id: Number(this.requestId()) || 0,
@@ -408,9 +412,8 @@ export class TimeOffForm implements OnInit {
       is_half_day: isHalfDay,
       half_day_period: isHalfDay ? this.getHalfDayPeriod() : 'FULL',
       delete_file_ids: this.deletedFileIds().length ? this.deletedFileIds() : undefined,
-      files: this.attachments()
-        .map((attachment) => attachment.file)
-        .filter((file): file is File => file instanceof File),
+      files: newAttachments.map((attachment) => attachment.file),
+      file_remarks: newAttachments.map((attachment) => attachment.description.trim()),
       request_by: employeeCode,
     };
 

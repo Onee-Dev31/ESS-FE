@@ -110,6 +110,7 @@ export class TimeOffService {
       payload.delete_file_ids.forEach((id) => formData.append('delete_file_ids', String(id)));
     }
     payload.files?.forEach((file) => formData.append('files', file, file.name));
+    payload.file_remarks?.forEach((remark) => formData.append('file_remarks', remark));
 
     return this.http.post(`${this.baseUrl}/leave/LeaveRequests`, formData);
   }
@@ -137,7 +138,6 @@ export class TimeOffService {
             : result.data && !Array.isArray(result.data)
               ? (result.data.items ?? result.data.records ?? result.data.requests ?? [])
               : (result.items ?? []);
-        console.log(result.data);
         return rows.map((row) => this.mapLeaveRequest(row as Record<string, unknown>));
       }),
     );
@@ -195,6 +195,9 @@ export class TimeOffService {
               file_id: Number(file['file_id'] ?? file['id'] ?? 0) || undefined,
               name: String(file['file_name'] ?? file['name'] ?? ''),
               url: String(file['file_path'] ?? file['file_url'] ?? file['url'] ?? ''),
+              type: String(file['content_type'] ?? file['file_type'] ?? file['type'] ?? ''),
+              remark: String(file['remark'] ?? file['file_remark'] ?? file['description'] ?? ''),
+              uploaded_at: String(file['uploaded_at'] ?? file['created_at'] ?? ''),
             },
       ),
       days: Number(row['total_days'] ?? row['days'] ?? 0),
@@ -203,12 +206,10 @@ export class TimeOffService {
       shiftEndTime: String(row['end_time'] ?? row['shiftEndTime'] ?? ''),
       approver1_code: String(row['approver1_code'] ?? '') || null,
       approver1_action: String(row['approver1_action'] ?? '') || null,
-      approver1_comment:
-        String(row['approver1_comment'] ?? row['approver1_reason'] ?? '') || null,
+      approver1_comment: String(row['approver1_comment'] ?? row['approver1_reason'] ?? '') || null,
       approver2_code: String(row['approver2_code'] ?? '') || null,
       approver2_action: String(row['approver2_action'] ?? '') || null,
-      approver2_comment:
-        String(row['approver2_comment'] ?? row['approver2_reason'] ?? '') || null,
+      approver2_comment: String(row['approver2_comment'] ?? row['approver2_reason'] ?? '') || null,
       overall_status: String(row['overall_status'] ?? row['status'] ?? '') || null,
     };
   }

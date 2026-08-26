@@ -14,7 +14,14 @@ export interface TimeOffRequest {
   startDate: string;
   endDate: string;
   reason: string;
-  attachments: { file_id?: number; name: string; url?: string }[];
+  attachments: {
+    file_id?: number;
+    name: string;
+    url?: string;
+    type?: string;
+    remark?: string;
+    uploaded_at?: string;
+  }[];
   days?: number;
   leavePeriod?: string;
   shiftStartTime?: string;
@@ -104,6 +111,7 @@ export interface SaveLeaveRequestPayload {
   half_day_period?: string;
   delete_file_ids?: number[];
   files?: File[];
+  file_remarks?: string[];
   request_by?: string;
 }
 
