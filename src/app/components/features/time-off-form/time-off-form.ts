@@ -24,6 +24,7 @@ import {
 import { DateUtilityService } from '../../../services/date-utility.service';
 import { DialogService } from '../../../services/dialog';
 import { STORAGE_KEYS } from '../../../constants/storage.constants';
+import { FULL_DAY_ONLY_LEAVE_CODES } from '../../../constants/time-off-duration.constant';
 import {
   TIME_OFF_ATTACHMENT_ACCEPT,
   TIME_OFF_ATTACHMENT_FILE_CONFIG,
@@ -88,6 +89,7 @@ export class TimeOffForm implements OnInit {
   leavePeriod = signal<string>('full-day');
   shiftStartTime = signal<Date | null>(this.timeFromMinutes(9 * 60));
   shiftEndTime = signal<Date | null>(this.timeFromMinutes(18 * 60));
+  leaveDays = signal<number | null>(1);
 
   startDatePickerValue = computed<Date | null>(() => this.toPickerDate(this.startDate()));
   endDatePickerValue = computed<Date | null>(() => this.toPickerDate(this.endDate()));
@@ -247,7 +249,21 @@ export class TimeOffForm implements OnInit {
   selectLeaveType(id: string) {
     if (!this.isEditableRequest()) return;
     this.selectedLeaveType.set(id);
+    if (this.isFullDayOnlyLeaveType()) {
+      this.leavePeriod.set('full-day');
+      this.shiftStartTime.set(this.timeFromMinutes(this.shiftStartMinutes()));
+      this.shiftEndTime.set(this.timeFromMinutes(this.shiftEndMinutes()));
+      const currentDays = Number(this.leaveDays());
+      if (!Number.isInteger(currentDays)) this.leaveDays.set(Math.max(1, Math.ceil(currentDays)));
+    }
     this.cdr.detectChanges();
+  }
+
+  isFullDayOnlyLeaveType(): boolean {
+    const selectedCode = this.leaveTypes.find(
+      (type) => type.id === this.selectedLeaveType(),
+    )?.code;
+    return selectedCode ? FULL_DAY_ONLY_LEAVE_CODES.has(selectedCode.toUpperCase()) : false;
   }
 
   onStartDateChange() {
@@ -382,6 +398,16 @@ export class TimeOffForm implements OnInit {
       return;
     }
 
+    const leaveDays = Number(this.leaveDays());
+    if (!Number.isFinite(leaveDays) || leaveDays <= 0) {
+      this.toastService.warning('กรุณาระบุจำนวนวันลาให้มากกว่า 0');
+      return;
+    }
+    if (this.isFullDayOnlyLeaveType() && !Number.isInteger(leaveDays)) {
+      this.toastService.warning('ประเภทการลานี้ระบุได้เฉพาะจำนวนวันเต็ม');
+      return;
+    }
+
     const startTime = this.shiftStartTime();
     const endTime = this.shiftEndTime();
     if (!startTime || !endTime) {
@@ -418,7 +444,7 @@ export class TimeOffForm implements OnInit {
         : 'ส่งใบลา';
     const confirmed = await this.dialogService.confirm({
       title: `ยืนยันการ${actionLabel}`,
-      message: `${this.getSelectedLeaveTypeLabel()} • ${this.formatThaiDate(this.startDate())} - ${this.formatThaiDate(this.endDate())} • ${this.calculatedDays()} วัน`,
+      message: `${this.getSelectedLeaveTypeLabel()} • ${this.formatThaiDate(this.startDate())} - ${this.formatThaiDate(this.endDate())} • ${leaveDays} วัน`,
       confirmText: isResubmit
         ? 'ยืนยันส่งอีกครั้ง'
         : isExistingRequest
@@ -432,7 +458,7 @@ export class TimeOffForm implements OnInit {
 
     const startDate = this.toApiDateTime(this.startDate(), this.shiftStartTime());
     const endDate = this.toApiDateTime(this.endDate(), this.shiftEndTime());
-    const isHalfDay = this.calculatedDays() % 1 === 0.5;
+    const isHalfDay = !this.isFullDayOnlyLeaveType() && leaveDays % 1 === 0.5;
     const newAttachments = this.attachments().filter(
       (attachment): attachment is typeof attachment & { file: File } =>
         attachment.file instanceof File,
@@ -443,7 +469,7 @@ export class TimeOffForm implements OnInit {
       leave_type_id: Number(this.selectedLeaveType()),
       start_date: startDate,
       end_date: endDate,
-      total_days: this.calculatedDays(),
+      total_days: leaveDays,
       year: dayjs(this.startDate()).year(),
       reason: this.reason(),
       is_half_day: isHalfDay,
@@ -582,6 +608,7 @@ export class TimeOffForm implements OnInit {
     this.requestId.set(String(request.request_id ?? 0));
     this.selectedLeaveType.set(String(request.leave_type_id ?? ''));
     this.reason.set(request.reason ?? '');
+    this.leaveDays.set(Number.isFinite(request.days) && Number(request.days) > 0 ? Number(request.days) : 1);
     this.startDate.set(request.startDate.slice(0, 10));
     this.endDate.set(request.endDate.slice(0, 10));
     this.applyEmployeeShift(request);

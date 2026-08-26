@@ -93,6 +93,7 @@
       <section class="form-section-wrapper mt-4 animated-fade-in" *ngIf="selectedLeaveType()">
         <h4 class="section-heading">2. รายละเอียดการลา</h4>
 
+        @if (!isFullDayOnlyLeaveType()) {
         <div class="input-field-group mb-4">
           <label>ช่วงเวลาการลา</label>
           <div class="leave-period-options">
@@ -131,6 +132,7 @@
             </button>
           </div>
         </div>
+        }
 
         <div class="details-grid">
           <div class="input-field-group left-half">
@@ -152,6 +154,7 @@
             }
           </div>
 
+          @if (!isFullDayOnlyLeaveType()) {
           <div class="input-field-group left-half">
             <label>ตั้งแต่เวลา</label>
             @if (isEditableRequest()) {
@@ -169,6 +172,7 @@
               </div>
             }
           </div>
+          }
 
           <div class="input-field-group left-half">
             <label>ถึงวันที่ <span class="required">*</span></label>
@@ -190,6 +194,7 @@
             }
           </div>
 
+          @if (!isFullDayOnlyLeaveType()) {
           <div class="input-field-group left-half">
             <label>ถึงเวลา</label>
             @if (isEditableRequest()) {
@@ -207,23 +212,26 @@
               </div>
             }
           </div>
+          }
 
           <div class="leave-days-summary">
             <div class="leave-days-icon"><i class="fas fa-calculator"></i></div>
             <div class="leave-days-copy">
               <span class="leave-days-label">จำนวนวันลา</span>
-              <small>คำนวณอัตโนมัติจากวันที่และช่วงเวลาที่เลือก</small>
+              <small>กรอกจำนวนวันที่ต้องการลา</small>
             </div>
             <div class="leave-days-total">
               @if (isEditableRequest()) {
                 <input
-                  type="text"
-                  class="readonly-highlight leave-days-value"
-                  [value]="calculatedDays()"
-                  readonly
+                  type="number"
+                  class="leave-days-value"
+                  [min]="isFullDayOnlyLeaveType() ? 1 : 0.5"
+                  [step]="isFullDayOnlyLeaveType() ? 1 : 0.5"
+                  [ngModel]="leaveDays()"
+                  (ngModelChange)="leaveDays.set($event)"
                 />
               } @else {
-                <strong class="leave-days-value readonly-days-value">{{ calculatedDays() }}</strong>
+                <strong class="leave-days-value readonly-days-value">{{ leaveDays() }}</strong>
               }
               <span>วัน</span>
             </div>
