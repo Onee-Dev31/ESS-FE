@@ -17,6 +17,7 @@ import { ToastService } from '../../../services/toast';
 import { TimeOffService } from '../../../services/time-off.service';
 import {
   LeaveType,
+  EmployeeLeaveQuota,
   SaveLeaveRequestPayload,
   TimeOffRequest,
 } from '../../../interfaces/time-off.interface';
@@ -64,6 +65,7 @@ export class TimeOffForm implements OnInit {
   private readonly breakMinutes = 60;
   private readonly shiftStartMinutes = signal(9 * 60);
   private readonly shiftEndMinutes = signal(18 * 60);
+  private readonly isNightShift = signal(false);
   private timeOffService = inject(TimeOffService);
   private toastService = inject(ToastService);
   private dateUtil = inject(DateUtilityService);
@@ -98,7 +100,7 @@ export class TimeOffForm implements OnInit {
       if (!startTime || !endTime) return 0.5;
 
       const requestStart = this.minutesFromTime(startTime);
-      const requestEnd = this.minutesFromTime(endTime);
+      const requestEnd = this.normalizeShiftMinute(this.minutesFromTime(endTime));
 
       if (calendarDays > 1) {
         const middleDays = Math.max(0, calendarDays - 2);
@@ -135,16 +137,19 @@ export class TimeOffForm implements OnInit {
 
     this.setDatesBySelectedDate();
 
-    this.timeOffService.getQuotaRules().subscribe(({ master }) => {
+    const employeeCode = this.getEmployeeCodeFromStorage();
+    this.timeOffService.getEmployeeLeaveSummary(employeeCode, dayjs().year()).subscribe({
+      next: (summary) => {
       this.zone.run(() => {
-        console.log('[getQuotaRules] Response', master);
-        this.leaveTypes = master.map((type) => ({
+        this.leaveTypes = summary.map((type) => ({
           id: String(type.leave_type_id),
           code: type.leave_code,
           label: type.leave_name_th,
           icon: this.getLeaveTypeIcon(type.leave_code),
-          color: this.getLeaveTypeColor(type.leave_code),
+          color: type.color_hex || this.getLeaveTypeColor(type.leave_code),
         }));
+        this.applyRemainingQuotas(this.timeOffService.latestEmployeeQuotas());
+        this.applyLatestEmployeeShift();
         this.loadingTypes.set(false);
         if (this.initialLeaveTypeId) {
           const initialType = this.resolveInitialLeaveType(this.initialLeaveTypeId);
@@ -156,7 +161,38 @@ export class TimeOffForm implements OnInit {
 
         this.cdr.markForCheck();
       });
+      },
+      error: () => {
+        this.loadingTypes.set(false);
+        this.toastService.error('ไม่สามารถโหลดประเภทการลาและสิทธิ์คงเหลือได้');
+      },
     });
+
+    if (!this.timeOffService.latestEmployeeShift()) {
+      const currentYear = dayjs().year();
+      if (employeeCode) {
+        this.timeOffService.getLeaveRequests(currentYear, currentYear, employeeCode).subscribe(() => {
+          this.applyRemainingQuotas(this.timeOffService.latestEmployeeQuotas());
+          this.applyLatestEmployeeShift();
+          this.cdr.markForCheck();
+        });
+      }
+    }
+  }
+
+  private applyRemainingQuotas(quotas: EmployeeLeaveQuota[]): void {
+    if (!this.leaveTypes.length) return;
+
+    const remainingByLeaveType = new Map<string, number>();
+    quotas.forEach((quota) => {
+      if (Number.isFinite(quota.quota_remaining_days)) {
+        remainingByLeaveType.set(String(quota.leave_type_id), quota.quota_remaining_days);
+      }
+    });
+    this.leaveTypes = this.leaveTypes.map((type) => ({
+      ...type,
+      remaining: remainingByLeaveType.get(type.id),
+    }));
   }
 
   private resolveInitialLeaveType(value: string): LeaveType | undefined {
@@ -354,6 +390,7 @@ export class TimeOffForm implements OnInit {
     }
     if (
       this.startDate() === this.endDate() &&
+      !this.isNightShift() &&
       endTime.getHours() * 60 + endTime.getMinutes() <=
         startTime.getHours() * 60 + startTime.getMinutes()
     ) {
@@ -514,6 +551,12 @@ export class TimeOffForm implements OnInit {
     return this.leaveTypes.find((type) => type.id === this.selectedLeaveType())?.label ?? '-';
   }
 
+  getLeaveTypeOptionLabel(type: LeaveType): string {
+    return type.remaining === undefined
+      ? type.label
+      : `${type.label} (คงเหลือ ${type.remaining} วัน)`;
+  }
+
   formatTimeValue(value: Date | null): string {
     if (!value || Number.isNaN(value.getTime())) return '-';
     const hours = String(value.getHours()).padStart(2, '0');
@@ -541,6 +584,7 @@ export class TimeOffForm implements OnInit {
     this.reason.set(request.reason ?? '');
     this.startDate.set(request.startDate.slice(0, 10));
     this.endDate.set(request.endDate.slice(0, 10));
+    this.applyEmployeeShift(request);
     this.shiftStartTime.set(this.timeFromApiDate(request.startDate));
     this.shiftEndTime.set(this.timeFromApiDate(request.endDate));
     this.attachments.set(
@@ -561,6 +605,44 @@ export class TimeOffForm implements OnInit {
           ? 'afternoon'
           : 'full-day',
     );
+  }
+
+  private applyEmployeeShift(request: TimeOffRequest): void {
+    this.applyShiftTimes(
+      request.employee?.start_time ?? request.shiftStartTime,
+      request.employee?.end_time ?? request.shiftEndTime,
+      request.employee?.is_night_shift ?? request.isNightShift ?? false,
+    );
+  }
+
+  private applyLatestEmployeeShift(): void {
+    const shift = this.timeOffService.latestEmployeeShift();
+    if (!shift) return;
+    this.applyShiftTimes(shift.startTime, shift.endTime, shift.isNightShift);
+  }
+
+  private applyShiftTimes(startTime?: string, endTime?: string, isNightShift = false): void {
+    const shiftStart = this.minutesFromClock(startTime);
+    const shiftEnd = this.minutesFromClock(endTime);
+    if (shiftStart === null || shiftEnd === null) return;
+
+    this.isNightShift.set(isNightShift);
+    this.shiftStartMinutes.set(shiftStart);
+    this.shiftEndMinutes.set(isNightShift && shiftEnd <= shiftStart ? shiftEnd + 24 * 60 : shiftEnd);
+
+    if (!this.request) {
+      this.shiftStartTime.set(this.timeFromMinutes(shiftStart));
+      this.shiftEndTime.set(this.timeFromMinutes(shiftEnd));
+    }
+  }
+
+  private minutesFromClock(value?: string): number | null {
+    const match = value?.match(/^(\d{1,2}):(\d{2})/);
+    if (!match) return null;
+
+    const hours = Number(match[1]);
+    const minutes = Number(match[2]);
+    return hours <= 23 && minutes <= 59 ? hours * 60 + minutes : null;
   }
 
   private timeFromApiDate(value: string): Date {
@@ -591,6 +673,10 @@ export class TimeOffForm implements OnInit {
     return time.getHours() * 60 + time.getMinutes();
   }
 
+  private normalizeShiftMinute(minutes: number): number {
+    return this.isNightShift() && minutes < this.shiftStartMinutes() ? minutes + 24 * 60 : minutes;
+  }
+
   private timeFromMinutes(totalMinutes: number): Date {
     return new Date(1970, 0, 1, Math.floor(totalMinutes / 60), totalMinutes % 60);
   }
@@ -598,7 +684,9 @@ export class TimeOffForm implements OnInit {
   private getHalfDayPeriod(): '1ST' | '2ND' {
     const endTime = this.shiftEndTime();
     const secondHalfStart = this.getFirstHalfEndMinutes() + this.breakMinutes;
-    return endTime && this.minutesFromTime(endTime) <= secondHalfStart ? '1ST' : '2ND';
+    return endTime && this.normalizeShiftMinute(this.minutesFromTime(endTime)) <= secondHalfStart
+      ? '1ST'
+      : '2ND';
   }
 
   private getLeaveTypeIcon(code: string): string {

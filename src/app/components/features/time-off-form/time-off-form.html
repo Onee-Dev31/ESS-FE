@@ -47,7 +47,7 @@
                 <nz-option
                   *ngFor="let type of leaveTypes"
                   [nzValue]="type.id"
-                  [nzLabel]="type.label"
+                  [nzLabel]="getLeaveTypeOptionLabel(type)"
                 />
               </nz-select>
             } @else {
@@ -127,17 +127,6 @@
               <span class="option-label">
                 <i class="fas fa-calendar-day"></i>
                 ลาเต็มวัน
-              </span>
-            </button>
-            <button
-              type="button"
-              class="period-option"
-              [class.active]="leavePeriod() === 'custom'"
-              (click)="onLeavePeriodChange('custom')"
-            >
-              <span class="option-label">
-                <i class="fas fa-user-clock"></i>
-                กำหนดเอง
               </span>
             </button>
           </div>
