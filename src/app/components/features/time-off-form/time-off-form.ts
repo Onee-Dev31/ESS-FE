@@ -23,6 +23,11 @@ import {
 import { DateUtilityService } from '../../../services/date-utility.service';
 import { DialogService } from '../../../services/dialog';
 import { STORAGE_KEYS } from '../../../constants/storage.constants';
+import {
+  ApprovalStep,
+  ApprovalStepState,
+  ApprovalStepsComponent,
+} from '../../shared/approval-steps/approval-steps';
 import dayjs from 'dayjs';
 
 import {
@@ -34,20 +39,13 @@ import { NzDatePickerModule } from 'ng-zorro-antd/date-picker';
 import { NzTimePickerModule } from 'ng-zorro-antd/time-picker';
 import { NzSelectModule } from 'ng-zorro-antd/select';
 
-type ApprovalStepState = 'completed' | 'active' | 'pending' | 'rejected' | 'sendback' | 'cancelled';
-
-interface ApprovalStep {
-  label: string;
-  state: ApprovalStepState;
-  approverCode?: string;
-}
-
 @Component({
   selector: 'app-time-off-form',
   standalone: true,
   imports: [
     CommonModule,
     FormsModule,
+    ApprovalStepsComponent,
     FilePreviewModalComponent,
     NzDatePickerModule,
     NzTimePickerModule,
@@ -446,6 +444,8 @@ export class TimeOffForm implements OnInit {
         label: 'ผู้อนุมัติคนที่ 1',
         state: firstApproverState,
         approverCode: request?.approver1_code || undefined,
+        actionReason:
+          request?.approver1_comment?.trim() || request?.approver1_reason?.trim() || undefined,
       },
     ];
 
@@ -453,6 +453,8 @@ export class TimeOffForm implements OnInit {
       steps.push({
         label: 'ผู้อนุมัติคนที่ 2',
         approverCode: request?.approver2_code || undefined,
+        actionReason:
+          request?.approver2_comment?.trim() || request?.approver2_reason?.trim() || undefined,
         state: isCancelled
           ? 'pending'
           : isComplete

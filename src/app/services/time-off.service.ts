@@ -31,9 +31,17 @@ interface LeaveQuotaRulesResponse {
   data: LeaveQuotaData;
 }
 
-interface LeaveApprovalsResponse {
+export interface LeaveApprovalCounts {
+  pending: number;
+  approved: number;
+  rejected: number;
+  sendback: number;
+}
+
+export interface LeaveApprovalsResponse {
   success: boolean;
   data: LeaveApprovalRequest[];
+  counts: LeaveApprovalCounts;
 }
 
 @Injectable({
@@ -135,12 +143,27 @@ export class TimeOffService {
     );
   }
 
-  getApprovalsListByEmpCode(approverCode: string): Observable<LeaveApprovalRequest[]> {
-    const params = new HttpParams().set('approver_code', approverCode.trim());
+  getApprovalsListByEmpCode(
+    approverCode: string,
+    status: string,
+    yearFrom: number,
+    yearTo: number,
+  ): Observable<LeaveApprovalsResponse> {
+    const params = new HttpParams()
+      .set('approver_code', approverCode.trim())
+      .set('status', status)
+      .set('yearFrom', String(yearFrom))
+      .set('yearTo', String(yearTo));
 
     return this.http
       .get<LeaveApprovalsResponse>(`${this.baseUrl}/leave/GetApprovalsListByEmpCode`, { params })
-      .pipe(map((response) => (Array.isArray(response.data) ? response.data : [])));
+      .pipe(
+        map((response) => ({
+          ...response,
+          data: Array.isArray(response.data) ? response.data : [],
+          counts: response.counts ?? { pending: 0, approved: 0, rejected: 0, sendback: 0 },
+        })),
+      );
   }
 
   approveLeaveRequest(payload: LeaveApprovalActionPayload): Observable<unknown> {
@@ -180,8 +203,12 @@ export class TimeOffService {
       shiftEndTime: String(row['end_time'] ?? row['shiftEndTime'] ?? ''),
       approver1_code: String(row['approver1_code'] ?? '') || null,
       approver1_action: String(row['approver1_action'] ?? '') || null,
+      approver1_comment:
+        String(row['approver1_comment'] ?? row['approver1_reason'] ?? '') || null,
       approver2_code: String(row['approver2_code'] ?? '') || null,
       approver2_action: String(row['approver2_action'] ?? '') || null,
+      approver2_comment:
+        String(row['approver2_comment'] ?? row['approver2_reason'] ?? '') || null,
       overall_status: String(row['overall_status'] ?? row['status'] ?? '') || null,
     };
   }

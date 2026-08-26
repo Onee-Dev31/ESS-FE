@@ -107,22 +107,7 @@
             }
 
             @if (isExpanded(item.request_id)) {
-              <div class="approval-steps" [class.three-steps]="!item.approver2_code">
-                @for (step of getApprovalSteps(item); track $index) {
-                  <div class="approval-step" [ngClass]="step.state">
-                    <div class="step-marker">
-                      @if (step.state === 'completed') {
-                        <i class="fas fa-check"></i>
-                      } @else if (step.state === 'rejected' || step.state === 'sendback') {
-                        <i class="fas fa-times"></i>
-                      } @else {
-                        <span>{{ $index + 1 }}</span>
-                      }
-                    </div>
-                    <span class="step-label">{{ step.label }}</span>
-                  </div>
-                }
-              </div>
+              <app-approval-steps [steps]="getApprovalSteps(item)" />
 
               <div class="item-content">
                 <div class="leave-period">

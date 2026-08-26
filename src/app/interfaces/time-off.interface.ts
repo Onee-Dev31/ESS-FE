@@ -21,8 +21,12 @@ export interface TimeOffRequest {
   shiftEndTime?: string;
   approver1_code?: string | null;
   approver1_action?: string | null;
+  approver1_comment?: string | null;
+  approver1_reason?: string | null;
   approver2_code?: string | null;
   approver2_action?: string | null;
+  approver2_comment?: string | null;
+  approver2_reason?: string | null;
   overall_status?: string | null;
   requester?: Requester;
 }
@@ -64,9 +68,13 @@ export interface LeaveApprovalRequest {
   approver1_code: string;
   approver1_action: string | null;
   approver1_action_date: string | null;
+  approver1_comment?: string | null;
+  approver1_reason?: string | null;
   approver2_code: string | null;
   approver2_action: string | null;
   approver2_action_date: string | null;
+  approver2_comment?: string | null;
+  approver2_reason?: string | null;
   overall_status: string;
   MySlot: number;
   files: LeaveApprovalFile[];

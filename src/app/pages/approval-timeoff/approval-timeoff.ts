@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../services/auth.service';
 import {
   LeaveApprovalAction,
+  LeaveApprovalCounts,
   LeaveApprovalRequest,
   TimeOffService,
 } from '../../services/time-off.service';
@@ -19,14 +20,13 @@ import { FilePreviewModalComponent } from '../../components/modals/file-preview-
 import { FileConverterService } from '../../services/file-converter';
 import { ToastService } from '../../services/toast';
 import { DialogService } from '../../services/dialog';
+import {
+  ApprovalStep,
+  ApprovalStepState,
+  ApprovalStepsComponent,
+} from '../../components/shared/approval-steps/approval-steps';
 
 type ApprovalFilter = '' | 'Pending' | 'Approved' | 'Rejected' | 'Sendback';
-type ApprovalStepState = 'completed' | 'active' | 'pending' | 'rejected' | 'sendback';
-
-interface ApprovalStep {
-  label: string;
-  state: ApprovalStepState;
-}
 
 @Component({
   selector: 'app-approval-timeoff',
@@ -34,6 +34,7 @@ interface ApprovalStep {
   imports: [
     CommonModule,
     FormsModule,
+    ApprovalStepsComponent,
     PageHeaderComponent,
     PageLoaderComponent,
     EmptyStateComponent,
@@ -56,10 +57,16 @@ export class ApprovalTimeoff implements OnInit {
 
   readonly isLoading = this.loadingService.loading('timeoff-approvals-list');
   readonly approvals = signal<LeaveApprovalRequest[]>([]);
+  readonly approvalCounts = signal<LeaveApprovalCounts>({
+    pending: 0,
+    approved: 0,
+    rejected: 0,
+    sendback: 0,
+  });
   readonly isRefreshing = signal(false);
   readonly listing = createListingState(10);
   readonly tabs: { value: ApprovalFilter; label: string }[] = [
-    { value: '', label: 'ทั้งหมด' },
+    // { value: '', label: 'ทั้งหมด' },
     { value: 'Pending', label: 'รออนุมัติ' },
     { value: 'Approved', label: 'อนุมัติแล้ว' },
     { value: 'Rejected', label: 'ไม่อนุมัติ' },
@@ -114,34 +121,48 @@ export class ApprovalTimeoff implements OnInit {
     if (refresh) this.isRefreshing.set(true);
     else this.loadingService.start('timeoff-approvals-list');
 
-    this.timeOffService.getApprovalsListByEmpCode(approverCode).subscribe({
-      next: (rows) => {
-        this.approvals.set(rows);
-        this.listing.currentPage.set(0);
-        this.loadingService.stop('timeoff-approvals-list');
-        this.isRefreshing.set(false);
-      },
-      error: (error) => {
-        this.loadingService.stop('timeoff-approvals-list');
-        this.isRefreshing.set(false);
-        this.errorService.handle(error, {
-          component: 'ApprovalTimeoff',
-          action: 'load-approvals',
-        });
-      },
+    const currentYear = new Date().getFullYear();
+    const status = this.listing.filterStatus() as ApprovalFilter;
+
+    console.log('[getApprovalsListByEmpCode] Request', {
+      approverCode,
+      status,
+      yearFrom: currentYear,
+      yearTo: currentYear,
     });
+
+    this.timeOffService
+      .getApprovalsListByEmpCode(approverCode, status, currentYear, currentYear)
+      .subscribe({
+        next: (response) => {
+          console.log('[getApprovalsListByEmpCode] Response ', response);
+          this.approvals.set(response.data);
+          this.approvalCounts.set(response.counts);
+          this.listing.currentPage.set(0);
+          this.loadingService.stop('timeoff-approvals-list');
+          this.isRefreshing.set(false);
+        },
+        error: (error) => {
+          this.loadingService.stop('timeoff-approvals-list');
+          this.isRefreshing.set(false);
+          this.errorService.handle(error, {
+            component: 'ApprovalTimeoff',
+            action: 'load-approvals',
+          });
+        },
+      });
   }
 
   setActiveTab(status: ApprovalFilter): void {
     this.listing.filterStatus.set(status);
     this.listing.currentPage.set(0);
+    this.loadApprovals();
   }
 
   getTabCount(status: ApprovalFilter): number {
-    if (!status) return this.approvals().length;
-    return this.approvals().filter(
-      (item) => this.getMyAction(item).toLowerCase() === status.toLowerCase(),
-    ).length;
+    const counts = this.approvalCounts();
+    if (!status) return counts.pending + counts.approved + counts.rejected + counts.sendback;
+    return counts[status.toLowerCase() as keyof LeaveApprovalCounts];
   }
 
   getMyAction(item: LeaveApprovalRequest): string {
@@ -182,42 +203,43 @@ export class ApprovalTimeoff implements OnInit {
     const approver2Action = (item.approver2_action || 'Pending').toLowerCase();
     const overallStatus = (item.overall_status || item.status || '').toLowerCase();
     const hasSecondApprover = Boolean(item.approver2_code?.trim());
-    const isRejected =
-      overallStatus === 'rejected' ||
-      approver1Action === 'rejected' ||
-      approver2Action === 'rejected';
-    const isSentBack =
-      overallStatus === 'sendback' ||
-      approver1Action === 'sendback' ||
-      approver2Action === 'sendback';
-    const isComplete =
-      overallStatus === 'approved' ||
-      (hasSecondApprover ? approver2Action === 'approved' : approver1Action === 'approved');
+    const isCancelled = ['cancelled', 'canceled', 'ยกเลิกคำขอ', 'ถูกยกเลิก'].includes(overallStatus);
+    const isComplete = overallStatus === 'approved';
+
+    const firstApproverState: ApprovalStepState = isCancelled
+      ? 'pending'
+      : isComplete || approver1Action === 'approved'
+        ? 'completed'
+        : approver1Action === 'rejected'
+          ? 'rejected'
+          : ['sendback', 'send_back'].includes(approver1Action)
+            ? 'sendback'
+            : 'active';
 
     const steps: ApprovalStep[] = [
-      { label: 'คำขอใหม่', state: 'completed' },
+      { label: 'คำขอใหม่', state: isCancelled ? 'cancelled' : 'completed' },
       {
         label: 'ผู้อนุมัติคนที่ 1',
-        state:
-          approver1Action === 'approved'
-            ? 'completed'
-            : approver1Action === 'rejected'
-              ? 'rejected'
-              : approver1Action === 'sendback'
-                ? 'sendback'
-                : 'active',
+        approverCode: item.approver1_code?.trim() || undefined,
+        actionReason:
+          item.approver1_comment?.trim() || item.approver1_reason?.trim() || undefined,
+        state: firstApproverState,
       },
     ];
 
     if (hasSecondApprover) {
       steps.push({
         label: 'ผู้อนุมัติคนที่ 2',
-        state:
-          approver2Action === 'approved'
+        approverCode: item.approver2_code?.trim() || undefined,
+        actionReason:
+          item.approver2_comment?.trim() || item.approver2_reason?.trim() || undefined,
+        state: isCancelled
+          ? 'pending'
+          : isComplete || approver2Action === 'approved'
             ? 'completed'
             : approver2Action === 'rejected'
               ? 'rejected'
-              : approver2Action === 'sendback'
+              : ['sendback', 'send_back'].includes(approver2Action)
                 ? 'sendback'
                 : approver1Action === 'approved'
                   ? 'active'
@@ -226,14 +248,8 @@ export class ApprovalTimeoff implements OnInit {
     }
 
     steps.push({
-      label: isRejected ? 'ไม่อนุมัติ' : isSentBack ? 'ส่งกลับแก้ไข' : 'อนุมัติแล้ว',
-      state: isRejected
-        ? 'rejected'
-        : isSentBack
-          ? 'sendback'
-          : isComplete
-            ? 'completed'
-            : 'pending',
+      label: 'อนุมัติแล้ว',
+      state: !isCancelled && isComplete ? 'completed' : 'pending',
     });
 
     return steps;

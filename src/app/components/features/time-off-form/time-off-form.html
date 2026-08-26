@@ -29,38 +29,7 @@
       </div>
 
       @if (request) {
-        <div
-          class="request-approval-steps"
-          [class.two-steps]="getRequestApprovalSteps().length === 2"
-          [class.three-steps]="getRequestApprovalSteps().length === 3"
-        >
-          @for (step of getRequestApprovalSteps(); track $index) {
-            <div class="request-approval-step" [ngClass]="step.state">
-              <div class="step-marker">
-                @if (step.state === 'completed') {
-                  <i class="fas fa-check"></i>
-                } @else if (step.state === 'rejected' || step.state === 'cancelled') {
-                  <i class="fas fa-times"></i>
-                } @else if (step.state === 'sendback') {
-                  <i class="fas fa-undo-alt"></i>
-                } @else {
-                  <span>{{ $index + 1 }}</span>
-                }
-              </div>
-              <span class="step-label">{{ step.label }}</span>
-              @if (step.approverCode) {
-                <span class="step-approver-code">{{ step.approverCode }}</span>
-              }
-              @if (step.state === 'sendback') {
-                <span class="step-action-label sendback-label">Sendback</span>
-              } @else if (step.state === 'rejected') {
-                <span class="step-action-label rejected-label">Rejected</span>
-              } @else if (step.state === 'cancelled') {
-                <span class="step-action-label cancelled-label">ยกเลิกคำขอ</span>
-              }
-            </div>
-          }
-        </div>
+        <app-approval-steps [steps]="getRequestApprovalSteps()" />
       }
 
       <section class="form-section-wrapper">
