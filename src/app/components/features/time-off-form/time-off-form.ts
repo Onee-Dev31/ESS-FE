@@ -261,7 +261,9 @@ export class TimeOffForm implements OnInit {
   }
 
   isLeaveTypeUnavailable(type: LeaveType): boolean {
-    return type.serviceYearEligible === false || (type.available !== undefined && type.available <= 0);
+    return (
+      type.serviceYearEligible === false || (type.available !== undefined && type.available <= 0)
+    );
   }
 
   getLeaveTypeAvailabilityLabel(type: LeaveType): string {
@@ -642,9 +644,8 @@ export class TimeOffForm implements OnInit {
     if (type.serviceYearEligible === false) {
       return `${type.label} (${this.getServiceYearRequirementLabel(type)}${careerLimit ? ` • ${careerLimit}` : ''})`;
     }
-    const availability = type.available === undefined
-      ? type.label
-      : `${type.label} (ใช้ได้ ${type.available} วัน)`;
+    const availability =
+      type.available === undefined ? type.label : `${type.label} (ใช้ได้ ${type.available} วัน)`;
     return careerLimit ? `${availability} • ${careerLimit}` : availability;
   }
 
