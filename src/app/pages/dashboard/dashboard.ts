@@ -462,7 +462,6 @@ export class DashboardComponent implements OnInit {
 
   ngOnInit() {
     this.performanceList = this.dashboardService.getPerformanceList();
-    this.getTeamCalendar();
 
     this.loadInitialData().subscribe({
       next: ([
