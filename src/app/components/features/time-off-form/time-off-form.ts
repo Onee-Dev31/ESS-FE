@@ -23,6 +23,17 @@ import {
 import { DateUtilityService } from '../../../services/date-utility.service';
 import { DialogService } from '../../../services/dialog';
 import { STORAGE_KEYS } from '../../../constants/storage.constants';
+import { FULL_DAY_ONLY_LEAVE_CODES } from '../../../constants/time-off-duration.constant';
+import {
+  TIME_OFF_ATTACHMENT_ACCEPT,
+  TIME_OFF_ATTACHMENT_FILE_CONFIG,
+} from '../../../constants/time-off-attachment-file.constant';
+import { validateFiles } from '../../../utils/file-validation.util';
+import {
+  ApprovalStep,
+  ApprovalStepState,
+  ApprovalStepsComponent,
+} from '../../shared/approval-steps/approval-steps';
 import dayjs from 'dayjs';
 
 import {
@@ -34,20 +45,13 @@ import { NzDatePickerModule } from 'ng-zorro-antd/date-picker';
 import { NzTimePickerModule } from 'ng-zorro-antd/time-picker';
 import { NzSelectModule } from 'ng-zorro-antd/select';
 
-type ApprovalStepState = 'completed' | 'active' | 'pending' | 'rejected' | 'sendback' | 'cancelled';
-
-interface ApprovalStep {
-  label: string;
-  state: ApprovalStepState;
-  approverCode?: string;
-}
-
 @Component({
   selector: 'app-time-off-form',
   standalone: true,
   imports: [
     CommonModule,
     FormsModule,
+    ApprovalStepsComponent,
     FilePreviewModalComponent,
     NzDatePickerModule,
     NzTimePickerModule,
@@ -57,9 +61,11 @@ interface ApprovalStep {
   styleUrl: './time-off-form.scss',
 })
 export class TimeOffForm implements OnInit {
+  readonly attachmentAccept = TIME_OFF_ATTACHMENT_ACCEPT;
   private readonly breakMinutes = 60;
   private readonly shiftStartMinutes = signal(9 * 60);
   private readonly shiftEndMinutes = signal(18 * 60);
+  private readonly isNightShift = signal(false);
   private timeOffService = inject(TimeOffService);
   private toastService = inject(ToastService);
   private dateUtil = inject(DateUtilityService);
@@ -82,6 +88,8 @@ export class TimeOffForm implements OnInit {
   leavePeriod = signal<string>('full-day');
   shiftStartTime = signal<Date | null>(this.timeFromMinutes(9 * 60));
   shiftEndTime = signal<Date | null>(this.timeFromMinutes(18 * 60));
+  leaveDays = signal<number | null>(1);
+  leaveDaysInput = signal('1');
 
   startDatePickerValue = computed<Date | null>(() => this.toPickerDate(this.startDate()));
   endDatePickerValue = computed<Date | null>(() => this.toPickerDate(this.endDate()));
@@ -94,7 +102,7 @@ export class TimeOffForm implements OnInit {
       if (!startTime || !endTime) return 0.5;
 
       const requestStart = this.minutesFromTime(startTime);
-      const requestEnd = this.minutesFromTime(endTime);
+      const requestEnd = this.normalizeShiftMinute(this.minutesFromTime(endTime));
 
       if (calendarDays > 1) {
         const middleDays = Math.max(0, calendarDays - 2);
@@ -129,34 +137,72 @@ export class TimeOffForm implements OnInit {
     this.currentDate.set(this.dateUtil.formatDateToBE(dayjs().toISOString(), 'DD/MM/YYYY'));
     this.employeeId.set(this.getEmployeeCodeFromStorage());
 
-    // ✅ วันที่จาก selectedDate ถ้ามี
-    if (this.selectedDate?.trim()) {
-      this.startDate.set(this.selectedDate.trim());
-      this.endDate.set(this.selectedDate.trim());
-    } else {
-      this.resetDates();
-    }
+    this.setDatesBySelectedDate();
 
-    this.timeOffService.getQuotaRules().subscribe(({ master }) => {
-      this.zone.run(() => {
-        this.leaveTypes = master.map((type) => ({
-          id: String(type.leave_type_id),
-          code: type.leave_code,
-          label: type.leave_name_th,
-          icon: this.getLeaveTypeIcon(type.leave_code),
-          color: this.getLeaveTypeColor(type.leave_code),
-        }));
+    const employeeCode = this.getEmployeeCodeFromStorage();
+    this.timeOffService.getEmployeeLeaveSummary(employeeCode, dayjs().year()).subscribe({
+      next: (summary) => {
+        console.log('[getEmployeeLeaveSummary] Response', summary);
+        this.zone.run(() => {
+          this.leaveTypes = summary.map((type) => ({
+            id: String(type.leave_type_id),
+            code: type.leave_code,
+            label: type.leave_name_th,
+            icon: type.icon_name || this.getLeaveTypeIcon(),
+            color: type.color_hex || this.getLeaveTypeColor(type.leave_code),
+            available: Number.isFinite(type.available_days)
+              ? Number(type.available_days)
+              : undefined,
+            serviceYearEligible: !(
+              type.service_year_eligible === 0 || type.service_year_eligible === false
+            ),
+            minServiceYears: Number.isFinite(type.min_service_years)
+              ? Number(type.min_service_years)
+              : undefined,
+            maxTimesPerCareer: Number.isFinite(type.max_times_per_career)
+              ? Number(type.max_times_per_career)
+              : undefined,
+          }));
+          this.applyLatestEmployeeShift();
+          this.loadingTypes.set(false);
+          if (this.initialLeaveTypeId) {
+            const initialType = this.resolveInitialLeaveType(this.initialLeaveTypeId);
+            if (initialType) this.selectLeaveType(initialType.id);
+          }
+          if (this.request) {
+            this.populateRequest(this.request);
+          }
+
+          this.cdr.markForCheck();
+        });
+      },
+      error: () => {
         this.loadingTypes.set(false);
-        if (this.initialLeaveTypeId) {
-          this.selectLeaveType(this.initialLeaveTypeId);
-        }
-        if (this.request) {
-          this.populateRequest(this.request);
-        }
-
-        this.cdr.markForCheck();
-      });
+        this.toastService.error('ไม่สามารถโหลดประเภทการลาและสิทธิ์คงเหลือได้');
+      },
     });
+
+    if (!this.timeOffService.latestEmployeeShift()) {
+      const currentYear = dayjs().year();
+      if (employeeCode) {
+        this.timeOffService
+          .getLeaveRequests(currentYear, currentYear, employeeCode)
+          .subscribe(() => {
+            this.applyLatestEmployeeShift();
+            this.cdr.markForCheck();
+          });
+      }
+    }
+  }
+
+  private resolveInitialLeaveType(value: string): LeaveType | undefined {
+    const normalizedValue = value.trim().toLowerCase();
+    return this.leaveTypes.find(
+      (type) =>
+        type.id.toLowerCase() === normalizedValue ||
+        type.code?.toLowerCase() === normalizedValue ||
+        type.label.trim().toLowerCase() === normalizedValue,
+    );
   }
 
   ngOnChanges(changes: SimpleChanges) {
@@ -166,10 +212,11 @@ export class TimeOffForm implements OnInit {
   }
 
   private setDatesBySelectedDate() {
-    const d = this.selectedDate?.trim();
-    if (d) {
-      this.startDate.set(d);
-      this.endDate.set(d);
+    const selectedDate = dayjs(this.selectedDate?.trim());
+    if (selectedDate.isValid()) {
+      const date = selectedDate.format('YYYY-MM-DD');
+      this.startDate.set(date);
+      this.endDate.set(date);
     } else {
       this.resetDates(); // today
     }
@@ -199,8 +246,81 @@ export class TimeOffForm implements OnInit {
 
   selectLeaveType(id: string) {
     if (!this.isEditableRequest()) return;
+    const leaveType = this.leaveTypes.find((type) => type.id === id);
+    if (!leaveType || this.isLeaveTypeUnavailable(leaveType)) return;
     this.selectedLeaveType.set(id);
+    if (this.isFullDayOnlyLeaveType()) {
+      this.leavePeriod.set('full-day');
+      this.shiftStartTime.set(this.timeFromMinutes(this.shiftStartMinutes()));
+      this.shiftEndTime.set(this.timeFromMinutes(this.shiftEndMinutes()));
+      const currentDays = Number(this.leaveDays());
+      if (!Number.isInteger(currentDays)) this.setLeaveDays(Math.max(1, Math.floor(currentDays)));
+    }
+    this.onLeaveDaysChange(this.leaveDays());
     this.cdr.detectChanges();
+  }
+
+  isLeaveTypeUnavailable(type: LeaveType): boolean {
+    return (
+      type.serviceYearEligible === false || (type.available !== undefined && type.available <= 0)
+    );
+  }
+
+  getLeaveTypeAvailabilityLabel(type: LeaveType): string {
+    if (type.serviceYearEligible === false) return this.getServiceYearRequirementLabel(type);
+    return this.isLeaveTypeUnavailable(type) ? 'สิทธิ์หมด' : 'คลิกเพื่อเลือก';
+  }
+
+  private getServiceYearRequirementLabel(type: LeaveType): string {
+    return type.minServiceYears !== undefined
+      ? `อายุงานขั้นต่ำ ${type.minServiceYears} ปี`
+      : 'ไม่เข้าเงื่อนไขอายุงาน';
+  }
+
+  getSelectedLeaveTypeAvailableDays(): number | undefined {
+    return this.leaveTypes.find((type) => type.id === this.selectedLeaveType())?.available;
+  }
+
+  onLeaveDaysChange(value: number | null): void {
+    if (value === null || value === undefined || Number.isNaN(Number(value))) {
+      this.setLeaveDays(null);
+      return;
+    }
+
+    const availableDays = this.getSelectedLeaveTypeAvailableDays();
+    this.setLeaveDays(
+      availableDays !== undefined && Number(value) > availableDays ? availableDays : Number(value),
+    );
+  }
+
+  private setLeaveDays(value: number | null): void {
+    this.leaveDays.set(value);
+    this.leaveDaysInput.set(value === null ? '' : String(value));
+  }
+
+  onLeaveDaysInput(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const digitsAndDot = input.value.replace(/[^\d.]/g, '');
+    const [whole = '', ...decimalParts] = digitsAndDot.split('.');
+    const hasDot = !this.isFullDayOnlyLeaveType() && digitsAndDot.includes('.');
+    const decimal = decimalParts.join('').replace(/[^5]/g, '').slice(0, 1);
+    const sanitized = hasDot ? `${whole}.${decimal}` : whole;
+
+    input.value = sanitized;
+    this.leaveDaysInput.set(sanitized);
+    if (sanitized === '' || sanitized.endsWith('.')) return;
+
+    this.onLeaveDaysChange(Number(sanitized));
+
+    const currentValue = this.leaveDays();
+    if (currentValue !== null && Number(sanitized) !== currentValue) {
+      input.value = String(currentValue);
+    }
+  }
+
+  isFullDayOnlyLeaveType(): boolean {
+    const selectedCode = this.leaveTypes.find((type) => type.id === this.selectedLeaveType())?.code;
+    return selectedCode ? FULL_DAY_ONLY_LEAVE_CODES.has(selectedCode.toUpperCase()) : false;
   }
 
   onStartDateChange() {
@@ -268,15 +388,31 @@ export class TimeOffForm implements OnInit {
 
   onFileSelected(event: Event) {
     const input = event.target as HTMLInputElement;
-    if (input.files && input.files.length > 0) {
-      const currentAttachments = this.attachments();
-      const newAttachments = Array.from(input.files).map((file: File, index) => ({
+    if (input.files?.length) {
+      const { validFiles, errors } = validateFiles(
+        input.files,
+        TIME_OFF_ATTACHMENT_FILE_CONFIG,
+        this.attachments().length,
+      );
+
+      const newAttachments = validFiles.map((file, index) => ({
         id: Date.now() + index,
         name: file.name,
         description: '',
         file,
       }));
-      this.attachments.update((current) => [...current, ...newAttachments]);
+
+      if (newAttachments.length) {
+        this.attachments.update((current) => [...current, ...newAttachments]);
+      }
+      if (errors.length) {
+        void this.dialogService.alert({
+          title: 'ไฟล์ไม่ถูกต้อง',
+          message: errors.join('\n'),
+          confirmText: 'OK',
+          type: 'warning',
+        });
+      }
     }
     input.value = '';
   }
@@ -319,6 +455,21 @@ export class TimeOffForm implements OnInit {
       return;
     }
 
+    const leaveDays = Number(this.leaveDays());
+    if (!Number.isFinite(leaveDays) || leaveDays <= 0) {
+      this.toastService.warning('กรุณาระบุจำนวนวันลาให้มากกว่า 0');
+      return;
+    }
+    if (this.isFullDayOnlyLeaveType() && !Number.isInteger(leaveDays)) {
+      this.toastService.warning('ประเภทการลานี้ระบุได้เฉพาะจำนวนวันเต็ม');
+      return;
+    }
+    const availableDays = this.getSelectedLeaveTypeAvailableDays();
+    if (availableDays !== undefined && leaveDays > availableDays) {
+      this.toastService.warning(`จำนวนวันลาต้องไม่เกินสิทธิ์ที่ใช้ได้ ${availableDays} วัน`);
+      return;
+    }
+
     const startTime = this.shiftStartTime();
     const endTime = this.shiftEndTime();
     if (!startTime || !endTime) {
@@ -327,6 +478,7 @@ export class TimeOffForm implements OnInit {
     }
     if (
       this.startDate() === this.endDate() &&
+      !this.isNightShift() &&
       endTime.getHours() * 60 + endTime.getMinutes() <=
         startTime.getHours() * 60 + startTime.getMinutes()
     ) {
@@ -354,7 +506,7 @@ export class TimeOffForm implements OnInit {
         : 'ส่งใบลา';
     const confirmed = await this.dialogService.confirm({
       title: `ยืนยันการ${actionLabel}`,
-      message: `${this.getSelectedLeaveTypeLabel()} • ${this.formatThaiDate(this.startDate())} - ${this.formatThaiDate(this.endDate())} • ${this.calculatedDays()} วัน`,
+      message: `${this.getSelectedLeaveTypeLabel()} • ${this.formatThaiDate(this.startDate())} - ${this.formatThaiDate(this.endDate())} • ${leaveDays} วัน`,
       confirmText: isResubmit
         ? 'ยืนยันส่งอีกครั้ง'
         : isExistingRequest
@@ -368,22 +520,25 @@ export class TimeOffForm implements OnInit {
 
     const startDate = this.toApiDateTime(this.startDate(), this.shiftStartTime());
     const endDate = this.toApiDateTime(this.endDate(), this.shiftEndTime());
-    const isHalfDay = this.calculatedDays() % 1 === 0.5;
+    const isHalfDay = !this.isFullDayOnlyLeaveType() && leaveDays % 1 === 0.5;
+    const newAttachments = this.attachments().filter(
+      (attachment): attachment is typeof attachment & { file: File } =>
+        attachment.file instanceof File,
+    );
     const payload: SaveLeaveRequestPayload = {
       action: this.isSendbackStatus() ? 'Resubmit' : 'Upsert',
       request_id: Number(this.requestId()) || 0,
       leave_type_id: Number(this.selectedLeaveType()),
       start_date: startDate,
       end_date: endDate,
-      total_days: this.calculatedDays(),
+      total_days: leaveDays,
       year: dayjs(this.startDate()).year(),
       reason: this.reason(),
       is_half_day: isHalfDay,
       half_day_period: isHalfDay ? this.getHalfDayPeriod() : 'FULL',
       delete_file_ids: this.deletedFileIds().length ? this.deletedFileIds() : undefined,
-      files: this.attachments()
-        .map((attachment) => attachment.file)
-        .filter((file): file is File => file instanceof File),
+      files: newAttachments.map((attachment) => attachment.file),
+      file_remarks: newAttachments.map((attachment) => attachment.description.trim()),
       request_by: employeeCode,
     };
 
@@ -446,6 +601,8 @@ export class TimeOffForm implements OnInit {
         label: 'ผู้อนุมัติคนที่ 1',
         state: firstApproverState,
         approverCode: request?.approver1_code || undefined,
+        actionReason:
+          request?.approver1_comment?.trim() || request?.approver1_reason?.trim() || undefined,
       },
     ];
 
@@ -453,6 +610,8 @@ export class TimeOffForm implements OnInit {
       steps.push({
         label: 'ผู้อนุมัติคนที่ 2',
         approverCode: request?.approver2_code || undefined,
+        actionReason:
+          request?.approver2_comment?.trim() || request?.approver2_reason?.trim() || undefined,
         state: isCancelled
           ? 'pending'
           : isComplete
@@ -480,6 +639,35 @@ export class TimeOffForm implements OnInit {
     return this.leaveTypes.find((type) => type.id === this.selectedLeaveType())?.label ?? '-';
   }
 
+  getLeaveTypeOptionLabel(type: LeaveType): string {
+    const careerLimit = this.getCareerLimitLabel(type);
+    if (type.serviceYearEligible === false) {
+      return `${type.label} (${this.getServiceYearRequirementLabel(type)}${careerLimit ? ` • ${careerLimit}` : ''})`;
+    }
+    const availability =
+      type.available === undefined ? type.label : `${type.label} (ใช้ได้ ${type.available} วัน)`;
+    return careerLimit ? `${availability} • ${careerLimit}` : availability;
+  }
+
+  getLeaveTypeOptionStatus(type: LeaveType): string {
+    const careerLimit = this.getCareerLimitLabel(type);
+    const status =
+      type.serviceYearEligible === false
+        ? this.getServiceYearRequirementLabel(type)
+        : this.isLeaveTypeUnavailable(type)
+          ? 'สิทธิ์หมด'
+          : type.available === undefined
+            ? 'เลือกได้'
+            : `เลือกได้ • ใช้ได้ ${type.available} วัน`;
+    return careerLimit ? `${status} • ${careerLimit}` : status;
+  }
+
+  getCareerLimitLabel(type: LeaveType): string {
+    return type.maxTimesPerCareer !== undefined
+      ? `${type.maxTimesPerCareer} ครั้งตลอดการทำงาน`
+      : '';
+  }
+
   formatTimeValue(value: Date | null): string {
     if (!value || Number.isNaN(value.getTime())) return '-';
     const hours = String(value.getHours()).padStart(2, '0');
@@ -505,8 +693,12 @@ export class TimeOffForm implements OnInit {
     this.requestId.set(String(request.request_id ?? 0));
     this.selectedLeaveType.set(String(request.leave_type_id ?? ''));
     this.reason.set(request.reason ?? '');
+    this.setLeaveDays(
+      Number.isFinite(request.days) && Number(request.days) > 0 ? Number(request.days) : 1,
+    );
     this.startDate.set(request.startDate.slice(0, 10));
     this.endDate.set(request.endDate.slice(0, 10));
+    this.applyEmployeeShift(request);
     this.shiftStartTime.set(this.timeFromApiDate(request.startDate));
     this.shiftEndTime.set(this.timeFromApiDate(request.endDate));
     this.attachments.set(
@@ -527,6 +719,46 @@ export class TimeOffForm implements OnInit {
           ? 'afternoon'
           : 'full-day',
     );
+  }
+
+  private applyEmployeeShift(request: TimeOffRequest): void {
+    this.applyShiftTimes(
+      request.employee?.start_time ?? request.shiftStartTime,
+      request.employee?.end_time ?? request.shiftEndTime,
+      request.employee?.is_night_shift ?? request.isNightShift ?? false,
+    );
+  }
+
+  private applyLatestEmployeeShift(): void {
+    const shift = this.timeOffService.latestEmployeeShift();
+    if (!shift) return;
+    this.applyShiftTimes(shift.startTime, shift.endTime, shift.isNightShift);
+  }
+
+  private applyShiftTimes(startTime?: string, endTime?: string, isNightShift = false): void {
+    const shiftStart = this.minutesFromClock(startTime);
+    const shiftEnd = this.minutesFromClock(endTime);
+    if (shiftStart === null || shiftEnd === null) return;
+
+    this.isNightShift.set(isNightShift);
+    this.shiftStartMinutes.set(shiftStart);
+    this.shiftEndMinutes.set(
+      isNightShift && shiftEnd <= shiftStart ? shiftEnd + 24 * 60 : shiftEnd,
+    );
+
+    if (!this.request) {
+      this.shiftStartTime.set(this.timeFromMinutes(shiftStart));
+      this.shiftEndTime.set(this.timeFromMinutes(shiftEnd));
+    }
+  }
+
+  private minutesFromClock(value?: string): number | null {
+    const match = value?.match(/^(\d{1,2}):(\d{2})/);
+    if (!match) return null;
+
+    const hours = Number(match[1]);
+    const minutes = Number(match[2]);
+    return hours <= 23 && minutes <= 59 ? hours * 60 + minutes : null;
   }
 
   private timeFromApiDate(value: string): Date {
@@ -557,6 +789,10 @@ export class TimeOffForm implements OnInit {
     return time.getHours() * 60 + time.getMinutes();
   }
 
+  private normalizeShiftMinute(minutes: number): number {
+    return this.isNightShift() && minutes < this.shiftStartMinutes() ? minutes + 24 * 60 : minutes;
+  }
+
   private timeFromMinutes(totalMinutes: number): Date {
     return new Date(1970, 0, 1, Math.floor(totalMinutes / 60), totalMinutes % 60);
   }
@@ -564,17 +800,13 @@ export class TimeOffForm implements OnInit {
   private getHalfDayPeriod(): '1ST' | '2ND' {
     const endTime = this.shiftEndTime();
     const secondHalfStart = this.getFirstHalfEndMinutes() + this.breakMinutes;
-    return endTime && this.minutesFromTime(endTime) <= secondHalfStart ? '1ST' : '2ND';
+    return endTime && this.normalizeShiftMinute(this.minutesFromTime(endTime)) <= secondHalfStart
+      ? '1ST'
+      : '2ND';
   }
 
-  private getLeaveTypeIcon(code: string): string {
-    const icons: Record<string, string> = {
-      ANNUAL: 'fas fa-plane-departure',
-      SICK: 'fas fa-stethoscope',
-      PERSONAL: 'fas fa-briefcase',
-      FUNERAL: 'fas fa-ribbon',
-    };
-    return icons[code] ?? 'fas fa-calendar-day';
+  private getLeaveTypeIcon(): string {
+    return 'fas fa-calendar-day';
   }
 
   private getLeaveTypeColor(code: string): string {

@@ -387,12 +387,14 @@ export class DashboardComponent implements OnInit {
     if (arg.view.type === 'dayGridMonth' && !arg.dayEl.classList.contains('fc-day')) return;
 
     this.zone.run(() => {
-      const dateStr = dayjs(arg.date).format('YYYY-MM-DD');
+      // Use FullCalendar's date-only value to avoid a timezone shift from Date conversion.
+      const dateStr = arg.dateStr.slice(0, 10);
 
       // ✅ ถ้าวันหยุด/เสาร์อาทิตย์ แล้วไม่อยากให้เปิดฟอร์ม ก็ใส่เงื่อนไขได้
       // if (this.holidayMap?.[dateStr]) return;
 
       this.selectedDate.set(dateStr);
+      this.selectedLeaveTypeId.set('ลาพักร้อน');
       this.selectedRequestStatus.set('NEW'); // หรือค่า default ที่คุณใช้
       this.isFormOpen.set(true);
 
@@ -460,7 +462,6 @@ export class DashboardComponent implements OnInit {
 
   ngOnInit() {
     this.performanceList = this.dashboardService.getPerformanceList();
-    this.getTeamCalendar();
 
     this.loadInitialData().subscribe({
       next: ([
@@ -741,10 +742,7 @@ export class DashboardComponent implements OnInit {
   }
 
   openTimeOffForm(leaveLabel: string) {
-    const mapping = BUSINESS_CONFIG.LEAVE_TYPE_MAP;
-
-    const typeId = mapping[leaveLabel] || '';
-    this.selectedLeaveTypeId.set(typeId);
+    this.selectedLeaveTypeId.set(leaveLabel);
     this.isTimeOffModalOpen.set(true);
   }
 
@@ -788,5 +786,7 @@ export class DashboardComponent implements OnInit {
 
   closeForm() {
     this.isFormOpen.set(false);
+    this.selectedDate.set('');
+    this.selectedLeaveTypeId.set('');
   }
 }

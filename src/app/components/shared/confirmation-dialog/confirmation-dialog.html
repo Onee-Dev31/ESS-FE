@@ -7,17 +7,19 @@
 
       <div class="dialog-content">
         <h3 class="dialog-title">{{ dialog.title }}</h3>
-        <p class="dialog-message" [innerHTML]="dialog.message"></p>
+        <p class="dialog-message">{{ dialog.message }}</p>
       </div>
 
       <div class="dialog-actions">
-        <button class="btn-cancel" (click)="cancel()">
-          {{ dialog.cancelText }}
-        </button>
+        @if (dialog.showCancel) {
+          <button class="btn-cancel" (click)="cancel()">
+            {{ dialog.cancelText }}
+          </button>
+        }
         <button
           class="btn-confirm"
           [class.btn-danger]="dialog.type === 'danger'"
-          [class.btn-warning]="dialog.type === 'warning'"
+          [class.btn-warning]="dialog.type === 'warning' && dialog.showCancel"
           (click)="confirm()"
         >
           {{ dialog.confirmText }}

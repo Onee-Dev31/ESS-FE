@@ -92,7 +92,10 @@
       <div class="card-list-view">
         @if (isLoading()) {
         } @else {
-          @for (request of comps.paginatedData(); track request.id) {
+          @for (
+            request of comps.paginatedData();
+            track request.request_id ? 'request-' + request.request_id : 'row-' + $index
+          ) {
             @let statusMeta = getStatusMeta(request.status);
             <div class="mobile-card">
               <div class="card-header">
@@ -204,7 +207,10 @@
                 <th class="actions-column">ดำเนินการ</th>
               </tr>
             </thead>
-            @for (request of comps.paginatedData(); track request.id) {
+            @for (
+              request of comps.paginatedData();
+              track request.request_id ? 'request-' + request.request_id : 'row-' + $index
+            ) {
               @let statusMeta = getStatusMeta(request.status);
               <tbody>
                 <tr>
@@ -226,7 +232,10 @@
                   </td>
                   <td>
                     <div class="leave-type-cell">
-                      <i [class]="getLeaveTypeIcon(request.leaveType)"></i>
+                      <i
+                        [class]="request.leaveType_icon"
+                        [style.color]="request.leaveType_color"
+                      ></i>
                       <div>
                         <span>{{ request.leaveType }}</span>
                         <small>
