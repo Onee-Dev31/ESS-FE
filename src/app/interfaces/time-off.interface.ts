@@ -1,5 +1,46 @@
 import { Requester } from './core.interface';
 
+export interface TimeOffEmployee {
+  employee_code: string;
+  employee_first_name: string;
+  employee_last_name: string;
+  employee_nickname: string;
+  job_grade: string;
+  start_work_date: string;
+  service_year: number;
+  shift_code: string;
+  start_time: string;
+  end_time: string;
+  is_night_shift: boolean;
+}
+
+export interface EmployeeLeaveQuota {
+  leave_type_id: number;
+  leave_code: string;
+  leave_name_th: string;
+  leave_name_en: string;
+  job_grade: number;
+  service_year: number;
+  rule_id: number;
+  jobclass_min: number;
+  jobclass_max: number;
+  service_year_min: number;
+  service_year_max: number | null;
+  quota_total_days: number;
+  quota_used_days: number;
+  quota_remaining_days: number;
+  quota_max_times: number | null;
+  quota_used_times: number;
+  quota_remaining_times: number | null;
+  max_days_per_event: number | null;
+  min_half_day: boolean;
+  is_paid: boolean;
+  paid_days_limit: number | null;
+  advance_notice_days: number;
+  require_medical_cert: boolean;
+  medical_cert_after_days: number | null;
+}
+
 export interface TimeOffRequest {
   id: string;
   request_id?: number;
@@ -26,6 +67,9 @@ export interface TimeOffRequest {
   leavePeriod?: string;
   shiftStartTime?: string;
   shiftEndTime?: string;
+  isNightShift?: boolean;
+  employee?: TimeOffEmployee;
+  quotas?: EmployeeLeaveQuota[];
   approver1_code?: string | null;
   approver1_action?: string | null;
   approver1_comment?: string | null;
@@ -134,6 +178,31 @@ export interface LeaveTypeMaster {
   leave_code: string;
   leave_name_th: string;
   leave_name_en: string;
+}
+
+export interface EmployeeLeaveSummary {
+  leave_type_id: number;
+  leave_code: string;
+  leave_name_th: string;
+  leave_name_en: string;
+  quota_type: string;
+  icon_name: string;
+  color_hex: string;
+  is_paid: boolean;
+  paid_days_limit: number | null;
+  carry_forward: boolean;
+  advance_notice_days: number;
+  require_medical_cert: boolean;
+  medical_cert_after_days: number | null;
+  include_holiday: boolean;
+  min_service_years: number | null;
+  gender_restriction: string | null;
+  max_times_per_year: number | null;
+  quota_days: number | null;
+  used_days: number | null;
+  remaining_days: number | null;
+  once_career_used: boolean | null;
+  service_year_eligible: number | boolean;
 }
 
 export interface LeaveQuotaData {

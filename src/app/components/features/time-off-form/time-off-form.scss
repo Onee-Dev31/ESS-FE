@@ -725,6 +725,19 @@ textarea.custom-form-control {
       font-weight: 800;
       text-align: right;
     }
+
+    input.leave-days-value {
+      width: 76px;
+      padding: 5px 8px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: var(--bg-card);
+
+      &:focus {
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary) 12%, transparent);
+      }
+    }
   }
 }
 
