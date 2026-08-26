@@ -153,6 +153,15 @@ export class TimeOffForm implements OnInit {
             available: Number.isFinite(type.available_days)
               ? Number(type.available_days)
               : undefined,
+            serviceYearEligible: !(
+              type.service_year_eligible === 0 || type.service_year_eligible === false
+            ),
+            minServiceYears: Number.isFinite(type.min_service_years)
+              ? Number(type.min_service_years)
+              : undefined,
+            maxTimesPerCareer: Number.isFinite(type.max_times_per_career)
+              ? Number(type.max_times_per_career)
+              : undefined,
           }));
           this.applyLatestEmployeeShift();
           this.loadingTypes.set(false);
@@ -252,7 +261,18 @@ export class TimeOffForm implements OnInit {
   }
 
   isLeaveTypeUnavailable(type: LeaveType): boolean {
-    return type.available !== undefined && type.available <= 0;
+    return type.serviceYearEligible === false || (type.available !== undefined && type.available <= 0);
+  }
+
+  getLeaveTypeAvailabilityLabel(type: LeaveType): string {
+    if (type.serviceYearEligible === false) return this.getServiceYearRequirementLabel(type);
+    return this.isLeaveTypeUnavailable(type) ? 'สิทธิ์หมด' : 'คลิกเพื่อเลือก';
+  }
+
+  private getServiceYearRequirementLabel(type: LeaveType): string {
+    return type.minServiceYears !== undefined
+      ? `อายุงานขั้นต่ำ ${type.minServiceYears} ปี`
+      : 'ไม่เข้าเงื่อนไขอายุงาน';
   }
 
   getSelectedLeaveTypeAvailableDays(): number | undefined {
@@ -618,9 +638,33 @@ export class TimeOffForm implements OnInit {
   }
 
   getLeaveTypeOptionLabel(type: LeaveType): string {
-    return type.available === undefined
+    const careerLimit = this.getCareerLimitLabel(type);
+    if (type.serviceYearEligible === false) {
+      return `${type.label} (${this.getServiceYearRequirementLabel(type)}${careerLimit ? ` • ${careerLimit}` : ''})`;
+    }
+    const availability = type.available === undefined
       ? type.label
       : `${type.label} (ใช้ได้ ${type.available} วัน)`;
+    return careerLimit ? `${availability} • ${careerLimit}` : availability;
+  }
+
+  getLeaveTypeOptionStatus(type: LeaveType): string {
+    const careerLimit = this.getCareerLimitLabel(type);
+    const status =
+      type.serviceYearEligible === false
+        ? this.getServiceYearRequirementLabel(type)
+        : this.isLeaveTypeUnavailable(type)
+          ? 'สิทธิ์หมด'
+          : type.available === undefined
+            ? 'เลือกได้'
+            : `เลือกได้ • ใช้ได้ ${type.available} วัน`;
+    return careerLimit ? `${status} • ${careerLimit}` : status;
+  }
+
+  getCareerLimitLabel(type: LeaveType): string {
+    return type.maxTimesPerCareer !== undefined
+      ? `${type.maxTimesPerCareer} ครั้งตลอดการทำงาน`
+      : '';
   }
 
   formatTimeValue(value: Date | null): string {

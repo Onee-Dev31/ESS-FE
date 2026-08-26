@@ -200,6 +200,7 @@ export interface EmployeeLeaveSummary {
   min_service_years: number | null;
   gender_restriction: string | null;
   max_times_per_year: number | null;
+  max_times_per_career: number | null;
   quota_days: number | null;
   used_days: number | null;
   reserved_days: number | null;
@@ -234,5 +235,8 @@ export interface LeaveType {
   color: string;
   remaining?: number;
   available?: number;
+  serviceYearEligible?: boolean;
+  minServiceYears?: number;
+  maxTimesPerCareer?: number;
   code?: string;
 }
