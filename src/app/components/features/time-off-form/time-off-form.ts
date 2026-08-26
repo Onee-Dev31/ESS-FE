@@ -133,16 +133,11 @@ export class TimeOffForm implements OnInit {
     this.currentDate.set(this.dateUtil.formatDateToBE(dayjs().toISOString(), 'DD/MM/YYYY'));
     this.employeeId.set(this.getEmployeeCodeFromStorage());
 
-    // ✅ วันที่จาก selectedDate ถ้ามี
-    if (this.selectedDate?.trim()) {
-      this.startDate.set(this.selectedDate.trim());
-      this.endDate.set(this.selectedDate.trim());
-    } else {
-      this.resetDates();
-    }
+    this.setDatesBySelectedDate();
 
     this.timeOffService.getQuotaRules().subscribe(({ master }) => {
       this.zone.run(() => {
+        console.log('[getQuotaRules] Response', master);
         this.leaveTypes = master.map((type) => ({
           id: String(type.leave_type_id),
           code: type.leave_code,
@@ -152,7 +147,8 @@ export class TimeOffForm implements OnInit {
         }));
         this.loadingTypes.set(false);
         if (this.initialLeaveTypeId) {
-          this.selectLeaveType(this.initialLeaveTypeId);
+          const initialType = this.resolveInitialLeaveType(this.initialLeaveTypeId);
+          if (initialType) this.selectLeaveType(initialType.id);
         }
         if (this.request) {
           this.populateRequest(this.request);
@@ -163,6 +159,16 @@ export class TimeOffForm implements OnInit {
     });
   }
 
+  private resolveInitialLeaveType(value: string): LeaveType | undefined {
+    const normalizedValue = value.trim().toLowerCase();
+    return this.leaveTypes.find(
+      (type) =>
+        type.id.toLowerCase() === normalizedValue ||
+        type.code?.toLowerCase() === normalizedValue ||
+        type.label.trim().toLowerCase() === normalizedValue,
+    );
+  }
+
   ngOnChanges(changes: SimpleChanges) {
     if (changes['selectedDate']) {
       this.setDatesBySelectedDate();
@@ -170,10 +176,11 @@ export class TimeOffForm implements OnInit {
   }
 
   private setDatesBySelectedDate() {
-    const d = this.selectedDate?.trim();
-    if (d) {
-      this.startDate.set(d);
-      this.endDate.set(d);
+    const selectedDate = dayjs(this.selectedDate?.trim());
+    if (selectedDate.isValid()) {
+      const date = selectedDate.format('YYYY-MM-DD');
+      this.startDate.set(date);
+      this.endDate.set(date);
     } else {
       this.resetDates(); // today
     }

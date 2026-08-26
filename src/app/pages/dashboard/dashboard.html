@@ -542,6 +542,7 @@
       @defer {
         <app-time-off-form
           [selectedDate]="selectedDate()"
+          [initialLeaveTypeId]="selectedLeaveTypeId()"
           [requestStatus]="selectedRequestStatus()"
           (onClose)="closeForm()"
         >
