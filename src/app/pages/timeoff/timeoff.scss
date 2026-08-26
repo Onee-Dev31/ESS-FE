@@ -441,6 +441,12 @@ $status-cancelled-text: var(--text-table-head);
         font-size: 1rem;
       }
 
+      .leave-type-api-icon {
+        flex: 0 0 auto;
+        color: $primary;
+        font-size: 1.25rem;
+      }
+
       span,
       small {
         display: block;

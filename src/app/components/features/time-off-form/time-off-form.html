@@ -68,7 +68,13 @@
             <div class="leave-body">
               <div class="leave-header">
                 <div class="leave-icon">
-                  <i [class]="type.icon" [style.color]="type.color"></i>
+                  @if (isFontAwesomeIcon(type.icon)) {
+                    <i [class]="type.icon" [style.color]="type.color"></i>
+                  } @else {
+                    <span class="material-symbols-outlined" [style.color]="type.color">
+                      {{ type.icon }}
+                    </span>
+                  }
                 </div>
               </div>
               <div class="info-col">

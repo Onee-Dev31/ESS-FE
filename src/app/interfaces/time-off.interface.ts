@@ -52,6 +52,8 @@ export interface TimeOffRequest {
   employee_code?: string;
   leaveType: string;
   leave_type_id?: number;
+  leaveType_icon?: string;
+  leaveType_color?: string;
   startDate: string;
   endDate: string;
   reason: string;

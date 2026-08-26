@@ -361,7 +361,8 @@
           border-radius: 9px;
           transition: all 0.25s ease;
 
-          i {
+          i,
+          .material-symbols-outlined {
             font-size: $font-size-body;
           }
         }

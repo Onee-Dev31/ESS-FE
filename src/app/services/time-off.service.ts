@@ -229,6 +229,9 @@ export class TimeOffService {
       employee_code: String(row['employee_code'] ?? ''),
       leaveType: String(row['leave_name_th'] ?? row['leaveType'] ?? row['leave_type_name'] ?? ''),
       leave_type_id: Number(row['leave_type_id'] ?? 0),
+      leaveType_color:
+        String(row['leaveType_color'] ?? row['color_hex'] ?? '').trim() || undefined,
+      leaveType_icon: String(row['leaveType_icon'] ?? row['icon_name'] ?? '').trim() || undefined,
       startDate: String(row['start_date'] ?? row['startDate'] ?? ''),
       endDate: String(row['end_date'] ?? row['endDate'] ?? ''),
       reason: String(row['reason'] ?? ''),
@@ -251,21 +254,22 @@ export class TimeOffService {
       ),
       shiftEndTime: String(employee['end_time'] ?? row['end_time'] ?? row['shiftEndTime'] ?? ''),
       isNightShift: Boolean(employee['is_night_shift'] ?? row['is_night_shift'] ?? false),
-      employee: row['employee'] || responseEmployee
-        ? {
-            employee_code: String(employee['employee_code'] ?? ''),
-            employee_first_name: String(employee['employee_first_name'] ?? ''),
-            employee_last_name: String(employee['employee_last_name'] ?? ''),
-            employee_nickname: String(employee['employee_nickname'] ?? ''),
-            job_grade: String(employee['job_grade'] ?? ''),
-            start_work_date: String(employee['start_work_date'] ?? ''),
-            service_year: Number(employee['service_year'] ?? 0),
-            shift_code: String(employee['shift_code'] ?? ''),
-            start_time: String(employee['start_time'] ?? ''),
-            end_time: String(employee['end_time'] ?? ''),
-            is_night_shift: Boolean(employee['is_night_shift'] ?? false),
-          }
-        : undefined,
+      employee:
+        row['employee'] || responseEmployee
+          ? {
+              employee_code: String(employee['employee_code'] ?? ''),
+              employee_first_name: String(employee['employee_first_name'] ?? ''),
+              employee_last_name: String(employee['employee_last_name'] ?? ''),
+              employee_nickname: String(employee['employee_nickname'] ?? ''),
+              job_grade: String(employee['job_grade'] ?? ''),
+              start_work_date: String(employee['start_work_date'] ?? ''),
+              service_year: Number(employee['service_year'] ?? 0),
+              shift_code: String(employee['shift_code'] ?? ''),
+              start_time: String(employee['start_time'] ?? ''),
+              end_time: String(employee['end_time'] ?? ''),
+              is_night_shift: Boolean(employee['is_night_shift'] ?? false),
+            }
+          : undefined,
       quotas: responseQuotas,
       approver1_code: String(row['approver1_code'] ?? '') || null,
       approver1_action: String(row['approver1_action'] ?? '') || null,

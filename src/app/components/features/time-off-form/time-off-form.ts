@@ -142,27 +142,28 @@ export class TimeOffForm implements OnInit {
     const employeeCode = this.getEmployeeCodeFromStorage();
     this.timeOffService.getEmployeeLeaveSummary(employeeCode, dayjs().year()).subscribe({
       next: (summary) => {
-      this.zone.run(() => {
-        this.leaveTypes = summary.map((type) => ({
-          id: String(type.leave_type_id),
-          code: type.leave_code,
-          label: type.leave_name_th,
-          icon: this.getLeaveTypeIcon(type.leave_code),
-          color: type.color_hex || this.getLeaveTypeColor(type.leave_code),
-        }));
-        this.applyRemainingQuotas(this.timeOffService.latestEmployeeQuotas());
-        this.applyLatestEmployeeShift();
-        this.loadingTypes.set(false);
-        if (this.initialLeaveTypeId) {
-          const initialType = this.resolveInitialLeaveType(this.initialLeaveTypeId);
-          if (initialType) this.selectLeaveType(initialType.id);
-        }
-        if (this.request) {
-          this.populateRequest(this.request);
-        }
+        console.log('[getEmployeeLeaveSummary] Response', summary);
+        this.zone.run(() => {
+          this.leaveTypes = summary.map((type) => ({
+            id: String(type.leave_type_id),
+            code: type.leave_code,
+            label: type.leave_name_th,
+            icon: type.icon_name || this.getLeaveTypeIcon(type.leave_code),
+            color: type.color_hex || this.getLeaveTypeColor(type.leave_code),
+          }));
+          this.applyRemainingQuotas(this.timeOffService.latestEmployeeQuotas());
+          this.applyLatestEmployeeShift();
+          this.loadingTypes.set(false);
+          if (this.initialLeaveTypeId) {
+            const initialType = this.resolveInitialLeaveType(this.initialLeaveTypeId);
+            if (initialType) this.selectLeaveType(initialType.id);
+          }
+          if (this.request) {
+            this.populateRequest(this.request);
+          }
 
-        this.cdr.markForCheck();
-      });
+          this.cdr.markForCheck();
+        });
       },
       error: () => {
         this.loadingTypes.set(false);
@@ -173,11 +174,13 @@ export class TimeOffForm implements OnInit {
     if (!this.timeOffService.latestEmployeeShift()) {
       const currentYear = dayjs().year();
       if (employeeCode) {
-        this.timeOffService.getLeaveRequests(currentYear, currentYear, employeeCode).subscribe(() => {
-          this.applyRemainingQuotas(this.timeOffService.latestEmployeeQuotas());
-          this.applyLatestEmployeeShift();
-          this.cdr.markForCheck();
-        });
+        this.timeOffService
+          .getLeaveRequests(currentYear, currentYear, employeeCode)
+          .subscribe(() => {
+            this.applyRemainingQuotas(this.timeOffService.latestEmployeeQuotas());
+            this.applyLatestEmployeeShift();
+            this.cdr.markForCheck();
+          });
       }
     }
   }
@@ -260,9 +263,7 @@ export class TimeOffForm implements OnInit {
   }
 
   isFullDayOnlyLeaveType(): boolean {
-    const selectedCode = this.leaveTypes.find(
-      (type) => type.id === this.selectedLeaveType(),
-    )?.code;
+    const selectedCode = this.leaveTypes.find((type) => type.id === this.selectedLeaveType())?.code;
     return selectedCode ? FULL_DAY_ONLY_LEAVE_CODES.has(selectedCode.toUpperCase()) : false;
   }
 
@@ -583,6 +584,10 @@ export class TimeOffForm implements OnInit {
       : `${type.label} (คงเหลือ ${type.remaining} วัน)`;
   }
 
+  isFontAwesomeIcon(icon: string): boolean {
+    return /(^|\s)fa[srbl]?($|\s)/.test(icon);
+  }
+
   formatTimeValue(value: Date | null): string {
     if (!value || Number.isNaN(value.getTime())) return '-';
     const hours = String(value.getHours()).padStart(2, '0');
@@ -608,7 +613,9 @@ export class TimeOffForm implements OnInit {
     this.requestId.set(String(request.request_id ?? 0));
     this.selectedLeaveType.set(String(request.leave_type_id ?? ''));
     this.reason.set(request.reason ?? '');
-    this.leaveDays.set(Number.isFinite(request.days) && Number(request.days) > 0 ? Number(request.days) : 1);
+    this.leaveDays.set(
+      Number.isFinite(request.days) && Number(request.days) > 0 ? Number(request.days) : 1,
+    );
     this.startDate.set(request.startDate.slice(0, 10));
     this.endDate.set(request.endDate.slice(0, 10));
     this.applyEmployeeShift(request);
@@ -655,7 +662,9 @@ export class TimeOffForm implements OnInit {
 
     this.isNightShift.set(isNightShift);
     this.shiftStartMinutes.set(shiftStart);
-    this.shiftEndMinutes.set(isNightShift && shiftEnd <= shiftStart ? shiftEnd + 24 * 60 : shiftEnd);
+    this.shiftEndMinutes.set(
+      isNightShift && shiftEnd <= shiftStart ? shiftEnd + 24 * 60 : shiftEnd,
+    );
 
     if (!this.request) {
       this.shiftStartTime.set(this.timeFromMinutes(shiftStart));

@@ -232,7 +232,19 @@
                   </td>
                   <td>
                     <div class="leave-type-cell">
-                      <i [class]="getLeaveTypeIcon(request.leaveType)"></i>
+                      @if (request.leaveType_icon) {
+                        <span
+                          class="material-symbols-outlined leave-type-api-icon"
+                          [style.color]="request.leaveType_color || null"
+                        >
+                          {{ request.leaveType_icon }}
+                        </span>
+                      } @else {
+                        <i
+                          [class]="getLeaveTypeIcon(request.leaveType)"
+                          [style.color]="request.leaveType_color || null"
+                        ></i>
+                      }
                       <div>
                         <span>{{ request.leaveType }}</span>
                         <small>
