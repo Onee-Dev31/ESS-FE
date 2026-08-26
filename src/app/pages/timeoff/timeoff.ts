@@ -406,17 +406,6 @@ export class TimeoffComponent implements OnInit {
     return request.startDate === request.endDate;
   }
 
-  getLeaveTypeIcon(leaveType: string): string {
-    const iconMap: { [key: string]: string } = {
-      ลาพักร้อน: 'fas fa-plane-departure',
-      ลากิจ: 'fas fa-briefcase',
-      ลาป่วย: 'fas fa-stethoscope',
-      ลาทำหมัน: 'fas fa-user-md',
-      ลาเพื่อจัดการงานศพ: 'fas fa-ribbon',
-    };
-    return iconMap[leaveType] || 'fas fa-calendar';
-  }
-
   getPeriodLabel(period: string | undefined): string {
     if (!period) return '';
     const periodMap: Record<string, string> = {

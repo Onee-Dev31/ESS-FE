@@ -349,8 +349,8 @@
                         </h3>
                         <div class="leave-icon">
                           <i
-                            [class]="leave.iconClass"
-                            [style.color]="leave.iconColor || '#888'"
+                            [class]="leave.icon_name || leave.iconClass"
+                            [style.color]="leave.color_hex || leave.iconColor || '#888'"
                           ></i>
                         </div>
                       </div>

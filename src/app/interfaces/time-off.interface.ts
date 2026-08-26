@@ -202,7 +202,10 @@ export interface EmployeeLeaveSummary {
   max_times_per_year: number | null;
   quota_days: number | null;
   used_days: number | null;
+  reserved_days: number | null;
+  committed_days: number | null;
   remaining_days: number | null;
+  available_days: number | null;
   once_career_used: boolean | null;
   service_year_eligible: number | boolean;
 }
@@ -230,5 +233,6 @@ export interface LeaveType {
   icon: string;
   color: string;
   remaining?: number;
+  available?: number;
   code?: string;
 }

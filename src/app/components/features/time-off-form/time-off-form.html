@@ -48,6 +48,7 @@
                   *ngFor="let type of leaveTypes"
                   [nzValue]="type.id"
                   [nzLabel]="getLeaveTypeOptionLabel(type)"
+                  [nzDisabled]="isLeaveTypeUnavailable(type)"
                 />
               </nz-select>
             } @else {
@@ -63,24 +64,20 @@
             *ngFor="let type of leaveTypes"
             [title]="type.label"
             [class.active]="selectedLeaveType() === type.id"
+            [class.disabled]="isLeaveTypeUnavailable(type)"
+            [attr.aria-disabled]="isLeaveTypeUnavailable(type)"
             (click)="selectLeaveType(type.id)"
           >
             <div class="leave-body">
               <div class="leave-header">
                 <div class="leave-icon">
-                  @if (isFontAwesomeIcon(type.icon)) {
-                    <i [class]="type.icon" [style.color]="type.color"></i>
-                  } @else {
-                    <span class="material-symbols-outlined" [style.color]="type.color">
-                      {{ type.icon }}
-                    </span>
-                  }
+                  <i [class]="type.icon" [style.color]="type.color"></i>
                 </div>
               </div>
               <div class="info-col">
                 <p class="leave-label">{{ type.label }}</p>
-                @if (type.remaining !== undefined) {
-                  <div class="leave-remaining">คงเหลือ: {{ type.remaining }} วัน</div>
+                @if (type.available !== undefined) {
+                  <div class="leave-remaining">ใช้ได้: {{ type.available }} วัน</div>
                 }
               </div>
             </div>
@@ -89,7 +86,7 @@
               [style.background-color]="type.color + '15'"
               [style.color]="type.color"
             >
-              <span>คลิกเพื่อเลือก</span>
+              <span>{{ isLeaveTypeUnavailable(type) ? 'สิทธิ์หมด' : 'คลิกเพื่อเลือก' }}</span>
               <i class="fas fa-check-circle" *ngIf="selectedLeaveType() === type.id"></i>
             </div>
           </div>
@@ -229,12 +226,11 @@
             <div class="leave-days-total">
               @if (isEditableRequest()) {
                 <input
-                  type="number"
+                  type="text"
+                  inputmode="decimal"
                   class="leave-days-value"
-                  [min]="isFullDayOnlyLeaveType() ? 1 : 0.5"
-                  [step]="isFullDayOnlyLeaveType() ? 1 : 0.5"
-                  [ngModel]="leaveDays()"
-                  (ngModelChange)="leaveDays.set($event)"
+                  [value]="leaveDaysInput()"
+                  (input)="onLeaveDaysInput($event)"
                 />
               } @else {
                 <strong class="leave-days-value readonly-days-value">{{ leaveDays() }}</strong>

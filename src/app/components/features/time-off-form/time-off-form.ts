@@ -17,7 +17,6 @@ import { ToastService } from '../../../services/toast';
 import { TimeOffService } from '../../../services/time-off.service';
 import {
   LeaveType,
-  EmployeeLeaveQuota,
   SaveLeaveRequestPayload,
   TimeOffRequest,
 } from '../../../interfaces/time-off.interface';
@@ -90,6 +89,7 @@ export class TimeOffForm implements OnInit {
   shiftStartTime = signal<Date | null>(this.timeFromMinutes(9 * 60));
   shiftEndTime = signal<Date | null>(this.timeFromMinutes(18 * 60));
   leaveDays = signal<number | null>(1);
+  leaveDaysInput = signal('1');
 
   startDatePickerValue = computed<Date | null>(() => this.toPickerDate(this.startDate()));
   endDatePickerValue = computed<Date | null>(() => this.toPickerDate(this.endDate()));
@@ -148,10 +148,12 @@ export class TimeOffForm implements OnInit {
             id: String(type.leave_type_id),
             code: type.leave_code,
             label: type.leave_name_th,
-            icon: type.icon_name || this.getLeaveTypeIcon(type.leave_code),
+            icon: type.icon_name || this.getLeaveTypeIcon(),
             color: type.color_hex || this.getLeaveTypeColor(type.leave_code),
+            available: Number.isFinite(type.available_days)
+              ? Number(type.available_days)
+              : undefined,
           }));
-          this.applyRemainingQuotas(this.timeOffService.latestEmployeeQuotas());
           this.applyLatestEmployeeShift();
           this.loadingTypes.set(false);
           if (this.initialLeaveTypeId) {
@@ -177,27 +179,11 @@ export class TimeOffForm implements OnInit {
         this.timeOffService
           .getLeaveRequests(currentYear, currentYear, employeeCode)
           .subscribe(() => {
-            this.applyRemainingQuotas(this.timeOffService.latestEmployeeQuotas());
             this.applyLatestEmployeeShift();
             this.cdr.markForCheck();
           });
       }
     }
-  }
-
-  private applyRemainingQuotas(quotas: EmployeeLeaveQuota[]): void {
-    if (!this.leaveTypes.length) return;
-
-    const remainingByLeaveType = new Map<string, number>();
-    quotas.forEach((quota) => {
-      if (Number.isFinite(quota.quota_remaining_days)) {
-        remainingByLeaveType.set(String(quota.leave_type_id), quota.quota_remaining_days);
-      }
-    });
-    this.leaveTypes = this.leaveTypes.map((type) => ({
-      ...type,
-      remaining: remainingByLeaveType.get(type.id),
-    }));
   }
 
   private resolveInitialLeaveType(value: string): LeaveType | undefined {
@@ -251,15 +237,63 @@ export class TimeOffForm implements OnInit {
 
   selectLeaveType(id: string) {
     if (!this.isEditableRequest()) return;
+    const leaveType = this.leaveTypes.find((type) => type.id === id);
+    if (!leaveType || this.isLeaveTypeUnavailable(leaveType)) return;
     this.selectedLeaveType.set(id);
     if (this.isFullDayOnlyLeaveType()) {
       this.leavePeriod.set('full-day');
       this.shiftStartTime.set(this.timeFromMinutes(this.shiftStartMinutes()));
       this.shiftEndTime.set(this.timeFromMinutes(this.shiftEndMinutes()));
       const currentDays = Number(this.leaveDays());
-      if (!Number.isInteger(currentDays)) this.leaveDays.set(Math.max(1, Math.ceil(currentDays)));
+      if (!Number.isInteger(currentDays)) this.setLeaveDays(Math.max(1, Math.floor(currentDays)));
     }
+    this.onLeaveDaysChange(this.leaveDays());
     this.cdr.detectChanges();
+  }
+
+  isLeaveTypeUnavailable(type: LeaveType): boolean {
+    return type.available !== undefined && type.available <= 0;
+  }
+
+  getSelectedLeaveTypeAvailableDays(): number | undefined {
+    return this.leaveTypes.find((type) => type.id === this.selectedLeaveType())?.available;
+  }
+
+  onLeaveDaysChange(value: number | null): void {
+    if (value === null || value === undefined || Number.isNaN(Number(value))) {
+      this.setLeaveDays(null);
+      return;
+    }
+
+    const availableDays = this.getSelectedLeaveTypeAvailableDays();
+    this.setLeaveDays(
+      availableDays !== undefined && Number(value) > availableDays ? availableDays : Number(value),
+    );
+  }
+
+  private setLeaveDays(value: number | null): void {
+    this.leaveDays.set(value);
+    this.leaveDaysInput.set(value === null ? '' : String(value));
+  }
+
+  onLeaveDaysInput(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const digitsAndDot = input.value.replace(/[^\d.]/g, '');
+    const [whole = '', ...decimalParts] = digitsAndDot.split('.');
+    const hasDot = !this.isFullDayOnlyLeaveType() && digitsAndDot.includes('.');
+    const decimal = decimalParts.join('').replace(/[^5]/g, '').slice(0, 1);
+    const sanitized = hasDot ? `${whole}.${decimal}` : whole;
+
+    input.value = sanitized;
+    this.leaveDaysInput.set(sanitized);
+    if (sanitized === '' || sanitized.endsWith('.')) return;
+
+    this.onLeaveDaysChange(Number(sanitized));
+
+    const currentValue = this.leaveDays();
+    if (currentValue !== null && Number(sanitized) !== currentValue) {
+      input.value = String(currentValue);
+    }
   }
 
   isFullDayOnlyLeaveType(): boolean {
@@ -406,6 +440,11 @@ export class TimeOffForm implements OnInit {
     }
     if (this.isFullDayOnlyLeaveType() && !Number.isInteger(leaveDays)) {
       this.toastService.warning('ประเภทการลานี้ระบุได้เฉพาะจำนวนวันเต็ม');
+      return;
+    }
+    const availableDays = this.getSelectedLeaveTypeAvailableDays();
+    if (availableDays !== undefined && leaveDays > availableDays) {
+      this.toastService.warning(`จำนวนวันลาต้องไม่เกินสิทธิ์ที่ใช้ได้ ${availableDays} วัน`);
       return;
     }
 
@@ -579,13 +618,9 @@ export class TimeOffForm implements OnInit {
   }
 
   getLeaveTypeOptionLabel(type: LeaveType): string {
-    return type.remaining === undefined
+    return type.available === undefined
       ? type.label
-      : `${type.label} (คงเหลือ ${type.remaining} วัน)`;
-  }
-
-  isFontAwesomeIcon(icon: string): boolean {
-    return /(^|\s)fa[srbl]?($|\s)/.test(icon);
+      : `${type.label} (ใช้ได้ ${type.available} วัน)`;
   }
 
   formatTimeValue(value: Date | null): string {
@@ -613,7 +648,7 @@ export class TimeOffForm implements OnInit {
     this.requestId.set(String(request.request_id ?? 0));
     this.selectedLeaveType.set(String(request.leave_type_id ?? ''));
     this.reason.set(request.reason ?? '');
-    this.leaveDays.set(
+    this.setLeaveDays(
       Number.isFinite(request.days) && Number(request.days) > 0 ? Number(request.days) : 1,
     );
     this.startDate.set(request.startDate.slice(0, 10));
@@ -725,14 +760,8 @@ export class TimeOffForm implements OnInit {
       : '2ND';
   }
 
-  private getLeaveTypeIcon(code: string): string {
-    const icons: Record<string, string> = {
-      ANNUAL: 'fas fa-plane-departure',
-      SICK: 'fas fa-stethoscope',
-      PERSONAL: 'fas fa-briefcase',
-      FUNERAL: 'fas fa-ribbon',
-    };
-    return icons[code] ?? 'fas fa-calendar-day';
+  private getLeaveTypeIcon(): string {
+    return 'fas fa-calendar-day';
   }
 
   private getLeaveTypeColor(code: string): string {

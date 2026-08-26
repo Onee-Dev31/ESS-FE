@@ -328,6 +328,18 @@
       }
     }
 
+    &.disabled {
+      cursor: not-allowed;
+      opacity: 0.5;
+      filter: grayscale(0.35);
+
+      &:hover {
+        transform: none;
+        border-color: var(--border);
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
+      }
+    }
+
     &.active {
       border: 2px solid var(--primary);
       background: var(--status-new-bg);
@@ -728,7 +740,7 @@ textarea.custom-form-control {
     }
 
     input.leave-days-value {
-      width: 76px;
+      width: 100px;
       padding: 5px 8px;
       border: 1px solid var(--border);
       border-radius: 8px;
