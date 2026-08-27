@@ -317,7 +317,7 @@ export class DashboardIT implements OnInit {
   @ViewChild(TicketChatComponent) ticketChat?: TicketChatComponent;
 
   filter = {
-    dateRange: [dayjs().subtract(3, 'month').toDate(), dayjs().toDate()] as [Date, Date] | null,
+    dateRange: [dayjs().startOf('year').toDate(), dayjs().toDate()] as [Date, Date] | null,
   };
 
   @ViewChild('ticketList') ticketList!: ElementRef;
