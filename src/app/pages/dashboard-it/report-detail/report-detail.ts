@@ -346,6 +346,8 @@ export class ReportDetail {
     assignees?: any,
     comment?: any,
     attachments?: any[],
+    repairCostType?: string,
+    reason?: string,
   ) {
     const formData = new FormData();
 
@@ -358,6 +360,10 @@ export class ReportDetail {
 
     if (command === 'onhold') {
       formData.append('itResult', 'Hold');
+    }
+
+    if ((command === 'onhold' || command === 'assign') && reason) {
+      formData.append('reason', reason);
     }
 
     if (command === 'close') {
@@ -373,8 +379,12 @@ export class ReportDetail {
       formData.append('assignJson', JSON.stringify(assignees));
     }
 
-    if (command === 'acknowledge') {
+    if (command === 'acknowledge' || (command === 'assign' && comment)) {
       formData.append('comment', comment);
+    }
+
+    if ((command === 'acknowledge' || command === 'assign') && repairCostType) {
+      formData.append('repairCostType', repairCostType);
     }
 
     if (command === 'acknowledge' || command === 'assign') {
@@ -413,17 +423,25 @@ export class ReportDetail {
       return;
     }
 
-    if (!data?.ticketTypeId?.tag) {
+    if (!data?.ticketTypeId) {
       this.swalService.warning('กรุณาเลือกประเภท Ticket');
       return;
     }
 
-    const tag = data.ticketTypeId.tag;
+    const tag = data.ticketTypeId;
 
     this.swalService.loading('กำลังบันทึกข้อมูล...');
     this.IS_ACKNOWLEDGE_TICKET.set(false);
 
-    this.updateTicket('acknowledge', ticketId, tag, null, null).subscribe({
+    this.updateTicket(
+      'acknowledge',
+      ticketId,
+      tag,
+      null,
+      data.message,
+      data.attachments,
+      data.repairCostType,
+    ).subscribe({
       next: (res) => {
         if (!res?.success) {
           this.swalService.warning('ไม่สามารถบันทึกข้อมูลได้');
@@ -449,8 +467,10 @@ export class ReportDetail {
   // -- deny --
 
   onHoldTicket() {
-    this.swalService.confirm('ยืนยันการหยุดชั่วคราว (On Hold)').then((result) => {
+    this.swalService.promptReason('ยืนยันการหยุดชั่วคราว (On Hold)').then((result) => {
       if (!result.isConfirmed) return;
+
+      const reason = result.value?.trim() || undefined;
 
       const ticket = this.selectedTicket();
       const ticketId = ticket?.ticketId;
@@ -462,7 +482,16 @@ export class ReportDetail {
 
       this.swalService.loading('กำลังบันทึกข้อมูล...');
 
-      this.updateTicket('onhold', ticketId, '', null, null).subscribe({
+      this.updateTicket(
+        'onhold',
+        ticketId,
+        '',
+        null,
+        null,
+        undefined,
+        undefined,
+        reason,
+      ).subscribe({
         next: (res) => {
           if (!res?.success) {
             this.swalService.warning('ไม่สามารถบันทึกข้อมูลได้');
@@ -599,7 +628,16 @@ export class ReportDetail {
     this.swalService.loading('กำลังบันทึกข้อมูล...');
     this.IS_ASSIGN_TICKET.set(false);
 
-    this.updateTicket('assign', ticketId, typeTicket, assignees).subscribe({
+    this.updateTicket(
+      'assign',
+      ticketId,
+      typeTicket,
+      assignees,
+      data.message,
+      data.attachments,
+      data.repairCostType,
+      data.reason,
+    ).subscribe({
       next: (res) => {
         console.log('[submitAssign] next res:', res);
 

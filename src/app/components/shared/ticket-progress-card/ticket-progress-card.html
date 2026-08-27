@@ -53,6 +53,12 @@
                   {{ step.createdDate | date: 'EEE dd - HH:mm' : '' : 'en' }}
                 }
               </small>
+              @if (step.reason?.trim()) {
+                <div class="timeline-reason">
+                  <i class="fa-regular fa-comment-dots" aria-hidden="true"></i>
+                  {{ step.reason }}
+                </div>
+              }
             </div>
             @if (step.Assignee?.length) {
               <div class="timeline-assignee">

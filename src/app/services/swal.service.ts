@@ -60,6 +60,24 @@ export class SwalService {
     });
   }
 
+  promptReason(title: string) {
+    return Swal.fire({
+      icon: 'question',
+      title,
+      input: 'textarea',
+      inputLabel: 'เหตุผล',
+      inputPlaceholder: 'กรุณากรอกเหตุผล...',
+      inputAttributes: {
+        'aria-label': 'เหตุผล',
+      },
+      showCancelButton: true,
+      confirmButtonText: 'ตกลง',
+      cancelButtonText: 'ยกเลิก',
+      confirmButtonColor: '#6366f1',
+      cancelButtonColor: '#9ca3af',
+    });
+  }
+
   loading(title: string = 'กำลังดำเนินการ...', text?: string) {
     Swal.fire({
       title,

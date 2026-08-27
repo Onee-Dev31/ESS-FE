@@ -17,20 +17,66 @@
 
         <div class="tag-group">
           <label class="tag">
-            <input type="radio" name="tag" [value]="2" [(ngModel)]="selectedTag" />
+            <input type="radio" name="tag" [value]="2" [(ngModel)]="selectedTag" (ngModelChange)="onTagChange()" />
             <span>แจ้งปัญหา</span>
           </label>
 
           <label class="tag">
-            <input type="radio" name="tag" [value]="1" [(ngModel)]="selectedTag" />
+            <input type="radio" name="tag" [value]="1" [(ngModel)]="selectedTag" (ngModelChange)="onTagChange()" />
             <span>แจ้งซ่อม</span>
           </label>
 
           <label class="tag">
-            <input type="radio" name="tag" [value]="3" [(ngModel)]="selectedTag" />
+            <input type="radio" name="tag" [value]="3" [(ngModel)]="selectedTag" (ngModelChange)="onTagChange()" />
             <span>ขอใช้บริการ</span>
           </label>
         </div>
+      </div>
+      @if (isChangedToRepair) {
+        <div class="repair-details">
+          <p>ประเภทค่าใช้จ่าย<span class="required">*</span></p>
+          <div class="tag-group">
+            <label class="tag">
+              <input type="radio" name="repairCost" value="paid" [(ngModel)]="repairCostType" />
+              <span>ขออนุมัติ Budget ต้นสังกัด</span>
+            </label>
+            <label class="tag">
+              <input type="radio" name="repairCost" value="free" [(ngModel)]="repairCostType" />
+              <span>ดำเนินการตามปกติ</span>
+            </label>
+          </div>
+
+          <textarea name="message" class="form-input note" placeholder="อธิบายรายละเอียด..." [(ngModel)]="message"></textarea>
+
+          <input type="file" multiple hidden #fileInput [accept]="'.' + FILE_CONFIG.allowedExtensions.join(',.')" (change)="onFileSelected($event)" />
+          <button type="button" class="attach-btn" (click)="fileInput.click()">
+            <i class="fas fa-paperclip"></i> แนบไฟล์
+          </button>
+
+          @if (repairCostType === 'paid' && attachments.length === 0) {
+            <p class="attachment-warning"><i class="fas fa-exclamation-circle"></i> กรุณาแนบไฟล์ใบเสนอราคา / เอกสารประกอบการขออนุมัติ Budget</p>
+          }
+          @if (attachments.length > 0) {
+            <div class="file-chips">
+              @for (file of attachments; track file.name; let i = $index) {
+                <div class="file-chip" (click)="viewFile(file)">
+                  <i class="far fa-file"></i><span class="file-name">{{ file.name }}</span>
+                  <button type="button" class="chip-remove" (click)="removeAttachment(i); $event.stopPropagation()"><i class="fas fa-times"></i></button>
+                </div>
+              }
+            </div>
+          }
+        </div>
+      }
+      <div class="assign-reason">
+        <label for="assignReason">เหตุผล <span class="optional-label">(ไม่บังคับ)</span></label>
+        <textarea
+          id="assignReason"
+          name="reason"
+          class="form-input note"
+          placeholder="กรอกเหตุผลในการส่งต่อ..."
+          [(ngModel)]="reason"
+        ></textarea>
       </div>
       <div class="form-field search">
         <input
@@ -108,7 +154,7 @@
           <button
             nz-button
             class="btn-save-custom"
-            [disabled]="selectedAssigneeEmpCodes.length === 0 || selectedTag === null"
+            [disabled]="selectedAssigneeEmpCodes.length === 0 || selectedTag === null || (isChangedToRepair && (!repairCostType || !message.trim() || (repairCostType === 'paid' && attachments.length === 0)))"
             (click)="save()"
           >
             <i class="fas fa-paper-plane"></i>
@@ -123,3 +169,7 @@
     </div>
   </div>
 </div>
+
+@if (isPreviewModalOpen()) {
+  <app-file-preview-modal [files]="previewFiles()" (onClose)="isPreviewModalOpen.set(false)" />
+}

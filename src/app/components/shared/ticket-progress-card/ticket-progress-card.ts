@@ -27,5 +27,6 @@ export class TicketProgressCardComponent {
 
   selectAssignee(assignee: any): void {
     this.selectedAssignee.set(assignee);
+    console.log('Selected Assignee:', assignee);
   }
 }
