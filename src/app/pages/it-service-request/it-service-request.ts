@@ -41,7 +41,6 @@ import { PageLoaderComponent } from '../../components/shared/page-loader/page-lo
   imports: [
     CommonModule,
     FormsModule,
-    PageHeaderComponent,
     NzSelectModule,
     ExampleServiceRequestModal,
     FilePreviewModalComponent,

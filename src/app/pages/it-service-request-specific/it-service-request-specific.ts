@@ -94,7 +94,7 @@ interface SpecificPersonRequest {
 @Component({
   selector: 'app-it-service-request',
   standalone: true,
-  imports: [CommonModule, FormsModule, PageHeaderComponent, NzSelectModule, PageLoaderComponent],
+  imports: [CommonModule, FormsModule, NzSelectModule, PageLoaderComponent],
   templateUrl: './it-service-request-specific.html',
   styleUrl: './it-service-request-specific.scss',
 })

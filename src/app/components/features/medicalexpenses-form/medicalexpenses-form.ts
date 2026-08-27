@@ -33,6 +33,7 @@ import { formatMoneyInput } from '../../../utils/formatText';
 import { SwalService } from '../../../services/swal.service';
 import { NzDatePickerModule } from 'ng-zorro-antd/date-picker';
 import { SkeletonComponent } from '../../shared/skeleton/skeleton';
+import { CdkScrollable } from '@angular/cdk/scrolling';
 
 @Component({
   selector: 'app-medicalexpenses-form',
@@ -43,6 +44,7 @@ import { SkeletonComponent } from '../../shared/skeleton/skeleton';
     FilePreviewModalComponent,
     NzDatePickerModule,
     SkeletonComponent,
+    CdkScrollable,
   ],
   templateUrl: './medicalexpenses-form.html',
   styleUrl: './medicalexpenses-form.scss',

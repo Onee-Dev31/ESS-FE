@@ -354,10 +354,7 @@ export class ResignManagement {
     );
 
     if (hasInvalidDateRange) {
-      this.swalService.warning(
-        'แจ้งเตือน',
-        'Last Date ต้องน้อยกว่าหรือเท่ากับ Effective Date',
-      );
+      this.swalService.warning('แจ้งเตือน', 'Last Date ต้องน้อยกว่าหรือเท่ากับ Effective Date');
       return;
     }
 
