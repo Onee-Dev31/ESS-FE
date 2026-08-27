@@ -42,7 +42,7 @@ import {
 import dayjs from 'dayjs';
 import { ItProblemReportComponent } from '../it-problem-report/it-problem-report';
 import { ItRepairRequestComponent } from '../it-repair-request/it-repair-request';
-import { ITServiceRequestComponent } from '../it-service-request/it-service-request';
+import { ITServiceRequestCombinedComponent } from '../it-service-request-combined/it-service-request-combined';
 import { SwalService } from '../../services/swal.service';
 import { tickets } from '../../utils/it-dashboard-mock';
 import { AcknowledgeModal } from './modal/acknowledge-modal/acknowledge-modal';
@@ -86,7 +86,7 @@ import { PageLoaderComponent } from '../../components/shared/page-loader/page-lo
     FilePreviewModalComponent,
     ItProblemReportComponent,
     ItRepairRequestComponent,
-    ITServiceRequestComponent,
+    ITServiceRequestCombinedComponent,
     AcknowledgeModal,
     DenyModal,
     AssignModal,

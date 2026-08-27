@@ -657,6 +657,8 @@ export class ITServiceRequestComponent implements OnInit {
           : 'false',
     ); //it เปิดให้ตัวเอง ?
 
+    console.log('IsSelfRequestByIT >', this.openBy, '>', this.authService.userData().DEPARTMENT);
+
     selectedServices.forEach((service) => {
       formData.append('serviceTypeIds', service.id.toString());
     });
