@@ -27,7 +27,12 @@
         [disabled]="!hasMessage || isSubmitting()"
         (click)="submit()"
       >
-        <i class="fa-solid" [class.fa-spinner]="isSubmitting()" [class.fa-spin]="isSubmitting()" [class.fa-paper-plane]="!isSubmitting()"></i>
+        <i
+          class="fa-solid"
+          [class.fa-spinner]="isSubmitting()"
+          [class.fa-spin]="isSubmitting()"
+          [class.fa-paper-plane]="!isSubmitting()"
+        ></i>
         {{ isSubmitting() ? 'กำลังเตรียมรูปภาพ...' : 'ส่งข้อความ' }}
       </button>
     </footer>

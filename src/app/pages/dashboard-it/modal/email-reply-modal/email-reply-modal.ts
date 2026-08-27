@@ -21,7 +21,11 @@ export class EmailReplyModal {
 
   get hasMessage(): boolean {
     const html = this.message ?? '';
-    const hasText = html.replace(/<[^>]*>/g, '').replace(/&nbsp;/g, ' ').trim().length > 0;
+    const hasText =
+      html
+        .replace(/<[^>]*>/g, '')
+        .replace(/&nbsp;/g, ' ')
+        .trim().length > 0;
     const hasImage = /<img\b[^>]*>/i.test(html);
 
     return hasText || hasImage;
