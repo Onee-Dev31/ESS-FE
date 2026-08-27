@@ -682,7 +682,7 @@ export class DashboardComponent implements OnInit {
   }
 
   getItAssetByAduser(adUser: string) {
-    return this.itAssetService.GetItAssetByAD('SNIPE-IT', adUser);
+    return this.itAssetService.getEmployeeAssets(adUser);
   }
 
   getOneeuserByAduser(adUser: string) {
@@ -721,7 +721,7 @@ export class DashboardComponent implements OnInit {
   }
 
   mapItStory() {
-    const assets = this.itAsset().data.rows || [];
+    const assets = this.itAsset().data || [];
     const user = this.oneeUser() || [];
     const map = [
       {
@@ -733,8 +733,8 @@ export class DashboardComponent implements OnInit {
         value: user.PasswordExpirationDate,
       },
       ...assets.map((item: any) => ({
-        label: item.category.name,
-        value: item.model.name,
+        label: item.Category,
+        value: item.Model,
       })),
     ];
 
