@@ -41,7 +41,7 @@ export class LayoutComponent implements OnInit {
 
     if (this.lastIsSmallScreen === null) {
       if (isSmallScreen) {
-        this.sidebarService.setCollapsed(true);
+        this.sidebarService.setCollapsed(false);
       }
       this.lastIsSmallScreen = isSmallScreen;
       return;
