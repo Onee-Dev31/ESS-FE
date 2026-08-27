@@ -333,7 +333,35 @@ export class ResignManagement {
   }
 
   confirm() {
-    const result = Object.values(this.activeDates)
+    const activeDateValues = Object.values(this.activeDates);
+    const hasIncompleteDates = activeDateValues.some(
+      (item) => (item.lastDate && !item.effectiveDate) || (!item.lastDate && item.effectiveDate),
+    );
+
+    if (hasIncompleteDates) {
+      this.swalService.warning(
+        'แจ้งเตือน',
+        'กรุณาระบุ Last Date และ Effective Date ให้ครบทั้งสองช่อง',
+      );
+      return;
+    }
+
+    const hasInvalidDateRange = activeDateValues.some(
+      (item) =>
+        item.lastDate &&
+        item.effectiveDate &&
+        dayjs(item.lastDate).isAfter(dayjs(item.effectiveDate), 'day'),
+    );
+
+    if (hasInvalidDateRange) {
+      this.swalService.warning(
+        'แจ้งเตือน',
+        'Last Date ต้องน้อยกว่าหรือเท่ากับ Effective Date',
+      );
+      return;
+    }
+
+    const result = activeDateValues
       .filter((v) => v.lastDate && v.effectiveDate)
       .map((v) => ({
         empCode: v.empCode,
