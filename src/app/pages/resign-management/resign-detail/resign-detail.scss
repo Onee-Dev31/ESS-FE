@@ -921,7 +921,11 @@ $border: var(--border);
           }
 
           &.ant-select:not(.ant-select-disabled):hover .ant-select-selector {
-            border-color: color-mix(in srgb, var(--primary) 55%, var(--border-table-head)) !important;
+            border-color: color-mix(
+              in srgb,
+              var(--primary) 55%,
+              var(--border-table-head)
+            ) !important;
           }
 
           &.ant-select-focused:not(.ant-select-disabled) .ant-select-selector {

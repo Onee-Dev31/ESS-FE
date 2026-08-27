@@ -482,36 +482,29 @@ export class ReportDetail {
 
       this.swalService.loading('กำลังบันทึกข้อมูล...');
 
-      this.updateTicket(
-        'onhold',
-        ticketId,
-        '',
-        null,
-        null,
-        undefined,
-        undefined,
-        reason,
-      ).subscribe({
-        next: (res) => {
-          if (!res?.success) {
-            this.swalService.warning('ไม่สามารถบันทึกข้อมูลได้');
-            return;
-          }
+      this.updateTicket('onhold', ticketId, '', null, null, undefined, undefined, reason).subscribe(
+        {
+          next: (res) => {
+            if (!res?.success) {
+              this.swalService.warning('ไม่สามารถบันทึกข้อมูลได้');
+              return;
+            }
 
-          this.swalService.success(res.message || 'บันทึกสำเร็จ');
+            this.swalService.success(res.message || 'บันทึกสำเร็จ');
 
-          this.selectTicket();
+            this.selectTicket();
+          },
+
+          error: (error) => {
+            console.error('Acknowledge Ticket Error:', error);
+
+            this.swalService.warning(
+              'เกิดข้อผิดพลาด',
+              error?.message || 'ไม่สามารถติดต่อเซิร์ฟเวอร์ได้',
+            );
+          },
         },
-
-        error: (error) => {
-          console.error('Acknowledge Ticket Error:', error);
-
-          this.swalService.warning(
-            'เกิดข้อผิดพลาด',
-            error?.message || 'ไม่สามารถติดต่อเซิร์ฟเวอร์ได้',
-          );
-        },
-      });
+      );
     });
   }
   resumeTicket() {

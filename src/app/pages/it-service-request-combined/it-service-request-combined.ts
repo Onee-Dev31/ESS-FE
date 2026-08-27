@@ -102,7 +102,10 @@ export class ITServiceRequestCombinedComponent {
     if (!url.searchParams.has('tab')) return;
 
     url.searchParams.delete('tab');
-    window.history.replaceState(window.history.state, '', `${url.pathname}${url.search}${url.hash}`);
+    window.history.replaceState(
+      window.history.state,
+      '',
+      `${url.pathname}${url.search}${url.hash}`,
+    );
   }
-
 }
