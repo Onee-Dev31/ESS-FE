@@ -741,13 +741,13 @@ export class ItDashboardSummary {
     this.filter = {
       ...this.filter,
       status: status,
-      dateRange: [dayjs().subtract(3, 'month').toDate(), dayjs().toDate()] as [Date, Date] | null,
+      dateRange: [dayjs().startOf('year').toDate(), dayjs().endOf('year').toDate()] as [Date, Date] | null,
     };
 
     this.filterOriginal = {
       ...this.filterOriginal,
       status: status,
-      dateRange: [dayjs().subtract(3, 'month').toDate(), dayjs().toDate()] as [Date, Date] | null,
+      dateRange: [dayjs().startOf('year').toDate(), dayjs().endOf('year').toDate()] as [Date, Date] | null,
     };
     this.loadTickets();
   }
