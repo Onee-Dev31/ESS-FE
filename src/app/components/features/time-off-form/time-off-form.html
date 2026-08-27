@@ -6,7 +6,7 @@
     </div>
   </header>
 
-  <fieldset class="form-content-fieldset" [disabled]="!isEditableRequest()">
+  <fieldset class="form-content-fieldset" cdkScrollable [disabled]="!isEditableRequest()">
     <main class="content-card">
       <div class="request-meta-strip" [class.has-request]="request?.leave_number">
         <div class="meta-item">

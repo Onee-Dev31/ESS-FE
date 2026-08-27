@@ -17,6 +17,16 @@
 
   @if (ticket.assignTimeline?.length) {
     <div class="timeline">
+      @if (showWaitingItTemplate && ticket.assignTimeline.length === 1) {
+        <div class="timeline-item timeline-item--waiting-it">
+          <div class="timeline-icon active"></div>
+          <div class="timeline-content">
+            <div class="timeline-title">
+              {{ +ticket.ticketTypeId === 3 ? 'รอการอนุมัติ' : 'รอ IT รับเรื่อง' }}<br />
+            </div>
+          </div>
+        </div>
+      }
       @for (
         step of ticket.assignTimeline.slice().reverse();
         track step.step + '|' + step.createdDate;

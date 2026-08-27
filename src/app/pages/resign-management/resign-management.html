@@ -131,6 +131,7 @@
                         nzDropdownClassName="custom-picker-popup"
                         [ngModel]="activeDates[emp.empCode]?.lastDate"
                         (ngModelChange)="setDate(emp, 'lastDate', $event)"
+                        [nzDisabledDate]="disableLastDate(emp.empCode)"
                         required
                       >
                       </nz-date-picker>
@@ -149,6 +150,8 @@
                         nzDropdownClassName="custom-picker-popup"
                         [ngModel]="activeDates[emp.empCode]?.effectiveDate"
                         (ngModelChange)="setDate(emp, 'effectiveDate', $event)"
+                        [nzDisabledDate]="disableEffectiveDate(emp.empCode)"
+                        [nzDefaultPickerValue]="activeDates[emp.empCode]?.lastDate ?? null"
                         required
                       >
                       </nz-date-picker>

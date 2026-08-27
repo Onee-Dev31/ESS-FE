@@ -420,6 +420,13 @@ export class ItServiceService {
     return this._http.post(`${this.baseUrl}/tickets/${id}/replies`, formData);
   }
 
+  replyTicketEmail(
+    id: string | number,
+    payload: { message: string; replyAll: boolean; executedBy: string },
+  ): Observable<any> {
+    return this._http.post(`${this.baseUrl}/tickets/${id}/reply-email`, payload);
+  }
+
   getDetailFromJobsByApplicant(id: string): Observable<any> {
     // return of({ success: true }).pipe(delay(1500));
     const token = this.authservice.allData().accessToken;

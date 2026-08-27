@@ -1,6 +1,6 @@
 import { CommonModule, NgComponentOutlet } from '@angular/common';
 import { isPlatformBrowser } from '@angular/common';
-import { Component, computed, inject, PLATFORM_ID, signal, Type } from '@angular/core';
+import { Component, computed, inject, Input, PLATFORM_ID, signal, Type } from '@angular/core';
 import { PageHeaderComponent } from '../../components/shared/page-header/page-header';
 import { SwalService } from '../../services/swal.service';
 import { ITServiceRequestComponent } from '../it-service-request/it-service-request';
@@ -24,6 +24,8 @@ interface RequestTabItem {
   styleUrl: './it-service-request-combined.scss',
 })
 export class ITServiceRequestCombinedComponent {
+  @Input() openBy = '';
+
   private readonly swalService = inject(SwalService);
   private readonly platformId = inject(PLATFORM_ID);
 
@@ -54,7 +56,9 @@ export class ITServiceRequestCombinedComponent {
   readonly activeTabItem = computed(
     () => this.tabs.find((tab) => tab.key === this.activeTab()) ?? this.tabs[0],
   );
-  readonly componentInputs = { openBy: 'IT' };
+  get componentInputs() {
+    return { openBy: this.openBy };
+  }
 
   constructor() {
     this.removeLegacyTabQueryParam();

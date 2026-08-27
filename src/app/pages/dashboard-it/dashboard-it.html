@@ -439,7 +439,7 @@
             } @else if (IS_OPEN_IT_SERVICE() === 1) {
               <app-it-repair-request openBy="IT"></app-it-repair-request>
             } @else if (IS_OPEN_IT_SERVICE() === 3) {
-              <app-it-service-request openBy="IT"></app-it-service-request>
+              <app-it-service-request-combined openBy="IT"></app-it-service-request-combined>
             }
           </div>
         </div>
@@ -454,6 +454,14 @@
       (submitModal)="submitNote($event)"
     >
     </app-note-modal>
+  }
+
+  @if (IS_EMAIL_REPLY_MODAL()) {
+    <app-email-reply-modal
+      [ticket]="selectedTicket()"
+      (closeModal)="closeEmailReplyModal()"
+      (submitModal)="submitEmailReply($event)"
+    />
   }
 
   @if (IS_DENY_TICKET()) {

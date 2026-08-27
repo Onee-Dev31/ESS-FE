@@ -1,5 +1,6 @@
-<div class="combined-request-page">
+<div class="combined-request-page" [class.combined-request-page--it]="openBy === 'IT'">
   <app-page-header
+    *ngIf="openBy !== 'IT'"
     title="IT Service Request (ขอรับบริการ IT)"
     subtitle="เลือกหมวดหมู่คำขอที่ต้องการดำเนินการ"
   />

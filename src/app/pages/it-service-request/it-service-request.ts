@@ -41,7 +41,6 @@ import { PageLoaderComponent } from '../../components/shared/page-loader/page-lo
   imports: [
     CommonModule,
     FormsModule,
-    PageHeaderComponent,
     NzSelectModule,
     ExampleServiceRequestModal,
     FilePreviewModalComponent,
@@ -76,7 +75,7 @@ export class ITServiceRequestComponent implements OnInit {
   attachments = signal<{ name: string; size: number; file: File }[]>([]);
   isPreviewModalOpen = signal<boolean>(false);
   formErrors = signal<Record<string, string>>({});
-  private initialLoadsPending = signal(2);
+  private initialLoadsPending = signal(1);
   isPageLoading = computed(() => this.initialLoadsPending() > 0);
   previewFiles = signal<FilePreviewItem[]>([]);
 
@@ -657,6 +656,8 @@ export class ITServiceRequestComponent implements OnInit {
           : 'false',
     ); //it เปิดให้ตัวเอง ?
 
+    console.log('IsSelfRequestByIT >', this.openBy, '>', this.authService.userData().DEPARTMENT);
+
     selectedServices.forEach((service) => {
       formData.append('serviceTypeIds', service.id.toString());
     });
@@ -898,31 +899,45 @@ export class ITServiceRequestComponent implements OnInit {
       });
   }
   getOpenFor() {
-    this.itServiceService
-      .getOpenFor({ currentEmpId: this.authService.userData().CODEMPID })
-      .pipe(finalize(() => this.completeInitialLoad()))
-      .subscribe({
-        next: (res) => {
-          const mapped = res.data.map((item: any) => ({
-            ...item,
-            label: item.value === '__FREELANCE__' ? 'Freelance หรือ บุคคลอื่น' : item.label,
-          }));
+    if (this.openBy === 'IT') {
+      this.initialLoadsPending.update((count) => count + 1);
+      this.itServiceService
+        .getOpenFor({ currentEmpId: this.authService.userData().CODEMPID })
+        .pipe(finalize(() => this.completeInitialLoad()))
+        .subscribe({
+          next: (res) => {
+            const options = res.data.map((item: any) => ({
+              ...item,
+              label: item.value === '__FREELANCE__' ? 'Freelance' : item.label,
+            }));
+            this.openForOptions.set(options);
 
-          this.openForOptions.set(mapped);
-          const defaultOption = this.openForOptions().find(
-            (opt) => opt.value === this.authService.userData().CODEMPID,
-          );
-          if (defaultOption) {
-            this.selectedOpenFor.set({
-              value: defaultOption.value,
-              label: defaultOption.label,
-            });
-          }
-        },
-        error: (error) => {
-          console.error('Error fetching data:', error);
-        },
-      });
+            const defaultOption = options.find(
+              (option: any) => option.value === this.authService.userData().CODEMPID,
+            );
+            if (defaultOption) {
+              this.selectedOpenFor.set({
+                value: defaultOption.value,
+                label: defaultOption.label,
+              });
+            }
+          },
+          error: (error) => console.error('Error fetching open-for options:', error),
+        });
+      return;
+    }
+
+    const employee = this.authService.userData();
+    const selfOption = {
+      value: employee.CODEMPID,
+      label: `${employee.CODEMPID} - ${employee.NAMFIRSTT ?? ''} ${employee.NAMLASTT ?? ''}`.trim(),
+    };
+
+    this.openForOptions.set([
+      selfOption,
+      { value: '__FREELANCE__', label: 'Freelance', isFreelance: true },
+    ]);
+    this.selectedOpenFor.set(selfOption);
   }
 
   getDetailFromJobsByApplicantId(id: string) {

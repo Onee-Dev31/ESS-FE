@@ -187,9 +187,11 @@ export class TextEditorComponent {
       });
   }
 
-  onContentChange(value: string) {
-    this.value = value;
-    this.valueChange.emit(value);
+  onContentChange(value: string | null) {
+    const normalizedValue = value ?? '';
+
+    this.value = normalizedValue;
+    this.valueChange.emit(normalizedValue);
 
     this.checkDeletedImages();
   }

@@ -1,0 +1,40 @@
+<div class="modal-overlay email-reply-modal">
+  <div class="modal-container">
+    <header class="modal-header">
+      <div>
+        <h2><i class="fa-solid fa-reply-all"></i> ตอบกลับอีเมล</h2>
+        <p>{{ ticket?.ticketNumber }} · {{ ticket?.requesterEmail || ticket?.requesterName }}</p>
+      </div>
+      <button type="button" class="btn-close" (click)="close()" aria-label="ปิด">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </header>
+
+    <div class="modal-body">
+      <label>ข้อความตอบกลับ <span>*</span></label>
+      <app-text-editor
+        [value]="message"
+        (valueChange)="onMessageChange($event)"
+        placeholder="พิมพ์ข้อความตอบกลับ..."
+      />
+    </div>
+
+    <footer class="modal-footer">
+      <button type="button" class="btn-cancel" (click)="close()">ยกเลิก</button>
+      <button
+        type="button"
+        class="btn-submit"
+        [disabled]="!hasMessage || isSubmitting()"
+        (click)="submit()"
+      >
+        <i
+          class="fa-solid"
+          [class.fa-spinner]="isSubmitting()"
+          [class.fa-spin]="isSubmitting()"
+          [class.fa-paper-plane]="!isSubmitting()"
+        ></i>
+        {{ isSubmitting() ? 'กำลังเตรียมรูปภาพ...' : 'ส่งข้อความ' }}
+      </button>
+    </footer>
+  </div>
+</div>

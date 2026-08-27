@@ -15,6 +15,7 @@ export class TicketProgressCardComponent {
   @Input({ required: true }) ticket!: any;
   @Input({ required: true }) audience!: TicketStatusAudience;
   @Input() showNoteButton = false;
+  @Input() showWaitingItTemplate = false;
   @Output() noteClick = new EventEmitter<void>();
 
   selectedAssignee = signal<any | null>(null);

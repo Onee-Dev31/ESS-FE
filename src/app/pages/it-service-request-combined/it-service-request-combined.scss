@@ -2,6 +2,10 @@
 
 .combined-request-page {
   padding: 20px;
+
+  &--it {
+    padding: 0;
+  }
 }
 
 .request-tabs {

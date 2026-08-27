@@ -44,6 +44,7 @@ import {
 import { NzDatePickerModule } from 'ng-zorro-antd/date-picker';
 import { NzTimePickerModule } from 'ng-zorro-antd/time-picker';
 import { NzSelectModule } from 'ng-zorro-antd/select';
+import { CdkScrollable } from '@angular/cdk/scrolling';
 
 @Component({
   selector: 'app-time-off-form',
@@ -56,6 +57,7 @@ import { NzSelectModule } from 'ng-zorro-antd/select';
     NzDatePickerModule,
     NzTimePickerModule,
     NzSelectModule,
+    CdkScrollable,
   ],
   templateUrl: './time-off-form.html',
   styleUrl: './time-off-form.scss',

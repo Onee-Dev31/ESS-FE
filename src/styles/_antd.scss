@@ -297,8 +297,6 @@
 .custom-picker-popup .ant-picker-panel-container {
   z-index: 1150 !important;
 
-  position: fixed !important;
-
   max-width: calc(100vw - 24px) !important;
 
   box-sizing: border-box;
@@ -438,7 +436,6 @@ nz-range-picker {
 .custom-range-picker-popup,
 .custom-range-picker-popup .ant-picker-panel-container {
   z-index: 1150 !important;
-  position: fixed !important;
   max-width: calc(100vw - 24px) !important;
   box-sizing: border-box;
   overflow-x: auto;
