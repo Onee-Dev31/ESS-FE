@@ -46,6 +46,7 @@ import { ITServiceRequestCombinedComponent } from '../it-service-request-combine
 import { SwalService } from '../../services/swal.service';
 import { tickets } from '../../utils/it-dashboard-mock';
 import { AcknowledgeModal } from './modal/acknowledge-modal/acknowledge-modal';
+import { EmailReplyModal } from './modal/email-reply-modal/email-reply-modal';
 import { DenyModal } from './modal/deny-modal/deny-modal';
 import { AssignModal } from './modal/assign-modal/assign-modal';
 import { NoteModal } from './modal/note-modal/note-modal';
@@ -88,6 +89,7 @@ import { PageLoaderComponent } from '../../components/shared/page-loader/page-lo
     ItRepairRequestComponent,
     ITServiceRequestCombinedComponent,
     AcknowledgeModal,
+    EmailReplyModal,
     DenyModal,
     AssignModal,
     NoteModal,
@@ -391,6 +393,7 @@ export class DashboardIT implements OnInit {
   IS_ONHOLD_TICKET = signal(false);
   IS_ACKNOWLEDGE_TICKET = signal(false);
   IS_NOTE_TICKET = signal(false);
+  IS_EMAIL_REPLY_MODAL = signal(false);
   IS_ASSIGN_TICKET = signal(false);
   IS_NOTEFORIT_TICKET = signal(false);
   isCcModalVisible = false;
@@ -758,6 +761,63 @@ export class DashboardIT implements OnInit {
       }
       return next;
     });
+  }
+
+  canReplyToEmailTicket(ticket: any): boolean {
+    const viaEmail =
+      ticket?.viaEmail === true ||
+      ticket?.viaEmail === 1 ||
+      ticket?.viaEmail === '1' ||
+      ticket?.viaEmail === 'true';
+    const acknowledgedStatuses = ['In Progress', 'Assigned', 'ReOpened', 'Hold'];
+
+    return viaEmail && acknowledgedStatuses.includes(ticket?.status);
+  }
+
+  openEmailReply(): void {
+    this.IS_EMAIL_REPLY_MODAL.set(true);
+  }
+
+  closeEmailReplyModal(): void {
+    this.IS_EMAIL_REPLY_MODAL.set(false);
+  }
+
+  submitEmailReply(data: any): void {
+    const executedBy = this.authService.currentUser() ?? this.authService.userData()?.AD_USER ?? '';
+
+    if (!data?.id || !data?.message || !executedBy) {
+      this.swalService.warning('ข้อมูลสำหรับตอบกลับอีเมลไม่ครบถ้วน');
+      return;
+    }
+
+    console.log(data);
+
+    this.IS_EMAIL_REPLY_MODAL.set(false);
+    this.swalService.loading('กำลังส่งอีเมล...');
+    this.itServiceService
+      .replyTicketEmail(data.id, {
+        message: data.message,
+        replyAll: true,
+        executedBy,
+      })
+      .subscribe({
+        next: (res) => {
+          if (res?.success === false) {
+            this.swalService.warning(res.message || 'ไม่สามารถส่งอีเมลได้');
+            return;
+          }
+
+          this.swalService.success(res?.message || 'ส่งอีเมลเรียบร้อยแล้ว');
+          this.selectTicket(String(data.id));
+          this.getAllTickets();
+        },
+        error: (error) => {
+          this.swalService.warning(
+            'เกิดข้อผิดพลาด',
+            error?.error?.message || error?.message || 'ไม่สามารถส่งอีเมลได้',
+          );
+        },
+      });
   }
 
   closeChat() {
@@ -1570,20 +1630,25 @@ export class DashboardIT implements OnInit {
   }
 
   get currentActions() {
-    if (this.selectedTicket().repair_cost_type === 'paid') {
-      return (
-        this.actionConfig['waiting-user-resubmit'] || {
-          left: [],
-          right: [],
-        }
-      );
+    const ticket = this.selectedTicket();
+    const configuredActions = (ticket?.repair_cost_type === 'paid'
+      ? this.actionConfig['waiting-user-resubmit']
+      : this.actionConfig[ticket?.status]) ?? { left: [], right: [] };
+    const actions = {
+      left: [...configuredActions.left],
+      right: [...configuredActions.right],
+    };
+
+    if (this.canReplyToEmailTicket(ticket)) {
+      actions.right.unshift({
+        label: 'ตอบกลับ',
+        icon: 'fa-reply-all',
+        class: 'btn-reply',
+        action: () => this.openEmailReply(),
+      });
     }
-    return (
-      this.actionConfig[this.selectedTicket().status] || {
-        left: [],
-        right: [],
-      }
-    );
+
+    return actions;
   }
 
   private checkBeforeAction(callback: () => void) {

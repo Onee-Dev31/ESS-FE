@@ -385,11 +385,7 @@
   <!-- Open For -->
   <app-ticket-open-for-card *ngIf="t.openFor as openFor" [openFor]="openFor" />
   <!-- Progress / Timeline -->
-  <app-ticket-progress-card
-    [ticket]="t"
-    audience="user"
-    [showWaitingItTemplate]="true"
-  />
+  <app-ticket-progress-card [ticket]="t" audience="user" [showWaitingItTemplate]="true" />
 </ng-template>
 
 <!-- ============================================================ -->

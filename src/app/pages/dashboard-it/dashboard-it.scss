@@ -2687,6 +2687,11 @@
     --btn-bg: var(--btn-assign-bg);
   }
 
+  &.btn-reply {
+    --btn-border: #1d4ed8;
+    --btn-bg: #2563eb;
+  }
+
   &.btn-done {
     --btn-border: var(--btn-close-border);
     --btn-bg: var(--btn-close-bg);
