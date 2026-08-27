@@ -76,7 +76,7 @@ export class ITServiceRequestComponent implements OnInit {
   attachments = signal<{ name: string; size: number; file: File }[]>([]);
   isPreviewModalOpen = signal<boolean>(false);
   formErrors = signal<Record<string, string>>({});
-  private initialLoadsPending = signal(2);
+  private initialLoadsPending = signal(1);
   isPageLoading = computed(() => this.initialLoadsPending() > 0);
   previewFiles = signal<FilePreviewItem[]>([]);
 
@@ -900,6 +900,34 @@ export class ITServiceRequestComponent implements OnInit {
       });
   }
   getOpenFor() {
+    if (this.openBy === 'IT') {
+      this.initialLoadsPending.update((count) => count + 1);
+      this.itServiceService
+        .getOpenFor({ currentEmpId: this.authService.userData().CODEMPID })
+        .pipe(finalize(() => this.completeInitialLoad()))
+        .subscribe({
+          next: (res) => {
+            const options = res.data.map((item: any) => ({
+              ...item,
+              label: item.value === '__FREELANCE__' ? 'Freelance' : item.label,
+            }));
+            this.openForOptions.set(options);
+
+            const defaultOption = options.find(
+              (option: any) => option.value === this.authService.userData().CODEMPID,
+            );
+            if (defaultOption) {
+              this.selectedOpenFor.set({
+                value: defaultOption.value,
+                label: defaultOption.label,
+              });
+            }
+          },
+          error: (error) => console.error('Error fetching open-for options:', error),
+        });
+      return;
+    }
+
     const employee = this.authService.userData();
     const selfOption = {
       value: employee.CODEMPID,
@@ -911,7 +939,6 @@ export class ITServiceRequestComponent implements OnInit {
       { value: '__FREELANCE__', label: 'Freelance', isFreelance: true },
     ]);
     this.selectedOpenFor.set(selfOption);
-    this.completeInitialLoad();
   }
 
   getDetailFromJobsByApplicantId(id: string) {

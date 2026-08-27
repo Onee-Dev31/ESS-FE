@@ -662,7 +662,6 @@ export class ITServiceRequestSpecificComponent implements OnInit {
     const formData = new FormData();
     formData.append('ticketTypeId', '3');
 
-        this.specificPeople()[0].openFor.value === this.authService.userData().CODEMPID;
     const isSelfRequest =
       this.specificPeople().length === 1 &&
       this.specificPeople()[0].openFor.value === this.authService.userData().CODEMPID;
@@ -1617,6 +1616,39 @@ export class ITServiceRequestSpecificComponent implements OnInit {
   }
 
   getOpenFor() {
+    if (this.openBy === 'IT') {
+      this.initialLoadsPending.update((count) => count + 1);
+      this.itServiceService
+        .getOpenFor({ currentEmpId: this.authService.userData().CODEMPID })
+        .pipe(finalize(() => this.completeInitialLoad()))
+        .subscribe({
+          next: (res) => {
+            const options = res.data.map((item: any) => ({
+              ...item,
+              label: item.value === '__FREELANCE__' ? 'Freelance' : item.label,
+            }));
+            this.openForOptions.set(options);
+            this.openForOptions_noFreelance.set(
+              options.filter((item: any) => item.value !== '__FREELANCE__'),
+            );
+            this.refreshOneeSupervisors();
+
+            const defaultOption = options.find(
+              (option: any) => option.value === this.authService.userData().CODEMPID,
+            );
+            if (defaultOption) {
+              this.specificPeople.update((people) =>
+                people.map((person, index) =>
+                  index === 0 ? { ...person, openFor: defaultOption } : person,
+                ),
+              );
+            }
+          },
+          error: (error) => console.error('Error fetching open-for options:', error),
+        });
+      return;
+    }
+
     const employee = this.authService.userData();
     const selfOption = {
       value: employee.CODEMPID,
