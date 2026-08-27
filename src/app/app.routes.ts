@@ -137,20 +137,29 @@ export const routes: Routes = [
         canActivate: [menuGuard],
         data: { animation: 'ITRequest' },
       },
-      {
-        path: 'it-service-request',
-        loadComponent: () =>
-          import('./pages/it-service-request/it-service-request').then(
-            (m) => m.ITServiceRequestComponent,
-          ),
-        canActivate: [menuGuard],
-        data: { animation: 'ITRequest' },
-      },
+      // {
+      //   path: 'it-service-request',
+      //   loadComponent: () =>
+      //     import('./pages/it-service-request/it-service-request').then(
+      //       (m) => m.ITServiceRequestComponent,
+      //     ),
+      //   canActivate: [menuGuard],
+      //   data: { animation: 'ITRequest' },
+      // },
       {
         path: 'it-service-request-specific',
         loadComponent: () =>
           import('./pages/it-service-request-specific/it-service-request-specific').then(
             (m) => m.ITServiceRequestSpecificComponent,
+          ),
+        canActivate: [menuGuard],
+        data: { animation: 'ITRequest' },
+      },
+      {
+        path: 'it-service-request',
+        loadComponent: () =>
+          import('./pages/it-service-request-combined/it-service-request-combined').then(
+            (m) => m.ITServiceRequestCombinedComponent,
           ),
         canActivate: [menuGuard],
         data: { animation: 'ITRequest' },
