@@ -317,7 +317,7 @@ export class DashboardIT implements OnInit {
   @ViewChild(TicketChatComponent) ticketChat?: TicketChatComponent;
 
   filter = {
-    dateRange: [dayjs().subtract(3, 'month').toDate(), dayjs().toDate()] as [Date, Date] | null,
+    dateRange: [dayjs().startOf('year').toDate(), dayjs().toDate()] as [Date, Date] | null,
   };
 
   @ViewChild('ticketList') ticketList!: ElementRef;
@@ -1200,6 +1200,7 @@ export class DashboardIT implements OnInit {
         step: t.step,
         title: t.title,
         description: t.description,
+        reason: t.reason,
         status: t.status,
         Assignee: assigneeList,
 
@@ -1508,6 +1509,7 @@ export class DashboardIT implements OnInit {
     comment?: any,
     attachments?: any[],
     repairCostType?: string,
+    reason?: string,
   ) {
     // console.log(command, ticketId, ticketTypeId, comment, attachments);
 
@@ -1524,6 +1526,10 @@ export class DashboardIT implements OnInit {
       formData.append('itResult', 'Hold');
     }
 
+    if ((command === 'onhold' || command === 'assign') && reason) {
+      formData.append('reason', reason);
+    }
+
     if (command === 'close') {
       formData.append('itResult', 'Closed');
     }
@@ -1537,11 +1543,12 @@ export class DashboardIT implements OnInit {
       formData.append('assignJson', JSON.stringify(assignees));
     }
 
-    if (command === 'acknowledge') {
+    if (command === 'acknowledge' || (command === 'assign' && comment)) {
       formData.append('comment', comment);
-      if (repairCostType) {
-        formData.append('repairCostType', repairCostType);
-      }
+    }
+
+    if ((command === 'acknowledge' || command === 'assign') && repairCostType) {
+      formData.append('repairCostType', repairCostType);
     }
 
     if (command === 'acknowledge' || command === 'assign') {
@@ -1693,8 +1700,10 @@ export class DashboardIT implements OnInit {
   // -- onHold --
   onHoldTicket() {
     this.checkBeforeAction(() => {
-      this.swalService.confirm('ยืนยันการหยุดชั่วคราว (On Hold)').then((result) => {
+      this.swalService.promptReason('ยืนยันการหยุดชั่วคราว (On Hold)').then((result) => {
         if (!result.isConfirmed) return;
+
+        const reason = result.value?.trim() || undefined;
 
         const ticket = this.selectedTicket();
         const ticketId = ticket?.ticketId;
@@ -1706,7 +1715,16 @@ export class DashboardIT implements OnInit {
 
         this.swalService.loading('กำลังบันทึกข้อมูล...');
 
-        this.updateTicket('onhold', ticketId, '', null, null).subscribe({
+        this.updateTicket(
+          'onhold',
+          ticketId,
+          '',
+          null,
+          null,
+          undefined,
+          undefined,
+          reason,
+        ).subscribe({
           next: (res) => {
             if (!res?.success) {
               this.swalService.warning('ไม่สามารถบันทึกข้อมูลได้');
@@ -1893,7 +1911,16 @@ export class DashboardIT implements OnInit {
     this.swalService.loading('กำลังบันทึกข้อมูล...');
     this.IS_ASSIGN_TICKET.set(false);
 
-    this.updateTicket('assign', ticketId, typeTicket, assignees).subscribe({
+    this.updateTicket(
+      'assign',
+      ticketId,
+      typeTicket,
+      assignees,
+      data.message,
+      data.attachments,
+      data.repairCostType,
+      data.reason,
+    ).subscribe({
       next: (res) => {
         if (!res?.success) {
           this.swalService.warning('ไม่สามารถบันทึกข้อมูลได้');

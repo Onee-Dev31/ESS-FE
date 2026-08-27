@@ -915,6 +915,7 @@ export class ItService implements OnInit {
         step: t.step,
         title: t.title,
         description: t.description,
+        reason: t.reason,
         status: t.status,
         Assignee: assigneeList,
 

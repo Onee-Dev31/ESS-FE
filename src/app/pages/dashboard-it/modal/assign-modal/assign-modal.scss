@@ -590,3 +590,122 @@
 .required {
   color: red;
 }
+
+.repair-details {
+  padding: 16px;
+  margin: 10px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 20px;
+
+  textarea.form-input {
+    width: 100%;
+    margin-top: 16px;
+    min-height: 100px;
+    height: auto !important;
+    padding: 16px 20px !important;
+    border: 1px solid var(--text-muted) !important;
+    border-radius: 16px !important;
+    background: var(--bg-card) !important;
+    color: var(--text) !important;
+    font-family: $font-main;
+    font-size: 0.95rem !important;
+    line-height: 1.6;
+    resize: vertical;
+    transition: all 0.2s;
+
+    &::placeholder {
+      color: var(--text-muted);
+      font-weight: 400;
+    }
+
+    &:focus {
+      outline: none;
+      border-color: var(--status-progress-text) !important;
+      box-shadow: 0 0 0 4px rgba(167, 139, 250, 0.1) !important;
+    }
+  }
+}
+
+.assign-reason {
+  padding: 0 16px 10px;
+
+  label {
+    display: block;
+    margin-bottom: 8px;
+    color: var(--text);
+  }
+
+  .optional-label {
+    color: var(--text-muted);
+    font-size: 12px;
+  }
+
+  textarea.form-input {
+    width: 100%;
+    min-height: 80px;
+    height: auto !important;
+    padding: 12px 16px !important;
+    border: 1px solid var(--text-muted) !important;
+    border-radius: 16px !important;
+    background: var(--bg-card) !important;
+    color: var(--text) !important;
+    font-family: $font-main;
+    font-size: 0.95rem !important;
+    line-height: 1.6;
+    resize: vertical;
+
+    &::placeholder {
+      color: var(--text-muted);
+    }
+
+    &:focus {
+      outline: none;
+      border-color: var(--status-progress-text) !important;
+      box-shadow: 0 0 0 4px rgba(167, 139, 250, 0.1) !important;
+    }
+  }
+}
+
+.attach-btn {
+  border: none;
+  background: transparent;
+  color: var(--primary);
+  cursor: pointer;
+  padding: 8px 0;
+}
+
+.attachment-warning {
+  color: var(--danger);
+  font-size: 12px;
+}
+
+.file-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.file-chip {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  border: 1px solid var(--border-color);
+  border-radius: 999px;
+  background: var(--bg-slate);
+  cursor: pointer;
+}
+
+.file-name {
+  max-width: 180px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.chip-remove {
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+}

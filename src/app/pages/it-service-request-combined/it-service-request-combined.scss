@@ -1,0 +1,98 @@
+@use '../../../styles/mixins' as *;
+
+.combined-request-page {
+  padding: 20px;
+}
+
+.request-tabs {
+  display: flex;
+  gap: 4px;
+  margin-top: 18px;
+  border-bottom: 1px solid var(--border);
+}
+
+.request-tab {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 220px;
+  padding: 10px 18px;
+  border: 0;
+  border-radius: 9px 9px 0 0;
+  background: transparent;
+  color: var(--text-sub);
+  text-align: left;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  > i {
+    width: 20px;
+    color: var(--text-muted);
+    text-align: center;
+  }
+
+  > span {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  strong {
+    font-size: 0.9rem;
+  }
+
+  small {
+    color: var(--text-muted);
+    font-size: 0.72rem;
+    font-weight: 400;
+  }
+
+  &:hover:not(:disabled) {
+    color: var(--primary);
+    background: color-mix(in srgb, var(--primary) 5%, transparent);
+  }
+
+  &.active {
+    color: var(--primary);
+    background: color-mix(in srgb, var(--primary) 10%, var(--bg-card));
+
+    > i {
+      color: var(--primary);
+    }
+  }
+
+  &:disabled {
+    cursor: wait;
+    opacity: 0.7;
+  }
+}
+
+.request-form-host {
+  margin-top: 14px;
+
+  // Child pages already provide their own cards and spacing. Remove only the
+  // outer page padding when they are hosted inside this combined page.
+  ::ng-deep .it-request-page {
+    padding: 0;
+  }
+}
+
+@include mobile {
+  .combined-request-page {
+    padding: 14px;
+  }
+
+  .request-tabs {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .request-tab {
+    min-width: 0;
+    padding: 10px 12px;
+
+    small {
+      display: none;
+    }
+  }
+}

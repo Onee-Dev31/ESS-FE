@@ -504,6 +504,100 @@ $border: var(--border);
 .content-card.resign {
   margin-top: 0.8rem;
 
+  .year-range-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin: 0.75rem 1.5rem 1rem;
+    padding: 12px 16px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: var(--bg-table-head);
+
+    > label {
+      color: var(--text-sub);
+      font-size: 0.875rem;
+      font-weight: 600;
+    }
+
+    .year-range-controls {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .year-range-picker {
+      width: 300px;
+      height: 46px;
+      padding: 0 16px;
+      border-color: var(--border-table-head);
+      border-radius: 10px;
+      background: var(--input-bg);
+
+      &:hover,
+      &.ant-picker-focused {
+        border-color: var(--primary);
+      }
+
+      ::ng-deep {
+        .ant-picker-input > input {
+          height: 44px;
+          font-size: 0.9rem;
+        }
+
+        .ant-picker-range-separator {
+          padding: 0 10px;
+          color: var(--text-muted);
+        }
+
+        .ant-picker-suffix {
+          color: var(--text-sub);
+          font-size: 1rem;
+        }
+      }
+    }
+
+    .btn-search-year {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      height: 46px;
+      padding: 0 22px;
+      border: 0;
+      border-radius: 999px;
+      background: #582d96;
+      color: #fff;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+
+      &:hover {
+        background: #4a257d;
+        box-shadow: 0 3px 10px rgba(88, 45, 150, 0.22);
+      }
+    }
+
+    @include mobile {
+      margin: 0.75rem 1rem 1rem;
+      padding: 12px;
+      align-items: stretch;
+      flex-direction: column;
+
+      .year-range-controls,
+      .year-range-picker,
+      .btn-search-year {
+        width: 100%;
+      }
+
+      .year-range-controls {
+        align-items: stretch;
+        flex-direction: column;
+      }
+    }
+  }
+
   .card-header-title {
     @include card-header-title(var(--text), var(--red));
     display: flex;
