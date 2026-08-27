@@ -1,0 +1,36 @@
+<div class="combined-request-page">
+  <app-page-header
+    title="IT Service Request (ขอรับบริการ IT)"
+    subtitle="เลือกหมวดหมู่คำขอที่ต้องการดำเนินการ"
+  />
+
+  <nav class="request-tabs" aria-label="หมวดหมู่แบบฟอร์ม IT Service Request">
+    @for (tab of tabs; track tab.key) {
+      <button
+        type="button"
+        class="request-tab"
+        [class.active]="activeTab() === tab.key"
+        [disabled]="isSwitching()"
+        [attr.aria-selected]="activeTab() === tab.key"
+        (click)="selectTab(tab.key)"
+      >
+        <i [class]="tab.icon"></i>
+        <span>
+          <strong>{{ tab.label }}</strong>
+          <small>{{ tab.description }}</small>
+        </span>
+      </button>
+    }
+  </nav>
+
+  <section
+    class="request-form-host"
+    (input)="markCurrentTabDirty()"
+    (change)="markCurrentTabDirty()"
+    (click)="onFormClick($event)"
+  >
+    <ng-container
+      *ngComponentOutlet="activeTabItem().component; inputs: componentInputs"
+    ></ng-container>
+  </section>
+</div>

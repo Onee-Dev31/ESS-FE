@@ -15,10 +15,8 @@ export class ItAssetService {
     private authService: AuthService,
   ) {}
 
-  GetItAssetByAD(systemcode: string, username: string) {
-    return this._http.get<any>(
-      `${this.baseUrl}/it/get-it-asset-by-AD?systemcode=${systemcode}&username=${username}`,
-    );
+  getEmployeeAssets(username: string) {
+    return this._http.get<any>(`${this.baseUrl}/it/employee-assets?username=${username}`);
   }
 
   getOneeuserByAd(adUser: string): Observable<any> {

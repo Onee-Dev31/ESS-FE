@@ -52,8 +52,8 @@ export class InfoModal implements OnChanges {
         next: (res) => {
           console.log('res', res);
           // API 1
-          this.emp_asset = res.asset.data.rows;
-          this.userId_asset = res.asset.userId_asset;
+          this.emp_asset = res.asset?.data ?? [];
+          this.userId_asset = res.asset?.userId;
 
           // API 2
           const statusMap: any = {
@@ -85,7 +85,7 @@ export class InfoModal implements OnChanges {
   }
 
   getItAssetByAduser(adUser: string) {
-    return this.itAssetService.GetItAssetByAD('SNIPE-IT', adUser);
+    return this.itAssetService.getEmployeeAssets(adUser);
   }
 
   getOneeuserByAduser(adUser: string) {

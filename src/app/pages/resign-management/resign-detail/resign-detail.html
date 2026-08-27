@@ -57,9 +57,29 @@
     </form>
   </div>
 
-  <nz-tabs [nzSelectedIndex]="activeTabIndex" (nzSelectedIndexChange)="selectTab($event)">
-    <nz-tab *ngFor="let tab of tabs" [nzTitle]="tab.name"> </nz-tab>
+  <nz-tabs
+    class="resign-status-tabs"
+    [nzSelectedIndex]="activeTabIndex"
+    [nzTabBarExtraContent]="yearInfo"
+    (nzSelectedIndexChange)="selectTab($event)"
+  >
+    <nz-tab *ngFor="let tab of tabs" [nzTitle]="statusTab">
+      <ng-template #statusTab>
+        <span class="status-tab" [class]="'status-tab status-tab--' + tab.key">
+          <i [class]="tab.icon"></i>
+          {{ tab.name }}
+        </span>
+      </ng-template>
+    </nz-tab>
   </nz-tabs>
+
+  <ng-template #yearInfo>
+    <span class="data-year-info">
+      <i class="fa-regular fa-calendar"></i>
+      ข้อมูลปี พ.ศ. {{ currentBuddhistYear }}
+      <span>(ค.ศ. {{ currentYear }})</span>
+    </span>
+  </ng-template>
 
   <div class="content-card resign">
     <div class="card-header-title">
@@ -75,17 +95,19 @@
         <table class="modern-table">
           <thead>
             <tr>
-              <th style="width: 40px">
-                <label class="checkbox-custom">
-                  <input
-                    type="checkbox"
-                    [checked]="isAllSelectedEmployee()"
-                    [indeterminate]="isSomeSelectedEmployee()"
-                    (change)="toggleSelectAllEmployees($event)"
-                  />
-                  <span class="checkmark"></span>
-                </label>
-              </th>
+              @if (activeTab === 'waiting') {
+                <th style="width: 40px">
+                  <label class="checkbox-custom">
+                    <input
+                      type="checkbox"
+                      [checked]="isAllSelectedEmployee()"
+                      [indeterminate]="isSomeSelectedEmployee()"
+                      (change)="toggleSelectAllEmployees($event)"
+                    />
+                    <span class="checkmark"></span>
+                  </label>
+                </th>
+              }
               <th class="">ชื่อ-นามสกุล</th>
               <th class="">แผนก</th>
               <th class="">บริษัท</th>
@@ -94,25 +116,29 @@
               <th>Aduser</th>
               <th>Expire Date</th>
               <th class="text-center actions-col">
-                <button class="btn-approve" (click)="approve('Employee')">
-                  <i class="fa-solid fa-user-check"></i>Approve
-                </button>
+                @if (activeTab === 'waiting') {
+                  <button class="btn-approve" (click)="approve('Employee')">
+                    <i class="fa-solid fa-user-check"></i>Approve
+                  </button>
+                }
               </th>
             </tr>
           </thead>
           @for (emp of resignComps.paginatedData(); track emp.empCode) {
             <tbody>
               <tr>
-                <td>
-                  <label class="checkbox-custom">
-                    <input
-                      type="checkbox"
-                      [checked]="isCheckedEmployee(emp.empCode)"
-                      (change)="toggleSelectEmployee(emp, $any($event.target).checked)"
-                    />
-                    <span class="checkmark"></span>
-                  </label>
-                </td>
+                @if (activeTab === 'waiting') {
+                  <td>
+                    <label class="checkbox-custom">
+                      <input
+                        type="checkbox"
+                        [checked]="isCheckedEmployee(emp.empCode)"
+                        (change)="toggleSelectEmployee(emp, $any($event.target).checked)"
+                      />
+                      <span class="checkmark"></span>
+                    </label>
+                  </td>
+                }
                 <td class="col-name">
                   <div class="profile-name">
                     <div class="profile">
@@ -164,7 +190,7 @@
           } @empty {
             <tbody>
               <tr>
-                <td colspan="10" class="no-data-cell">
+                <td [attr.colspan]="activeTab === 'waiting' ? 10 : 9" class="no-data-cell">
                   <app-empty-state
                     title="ไม่พบข้อมูล"
                     description="ไม่พบรายชื่อพนักงานฟรีแลนซ์"
@@ -246,17 +272,19 @@
         <table class="modern-table">
           <thead>
             <tr>
-              <th style="width: 40px">
-                <label class="checkbox-custom">
-                  <input
-                    type="checkbox"
-                    [checked]="isAllSelectedFreelance()"
-                    [indeterminate]="isSomeSelectedFreelance()"
-                    (change)="toggleSelectAllFreelance($event)"
-                  />
-                  <span class="checkmark"></span>
-                </label>
-              </th>
+              @if (activeTab === 'waiting') {
+                <th style="width: 40px">
+                  <label class="checkbox-custom">
+                    <input
+                      type="checkbox"
+                      [checked]="isAllSelectedFreelance()"
+                      [indeterminate]="isSomeSelectedFreelance()"
+                      (change)="toggleSelectAllFreelance($event)"
+                    />
+                    <span class="checkmark"></span>
+                  </label>
+                </th>
+              }
               <th class="">ชื่อ-นามสกุล</th>
               <th class="">แผนก</th>
               <th class="">บริษัท</th>
@@ -265,25 +293,29 @@
               <th>Aduser</th>
               <th>Expire Date</th>
               <th class="text-center actions-col">
-                <button class="btn-approve" (click)="approve('Freelance')">
-                  <i class="fa-solid fa-user-check"></i>Approve
-                </button>
+                @if (activeTab === 'waiting') {
+                  <button class="btn-approve" (click)="approve('Freelance')">
+                    <i class="fa-solid fa-user-check"></i>Approve
+                  </button>
+                }
               </th>
             </tr>
           </thead>
           @for (emp of resignFreelanceComps.paginatedData(); track emp.empCode) {
             <tbody>
               <tr>
-                <td>
-                  <label class="checkbox-custom">
-                    <input
-                      type="checkbox"
-                      [checked]="isCheckedFreelance(emp.empCode)"
-                      (change)="toggleSelectFreelance(emp, $any($event.target).checked)"
-                    />
-                    <span class="checkmark"></span>
-                  </label>
-                </td>
+                @if (activeTab === 'waiting') {
+                  <td>
+                    <label class="checkbox-custom">
+                      <input
+                        type="checkbox"
+                        [checked]="isCheckedFreelance(emp.empCode)"
+                        (change)="toggleSelectFreelance(emp, $any($event.target).checked)"
+                      />
+                      <span class="checkmark"></span>
+                    </label>
+                  </td>
+                }
                 <td class="col-name">
                   <div class="profile-name">
                     <div class="profile">
@@ -332,7 +364,7 @@
           } @empty {
             <tbody>
               <tr>
-                <td colspan="10" class="no-data-cell">
+                <td [attr.colspan]="activeTab === 'waiting' ? 10 : 9" class="no-data-cell">
                   <app-empty-state
                     title="ไม่พบข้อมูล"
                     description="ไม่พบรายชื่อพนักงานฟรีแลนซ์"

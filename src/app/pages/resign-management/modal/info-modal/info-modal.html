@@ -127,17 +127,17 @@
                   <tbody>
                     @for (item of emp_asset; track item) {
                       <tr>
-                        <td>{{ item.asset_tag || '' }}</td>
-                        <td>{{ item.serial || '' }}</td>
-                        <td>{{ item.model.name || '' }}</td>
-                        <td>{{ item.category.name || '' }}</td>
-                        <td>{{ item.status_label.name || '' }}</td>
-                        <td>{{ item.location.name || '' }}</td>
-                        <td>{{ item.custom_fields?.CPU?.value || '' }}</td>
-                        <td>{{ item.custom_fields?.RAM?.value || '' }}</td>
-                        <td>{{ item.custom_fields?.['Hard Disk Drive']?.value || '' }}</td>
-                        <td>{{ item.custom_fields?.OS?.value || '' }}</td>
-                        <td>{{ item.custom_fields?.PO?.value || '' }}</td>
+                        <td>{{ item.AssetTag || '' }}</td>
+                        <td>{{ item.Serial || '' }}</td>
+                        <td>{{ item.Model || '' }}</td>
+                        <td>{{ item.Category || '' }}</td>
+                        <td>{{ item.Status || '' }}</td>
+                        <td>{{ item.Location || '' }}</td>
+                        <td>{{ item.CPU || '' }}</td>
+                        <td>{{ item.RAM || '' }}</td>
+                        <td>{{ item.HardDiskDrive || '' }}</td>
+                        <td>{{ item.OS || '' }}</td>
+                        <td>{{ item.PO || '' }}</td>
                       </tr>
                     }
                   </tbody>

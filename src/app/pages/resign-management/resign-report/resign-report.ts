@@ -24,6 +24,7 @@ import { Employee } from '../employeeData.interface';
 import * as XLSX from 'xlsx-js-style';
 import { ActivatedRoute } from '@angular/router';
 import { FreelanceService } from '../../../services/freelance-management.service';
+import { PageLoaderComponent } from '../../../components/shared/page-loader/page-loader';
 
 // interface EmployeeFormData {
 //   empCode: string; //CODEMPID
@@ -54,11 +55,14 @@ import { FreelanceService } from '../../../services/freelance-management.service
     EmptyStateComponent,
     PaginationComponent,
     NzSelectModule,
+    PageLoaderComponent,
   ],
   templateUrl: './resign-report.html',
   styleUrl: './resign-report.scss',
 })
 export class ResignReport {
+  private readonly loadingKey = 'resign-report-table';
+  readonly currentYear = new Date().getFullYear();
   pageTitle = signal<string>('รายการพนักงานลาออก');
 
   private loadingService = inject(LoadingService);
@@ -69,7 +73,7 @@ export class ResignReport {
   private authService = inject(AuthService);
   dataUtil = inject(DateUtilityService);
 
-  isLoading = this.loadingService.loading('resign-table');
+  isLoading = this.loadingService.loading(this.loadingKey);
 
   // MASTER
   companyList = signal<any[]>([]);
@@ -84,6 +88,12 @@ export class ResignReport {
   filterCompany = signal<any>(null);
   filterDepartment = signal<any>(null);
   filterMonth = signal<string>('');
+  yearFrom = signal<number>(this.currentYear);
+  yearTo = signal<number>(this.currentYear);
+  yearRange = signal<Date[]>([
+    new Date(this.currentYear, 0, 1),
+    new Date(this.currentYear, 11, 31),
+  ]);
 
   appliedCompany = signal<any>(null);
   appliedDepartment = signal<any>(null);
@@ -102,13 +112,15 @@ export class ResignReport {
   effectiveDate = signal<Date | null>(null);
 
   type: any = 'fulltime';
+  status: any = 'fulltime';
 
   constructor(private route: ActivatedRoute) {}
 
   ngOnInit() {
     this.route.queryParams.subscribe((params) => {
       this.type = params['type'];
-      console.log(this.type); // fulltime / freelance
+      this.status = params['status'];
+      console.log(this.type, this.status); // fulltime / freelance
     });
 
     this.getCompanies();
@@ -143,6 +155,8 @@ export class ResignReport {
 
   exportData() {
     const data = this.resignData();
+
+    console.log(data);
 
     const header = [
       [
@@ -198,7 +212,7 @@ export class ResignReport {
       dayjs(item.effectiveDate).format('DD/MM/YYYY'),
       item.adUser_syetem,
       item.status_system,
-      item.expiryDate_system,
+      item.expiryDate_system === '' ? '-' : item.expiryDate_system,
       item.adUser_actual,
       item.status_actual,
       item.expiryDate_actual,
@@ -515,7 +529,7 @@ export class ResignReport {
       id: item.ID,
 
       adUser_syetem: item.AD_USER,
-      status_system: item.AD_DISABLE_DATE ? 'Disable' : item.AD_EXPIRED_DATE ? 'Expire' : '',
+      status_system: item.AD_DISABLE_DATE ? 'Disable' : item.AD_EXPIRED_DATE ? 'Expire' : '-',
       expiryDate_system: this.dataUtil.formatDateToBE(item.AD_EXPIRED_DATE, 'DD/MM/YYYY'),
 
       adUser_actual: item.adUser,
@@ -524,10 +538,20 @@ export class ResignReport {
           ? 'Disable'
           : item.isDisabled === 'No' && item.adIsLocked
             ? item.adIsLocked
-            : '',
-      expiryDate_actual: this.dataUtil.formatDateToBE(item.accountExpires, 'DD/MM/YYYY'),
+            : '-',
+      // expiryDate_actual: this.dataUtil.formatDateToBE(item.accountExpires, 'DD/MM/YYYY'),
+      expiryDate_actual: this.isValidDate(item.accountExpires)
+        ? this.dataUtil.formatDateToBE(item.accountExpires, 'DD/MM/YYYY')
+        : item.accountExpires,
       passwordLastSet_actual: this.dataUtil.formatDateToBE(item.adPwdLastSet, 'DD/MM/YYYY'),
     }));
+  }
+
+  private isValidDate(value: any): boolean {
+    if (!value) return false;
+
+    const date = new Date(value);
+    return !isNaN(date.getTime());
   }
 
   private mapApiData_Freelance(items: any[]): any[] {
@@ -568,22 +592,34 @@ export class ResignReport {
 
   goToPage(page: number) {
     this.resignListing.currentPage.set(page);
+    this.loadingService.start(this.loadingKey);
 
-    this.fetchEmployeeByStatus('Resigned', page + 1, this.resignListing.pageSize()).subscribe(
-      (res) => this.dataResignFromApi(res),
-    );
+    this.fetchReportByType(page + 1, this.resignListing.pageSize())
+      .pipe(finalize(() => this.loadingService.stop(this.loadingKey)))
+      .subscribe((res) => this.dataResignFromApi(res));
   }
 
   setPageSize(size: number) {
     this.resignListing.pageSize.set(size);
     this.resignListing.currentPage.set(0);
+    this.loadingService.start(this.loadingKey);
 
-    this.fetchEmployeeByStatus('Resigned', 1, size).subscribe((res) => this.dataResignFromApi(res));
+    this.fetchReportByType(1, size)
+      .pipe(finalize(() => this.loadingService.stop(this.loadingKey)))
+      .subscribe((res) => this.dataResignFromApi(res));
   }
 
   onCompanyChange(company: any) {
     this.filterCompany.set(company);
     this.filterDepartment.set(null);
+  }
+
+  onYearRangeChange(range: Date[] | null) {
+    if (!range?.[0] || !range?.[1]) return;
+
+    this.yearRange.set(range);
+    this.yearFrom.set(range[0].getFullYear());
+    this.yearTo.set(range[1].getFullYear());
   }
 
   applyFilter() {
@@ -593,28 +629,27 @@ export class ResignReport {
   }
 
   loadInitialData() {
-    this.loadingService.start('freelance-list');
+    this.loadingService.start(this.loadingKey);
     const pageR = this.resignListing.currentPage() + 1;
     const sizeR = this.resignListing.pageSize();
 
-    if (this.type === 'fulltime') {
-      this.fetchEmployeeByStatus('Resigned', pageR, sizeR).subscribe((res) => {
+    this.fetchReportByType(pageR, sizeR)
+      .pipe(finalize(() => this.loadingService.stop(this.loadingKey)))
+      .subscribe((res) => {
         console.log('Resigned >>', res);
         this.dataResignFromApi(res);
-        this.loadingService.stop('freelance-list');
       });
-    } else {
-      this.fetchFreelanceByStatus('Resigned', pageR, sizeR).subscribe((res) => {
-        console.log('Resigned [FREE]>>', res);
-        this.dataResignFromApi(res);
-        this.loadingService.stop('freelance-list');
-      });
-    }
+  }
+
+  private fetchReportByType(page: number, pageSize: number) {
+    return this.type === 'fulltime'
+      ? this.fetchEmployeeByStatus('Resigned', page, pageSize)
+      : this.fetchFreelanceByStatus('Resigned', page, pageSize);
   }
 
   //GET
   private dataResignFromApi(res: any) {
-    // console.log("Resigned >>", res)
+    // console.log('dataResignFromApi >>', res, this.type);
 
     if (this.type === 'fulltime') {
       const items = res.data.items ?? [];
@@ -649,6 +684,9 @@ export class ResignReport {
       companyCode: company?.COMPANY_CODE,
       costCent: department?.COSTCENT,
       empStatus: status,
+      adExpiredDate: this.status === 'true' ? 'true' : 'false',
+      yearFrom: this.yearFrom(),
+      yearTo: this.yearTo(),
     });
 
     // return this.resignService.getEmployee({
