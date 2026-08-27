@@ -43,20 +43,43 @@
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  justify-content: flex-start;
   padding: clamp(30px, 3.6vw, 50px);
   color: #ffffff;
-  background: url('/login.png') center / cover no-repeat;
+  background: url('/the-one-background-clean.png') left center / cover no-repeat;
 
   @include tablet {
     display: none;
   }
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    background:
+      linear-gradient(180deg, rgba(0, 0, 0, 0.88) 0%, rgba(0, 0, 0, 0.42) 34%, transparent 66%),
+      linear-gradient(90deg, rgba(0, 0, 0, 0.42) 0%, rgba(0, 0, 0, 0.16) 58%, transparent 100%);
+    pointer-events: none;
+  }
 }
 
 .brand-lockup,
-.left-content {
+.left-content,
+.company-logo-stage,
+.company-logo-composite {
   position: relative;
   z-index: 1;
+}
+
+.company-logo-composite {
+  display: block;
+  width: min(740px, 100%);
+  height: auto;
+  margin: auto auto clamp(18px, 3.6vh, 38px);
+  top: clamp(40px, 5vh, 65px);
+  object-fit: contain;
+  filter: drop-shadow(0 10px 22px rgba(0, 0, 0, 0.44));
 }
 
 .brand-lockup {
@@ -87,15 +110,25 @@
   }
 }
 
+.company-logo-stage {
+  width: min(760px, 94%);
+  align-self: center;
+  margin: auto 0 clamp(12px, 2.4vh, 24px);
+  display: flex;
+  align-items: center;
+}
+
 .left-content {
-  width: min(680px, 96%);
-  padding-bottom: clamp(390px, 54vh, 600px);
+  width: min(760px, 94%);
+  align-self: center;
+  margin-top: clamp(82px, 13vh, 140px);
+  padding-bottom: 0;
 }
 
 .left-kicker {
   margin: 0 0 10px;
   color: rgba(255, 255, 255, 0.84);
-  font-size: 40px;
+  font-size: 34px;
   font-weight: 800;
   line-height: 1.15;
 }
@@ -103,7 +136,7 @@
 .left-content h1 {
   margin: 0;
   color: #ffffff;
-  font-size: clamp(1.65rem, 2.75vw, 3rem);
+  font-size: clamp(1.45rem, 2.35vw, 2.55rem);
   font-weight: 800;
   line-height: 1.15;
   letter-spacing: 0;
@@ -531,6 +564,10 @@
 
   .brand-lockup img {
     width: 62px;
+  }
+
+  .company-logo-stage {
+    width: min(620px, 96%);
   }
 }
 
