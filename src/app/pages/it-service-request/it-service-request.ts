@@ -900,31 +900,18 @@ export class ITServiceRequestComponent implements OnInit {
       });
   }
   getOpenFor() {
-    this.itServiceService
-      .getOpenFor({ currentEmpId: this.authService.userData().CODEMPID })
-      .pipe(finalize(() => this.completeInitialLoad()))
-      .subscribe({
-        next: (res) => {
-          const mapped = res.data.map((item: any) => ({
-            ...item,
-            label: item.value === '__FREELANCE__' ? 'Freelance หรือ บุคคลอื่น' : item.label,
-          }));
+    const employee = this.authService.userData();
+    const selfOption = {
+      value: employee.CODEMPID,
+      label: `${employee.CODEMPID} - ${employee.NAMFIRSTT ?? ''} ${employee.NAMLASTT ?? ''}`.trim(),
+    };
 
-          this.openForOptions.set(mapped);
-          const defaultOption = this.openForOptions().find(
-            (opt) => opt.value === this.authService.userData().CODEMPID,
-          );
-          if (defaultOption) {
-            this.selectedOpenFor.set({
-              value: defaultOption.value,
-              label: defaultOption.label,
-            });
-          }
-        },
-        error: (error) => {
-          console.error('Error fetching data:', error);
-        },
-      });
+    this.openForOptions.set([
+      selfOption,
+      { value: '__FREELANCE__', label: 'Freelance', isFreelance: true },
+    ]);
+    this.selectedOpenFor.set(selfOption);
+    this.completeInitialLoad();
   }
 
   getDetailFromJobsByApplicantId(id: string) {

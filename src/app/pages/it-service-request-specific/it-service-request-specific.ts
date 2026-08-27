@@ -160,7 +160,7 @@ export class ITServiceRequestSpecificComponent implements OnInit {
   onePortalResponseTypes: any;
   onePortalRole: any;
   openForOptions_noFreelance = signal<any[]>([]);
-  private initialLoadsPending = signal(5);
+  private initialLoadsPending = signal(4);
   isPageLoading = computed(() => this.initialLoadsPending() > 0);
 
   private completeInitialLoad() {
@@ -662,13 +662,15 @@ export class ITServiceRequestSpecificComponent implements OnInit {
     const formData = new FormData();
     formData.append('ticketTypeId', '3');
 
-    if (this.specificPeople().length === 1) {
-      const isSelf =
         this.specificPeople()[0].openFor.value === this.authService.userData().CODEMPID;
+    const isSelfRequest =
+      this.specificPeople().length === 1 &&
+      this.specificPeople()[0].openFor.value === this.authService.userData().CODEMPID;
 
-      formData.append('openForType', isSelf ? 'self' : 'other');
+    if (isSelfRequest) {
+      formData.append('openForType', 'self');
       formData.append('openForCodeempid', this.specificPeople()[0].openFor.value);
-    } else if (this.specificPeople().length > 1) {
+    } else {
       formData.append('openForType', 'freelance');
     }
 
@@ -1615,42 +1617,32 @@ export class ITServiceRequestSpecificComponent implements OnInit {
   }
 
   getOpenFor() {
-    this.itServiceService
-      .getOpenFor({ currentEmpId: this.authService.userData().CODEMPID })
-      .pipe(finalize(() => this.completeInitialLoad()))
-      .subscribe({
-        next: (res) => {
-          console.log(res);
-          this.openForOptions.set(res.data);
+    const employee = this.authService.userData();
+    const selfOption = {
+      value: employee.CODEMPID,
+      label: `${employee.CODEMPID} - ${employee.NAMFIRSTT ?? ''} ${employee.NAMLASTT ?? ''}`.trim(),
+      labelEN:
+        `${employee.CODEMPID} - ${employee.NAMFIRSTE ?? ''} ${employee.NAMLASTE ?? ''}`.trim(),
+      AD_USER: employee.AD_USER,
+      COMPANY_CODE: employee.COMPANY_CODE,
+      COMPANY_NAME: employee.COMPANY_NAME,
+      DEPARTMENT: employee.DEPARTMENT,
+      POST: employee.POST,
+      EMAIL: employee.EMAIL,
+    };
+    const freelanceOption = {
+      value: '__FREELANCE__',
+      label: 'Freelance',
+      labelEN: 'Freelance',
+      isFreelance: true,
+    };
 
-          this.openForOptions_noFreelance.set(
-            res.data.filter((item: any) => item.value !== '__FREELANCE__'),
-          );
-          this.refreshOneeSupervisors();
-
-          const defaultOption = this.openForOptions().find(
-            (opt) => opt.value === this.authService.userData().CODEMPID,
-          );
-
-          if (defaultOption) {
-            // this.selectedOpenFor.set(defaultOption);
-
-            this.specificPeople.update((people) =>
-              people.map((person, index) =>
-                index === 0
-                  ? {
-                      ...person,
-                      openFor: defaultOption,
-                    }
-                  : person,
-              ),
-            );
-          }
-        },
-        error: (error) => {
-          console.error('Error fetching data:', error);
-        },
-      });
+    this.openForOptions.set([selfOption, freelanceOption]);
+    this.openForOptions_noFreelance.set([selfOption]);
+    this.refreshOneeSupervisors();
+    this.specificPeople.update((people) =>
+      people.map((person, index) => (index === 0 ? { ...person, openFor: selfOption } : person)),
+    );
   }
   getDeptHeads() {
     this.settingService
