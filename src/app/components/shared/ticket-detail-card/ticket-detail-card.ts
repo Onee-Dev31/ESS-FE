@@ -32,6 +32,7 @@ export class TicketDetailCardComponent implements OnChanges {
   @Output() servicesClick = new EventEmitter<any[]>();
   @Output() descriptionChange = new EventEmitter<string>();
   @Output() copyClick = new EventEmitter<void>();
+  @Output() changeTypeClick = new EventEmitter<void>();
   @Output() detailClick = new EventEmitter<void>();
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -45,6 +46,10 @@ export class TicketDetailCardComponent implements OnChanges {
   }
   get services(): any[] {
     return this.ticket?.services ?? [];
+  }
+
+  get canChangeTicketType(): boolean {
+    return this.audience === 'it' && ['In Progress', 'Assigned'].includes(this.ticket?.status);
   }
 
   confirmImages() {

@@ -62,7 +62,20 @@
       @if (audience === 'it') {
         <div class="ticket-type">
           <span>ประเภทคำขอ</span>
-          <strong>{{ ticket.ticketType }}</strong>
+          @if (canChangeTicketType) {
+            <button
+              type="button"
+              class="ticket-type-choice"
+              title="เปลี่ยนประเภทคำขอ"
+              [attr.aria-label]="'เปลี่ยนประเภทคำขอ ปัจจุบันคือ ' + ticket.ticketType"
+              (click)="changeTypeClick.emit()"
+            >
+              <strong>{{ ticket.ticketType }}</strong>
+              <i class="fa-solid fa-pen"></i>
+            </button>
+          } @else {
+            <strong>{{ ticket.ticketType }}</strong>
+          }
         </div>
       }
       <div class="actions">

@@ -1,0 +1,184 @@
+@use '../../../../styles/variables' as *;
+@use '../../../../styles/mixins' as *;
+
+.modal-overlay {
+  @include modal-overlay-styles;
+}
+.modal-container {
+  width: min(95%, var(--modal-custom-width, 680px)) !important;
+  display: grid !important;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+
+  &.size-sm {
+    --modal-custom-width: 500px;
+  }
+  &.size-md {
+    --modal-custom-width: 680px;
+  }
+  &.size-lg {
+    --modal-custom-width: 900px;
+  }
+  &.size-xl {
+    --modal-custom-width: 1200px;
+  }
+  &.size-full {
+    --modal-custom-width: calc(100vw - 32px);
+    max-height: calc(100dvh - 32px);
+  }
+}
+
+header {
+  display: flex;
+  flex-direction: row !important;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border-toolbar);
+
+  .heading {
+    min-width: 0;
+  }
+  .title-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  h2 {
+    margin: 0;
+    color: var(--text-header);
+    font-size: 1.05rem;
+  }
+  p {
+    margin: 5px 0 0;
+    color: var(--text-muted);
+    font-size: $font-size-hint;
+  }
+  .header-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  &.primary {
+    background: var(--primary);
+    border-bottom-color: var(--primary);
+    h2,
+    .title-row > i {
+      color: white;
+    }
+    p {
+      color: rgba(255, 255, 255, 0.8);
+    }
+    .close-button {
+      color: white;
+      &:hover {
+        background: rgba(255, 255, 255, 0.15);
+        color: white;
+      }
+    }
+  }
+}
+
+.close-button {
+  width: 34px;
+  height: 34px;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+
+  &:hover {
+    background: var(--bg-slate);
+    color: var(--danger);
+  }
+}
+
+.modal-container > main {
+  display: block;
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-x: hidden;
+  overflow-y: auto !important;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-y;
+  &.padded {
+    padding: 22px 20px 24px;
+  }
+}
+footer {
+  display: flex;
+  flex-direction: row !important;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 20px;
+  border-top: 1px solid var(--border-toolbar);
+
+  &.align-start {
+    justify-content: flex-start;
+  }
+  &.align-center {
+    justify-content: center;
+  }
+  &.align-end {
+    justify-content: flex-end;
+  }
+  &.align-between {
+    justify-content: space-between;
+  }
+}
+
+// Projected footer actions use these shared variants in every modal.
+:host ::ng-deep [modalFooter] {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 10px;
+
+  .modal-button {
+    @include btn-secondary;
+    gap: 8px;
+    min-width: 76px;
+    height: 40px;
+    padding: 0 16px;
+    border-radius: 12px;
+    font-weight: 600;
+    font-size: $font-size-label;
+
+    &.primary {
+      @include btn-primary;
+      height: 40px;
+      padding: 0 16px;
+      border-radius: 12px;
+      font-weight: 600;
+      font-size: $font-size-label;
+      box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.2);
+
+      &:hover:not(:disabled) { box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.3); }
+    }
+
+    &.danger { border-color: var(--danger); background: var(--danger); color: white; }
+    &.text { min-width: auto; border-color: transparent; background: transparent; }
+
+    &:disabled {
+      border-color: var(--border-color);
+      background: var(--border-color);
+      color: var(--text-muted);
+      cursor: not-allowed;
+      box-shadow: none;
+      opacity: 0.8;
+    }
+  }
+}
+
+@media (max-width: 576px) {
+  .modal-container.mobile-fullscreen {
+    width: 100% !important;
+    height: 100dvh;
+    max-height: 100dvh;
+    border-radius: 0;
+  }
+}

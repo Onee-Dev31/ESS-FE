@@ -1,0 +1,130 @@
+@use '../../../../../styles/variables' as *;
+
+.content { padding: 22px 20px 24px; }
+
+.field-label {
+  display: block;
+  margin-bottom: 12px;
+  color: var(--text);
+  font-size: $font-size-label;
+
+  span { margin-left: 2px; color: var(--danger); }
+  small { color: var(--text-muted); font-size: inherit; }
+}
+
+.type-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.type-option {
+  min-height: 38px;
+  padding: 7px 16px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--bg-card);
+  color: var(--text);
+  font: 500 #{$font-size-label}/1.2 $font-main;
+  cursor: pointer;
+
+  &.selected {
+    border-color: var(--primary);
+    background: var(--primary);
+    color: white;
+    font-weight: 700;
+  }
+}
+
+.reason-label { margin-top: 24px; margin-bottom: 8px; }
+.repair-cost-card {
+  margin: 20px -20px 0;
+  padding: 20px;
+  border-top: 1px solid var(--border-toolbar);
+  border-bottom: 1px solid var(--border-toolbar);
+  background: color-mix(in srgb, var(--bg-slate), transparent 35%);
+}
+
+.attachment-label {
+  margin-top: 18px;
+  color: var(--text);
+  font-size: $font-size-label;
+  font-weight: 600;
+
+  span { margin-left: 2px; color: var(--danger); }
+}
+
+.upload-box {
+  display: flex;
+  width: 100%;
+  min-height: 108px;
+  margin-top: 8px;
+  padding: 16px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  border: 1.5px dashed color-mix(in srgb, var(--primary), transparent 48%);
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--primary), transparent 96%);
+  color: var(--primary);
+  font-family: $font-main;
+  cursor: pointer;
+  transition: background-color 0.18s ease, border-color 0.18s ease;
+
+  > i { font-size: $font-size-title; }
+  &:hover { border-color: var(--primary); background: color-mix(in srgb, var(--primary), transparent 91%); }
+  &:focus-visible { outline: 2px solid color-mix(in srgb, var(--primary), transparent 40%); outline-offset: 2px; }
+}
+
+.upload-title { color: var(--primary); font-size: $font-size-label; font-weight: 700; }
+.upload-hint { color: var(--text-muted); font-size: $font-size-hint; font-weight: 400; }
+
+.attachment-required {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  margin-top: 6px;
+  color: var(--danger);
+  font-size: $font-size-hint;
+}
+
+.file-list { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+.file-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  max-width: 100%;
+  padding: 7px 10px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--bg-card);
+  color: var(--text-sub);
+  font-size: $font-size-hint;
+
+  span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  button { border: 0; background: transparent; color: var(--text-muted); cursor: pointer; }
+}
+
+textarea {
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 112px;
+  padding: 16px;
+  resize: vertical;
+  border: 1px solid color-mix(in srgb, var(--primary), transparent 45%);
+  border-radius: 16px;
+  outline: none;
+  background: var(--bg-card);
+  color: var(--text);
+  font: 400 #{$font-size-label}/1.5 $font-main;
+
+  &::placeholder { color: var(--text-muted); }
+  &:focus { border-color: var(--primary); box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary), transparent 88%); }
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}

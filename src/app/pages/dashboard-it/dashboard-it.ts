@@ -48,6 +48,7 @@ import { tickets } from '../../utils/it-dashboard-mock';
 import { AcknowledgeModal } from './modal/acknowledge-modal/acknowledge-modal';
 import { EmailReplyModal } from './modal/email-reply-modal/email-reply-modal';
 import { DenyModal } from './modal/deny-modal/deny-modal';
+import { ChangeTicketTypeModal } from './modal/change-ticket-type-modal/change-ticket-type-modal';
 import { AssignModal } from './modal/assign-modal/assign-modal';
 import { NoteModal } from './modal/note-modal/note-modal';
 import { DateUtilityService } from '../../services/date-utility.service';
@@ -91,6 +92,7 @@ import { PageLoaderComponent } from '../../components/shared/page-loader/page-lo
     AcknowledgeModal,
     EmailReplyModal,
     DenyModal,
+    ChangeTicketTypeModal,
     AssignModal,
     NoteModal,
     ServicesDetailModal,
@@ -390,6 +392,7 @@ export class DashboardIT implements OnInit {
   }
   private initialized = false;
   IS_DENY_TICKET = signal(false);
+  IS_CHANGE_TICKET_TYPE = signal(false);
   IS_ONHOLD_TICKET = signal(false);
   IS_ACKNOWLEDGE_TICKET = signal(false);
   IS_NOTE_TICKET = signal(false);
@@ -1874,6 +1877,24 @@ export class DashboardIT implements OnInit {
 
   closeDenyModal() {
     this.IS_DENY_TICKET.set(false);
+  }
+
+  openChangeTicketTypeModal() {
+    this.IS_CHANGE_TICKET_TYPE.set(true);
+  }
+
+  closeChangeTicketTypeModal() {
+    this.IS_CHANGE_TICKET_TYPE.set(false);
+  }
+
+  previewChangeTicketType(_data: {
+    ticketTypeId: number;
+    repairCostType?: 'paid' | 'free';
+    reason: string;
+    attachments: { name: string; size: number; file: File }[];
+  }) {
+    // UI preview only: connect the update API here when the endpoint is ready.
+    this.closeChangeTicketTypeModal();
   }
 
   submitDeny(data: any) {
