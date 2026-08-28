@@ -10,9 +10,9 @@ import {
   ElementRef,
   ViewChild,
 } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, Location } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 import {
   FilePreviewModalComponent,
   FilePreviewItem,
@@ -169,7 +169,7 @@ export class ItService implements OnInit {
   private destroyRef = inject(DestroyRef);
   private cdr = inject(ChangeDetectorRef);
   private route = inject(ActivatedRoute);
-  private router = inject(Router);
+  private location = inject(Location);
   private userData = this.authService.userData();
 
   formatText = formatText;
@@ -210,6 +210,11 @@ export class ItService implements OnInit {
   pendingTicketId = '';
 
   constructor() {
+    this.route.paramMap.subscribe((params) => {
+      const ticketNumber = params.get('ticketNumber') || '';
+      if (ticketNumber) this.pendingTicketId = ticketNumber;
+    });
+
     this.route.queryParamMap.subscribe((params) => {
       const ticketId = params.get('ticket') || '';
       if (ticketId) this.pendingTicketId = ticketId;
@@ -1112,11 +1117,7 @@ export class ItService implements OnInit {
           if (this.pendingTicketId) {
             const pending = this.pendingTicketId;
             this.pendingTicketId = '';
-            this.router.navigate([], {
-              relativeTo: this.route,
-              queryParams: {},
-              replaceUrl: true,
-            });
+            this.location.replaceState('/it-service-list');
 
             const matched = this.Tickets().find(
               (t) => t.ticketNumber === pending || String(t.ticketId) === pending,

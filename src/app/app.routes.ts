@@ -191,6 +191,13 @@ export const routes: Routes = [
         data: { animation: 'ITRequest' },
       },
       {
+        path: 'it-service-list/:ticketNumber',
+        loadComponent: () =>
+          import('./pages/it-service-list/it-service-list').then((m) => m.ItService),
+        canActivate: [menuGuard],
+        data: { animation: 'ITRequest' },
+      },
+      {
         path: 'menu-setting',
         loadComponent: () => import('./pages/setting-menu/setting-menu').then((m) => m.SettingMenu),
         // canActivate: [menuGuard],
