@@ -66,9 +66,7 @@ export class SettingAllowanceRate implements OnInit {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (data) => {
-          this.rates.set(
-            [...(data ?? [])].sort((a, b) => a.min_hours - b.min_hours),
-          );
+          this.rates.set([...(data ?? [])].sort((a, b) => a.min_hours - b.min_hours));
           this.isLoading.set(false);
         },
         error: () => {
@@ -110,7 +108,9 @@ export class SettingAllowanceRate implements OnInit {
 
     this.isConfirming.set(true);
     const confirmation = await this.swalService.confirm(
-      this.editingRateId() === null ? 'ยืนยันการเพิ่มอัตราเบี้ยเลี้ยง?' : 'ยืนยันการแก้ไขอัตราเบี้ยเลี้ยง?',
+      this.editingRateId() === null
+        ? 'ยืนยันการเพิ่มอัตราเบี้ยเลี้ยง?'
+        : 'ยืนยันการแก้ไขอัตราเบี้ยเลี้ยง?',
       'กรุณาตรวจสอบข้อมูลก่อนยืนยัน',
     );
     this.isConfirming.set(false);
@@ -135,7 +135,9 @@ export class SettingAllowanceRate implements OnInit {
           this.isSaving.set(false);
           this.isModalOpen.set(false);
           this.swalService.success(
-            this.editingRateId() === null ? 'เพิ่มอัตราเบี้ยเลี้ยงสำเร็จ' : 'แก้ไขอัตราเบี้ยเลี้ยงสำเร็จ',
+            this.editingRateId() === null
+              ? 'เพิ่มอัตราเบี้ยเลี้ยงสำเร็จ'
+              : 'แก้ไขอัตราเบี้ยเลี้ยงสำเร็จ',
           );
           this.loadRates();
         },

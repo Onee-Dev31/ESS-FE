@@ -119,10 +119,7 @@ export class ChangeTicketTypeModal implements OnChanges {
       this.selectedTypeId !== this.originalTypeId ||
       (this.selectedTypeId === 1 && this.repairCostType !== this.originalRepairCostType);
 
-    return (
-      hasChanged &&
-      (this.selectedTypeId !== 1 || this.repairCostType !== null)
-    );
+    return hasChanged && (this.selectedTypeId !== 1 || this.repairCostType !== null);
   }
 
   save(): void {

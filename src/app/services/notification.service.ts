@@ -101,8 +101,7 @@ export class NotificationService {
           ReOpened: 'เปิดงานอีกครั้ง',
         };
         const [status, detail] = (d?.status ?? '').split('|');
-        if (status === 'ChangeType' && detail)
-          return `IT เปลี่ยนประเภทคำขอเป็น "${detail}"`;
+        if (status === 'ChangeType' && detail) return `IT เปลี่ยนประเภทคำขอเป็น "${detail}"`;
         if (status === 'In Progress' && detail) return `IT รับเรื่องของคุณแล้ว ประเภท "${detail}"`;
         if (status === 'Rejected' && detail) return `คำขอถูกปฏิเสธ เหตุผล: "${detail}"`;
         if (status === 'Referred_Back' && detail)

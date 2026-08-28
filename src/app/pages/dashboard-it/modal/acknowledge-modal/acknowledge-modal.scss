@@ -8,7 +8,9 @@
   color: var(--text);
   font-size: $font-size-label;
 
-  span { color: var(--text-muted); }
+  span {
+    color: var(--text-muted);
+  }
 }
 
 .modal-overlay {

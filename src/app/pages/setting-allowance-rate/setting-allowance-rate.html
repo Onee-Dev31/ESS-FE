@@ -52,7 +52,9 @@
               <tr>
                 <td>{{ index + 1 }}</td>
                 <td>{{ rate.min_hours }} - {{ rate.max_hours }} ชม.</td>
-                <td><span class="amount">{{ rate.rate_amount | number }} บาท</span></td>
+                <td>
+                  <span class="amount">{{ rate.rate_amount | number }} บาท</span>
+                </td>
                 <td>{{ rate.description }}</td>
                 <td class="action-column">
                   <div class="row-actions">

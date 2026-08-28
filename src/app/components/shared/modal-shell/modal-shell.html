@@ -12,10 +12,14 @@
     <header [class.primary]="headerStyle === 'primary'">
       <div class="heading">
         <div class="title-row">
-          @if (icon) { <i [class]="icon"></i> }
+          @if (icon) {
+            <i [class]="icon"></i>
+          }
           <h2>{{ title }}</h2>
         </div>
-        @if (subtitle) { <p>{{ subtitle }}</p> }
+        @if (subtitle) {
+          <p>{{ subtitle }}</p>
+        }
       </div>
       <div class="header-actions">
         <ng-content select="[modalHeaderAction]" />

@@ -1211,7 +1211,9 @@ export class Report {
   }
 
   filterAll = {
-    dateRange: [dayjs().startOf('year').toDate(), dayjs().endOf('year').toDate()] as [Date, Date] | null,
+    dateRange: [dayjs().startOf('year').toDate(), dayjs().endOf('year').toDate()] as
+      | [Date, Date]
+      | null,
   };
 
   applyFilterAll() {

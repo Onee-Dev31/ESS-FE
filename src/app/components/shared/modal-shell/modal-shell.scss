@@ -157,11 +157,21 @@ footer {
       font-size: $font-size-label;
       box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.2);
 
-      &:hover:not(:disabled) { box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.3); }
+      &:hover:not(:disabled) {
+        box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.3);
+      }
     }
 
-    &.danger { border-color: var(--danger); background: var(--danger); color: white; }
-    &.text { min-width: auto; border-color: transparent; background: transparent; }
+    &.danger {
+      border-color: var(--danger);
+      background: var(--danger);
+      color: white;
+    }
+    &.text {
+      min-width: auto;
+      border-color: transparent;
+      background: transparent;
+    }
 
     &:disabled {
       border-color: var(--border-color);

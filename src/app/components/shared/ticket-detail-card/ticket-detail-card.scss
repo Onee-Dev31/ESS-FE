@@ -238,8 +238,12 @@
   cursor: pointer;
   white-space: nowrap;
 
-  strong { font: inherit; }
-  i { font-size: $font-size-hint; }
+  strong {
+    font: inherit;
+  }
+  i {
+    font-size: $font-size-hint;
+  }
 
   &:hover {
     background: color-mix(in srgb, var(--primary), transparent 84%);
@@ -279,7 +283,9 @@
     transform: translateY(-1px);
   }
 
-  &:active { transform: translateY(0); }
+  &:active {
+    transform: translateY(0);
+  }
 
   &:focus-visible {
     outline: 2px solid color-mix(in srgb, var(--primary), transparent 35%);

@@ -7,111 +7,106 @@
   (closeModal)="closeModal.emit()"
 >
   <div class="content">
-      <div class="field-label">เลือกประเภทงาน<span>*</span></div>
-      <div class="type-options">
-        @for (type of ticketTypes; track type.id) {
+    <div class="field-label">เลือกประเภทงาน<span>*</span></div>
+    <div class="type-options">
+      @for (type of ticketTypes; track type.id) {
+        <button
+          type="button"
+          class="type-option"
+          [class.selected]="selectedTypeId === type.id"
+          (click)="selectType(type.id)"
+        >
+          {{ type.label }}
+        </button>
+      }
+    </div>
+
+    @if (selectedTypeId === 1) {
+      <div class="repair-cost-card">
+        <div class="field-label">ประเภทค่าใช้จ่าย<span>*</span></div>
+        <div class="type-options">
           <button
             type="button"
             class="type-option"
-            [class.selected]="selectedTypeId === type.id"
-            (click)="selectType(type.id)"
+            [class.selected]="repairCostType === 'paid'"
+            (click)="selectRepairCostType('paid')"
           >
-            {{ type.label }}
+            ขออนุมัติ Budget ต้นสังกัด
           </button>
+          <button
+            type="button"
+            class="type-option"
+            [class.selected]="repairCostType === 'free'"
+            (click)="selectRepairCostType('free')"
+          >
+            ดำเนินการตามปกติ
+          </button>
+        </div>
+
+        @if (repairCostType === 'paid') {
+          <div class="attachment-label">เอกสารประกอบการขอ Budget<span>*</span></div>
+          <input
+            #fileInput
+            type="file"
+            multiple
+            hidden
+            [accept]="'.' + fileConfig.allowedExtensions.join(',.')"
+            (change)="onFileSelected($event)"
+          />
+          <button
+            type="button"
+            class="upload-box"
+            (click)="fileInput.click()"
+            (dragover)="onDragOver($event)"
+            (drop)="onFileDrop($event)"
+          >
+            <i class="fas fa-cloud-arrow-up"></i>
+            <span class="upload-title">คลิกเพื่อแนบไฟล์ หรือลากไฟล์มาวาง</span>
+            <span class="upload-hint">ใบเสนอราคาหรือเอกสารประกอบ · สูงสุด 5 ไฟล์ ไฟล์ละ 5 MB</span>
+          </button>
+
+          @if (showAttachmentError) {
+            <div class="attachment-required">
+              <i class="fas fa-exclamation-circle"></i>
+              กรุณาแนบไฟล์ใบเสนอราคา / เอกสารประกอบการขออนุมัติ Budget
+            </div>
+          }
+
+          @if (attachments.length > 0) {
+            <div class="file-list">
+              @for (file of attachments; track file.name; let index = $index) {
+                <div class="file-chip">
+                  <i class="far fa-file"></i>
+                  <span>{{ file.name }}</span>
+                  <button type="button" aria-label="ลบไฟล์" (click)="removeAttachment(index)">
+                    <i class="fas fa-times"></i>
+                  </button>
+                </div>
+              }
+            </div>
+          }
         }
       </div>
+    }
 
-      @if (selectedTypeId === 1) {
-        <div class="repair-cost-card">
-          <div class="field-label">ประเภทค่าใช้จ่าย<span>*</span></div>
-          <div class="type-options">
-            <button
-              type="button"
-              class="type-option"
-              [class.selected]="repairCostType === 'paid'"
-              (click)="selectRepairCostType('paid')"
-            >
-              ขออนุมัติ Budget ต้นสังกัด
-            </button>
-            <button
-              type="button"
-              class="type-option"
-              [class.selected]="repairCostType === 'free'"
-              (click)="selectRepairCostType('free')"
-            >
-              ดำเนินการตามปกติ
-            </button>
-          </div>
-
-          @if (repairCostType === 'paid') {
-            <div class="attachment-label">เอกสารประกอบการขอ Budget<span>*</span></div>
-            <input
-              #fileInput
-              type="file"
-              multiple
-              hidden
-              [accept]="'.' + fileConfig.allowedExtensions.join(',.')"
-              (change)="onFileSelected($event)"
-            />
-            <button
-              type="button"
-              class="upload-box"
-              (click)="fileInput.click()"
-              (dragover)="onDragOver($event)"
-              (drop)="onFileDrop($event)"
-            >
-              <i class="fas fa-cloud-arrow-up"></i>
-              <span class="upload-title">คลิกเพื่อแนบไฟล์ หรือลากไฟล์มาวาง</span>
-              <span class="upload-hint">ใบเสนอราคาหรือเอกสารประกอบ · สูงสุด 5 ไฟล์ ไฟล์ละ 5 MB</span>
-            </button>
-
-            @if (showAttachmentError) {
-              <div class="attachment-required">
-                <i class="fas fa-exclamation-circle"></i>
-                กรุณาแนบไฟล์ใบเสนอราคา / เอกสารประกอบการขออนุมัติ Budget
-              </div>
-            }
-
-            @if (attachments.length > 0) {
-              <div class="file-list">
-                @for (file of attachments; track file.name; let index = $index) {
-                  <div class="file-chip">
-                    <i class="far fa-file"></i>
-                    <span>{{ file.name }}</span>
-                    <button type="button" aria-label="ลบไฟล์" (click)="removeAttachment(index)">
-                      <i class="fas fa-times"></i>
-                    </button>
-                  </div>
-                }
-              </div>
-            }
-          }
-        </div>
-      }
-
-      <label class="field-label reason-label" for="change-type-reason">
-        เหตุผล <small>(ไม่บังคับ)</small>
-      </label>
-      <textarea
-        id="change-type-reason"
-        [(ngModel)]="reason"
-        rows="4"
-        maxlength="1000"
-        placeholder="กรอกเหตุผลในการเปลี่ยนประเภทคำขอ..."
-      ></textarea>
+    <label class="field-label reason-label" for="change-type-reason">
+      เหตุผล <small>(ไม่บังคับ)</small>
+    </label>
+    <textarea
+      id="change-type-reason"
+      [(ngModel)]="reason"
+      rows="4"
+      maxlength="1000"
+      placeholder="กรอกเหตุผลในการเปลี่ยนประเภทคำขอ..."
+    ></textarea>
   </div>
 
   <div modalFooter class="modal-actions">
-      <button type="button" class="modal-button" (click)="closeModal.emit()">
-        <i class="fas fa-times"></i> ยกเลิก
-      </button>
-      <button
-        type="button"
-        class="modal-button primary"
-        [disabled]="!canSubmit"
-        (click)="save()"
-      >
-        <i class="fas fa-paper-plane"></i> ยืนยัน
-      </button>
+    <button type="button" class="modal-button" (click)="closeModal.emit()">
+      <i class="fas fa-times"></i> ยกเลิก
+    </button>
+    <button type="button" class="modal-button primary" [disabled]="!canSubmit" (click)="save()">
+      <i class="fas fa-paper-plane"></i> ยืนยัน
+    </button>
   </div>
 </app-modal-shell>
