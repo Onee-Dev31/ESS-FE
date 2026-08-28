@@ -57,6 +57,44 @@ export interface MedicalPolicy {
   policy_content: PolicyContent[];
 }
 
+// ─── Medical Benefit Plan (Master/GetMedicalBenefitPlans, Master/UpsertMedicalBenefitPlans) ──
+
+export interface MedicalBenefitPlan {
+  plan_id: number;
+  plan_no: number;
+  job_class_label: string;
+  job_class_min: number;
+  job_class_max: number;
+  opd_limit: number;
+  ipd_limit: number;
+  dental_limit: number;
+  vision_limit: number;
+  opd_per_visit_cap: number;
+  opd_over_cap: number;
+  ipd_daily_cap: number;
+  ipd_daily_over_cap: number;
+  is_active: boolean;
+}
+
+export interface UpsertMedicalBenefitPlanPayload {
+  plan_id?: number;
+  plan_no?: number;
+  job_class_label?: string;
+  job_class_min?: number;
+  job_class_max?: number;
+  opd_limit?: number;
+  ipd_limit?: number;
+  dental_limit?: number;
+  vision_limit?: number;
+  opd_per_visit_cap?: number;
+  opd_over_cap?: number;
+  ipd_daily_cap?: number;
+  ipd_daily_over_cap?: number;
+  is_active: boolean;
+  isDelete: boolean;
+  excuteby: string;
+}
+
 export interface MedicalPolicyResponse {
   success: boolean;
   data: MedicalPolicy;

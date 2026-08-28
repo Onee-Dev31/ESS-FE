@@ -225,6 +225,24 @@ export const routes: Routes = [
         data: { animation: 'Dashboard' },
       },
       {
+        path: 'allowance-setting',
+        loadComponent: () =>
+          import('./pages/setting-allowance-rate/setting-allowance-rate').then(
+            (m) => m.SettingAllowanceRate,
+          ),
+        // canActivate: [menuGuard],
+        data: { animation: 'Dashboard' },
+      },
+      {
+        path: 'medical-setting',
+        loadComponent: () =>
+          import('./pages/setting-medical-benefit-plan/setting-medical-benefit-plan').then(
+            (m) => m.SettingMedicalBenefitPlan,
+          ),
+        // canActivate: [menuGuard],
+        data: { animation: 'Dashboard' },
+      },
+      {
         path: 'notification-setting',
         loadComponent: () =>
           import('./pages/setting-notification/setting-notification').then(

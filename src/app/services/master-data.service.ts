@@ -7,6 +7,14 @@ import { DateConfig } from '../interfaces/core.interface';
 import { environment } from '../../environments/environment';
 import { HttpClient, HttpContext, HttpParams } from '@angular/common/http';
 import { SKIP_ERROR_TOAST } from '../interceptors/error.interceptor';
+import {
+  ClaimAllowanceRate,
+  UpsertClaimAllowanceRatePayload,
+} from '../interfaces/allowance.interface';
+import {
+  MedicalBenefitPlan,
+  UpsertMedicalBenefitPlanPayload,
+} from '../interfaces/medical.interface';
 
 export interface ClaimType {
   id: string;
@@ -141,5 +149,25 @@ export class MasterDataService {
 
   MasterPermission(): Observable<any> {
     return this._http.get(`${this.baseUrl}/Master/MasterPermission`);
+  }
+
+  /** GET api/Master/GetClaimAllowanceRates */
+  getClaimAllowanceRates(): Observable<ClaimAllowanceRate[]> {
+    return this._http.get<ClaimAllowanceRate[]>(`${this.baseUrl}/Master/GetClaimAllowanceRates`);
+  }
+
+  /** POST api/Master/UpsertClaimAllowanceRates */
+  upsertClaimAllowanceRate(payload: UpsertClaimAllowanceRatePayload): Observable<any> {
+    return this._http.post(`${this.baseUrl}/Master/UpsertClaimAllowanceRates`, payload);
+  }
+
+  /** GET api/Master/GetMedicalBenefitPlans */
+  getMedicalBenefitPlans(): Observable<MedicalBenefitPlan[]> {
+    return this._http.get<MedicalBenefitPlan[]>(`${this.baseUrl}/Master/GetMedicalBenefitPlans`);
+  }
+
+  /** POST api/Master/UpsertMedicalBenefitPlans */
+  upsertMedicalBenefitPlan(payload: UpsertMedicalBenefitPlanPayload): Observable<any> {
+    return this._http.post(`${this.baseUrl}/Master/UpsertMedicalBenefitPlans`, payload);
   }
 }
