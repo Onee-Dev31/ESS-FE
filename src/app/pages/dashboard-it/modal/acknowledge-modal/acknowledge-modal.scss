@@ -2,6 +2,15 @@
 @use '../../../../../styles/variables' as *;
 @use '../../../../../styles/mixins' as *;
 
+.reason-label {
+  display: block;
+  margin-bottom: 8px;
+  color: var(--text);
+  font-size: $font-size-label;
+
+  span { color: var(--text-muted); }
+}
+
 .modal-overlay {
   @include modal-overlay-styles;
 

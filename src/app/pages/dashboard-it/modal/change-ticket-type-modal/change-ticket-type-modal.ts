@@ -34,6 +34,7 @@ export class ChangeTicketTypeModal implements OnChanges {
   selectedTypeId = 2;
   originalTypeId = 2;
   repairCostType: 'paid' | 'free' | null = null;
+  originalRepairCostType: 'paid' | 'free' | null = null;
   reason = '';
   attachments: { name: string; size: number; file: File }[] = [];
   showAttachmentError = false;
@@ -45,6 +46,7 @@ export class ChangeTicketTypeModal implements OnChanges {
       this.selectedTypeId === 1 && ['paid', 'free'].includes(this.ticket?.repair_cost_type)
         ? this.ticket.repair_cost_type
         : null;
+    this.originalRepairCostType = this.repairCostType;
     this.reason = '';
     this.attachments = [];
     this.showAttachmentError = false;
@@ -113,8 +115,12 @@ export class ChangeTicketTypeModal implements OnChanges {
   }
 
   get canSubmit(): boolean {
+    const hasChanged =
+      this.selectedTypeId !== this.originalTypeId ||
+      (this.selectedTypeId === 1 && this.repairCostType !== this.originalRepairCostType);
+
     return (
-      this.selectedTypeId !== this.originalTypeId &&
+      hasChanged &&
       (this.selectedTypeId !== 1 || this.repairCostType !== null)
     );
   }
