@@ -66,6 +66,8 @@
 
 .brand-lockup,
 .left-content,
+.left-ess-logo-stage,
+.left-ess-logo,
 .company-logo-stage,
 .company-logo-composite {
   position: relative;
@@ -118,10 +120,26 @@
   align-items: center;
 }
 
+.left-ess-logo-stage {
+  position: absolute;
+  left: 50%;
+  top: clamp(370px, 57vh, 530px);
+  width: min(255px, 36%);
+  transform: translate(-50%, -50%);
+}
+
+.left-ess-logo {
+  display: block;
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+  filter: drop-shadow(0 18px 36px rgba(0, 0, 0, 0.38));
+}
+
 .left-content {
   width: min(760px, 94%);
   align-self: center;
-  margin-top: clamp(82px, 13vh, 140px);
+  margin-top: clamp(54px, 9vh, 104px);
   padding-bottom: 0;
 }
 
