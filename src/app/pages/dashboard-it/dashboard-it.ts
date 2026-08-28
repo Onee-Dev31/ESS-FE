@@ -1932,6 +1932,20 @@ export class DashboardIT implements OnInit {
         }
 
         this.swalService.success(res.message || 'เปลี่ยนประเภทคำขอสำเร็จ');
+
+        const typeNameMap: Record<number, string> = {
+          1: 'แจ้งซ่อม',
+          2: 'แจ้งปัญหา',
+          3: 'ขอใช้บริการ',
+        };
+        const typeName = typeNameMap[Number(data.ticketTypeId)] ?? '';
+
+        this.signalrService.ticketStatusNotify(
+          ticketId,
+          ticket?.requesterAduser ?? '',
+          typeName ? `ChangeType|${typeName}` : 'ChangeType',
+        );
+
         this.selectTicket(ticketId);
         this.getAllTickets();
       },
