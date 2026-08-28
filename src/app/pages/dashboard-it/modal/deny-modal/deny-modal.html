@@ -1,35 +1,33 @@
-<div class="modal-overlay denyTicket">
-  <div class="modal-container">
-    <div>
-      <header class="top-header-strip">
-        <h2>เหตุผลในการยกเลิก</h2>
-      </header>
+<form #denyForm="ngForm" (ngSubmit)="save(denyForm)">
+  <app-modal-shell
+    title="เหตุผลในการยกเลิก"
+    size="sm"
+    [padded]="false"
+    [showClose]="false"
+    [mobileFullscreen]="true"
+    (closeModal)="close()"
+  >
+    <div class="deny-content">
+      <textarea
+        class="deny-reason"
+        name="reason"
+        ngModel
+        required
+        placeholder="อธิบายรายละเอียด..."
+      ></textarea>
 
-      <form #denyForm="ngForm" (ngSubmit)="save(denyForm)">
-        <div class="content-card">
-          <textarea
-            class="form-input deny"
-            name="reason"
-            ngModel
-            required
-            placeholder="อธิบายรายละเอียด..."
-          ></textarea>
-
-          <div *ngIf="denyForm.submitted && denyForm.invalid" style="color: red; margin-top: 6px">
-            กรุณากรอกเหตุผลในการยกเลิก
-          </div>
-        </div>
-
-        <div class="form-actions-footer">
-          <button type="button" class="btn-back-custom" (click)="close()">
-            <i class="fas fa-times"></i> ยกเลิก
-          </button>
-
-          <button type="submit" class="btn-save-custom" [disabled]="denyForm.invalid">
-            <i class="fas fa-paper-plane"></i> ยืนยัน
-          </button>
-        </div>
-      </form>
+      @if (denyForm.submitted && denyForm.invalid) {
+        <div class="validation-message">กรุณากรอกเหตุผลในการยกเลิก</div>
+      }
     </div>
-  </div>
-</div>
+
+    <div modalFooter>
+      <button type="button" class="modal-button" (click)="close()">
+        <i class="fas fa-times"></i> ยกเลิก
+      </button>
+      <button type="submit" class="modal-button primary" [disabled]="denyForm.invalid">
+        <i class="fas fa-paper-plane"></i> ยืนยัน
+      </button>
+    </div>
+  </app-modal-shell>
+</form>

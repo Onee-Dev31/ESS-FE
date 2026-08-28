@@ -1,10 +1,11 @@
 import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { FormsModule, NgForm } from '@angular/forms';
+import { ModalShellComponent } from '../../../../components/shared/modal-shell/modal-shell';
 
 @Component({
   selector: 'app-deny-modal',
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, ModalShellComponent],
   templateUrl: './deny-modal.html',
   styleUrl: './deny-modal.scss',
 })

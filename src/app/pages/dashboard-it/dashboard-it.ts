@@ -48,6 +48,7 @@ import { tickets } from '../../utils/it-dashboard-mock';
 import { AcknowledgeModal } from './modal/acknowledge-modal/acknowledge-modal';
 import { EmailReplyModal } from './modal/email-reply-modal/email-reply-modal';
 import { DenyModal } from './modal/deny-modal/deny-modal';
+import { ChangeTicketTypeModal } from './modal/change-ticket-type-modal/change-ticket-type-modal';
 import { AssignModal } from './modal/assign-modal/assign-modal';
 import { NoteModal } from './modal/note-modal/note-modal';
 import { DateUtilityService } from '../../services/date-utility.service';
@@ -91,6 +92,7 @@ import { PageLoaderComponent } from '../../components/shared/page-loader/page-lo
     AcknowledgeModal,
     EmailReplyModal,
     DenyModal,
+    ChangeTicketTypeModal,
     AssignModal,
     NoteModal,
     ServicesDetailModal,
@@ -390,6 +392,7 @@ export class DashboardIT implements OnInit {
   }
   private initialized = false;
   IS_DENY_TICKET = signal(false);
+  IS_CHANGE_TICKET_TYPE = signal(false);
   IS_ONHOLD_TICKET = signal(false);
   IS_ACKNOWLEDGE_TICKET = signal(false);
   IS_NOTE_TICKET = signal(false);
@@ -1590,6 +1593,13 @@ export class DashboardIT implements OnInit {
       formData.append('reason', reason);
     }
 
+    if (command === 'changeType') {
+      formData.append('ITResult', 'ChangeType');
+      formData.append('newTicketTypeId', ticketTypeId || '2');
+      if (repairCostType) formData.append('repairCostType', repairCostType);
+      if (reason) formData.append('reason', reason);
+    }
+
     if (command === 'close') {
       formData.append('itResult', 'Closed');
     }
@@ -1661,6 +1671,7 @@ export class DashboardIT implements OnInit {
 
     this.itServiceService.checkItAvalible(ticketId).subscribe({
       next: (res) => {
+        console.log(res);
         if (!res?.success) {
           this.swalService.warning(res.message);
 
@@ -1714,6 +1725,8 @@ export class DashboardIT implements OnInit {
     }
 
     const tag = data.ticketTypeId;
+    const repairCostType =
+      Number(data.ticketTypeId) === 1 ? (data.repairCostType ?? 'free') : undefined;
 
     this.swalService.loading('กำลังบันทึกข้อมูล...');
     this.IS_ACKNOWLEDGE_TICKET.set(false);
@@ -1725,7 +1738,7 @@ export class DashboardIT implements OnInit {
       null,
       data.message,
       data.attachments,
-      data.repairCostType,
+      repairCostType,
     ).subscribe({
       next: (res) => {
         if (!res?.success) {
@@ -1874,6 +1887,76 @@ export class DashboardIT implements OnInit {
 
   closeDenyModal() {
     this.IS_DENY_TICKET.set(false);
+  }
+
+  openChangeTicketTypeModal() {
+    this.checkBeforeAction(() => {
+      this.IS_CHANGE_TICKET_TYPE.set(true);
+    });
+  }
+
+  closeChangeTicketTypeModal() {
+    this.IS_CHANGE_TICKET_TYPE.set(false);
+  }
+
+  submitChangeTicketType(data: {
+    ticketTypeId: number;
+    repairCostType?: 'paid' | 'free';
+    reason: string;
+    attachments: { name: string; size: number; file: File }[];
+  }) {
+    const ticket = this.selectedTicket();
+    const ticketId = ticket?.ticketId;
+    if (!ticketId) {
+      this.swalService.warning('ไม่พบ Ticket');
+      return;
+    }
+
+    this.swalService.loading('กำลังเปลี่ยนประเภทคำขอ...');
+    this.closeChangeTicketTypeModal();
+
+    this.updateTicket(
+      'changeType',
+      ticketId,
+      String(data.ticketTypeId),
+      null,
+      null,
+      data.attachments,
+      data.repairCostType,
+      data.reason,
+    ).subscribe({
+      next: (res) => {
+        if (!res?.success) {
+          this.swalService.warning(res?.message || 'ไม่สามารถเปลี่ยนประเภทคำขอได้');
+          return;
+        }
+
+        this.swalService.success(res.message || 'เปลี่ยนประเภทคำขอสำเร็จ');
+
+        const typeNameMap: Record<number, string> = {
+          1: 'แจ้งซ่อม',
+          2: 'แจ้งปัญหา',
+          3: 'ขอใช้บริการ',
+        };
+        const typeName = typeNameMap[Number(data.ticketTypeId)] ?? '';
+
+        this.signalrService.ticketStatusNotify(
+          ticketId,
+          ticket?.requesterAduser ?? '',
+          typeName ? `ChangeType|${typeName}` : 'ChangeType',
+        );
+
+        this.selectTicket(ticketId);
+        this.getAllTickets();
+      },
+      error: (error) => {
+        console.error('Change Ticket Type Error:', error);
+        this.swalService.warning(
+          'เกิดข้อผิดพลาด',
+          error?.error?.message || error?.message || 'ไม่สามารถเปลี่ยนประเภทคำขอได้',
+        );
+      },
+    });
   }
 
   submitDeny(data: any) {

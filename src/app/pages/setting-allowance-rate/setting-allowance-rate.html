@@ -1,0 +1,194 @@
+<div class="page">
+  <app-page-header
+    title="กำหนดอัตราเบี้ยเลี้ยง"
+    subtitle="Claim Allowance Rate Setting"
+    icon="fas fa-sack-dollar"
+  />
+
+  <div class="content-card">
+    <div class="card-header-title">
+      <div class="header-row">
+        <div>ตารางอัตราเบี้ยเลี้ยง</div>
+        <div class="card-actions">
+          <button type="button" class="btn-add" (click)="openCreate()">
+            <i class="fa-solid fa-plus"></i> เพิ่มอัตรา
+          </button>
+        </div>
+      </div>
+      <p>กำหนดจำนวนเงินที่ได้รับตามช่วงชั่วโมงทำงานล่วงเวลา</p>
+    </div>
+
+    <div class="table-responsive">
+      @if (isLoading()) {
+        <app-skeleton type="table" [rows]="5"></app-skeleton>
+      } @else if (errorMessage()) {
+        <app-empty-state
+          title="เกิดข้อผิดพลาด"
+          [description]="errorMessage()!"
+          icon="fas fa-triangle-exclamation"
+          actionLabel="ลองอีกครั้ง"
+          actionIcon="fas fa-rotate-right"
+          (action)="loadRates()"
+        ></app-empty-state>
+      } @else if (rates().length === 0) {
+        <app-empty-state
+          title="ยังไม่มีอัตราเบี้ยเลี้ยง"
+          description="เริ่มเพิ่มอัตราแรกได้เลย"
+          icon="fas fa-sack-dollar"
+        ></app-empty-state>
+      } @else {
+        <table class="modern-table">
+          <thead>
+            <tr>
+              <th>ลำดับ</th>
+              <th>ช่วงชั่วโมง</th>
+              <th>จำนวนเงิน</th>
+              <th>คำอธิบาย</th>
+              <th class="action-column"></th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (rate of rates(); track rate.rate_id; let index = $index) {
+              <tr>
+                <td>{{ index + 1 }}</td>
+                <td>{{ rate.min_hours }} - {{ rate.max_hours }} ชม.</td>
+                <td>
+                  <span class="amount">{{ rate.rate_amount | number }} บาท</span>
+                </td>
+                <td>{{ rate.description }}</td>
+                <td class="action-column">
+                  <div class="row-actions">
+                    <button
+                      type="button"
+                      class="btn-icon-edit"
+                      title="แก้ไขอัตรา"
+                      (click)="openEdit(rate)"
+                    >
+                      <i class="fa-solid fa-pen"></i>
+                    </button>
+                    <button
+                      type="button"
+                      class="btn-icon-delete"
+                      title="ลบอัตรา"
+                      [disabled]="deletingRateId() === rate.rate_id"
+                      (click)="deleteRate(rate)"
+                    >
+                      <i
+                        class="fa-solid"
+                        [class.fa-trash-can]="deletingRateId() !== rate.rate_id"
+                        [class.fa-spinner]="deletingRateId() === rate.rate_id"
+                        [class.spin]="deletingRateId() === rate.rate_id"
+                      ></i>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      }
+    </div>
+  </div>
+</div>
+
+@if (isModalOpen()) {
+  <app-modal-shell
+    [title]="editingRateId() === null ? 'เพิ่มอัตรา' : 'แก้ไขอัตรา'"
+    subtitle="อัตราเบี้ยเลี้ยง"
+    size="md"
+    [closeOnBackdrop]="!isSaving()"
+    [closeOnEscape]="!isSaving() && !isConfirming()"
+    (closeModal)="closeModal()"
+  >
+    <form id="allowance-rate-form" (ngSubmit)="saveRate()">
+      <fieldset class="field-group">
+        <legend>ช่วงชั่วโมงทำงานล่วงเวลา</legend>
+        <div class="field-grid">
+          <label class="form-field">
+            <span>ตั้งแต่ (ชม.)</span>
+            <input
+              type="number"
+              min="0"
+              step="0.5"
+              name="min_hours"
+              required
+              class="form-input"
+              [class.input-invalid]="getFieldError('min_hours')"
+              [(ngModel)]="form.min_hours"
+            />
+            @if (getFieldError('min_hours'); as error) {
+              <small class="field-error">{{ error }}</small>
+            }
+          </label>
+          <label class="form-field">
+            <span>ไม่เกิน (ชม.)</span>
+            <input
+              type="number"
+              min="0"
+              step="0.5"
+              name="max_hours"
+              required
+              class="form-input"
+              [class.input-invalid]="getFieldError('max_hours')"
+              [(ngModel)]="form.max_hours"
+            />
+            @if (getFieldError('max_hours'); as error) {
+              <small class="field-error">{{ error }}</small>
+            }
+          </label>
+        </div>
+      </fieldset>
+
+      <label class="form-field">
+        <span>จำนวนเงินที่ได้รับ (บาท)</span>
+        <input
+          type="number"
+          min="0"
+          step="1"
+          name="rate_amount"
+          required
+          class="form-input"
+          [class.input-invalid]="getFieldError('rate_amount')"
+          [(ngModel)]="form.rate_amount"
+        />
+        @if (getFieldError('rate_amount'); as error) {
+          <small class="field-error">{{ error }}</small>
+        }
+      </label>
+
+      <label class="form-field">
+        <span>คำอธิบาย</span>
+        <input
+          type="text"
+          name="description"
+          required
+          autocomplete="off"
+          class="form-input"
+          [class.input-invalid]="getFieldError('description')"
+          [(ngModel)]="form.description"
+        />
+        @if (getFieldError('description'); as error) {
+          <small class="field-error">{{ error }}</small>
+        }
+      </label>
+    </form>
+
+    <div modalFooter>
+      <button type="button" class="modal-button" (click)="closeModal()" [disabled]="isSaving()">
+        ยกเลิก
+      </button>
+      <button
+        type="submit"
+        form="allowance-rate-form"
+        class="modal-button primary"
+        [disabled]="isSaving() || isConfirming()"
+      >
+        @if (isSaving()) {
+          <i class="fa-solid fa-spinner spin"></i> กำลังบันทึก...
+        } @else {
+          <i class="fa-solid fa-check"></i> บันทึก
+        }
+      </button>
+    </div>
+  </app-modal-shell>
+}

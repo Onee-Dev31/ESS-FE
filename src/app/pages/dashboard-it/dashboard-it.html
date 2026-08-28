@@ -247,6 +247,7 @@
       (attachmentClick)="openAllAttachments($event)"
       (servicesClick)="showAll($event)"
       (copyClick)="copyDescription(t.id, t.description)"
+      (changeTypeClick)="openChangeTicketTypeModal()"
       (detailClick)="openDetail(t.ticketId, t.description)"
     />
 
@@ -471,6 +472,14 @@
       (submitModal)="submitDeny($event)"
     >
     </app-deny-modal>
+  }
+
+  @if (IS_CHANGE_TICKET_TYPE()) {
+    <app-change-ticket-type-modal
+      [ticket]="selectedTicket()"
+      (closeModal)="closeChangeTicketTypeModal()"
+      (submitModal)="submitChangeTicketType($event)"
+    />
   }
 
   @if (IS_ACKNOWLEDGE_TICKET()) {

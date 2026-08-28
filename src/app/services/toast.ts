@@ -20,7 +20,7 @@ export class ToastService {
   private show(
     type: Toast['type'],
     message: string,
-    duration: number = 3000,
+    duration: number = 5000,
     route?: string,
     queryParams?: Record<string, any>,
   ) {

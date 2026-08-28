@@ -5,10 +5,11 @@ import {
 } from '../../../../components/modals/file-preview-modal/file-preview-modal';
 import dayjs from 'dayjs';
 import { FormsModule } from '@angular/forms';
+import { ModalShellComponent } from '../../../../components/shared/modal-shell/modal-shell';
 
 @Component({
   selector: 'app-note-for-it-modal',
-  imports: [FilePreviewModalComponent, FormsModule],
+  imports: [FilePreviewModalComponent, FormsModule, ModalShellComponent],
   templateUrl: './note-for-it-modal.html',
   styleUrl: './note-for-it-modal.scss',
 })
