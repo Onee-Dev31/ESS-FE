@@ -54,19 +54,175 @@
   overflow-x: auto;
   padding: 0 1.5rem 1.5rem;
 
+  @include tablet {
+    display: none !important;
+  }
+
   @include mobile {
     padding: 0 0 14px;
   }
 }
 
 .modern-table {
-  @include modern-table;
+  width: 100%;
+  border-collapse: collapse;
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+
+  thead th {
+    padding: 12px 18px;
+    background: var(--bg-table-head);
+    color: var(--text-muted);
+    font-size: $font-size-label;
+    font-weight: 400;
+    text-transform: none;
+    letter-spacing: normal;
+    text-align: left;
+    white-space: nowrap;
+    border-bottom: none;
+  }
+
+  tbody td {
+    padding: 16px 18px;
+    font-size: $font-size-body;
+    color: var(--text-sub);
+    border-bottom: none;
+    border-top: 1px solid var(--border-table-head);
+    vertical-align: middle;
+  }
+
+  tbody tr:first-child td {
+    border-top: none;
+  }
+
+  tbody tr:hover td {
+    background: color-mix(in srgb, $primary 3%, var(--bg-card));
+  }
 }
 
 .amount {
   color: var(--primary);
   font-weight: 600;
   white-space: nowrap;
+}
+
+// ==================== MOBILE CARDS ====================
+.card-list-view {
+  display: none;
+
+  @include tablet {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding: 1rem;
+  }
+
+  .mobile-card {
+    background: var(--bg-card);
+    border-radius: 16px;
+    border: 1px solid rgba(0, 0, 0, 0.06);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    overflow: hidden;
+
+    .card-header {
+      background: var(--bg-card);
+      border-bottom: 1px solid var(--border-toolbar);
+      padding: 14px 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+
+      .card-dept-name {
+        font-weight: 700;
+        color: $primary;
+        font-size: 1rem;
+        display: block;
+      }
+
+      .card-dept-code {
+        font-size: 0.75rem;
+        color: var(--text-muted);
+        margin-top: 2px;
+      }
+
+      .amount {
+        flex-shrink: 0;
+      }
+    }
+
+    .card-body {
+      padding: 16px;
+
+      .info-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 0;
+        font-size: $font-size-label;
+        gap: 8px;
+
+        .label {
+          color: var(--text-sub);
+          flex-shrink: 0;
+        }
+
+        .value {
+          font-weight: 600;
+          color: var(--text-header);
+          text-align: right;
+        }
+      }
+
+      .card-footer-actions {
+        margin-top: 12px;
+        padding-top: 12px;
+        border-top: 1px solid var(--border-toolbar);
+        display: flex;
+        gap: 10px;
+
+        button {
+          flex: 1;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          gap: 8px;
+          padding: 9px 14px;
+          border-radius: 10px;
+          font-size: $font-size-label;
+          font-weight: 600;
+          cursor: pointer;
+          border: none;
+          transition: all 0.2s;
+        }
+
+        .btn-edit-sm {
+          background: color-mix(in srgb, $primary, transparent 88%);
+          color: $primary;
+
+          &:hover {
+            background: color-mix(in srgb, $primary, transparent 75%);
+          }
+        }
+
+        .btn-delete-sm {
+          background: color-mix(in srgb, $danger, transparent 88%);
+          color: $danger;
+
+          &:hover {
+            background: color-mix(in srgb, $danger, transparent 75%);
+          }
+
+          &:disabled {
+            opacity: 0.5;
+            cursor: wait;
+          }
+        }
+      }
+    }
+  }
 }
 
 .action-column {
