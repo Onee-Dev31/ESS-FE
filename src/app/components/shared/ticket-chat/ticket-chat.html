@@ -74,12 +74,12 @@
                   </div>
                   <div class="note__msg">
                     @if (note.referred_title === '[REFERRED]') {
-                      <span class="refer_tag" [class.last]="!note.isReferred">{{
+                      <span class="refer_tag referred">{{
                         note.referred_title
                       }}</span>
                     }
                     @if (note.referred_title === '[REJECTED]') {
-                      <span class="refer_tag last">{{ note.referred_title }}</span>
+                      <span class="refer_tag rejected">{{ note.referred_title }}</span>
                     }
                     @if (isHtmlMessage(note.message)) {
                       <span class="note__email" [innerHTML]="note.message | safeEmailHtml"></span>

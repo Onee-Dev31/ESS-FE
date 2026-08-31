@@ -1819,16 +1819,19 @@ textarea.form-input {
   line-height: 1.6;
 
   .refer_tag {
-    background-color: var(--tag-bg-green);
-    border: 1px solid var(--tag-color-green);
-    color: var(--tag-color-green) !important;
     border-radius: 4px;
     padding: 3px 5px;
     font-size: $font-size-label;
     font-weight: 600;
     margin-right: 5px;
 
-    &.last {
+    &.referred {
+      background: color-mix(in srgb, var(--warning) 14%, transparent);
+      border: 1px solid var(--warning);
+      color: var(--warning) !important;
+    }
+
+    &.rejected {
       background-color: var(--tag-bg-red);
       border: 1px solid var(--tag-color-red);
       color: var(--tag-color-red) !important;

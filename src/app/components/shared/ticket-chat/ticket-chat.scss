@@ -189,10 +189,14 @@
 .refer_tag {
   display: inline-block;
   margin-right: 4px;
-  color: var(--primary);
   font-weight: 700;
 }
-.refer_tag.last {
+
+.refer_tag.referred {
+  color: var(--warning);
+}
+
+.refer_tag.rejected {
   color: var(--danger);
 }
 .image-grid {
