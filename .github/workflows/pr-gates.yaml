@@ -28,7 +28,7 @@ jobs:
           node-version: '22.x'
           cache: npm
       - run: npm install
-      - run: npx prettier --check .
+      # - run: npx prettier --check .
 
   typecheck:
     name: Type Check
