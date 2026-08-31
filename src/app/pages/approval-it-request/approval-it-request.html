@@ -39,6 +39,24 @@
         </nz-input-wrapper>
       </div>
 
+      @if (showDateRangeFilter) {
+        <div class="year-range-filter">
+          <label>
+            <span>Date range</span>
+            <nz-range-picker
+              class="date-range-picker"
+              nzFormat="dd/MM/yyyy"
+              [ngModel]="dateRange()"
+              (ngModelChange)="dateRange.set($event)"
+            />
+          </label>
+          <button type="button" class="year-search-button" (click)="searchByDateRange()">
+            <i class="fas fa-search"></i>
+            Search
+          </button>
+        </div>
+      }
+
       <div class="tab-navigation">
         @for (tab of tabs; track tab) {
           <button
@@ -59,7 +77,25 @@
         <table class="modern-table">
           <thead>
             <tr>
-              <th class="col-requestNo"><i class="fas fa-hashtag mr-1"></i> Request No.</th>
+              <th class="col-requestNo">
+                <div class="request-number-header">
+                  <span><i class="fas fa-hashtag mr-1"></i> Request No.</span>
+                  @if (showDateRangeFilter && canFilterApprovalStage()) {
+                    <nz-select
+                      class="approval-stage-filter"
+                      [class.filter-approver]="approvalStageFilter() === 'approver'"
+                      [class.filter-director]="approvalStageFilter() === 'director'"
+                      aria-label="Filter approval stage"
+                      [ngModel]="approvalStageFilter()"
+                      (ngModelChange)="setApprovalStageFilter($event)"
+                    >
+                      <nz-option nzValue="all" nzLabel="All" />
+                      <nz-option nzValue="approver" nzLabel="Approver" />
+                      <nz-option nzValue="director" nzLabel="IT Director" />
+                    </nz-select>
+                  }
+                </div>
+              </th>
               <th class="col-requestDate"><i class="far fa-clock mr-1"></i> Request Date</th>
               <th class="col-requestBy"><i class="fas fa-user-edit mr-1"></i> Request By</th>
               <th class="col-requestFor"><i class="fas fa-user mr-1"></i> Request For</th>
@@ -75,11 +111,21 @@
                 [id]="'approval-row-' + row.original.requestId"
                 [class.highlighted-row]="highlightedTicketId() === row.original.requestId"
               >
-                <td class="col-requestNo detail" (click)="viewRequestDetail(row.original)">
-                  {{ row.original.requestNo }}
+                <td class="col-requestNo detail">
+                  <div class="request-number-cell">
+                    <span class="request-number-link" (click)="viewRequestDetail(row.original)">
+                      {{ row.original.requestNo }}
+                    </span>
+                    @if (row.original.isPendingItDirectorApproval && canFilterApprovalStage()) {
+                      <span class="director-pending-badge">IT Director</span>
+                    }
+                    @if (!row.original.isPendingItDirectorApproval && canFilterApprovalStage()) {
+                      <span class="director-pending-badge approver">Approver</span>
+                    }
+                  </div>
                 </td>
                 <td class="text-muted">
-                  <div>
+                  <div class="status-badge-stack">
                     {{ dateUtil.formatDateToBE(row.original.requestDate, 'DD MMMM YYYY') }}
                   </div>
                   <div>{{ dateUtil.formatDateToBE(row.original.requestDate, 'HH:mm') }} น.</div>
@@ -107,6 +153,15 @@
                     <span class="status-badge" [ngClass]="getStatusClass(row.original.status)">
                       {{ row.original.status }}
                     </span>
+                    @if (canSeeWaitingApprover() && row.original.originalData?.waitingApprover) {
+                      <span
+                        class="waiting-approver-badge"
+                        [class.it-director]="
+                          row.original.originalData?.waitingApprover === 'IT Director'
+                        "
+                        >รอ {{ row.original.originalData?.waitingApprover }}</span
+                      >
+                    }
                   </div>
 
                   <div
@@ -144,7 +199,7 @@
     </div>
 
     <div class="card-list-view">
-      @for (req of comps.paginatedData(); track trackByRowId($index, req)) {
+      @for (req of paginatedRows(); track trackByRowId($index, req)) {
         <div class="mobile-card">
           <div class="card-header">
             <div class="request-id">

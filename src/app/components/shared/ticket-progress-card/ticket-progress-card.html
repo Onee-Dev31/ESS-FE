@@ -43,10 +43,13 @@
               ticket.assignTimeline.length !== 1 &&
               !step.title.includes('ปิด') &&
               !step.title.includes('ปฏิเสธ') &&
-              !step.title.includes('Hold')
+              !step.title.toLowerCase().includes('rejected') &&
+              !step.title.toLowerCase().includes('hold')
             "
-            [class.deny]="step.title.includes('ปฏิเสธ')"
-            [class.hold]="step.title.includes('Hold')"
+            [class.deny]="
+              step.title.includes('ปฏิเสธ') || step.title.toLowerCase().includes('rejected')
+            "
+            [class.hold]="step.title.toLowerCase().includes('hold')"
           ></div>
           <div class="timeline-content">
             <div class="timeline-title">

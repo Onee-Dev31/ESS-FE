@@ -88,6 +88,64 @@
         </table>
       }
     </div>
+
+    <div class="card-list-view">
+      @if (isLoading()) {
+        <app-skeleton type="card" [rows]="3"></app-skeleton>
+      } @else if (errorMessage()) {
+        <app-empty-state
+          title="เกิดข้อผิดพลาด"
+          [description]="errorMessage()!"
+          icon="fas fa-triangle-exclamation"
+          actionLabel="ลองอีกครั้ง"
+          actionIcon="fas fa-rotate-right"
+          (action)="loadRates()"
+        ></app-empty-state>
+      } @else if (rates().length === 0) {
+        <app-empty-state
+          title="ยังไม่มีอัตราเบี้ยเลี้ยง"
+          description="เริ่มเพิ่มอัตราแรกได้เลย"
+          icon="fas fa-sack-dollar"
+        ></app-empty-state>
+      } @else {
+        @for (rate of rates(); track rate.rate_id; let index = $index) {
+          <div class="mobile-card">
+            <div class="card-header">
+              <div class="header-content">
+                <span class="card-dept-name">{{ rate.min_hours }} - {{ rate.max_hours }} ชม.</span>
+                <div class="card-dept-code">ลำดับ {{ index + 1 }}</div>
+              </div>
+              <span class="amount">{{ rate.rate_amount | number }} บาท</span>
+            </div>
+            <div class="card-body">
+              <div class="info-row">
+                <span class="label">คำอธิบาย:</span>
+                <span class="value">{{ rate.description }}</span>
+              </div>
+              <div class="card-footer-actions">
+                <button type="button" class="btn-edit-sm" (click)="openEdit(rate)">
+                  <i class="fa-solid fa-pen"></i> แก้ไข
+                </button>
+                <button
+                  type="button"
+                  class="btn-delete-sm"
+                  [disabled]="deletingRateId() === rate.rate_id"
+                  (click)="deleteRate(rate)"
+                >
+                  <i
+                    class="fa-solid"
+                    [class.fa-trash-can]="deletingRateId() !== rate.rate_id"
+                    [class.fa-spinner]="deletingRateId() === rate.rate_id"
+                    [class.spin]="deletingRateId() === rate.rate_id"
+                  ></i>
+                  ลบ
+                </button>
+              </div>
+            </div>
+          </div>
+        }
+      }
+    </div>
   </div>
 </div>
 

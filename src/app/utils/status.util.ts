@@ -162,3 +162,19 @@ export class StatusColor_text {
 export function getStatusLabel(status: string): string {
   return MAP_LABEL_STATUS[status?.toLowerCase()] || status;
 }
+
+interface ItAssignment {
+  codeempid?: string | null;
+}
+
+export function getStatusForIt(
+  assignments: ItAssignment[] | null | undefined,
+  currentEmployeeId: string,
+  status: string,
+): string {
+  const assignedUsers = assignments ?? [];
+  const isAssignedToCurrentUser =
+    assignedUsers.length === 1 && assignedUsers[0].codeempid === currentEmployeeId;
+
+  return isAssignedToCurrentUser && status === 'Assigned' ? 'In Progress' : status;
+}

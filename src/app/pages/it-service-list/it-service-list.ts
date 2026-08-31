@@ -126,8 +126,21 @@ export class ItService implements OnInit {
   canAccessChat = computed(() => {
     const ticket = this.selectedTicket();
     if (!ticket) return false;
+
     const myAdUser = (this.authService.currentUser() ?? '').toLowerCase();
     if ((ticket.requesterAduser ?? '').toLowerCase() === myAdUser) return true;
+
+    const myEmployeeId = String(this.authService.userData()?.CODEMPID ?? '').toLowerCase();
+    const hasItAccepted = (ticket.assignments ?? []).length > 0;
+    const isInCc = (ticket.ccList ?? []).some((cc: any) => {
+      const ccEmployeeId = String(cc.codeempid ?? cc.empCode ?? '').toLowerCase();
+      const ccAdUser = String(cc.adUser ?? cc.aduser ?? '').toLowerCase();
+
+      return (myEmployeeId && ccEmployeeId === myEmployeeId) || (myAdUser && ccAdUser === myAdUser);
+    });
+
+    if (hasItAccepted && isInCc) return true;
+
     const timeline: any[] = ticket.assignTimeline ?? [];
     const latestStep = timeline[timeline.length - 1];
     return (latestStep?.Assignee ?? []).some(

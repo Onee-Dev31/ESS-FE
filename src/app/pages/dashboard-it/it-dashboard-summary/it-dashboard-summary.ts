@@ -742,16 +742,14 @@ export class ItDashboardSummary {
       ...this.filter,
       status: status,
       dateRange: [dayjs().startOf('year').toDate(), dayjs().endOf('year').toDate()] as
-        | [Date, Date]
-        | null,
+        [Date, Date] | null,
     };
 
     this.filterOriginal = {
       ...this.filterOriginal,
       status: status,
       dateRange: [dayjs().startOf('year').toDate(), dayjs().endOf('year').toDate()] as
-        | [Date, Date]
-        | null,
+        [Date, Date] | null,
     };
     this.loadTickets();
   }

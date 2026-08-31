@@ -102,6 +102,84 @@
         </table>
       }
     </div>
+
+    <div class="card-list-view">
+      @if (isLoading()) {
+        <app-skeleton type="card" [rows]="3"></app-skeleton>
+      } @else if (errorMessage()) {
+        <app-empty-state
+          title="เกิดข้อผิดพลาด"
+          [description]="errorMessage()!"
+          icon="fas fa-triangle-exclamation"
+          actionLabel="ลองอีกครั้ง"
+          actionIcon="fas fa-rotate-right"
+          (action)="loadPlans()"
+        ></app-empty-state>
+      } @else if (plans().length === 0) {
+        <app-empty-state
+          title="ยังไม่มีแผนสวัสดิการ"
+          description="เริ่มเพิ่มแผนแรกได้เลย"
+          icon="fas fa-briefcase-medical"
+        ></app-empty-state>
+      } @else {
+        @for (plan of plans(); track plan.plan_id) {
+          <div class="mobile-card" [class.inactive-row]="!plan.is_active">
+            <div class="card-header">
+              <div class="header-content">
+                <span class="card-dept-name">{{ plan.job_class_label }}</span>
+                <div class="card-dept-code">แผนที่ {{ plan.plan_no }}</div>
+              </div>
+              <label class="toggle">
+                <input
+                  type="checkbox"
+                  [checked]="plan.is_active"
+                  [disabled]="togglingPlanId() === plan.plan_id"
+                  (change)="toggleActive(plan)"
+                />
+                <span class="toggle__slider"></span>
+              </label>
+            </div>
+            <div class="card-body">
+              <div class="info-row">
+                <span class="label">OPD limit:</span>
+                <span class="value">{{ plan.opd_limit | number }} บาท</span>
+              </div>
+              <div class="info-row">
+                <span class="label">IPD limit:</span>
+                <span class="value">{{ plan.ipd_limit | number }} บาท</span>
+              </div>
+              <div class="info-row">
+                <span class="label">ทันตกรรม:</span>
+                <span class="value">{{ plan.dental_limit | number }} บาท</span>
+              </div>
+              <div class="info-row">
+                <span class="label">สายตา:</span>
+                <span class="value">{{ plan.vision_limit | number }} บาท</span>
+              </div>
+              <div class="card-footer-actions">
+                <button type="button" class="btn-edit-sm" (click)="openEdit(plan)">
+                  <i class="fa-solid fa-pen"></i> แก้ไข
+                </button>
+                <button
+                  type="button"
+                  class="btn-delete-sm"
+                  [disabled]="deletingPlanId() === plan.plan_id"
+                  (click)="deletePlan(plan)"
+                >
+                  <i
+                    class="fa-solid"
+                    [class.fa-trash-can]="deletingPlanId() !== plan.plan_id"
+                    [class.fa-spinner]="deletingPlanId() === plan.plan_id"
+                    [class.spin]="deletingPlanId() === plan.plan_id"
+                  ></i>
+                  ลบ
+                </button>
+              </div>
+            </div>
+          </div>
+        }
+      }
+    </div>
   </div>
 </div>
 
