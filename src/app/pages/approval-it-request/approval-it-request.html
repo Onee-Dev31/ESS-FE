@@ -1,23 +1,15 @@
 <div class="approvals-wrapper">
   <app-page-header [title]="pageTitle()">
     <div class="utility-btns">
-      <div class="export-dropdown">
-        <button class="btn-outline" (click)="toggleExportMenu()">
-          <i class="fas fa-download mr-1"></i> <span class="btn-text">Export</span>
-          <i class="fas fa-chevron-down ml-1"></i>
-        </button>
-        <div class="dropdown-menu" [class.show]="showExportMenu()">
-          <button class="dropdown-item" (click)="exportPDF()">
-            <i class="fas fa-file-pdf text-danger"></i> Export PDF
-          </button>
-          <button class="dropdown-item" (click)="exportExcel()">
-            <i class="fas fa-file-excel text-success"></i> Export Excel
-          </button>
-          <button class="dropdown-item" (click)="print()">
-            <i class="fas fa-print text-secondary"></i> Print
-          </button>
-        </div>
-      </div>
+      <button
+        type="button"
+        class="export-button"
+        [disabled]="isExporting() || totalItems() === 0"
+        (click)="exportExcel()"
+      >
+        <i class="fas fa-file-excel"></i>
+        Export Excel
+      </button>
       <button class="btn-outline" (click)="refresh()">
         <i class="fas fa-sync-alt mr-1"></i> <span class="btn-text">Refresh</span>
       </button>
