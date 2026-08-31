@@ -260,14 +260,6 @@ export const routes: Routes = [
         data: { animation: 'Approvals' },
       },
       {
-        path: 'approval-it-request-legacy',
-        loadComponent: () =>
-          import('./pages/approval-it-request/approval-it-request-legacy').then(
-            (m) => m.ApprovalItRequestLegacyComponent,
-          ),
-        data: { animation: 'Approvals' },
-      },
-      {
         path: 'it-request-signature',
         loadComponent: () =>
           import('./pages/it-request-signature/it-request-signature').then(
