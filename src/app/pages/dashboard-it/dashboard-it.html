@@ -335,7 +335,7 @@
             {{ btn.label }}
           </button>
         }
-        <div *ngIf="t.status === 'Assigned' && t.repair_cost_type === 'paid'" class="warning-text">
+        <div *ngIf="t.status === 'Assigned' && t.user_status === 'Pending'" class="warning-text">
           รอ user ส่งข้อมูลเพิ่มเติม
         </div>
       </div>

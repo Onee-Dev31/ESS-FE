@@ -34,6 +34,17 @@
                 />
                 <span>แจ้งซ่อม</span>
               </label>
+
+              <label class="tag">
+                <input
+                  type="radio"
+                  name="tag"
+                  [value]="3"
+                  [(ngModel)]="selectedTag"
+                  (ngModelChange)="onTagChange($event)"
+                />
+                <span>ขอใช้บริการ</span>
+              </label>
             </div>
           </div>
 

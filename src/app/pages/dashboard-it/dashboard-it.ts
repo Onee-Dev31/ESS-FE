@@ -670,6 +670,7 @@ export class DashboardIT implements OnInit {
         status: ticket.IT_Status,
         repair_cost_type: ticket.repair_cost_type,
         it_satus: getStatusLabel(statusForIt), //ticket.IT_Status
+        user_status: ticket.user_status,
         approval_status: ticket.approval_status,
         attachments: attachments,
         assignments: assignments,
@@ -1642,7 +1643,8 @@ export class DashboardIT implements OnInit {
     const ticket = this.selectedTicket();
     const condition1 =
       ticket?.repair_cost_type === 'paid' && ticket?.approval_status !== 'Approved'; //แจ้งซ่อมแบบเสียตัง ยังไม่ได้ approve/resubmit มา
-    const configuredActions = (condition1
+    const condition2 = ticket?.user_status === 'Pending'; //รอ user resubmit > approval > it
+    const configuredActions = (condition1 || condition2
       ? this.actionConfig['waiting-user-resubmit']
       : this.actionConfig[ticket?.status]) ?? { left: [], right: [] };
     const actions = {
@@ -1728,6 +1730,8 @@ export class DashboardIT implements OnInit {
     const tag = data.ticketTypeId;
     const repairCostType =
       Number(data.ticketTypeId) === 1 ? (data.repairCostType ?? 'free') : undefined;
+
+    // console.log('acknowledge', ticketId, tag, null, data.message, data.attachments, repairCostType);
 
     this.swalService.loading('กำลังบันทึกข้อมูล...');
     this.IS_ACKNOWLEDGE_TICKET.set(false);
