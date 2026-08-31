@@ -57,6 +57,14 @@ export class ItRequestDetailModal {
   private dialogService = inject(DialogService);
   currentAction = signal<'Rejected' | 'Referred Back' | null>(null);
 
+  get canShowActions(): boolean {
+    return this.approvalItem.status === 'Pending';
+  }
+
+  get canReferBack(): boolean {
+    return this.canShowActions && !this.approvalItem.isPendingItDirectorApproval;
+  }
+
   get showAttachments(): boolean {
     const ticketTypeId = this.approvalItem.originalData?.ticketTypeId;
     // 1: แจ้งซ่อม (Repair), 2: แจ้งปัญหา (Problem)

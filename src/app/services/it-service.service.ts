@@ -308,6 +308,26 @@ export class ItServiceService {
     });
   }
 
+  getApprovalItRequestsByDateRange(params: {
+    empno: string;
+    dateFrom?: string;
+    dateTo?: string;
+  }): Observable<any> {
+    let httpParams = new HttpParams().set('empno', params.empno);
+
+    if (params.dateFrom) {
+      httpParams = httpParams.set('dateFrom', params.dateFrom);
+    }
+
+    if (params.dateTo) {
+      httpParams = httpParams.set('dateTo', params.dateTo);
+    }
+
+    return this._http.get<any>(`${this.baseUrl}/it/ticket-all-request-dateRange`, {
+      params: httpParams,
+    });
+  }
+
   approveTicket(ticketId: number, payload: any) {
     const formData = new FormData();
 
