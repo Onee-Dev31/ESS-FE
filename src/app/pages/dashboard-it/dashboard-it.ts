@@ -33,6 +33,7 @@ import {
   StatusColor_Reverse,
   StatusColor_text,
   getStatusLabel,
+  getStatusForIt,
 } from '../../utils/status.util';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import {
@@ -625,12 +626,11 @@ export class DashboardIT implements OnInit {
       const itNotes = await this.buildItNotes(replies, replyAttachments, ticket.requester_aduser);
       const result = this.buildTimeline(res.timeline, res.timelineAssignees);
 
-      const status_for_it =
-        assignments.length === 1 &&
-        assignments[0].codeempid === this.authService.userData().CODEMPID &&
-        ticket.IT_Status === 'Assigned'
-          ? 'In Progress'
-          : ticket.IT_Status;
+      const statusForIt = getStatusForIt(
+        assignments,
+        this.authService.userData().CODEMPID,
+        ticket.IT_Status,
+      );
 
       const isOpenForSelf =
         res.requestFor?.emp_code && res.requestFor.emp_code === res.requester?.emp_code;
@@ -669,7 +669,7 @@ export class DashboardIT implements OnInit {
         requesterColor: ticketTypyColor.getColor(ticket.ticket_type_id),
         status: ticket.IT_Status,
         repair_cost_type: ticket.repair_cost_type,
-        it_satus: getStatusLabel(status_for_it), //ticket.IT_Status
+        it_satus: getStatusLabel(statusForIt), //ticket.IT_Status
         approval_status: ticket.approval_status,
         attachments: attachments,
         assignments: assignments,
@@ -1434,12 +1434,11 @@ export class DashboardIT implements OnInit {
 
           const mapped = res.data.map((ticket: any) => {
             const assignments = ticket.assignments ?? [];
-            const status_for_it =
-              assignments.length === 1 &&
-              assignments[0].codeempid === this.authService.userData().CODEMPID &&
-              ticket.IT_Status === 'Assigned'
-                ? 'In Progress'
-                : ticket.IT_Status;
+            const statusForIt = getStatusForIt(
+              assignments,
+              this.authService.userData().CODEMPID,
+              ticket.IT_Status,
+            );
 
             return {
               ...ticket,
@@ -1447,7 +1446,7 @@ export class DashboardIT implements OnInit {
               ticketNumber: ticket.ticket_number,
               ticketType: ticket.ticket_type_name_th,
               status: ticket.status,
-              IT_Status: getStatusLabel(status_for_it),
+              IT_Status: getStatusLabel(statusForIt),
               requesterEmpId: ticket.requester_code,
               subject: ticket.subject,
               createdDate: new Date(ticket.created_at).toISOString(),
