@@ -16,6 +16,7 @@ import {
 } from '../file-preview-modal/file-preview-modal';
 import { FileConverterService } from '../../../services/file-converter';
 import { DateUtilityService } from '../../../services/date-utility.service';
+import { formatFileSize } from '../../../utils/file-size.util';
 
 @Component({
   selector: 'app-file-upload-modal',
@@ -28,6 +29,7 @@ export class FileUploadModal implements OnChanges {
   private toastService = inject(ToastService);
   private fileConvertService = inject(FileConverterService);
   dateUtil = inject(DateUtilityService);
+  formatFileSize = formatFileSize;
 
   @Input() currentFiles: File[] = [];
   @Input() dateLabel: string = '';
@@ -116,10 +118,6 @@ export class FileUploadModal implements OnChanges {
       return 'fas fa-file-excel text-green';
 
     return 'fas fa-file text-gray';
-  }
-
-  formatFileSize(size: number): string {
-    return (size / (1024 * 1024)).toFixed(2) + ' MB';
   }
 
   viewFile(file: any) {

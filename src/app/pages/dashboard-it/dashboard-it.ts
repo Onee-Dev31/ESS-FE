@@ -697,7 +697,7 @@ export class DashboardIT implements OnInit {
       }
       this.scrollToBottom();
 
-      // console.log(objectData);
+      console.log(objectData);
 
       const codeempid = this.authService.userData()?.CODEMPID;
       if (ticketId && codeempid) {
@@ -1641,7 +1641,9 @@ export class DashboardIT implements OnInit {
 
   get currentActions() {
     const ticket = this.selectedTicket();
-    const configuredActions = (ticket?.repair_cost_type === 'paid'
+    const condition1 =
+      ticket?.repair_cost_type === 'paid' && ticket?.approval_status !== 'Approved'; //แจ้งซ่อมแบบเสียตัง ยังไม่ได้ approve/resubmit มา
+    const configuredActions = (condition1
       ? this.actionConfig['waiting-user-resubmit']
       : this.actionConfig[ticket?.status]) ?? { left: [], right: [] };
     const actions = {

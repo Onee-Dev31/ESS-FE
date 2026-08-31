@@ -137,7 +137,7 @@
                   {{ file.fileName }}
                 </span>
 
-                <span class="file-size"> ({{ formatFileSize(file.file_size) }}) </span>
+                <span class="file-size"> ({{ formatFileSize(file.fileSize) }}) </span>
               </div>
 
               <!-- <button class="btn-view-file" (click)="viewFile(file)">
@@ -147,17 +147,6 @@
           </div>
         </div>
       </div>
-      <!-- Reject Reason Panel -->
-      <!-- <div class="reject-reason-panel" *ngIf="isRejectPanelOpen()" @fadeIn>
-                <div class="reject-reason-header">
-                    <i class="fas fa-times-circle"></i>
-                    <span>ระบุเหตุผล</span>
-                </div>
-                <textarea class="reject-reason-textarea" [ngModel]="rejectReason()"
-                    (ngModelChange)="rejectReason.set($event)" placeholder="กรุณาระบุเหตุผล.." rows="4" maxlength="500">
-                </textarea>
-                <div class="reject-char-count">{{ rejectReason().length }} / 500</div>
-            </div> -->
     </div>
 
     <div class="reject-reason-panel" *ngIf="isRejectPanelOpen()" @fadeIn>
