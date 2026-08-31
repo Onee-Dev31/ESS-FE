@@ -1643,7 +1643,7 @@ export class DashboardIT implements OnInit {
     const ticket = this.selectedTicket();
     const condition1 =
       ticket?.repair_cost_type === 'paid' && ticket?.approval_status !== 'Approved'; //แจ้งซ่อมแบบเสียตัง ยังไม่ได้ approve/resubmit มา
-    const condition2 = ticket?.user_status === 'Pending'; //รอ user resubmit > approval > it
+    const condition2 = ticket?.user_status === 'Pending' && ticket?.repair_cost_type !== 'free'; //รอ user resubmit > approval > it
     const configuredActions = (condition1 || condition2
       ? this.actionConfig['waiting-user-resubmit']
       : this.actionConfig[ticket?.status]) ?? { left: [], right: [] };
