@@ -486,6 +486,16 @@ export class NotificationService {
       };
     }
 
+    if (
+      input.notificationType === 'employee_resignation_bulk' ||
+      input.targetType === 'employee_resignation'
+    ) {
+      return {
+        route: '/resign-management/detail',
+        queryParams: { _t: Date.now() },
+      };
+    }
+
     if (!input.ticketId && !input.ticketNumber) {
       return { route: null, queryParams: null };
     }
