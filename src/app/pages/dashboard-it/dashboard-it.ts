@@ -538,7 +538,7 @@ export class DashboardIT implements OnInit {
           ),
         );
         if (this.selectedTicket()?.ticketId == ticketId) {
-          this.selectTicket(String(ticketId));
+          this.selectTicket(String(ticketId), { scrollToList: false });
         }
       });
   }
@@ -607,7 +607,7 @@ export class DashboardIT implements OnInit {
     this.selectTicket(String(ticketId), hasNewNote ? { openChat: true } : undefined);
   }
 
-  selectTicket(ticketId: string, options?: { openChat?: boolean }) {
+  selectTicket(ticketId: string, options?: { openChat?: boolean; scrollToList?: boolean }) {
     const previousTicketId = this.selectedTicket()?.ticketId;
 
     this.getTicketById(ticketId).subscribe(async (res: any) => {
@@ -719,16 +719,18 @@ export class DashboardIT implements OnInit {
         this.isTicketDetailOpen.set(true);
       }
 
-      // ✅ Scroll to ticket in sidebar (with retry logic in case list is still loading)
-      const scrollToTicket = (id: string, retries = 10) => {
-        const el = document.getElementById('ticket-' + id);
-        if (el) {
-          el.scrollIntoView({ behavior: 'smooth' });
-        } else if (retries > 0) {
-          setTimeout(() => scrollToTicket(id, retries - 1), 300);
-        }
-      };
-      scrollToTicket(ticketId);
+      if (options?.scrollToList !== false) {
+        // Scroll to ticket in sidebar (with retry logic in case list is still loading)
+        const scrollToTicket = (id: string, retries = 10) => {
+          const el = document.getElementById('ticket-' + id);
+          if (el) {
+            el.scrollIntoView({ behavior: 'smooth' });
+          } else if (retries > 0) {
+            setTimeout(() => scrollToTicket(id, retries - 1), 300);
+          }
+        };
+        scrollToTicket(ticketId);
+      }
     });
   }
 
@@ -1408,7 +1410,10 @@ export class DashboardIT implements OnInit {
   }
 
   // GET MASTER
-  getAllTickets(trackNew = false) {
+  getAllTickets(trackNew = false, preserveScroll = false, focusTicketId?: string) {
+    const preservedScrollTop = preserveScroll
+      ? (this.ticketList?.nativeElement?.scrollTop ?? 0)
+      : 0;
     const showPageLoader = !this.initialized && this.Tickets().length === 0;
     if (showPageLoader) this.isPageLoading.set(true);
 
@@ -1465,7 +1470,11 @@ export class DashboardIT implements OnInit {
 
             if (!el) return;
 
-            if (typeof el.scrollTo === 'function') {
+            if (focusTicketId) {
+              this.scrollTicketInList(focusTicketId);
+            } else if (preserveScroll) {
+              el.scrollTop = preservedScrollTop;
+            } else if (typeof el.scrollTo === 'function') {
               el.scrollTo({ top: 0, behavior: 'smooth' });
             } else {
               el.scrollTop = 0;
@@ -1495,6 +1504,26 @@ export class DashboardIT implements OnInit {
           console.error('Error fetching data:', error);
         },
       });
+  }
+
+  private scrollTicketInList(ticketId: string, retries = 10): void {
+    const container = this.ticketList?.nativeElement;
+    const ticketElement = document.getElementById(`ticket-${ticketId}`);
+    if (container && ticketElement) {
+      const containerRect = container.getBoundingClientRect();
+      const ticketRect = ticketElement.getBoundingClientRect();
+      const targetTop =
+        container.scrollTop +
+        ticketRect.top -
+        containerRect.top -
+        (container.clientHeight - ticketElement.clientHeight) / 2;
+      container.scrollTo({ top: Math.max(0, targetTop), behavior: 'smooth' });
+      return;
+    }
+
+    if (retries > 0) {
+      setTimeout(() => this.scrollTicketInList(ticketId, retries - 1), 200);
+    }
   }
 
   fetchUnreadIds() {
@@ -2008,10 +2037,10 @@ export class DashboardIT implements OnInit {
 
         this.swalService.success(res.message || 'บันทึกสำเร็จ');
 
+        this.signalrService.ticketStatusTrigger.next({ ticketId, status: 'Denied' });
         this.signalrService.ticketStatusNotify(ticketId, ticket?.requesterAduser ?? '', 'Denied');
-
-        this.selectTicket(ticketId);
-        this.getAllTickets();
+        this.filterStatus = 'all';
+        this.getAllTickets(false, false, String(ticketId));
       },
 
       error: (error) => {
@@ -2163,8 +2192,8 @@ export class DashboardIT implements OnInit {
         this.swalService.success(res.message || 'บันทึกสำเร็จ');
         this.signalrService.ticketStatusTrigger.next({ ticketId, status: 'Closed' });
         this.signalrService.ticketStatusNotify(ticketId, ticket?.requesterAduser ?? '', 'Closed');
-        this.selectTicket(ticketId);
-        this.getAllTickets();
+        this.filterStatus = 'all';
+        this.getAllTickets(false, false, String(ticketId));
       },
       error: (error) => {
         console.error('Closed Ticket Error:', error);
