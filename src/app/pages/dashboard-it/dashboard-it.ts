@@ -1925,14 +1925,27 @@ export class DashboardIT implements OnInit {
     this.IS_DENY_TICKET.set(false);
   }
 
+  private isTicketTypeChangeLocked(ticket: any): boolean {
+    const isApproved =
+      String(ticket?.approval_status ?? ticket?.approvalStatus ?? '')
+        .trim()
+        .toLowerCase() === 'approved';
+    const ticketTypeId = Number(ticket?.ticketTypeId ?? ticket?.ticket_type_id);
+    const isServiceRequest = ticketTypeId === 3;
+    const isPaidRepair =
+      ticketTypeId === 1 &&
+      String(ticket?.repair_cost_type ?? ticket?.repairCostType ?? '')
+        .trim()
+        .toLowerCase() === 'paid';
+
+    return isApproved && (isServiceRequest || isPaidRepair);
+  }
+
   openChangeTicketTypeModal() {
-    const approvalStatus = String(
-      this.selectedTicket()?.approval_status ?? this.selectedTicket()?.approvalStatus ?? '',
-    )
-      .trim()
-      .toLowerCase();
-    if (approvalStatus === 'approved') {
-      this.swalService.warning('Ticket ที่อนุมัติแล้วไม่สามารถเปลี่ยนประเภทคำขอได้');
+    if (this.isTicketTypeChangeLocked(this.selectedTicket())) {
+      this.swalService.warning(
+        'ขอใช้บริการหรือแจ้งซ่อมแบบเสียเงินที่อนุมัติแล้ว ไม่สามารถเปลี่ยนประเภทคำขอได้',
+      );
       return;
     }
     this.checkBeforeAction(() => {
@@ -1957,12 +1970,10 @@ export class DashboardIT implements OnInit {
       return;
     }
 
-    const isApproved =
-      String(ticket?.approval_status ?? ticket?.approvalStatus ?? '')
-        .trim()
-        .toLowerCase() === 'approved';
-    if (isApproved) {
-      this.swalService.warning('Ticket ที่อนุมัติแล้วไม่สามารถเปลี่ยนประเภทคำขอได้');
+    if (this.isTicketTypeChangeLocked(ticket)) {
+      this.swalService.warning(
+        'ขอใช้บริการหรือแจ้งซ่อมแบบเสียเงินที่อนุมัติแล้ว ไม่สามารถเปลี่ยนประเภทคำขอได้',
+      );
       return;
     }
     if (data.ticketTypeId === 3 && ticket?.viaEmail !== true) {

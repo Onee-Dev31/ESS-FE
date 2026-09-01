@@ -10,6 +10,25 @@
   }
 }
 
+.approved-ticket-type {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 14px;
+  border: 1px solid var(--border-toolbar);
+  border-radius: 12px;
+  background: var(--bg-slate);
+
+  span {
+    color: var(--text-muted);
+  }
+
+  strong {
+    color: var(--primary);
+  }
+}
+
 .tag-group {
   display: flex;
   flex-wrap: wrap;

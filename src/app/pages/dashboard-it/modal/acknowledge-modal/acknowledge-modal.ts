@@ -17,6 +17,22 @@ export class AcknowledgeModal {
   selectedTag: number | null = null;
   message = '';
 
+  get isApproved(): boolean {
+    return String(this.ticket?.approval_status ?? this.ticket?.approvalStatus ?? '')
+      .trim()
+      .toLowerCase() === 'approved';
+  }
+
+  get ticketTypeLabel(): string {
+    const ticketTypeId = Number(this.ticket?.ticketTypeId ?? this.ticket?.ticket_type_id);
+    const labels: Record<number, string> = {
+      1: 'แจ้งซ่อม',
+      2: 'แจ้งปัญหา',
+      3: 'ขอใช้บริการ',
+    };
+    return labels[ticketTypeId] ?? '-';
+  }
+
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['ticket'] && this.ticket) {
       this.selectedTag = this.ticket.ticketTypeId;
@@ -31,7 +47,9 @@ export class AcknowledgeModal {
   save(): void {
     if (!this.selectedTag) return;
 
-    const ticketTypeId = Number(this.selectedTag);
+    const ticketTypeId = this.isApproved
+      ? Number(this.ticket?.ticketTypeId ?? this.ticket?.ticket_type_id)
+      : Number(this.selectedTag);
 
     this.submitModal.emit({
       ticketTypeId,

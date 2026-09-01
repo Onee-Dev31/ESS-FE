@@ -14,7 +14,7 @@
           type="button"
           class="type-option"
           [class.selected]="selectedTypeId === type.id"
-          [disabled]="isApproved"
+          [disabled]="isTypeChangeLocked"
           (click)="selectType(type.id)"
         >
           {{ type.label }}
@@ -30,7 +30,7 @@
             type="button"
             class="type-option"
             [class.selected]="repairCostType === 'paid'"
-            [disabled]="isApproved"
+            [disabled]="isTypeChangeLocked"
             (click)="selectRepairCostType('paid')"
           >
             ขออนุมัติ Budget ต้นสังกัด
@@ -39,7 +39,7 @@
             type="button"
             class="type-option"
             [class.selected]="repairCostType === 'free'"
-            [disabled]="isApproved"
+            [disabled]="isTypeChangeLocked"
             (click)="selectRepairCostType('free')"
           >
             ดำเนินการตามปกติ

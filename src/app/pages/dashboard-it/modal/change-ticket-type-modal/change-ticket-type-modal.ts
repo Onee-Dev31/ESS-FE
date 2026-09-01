@@ -35,10 +35,20 @@ export class ChangeTicketTypeModal implements OnChanges {
     return this.ticket?.viaEmail === true;
   }
 
-  get isApproved(): boolean {
-    return String(this.ticket?.approval_status ?? this.ticket?.approvalStatus ?? '')
+  get isTypeChangeLocked(): boolean {
+    const isApproved =
+      String(this.ticket?.approval_status ?? this.ticket?.approvalStatus ?? '')
+        .trim()
+        .toLowerCase() === 'approved';
+    const ticketTypeId = Number(this.ticket?.ticketTypeId ?? this.ticket?.ticket_type_id);
+    const isApprovedServiceRequest = ticketTypeId === 3;
+    const isApprovedPaidRepair =
+      ticketTypeId === 1 &&
+      String(this.ticket?.repair_cost_type ?? this.ticket?.repairCostType ?? '')
       .trim()
-      .toLowerCase() === 'approved';
+      .toLowerCase() === 'paid';
+
+    return isApproved && (isApprovedServiceRequest || isApprovedPaidRepair);
   }
 
   get availableTicketTypes(): typeof this.ticketTypes {
@@ -67,7 +77,7 @@ export class ChangeTicketTypeModal implements OnChanges {
   }
 
   selectType(ticketTypeId: number): void {
-    if (this.isApproved || (ticketTypeId === 3 && !this.isViaEmail)) return;
+    if (this.isTypeChangeLocked || (ticketTypeId === 3 && !this.isViaEmail)) return;
     this.selectedTypeId = ticketTypeId;
     if (ticketTypeId !== 1) {
       this.repairCostType = null;
@@ -77,7 +87,7 @@ export class ChangeTicketTypeModal implements OnChanges {
   }
 
   selectRepairCostType(value: 'paid' | 'free'): void {
-    if (this.isApproved) return;
+    if (this.isTypeChangeLocked) return;
     this.repairCostType = value;
     this.showAttachmentError = false;
     if (value !== 'paid') this.attachments = [];
@@ -131,7 +141,7 @@ export class ChangeTicketTypeModal implements OnChanges {
   }
 
   get canSubmit(): boolean {
-    if (this.isApproved || (this.selectedTypeId === 3 && !this.isViaEmail)) return false;
+    if (this.isTypeChangeLocked || (this.selectedTypeId === 3 && !this.isViaEmail)) return false;
     const hasChanged =
       this.selectedTypeId !== this.originalTypeId ||
       (this.selectedTypeId === 1 && this.repairCostType !== this.originalRepairCostType);

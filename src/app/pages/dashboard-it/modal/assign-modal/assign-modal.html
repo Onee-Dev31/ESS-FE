@@ -12,23 +12,30 @@
 
   <div class="content-card">
     <div class="select-tag">
-      <p>เลือกประเภทงาน<span class="required">*</span></p>
-      <div class="tag-group">
-        <label class="tag">
-          <input type="radio" name="tag" [value]="2" [(ngModel)]="selectedTag" (ngModelChange)="onTagChange()" />
-          <span>แจ้งปัญหา</span>
-        </label>
-        <label class="tag">
-          <input type="radio" name="tag" [value]="1" [(ngModel)]="selectedTag" (ngModelChange)="onTagChange()" />
-          <span>แจ้งซ่อม</span>
-        </label>
-        @if (ticket?.viaEmail === true) {
+      @if (isApproved) {
+        <div class="approved-ticket-type">
+          <span>ประเภทงาน</span>
+          <strong>{{ ticketTypeLabel }}</strong>
+        </div>
+      } @else {
+        <p>เลือกประเภทงาน<span class="required">*</span></p>
+        <div class="tag-group">
           <label class="tag">
-            <input type="radio" name="tag" [value]="3" [(ngModel)]="selectedTag" (ngModelChange)="onTagChange()" />
-            <span>ขอใช้บริการ</span>
+            <input type="radio" name="tag" [value]="2" [(ngModel)]="selectedTag" (ngModelChange)="onTagChange()" />
+            <span>แจ้งปัญหา</span>
           </label>
-        }
-      </div>
+          <label class="tag">
+            <input type="radio" name="tag" [value]="1" [(ngModel)]="selectedTag" (ngModelChange)="onTagChange()" />
+            <span>แจ้งซ่อม</span>
+          </label>
+          @if (ticket?.viaEmail === true) {
+            <label class="tag">
+              <input type="radio" name="tag" [value]="3" [(ngModel)]="selectedTag" (ngModelChange)="onTagChange()" />
+              <span>ขอใช้บริการ</span>
+            </label>
+          }
+        </div>
+      }
     </div>
 
     <div class="assign-reason">

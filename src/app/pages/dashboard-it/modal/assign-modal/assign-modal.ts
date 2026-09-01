@@ -57,6 +57,22 @@ export class AssignModal {
   // assignSearchKeyword = '';
   ticketId: number | null = null;
 
+  get isApproved(): boolean {
+    return String(this.ticket?.approval_status ?? this.ticket?.approvalStatus ?? '')
+      .trim()
+      .toLowerCase() === 'approved';
+  }
+
+  get ticketTypeLabel(): string {
+    const ticketTypeId = Number(this.ticket?.ticketTypeId ?? this.ticket?.ticket_type_id);
+    const labels: Record<number, string> = {
+      1: 'แจ้งซ่อม',
+      2: 'แจ้งปัญหา',
+      3: 'ขอใช้บริการ',
+    };
+    return labels[ticketTypeId] ?? '-';
+  }
+
   ngOnChanges(changes: SimpleChanges) {
     if (changes['ticket'] && this.ticket) {
       this.selectedTag = Number(this.ticket.ticketTypeId);
@@ -163,9 +179,12 @@ export class AssignModal {
   }
 
   save() {
+    const ticketTypeId = this.isApproved
+      ? Number(this.ticket?.ticketTypeId ?? this.ticket?.ticket_type_id)
+      : this.selectedTag;
     this.submitModal.emit({
       assignees: this.selectedAssigneeEmpCodes,
-      ticketTypeId: this.selectedTag,
+      ticketTypeId,
       ticketId: this.ticketId,
       reason: this.reason.trim() || undefined,
       ...(this.isChangedToRepair && { repairCostType: 'free' }),
