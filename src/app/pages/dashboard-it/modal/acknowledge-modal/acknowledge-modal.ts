@@ -1,10 +1,11 @@
 import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, Input, Output, SimpleChanges } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { ModalShellComponent } from '../../../../components/shared/modal-shell/modal-shell';
 
 @Component({
   selector: 'app-acknowledge-modal',
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, ModalShellComponent],
   templateUrl: './acknowledge-modal.html',
   styleUrl: './acknowledge-modal.scss',
 })
@@ -14,19 +15,13 @@ export class AcknowledgeModal {
   @Output() closeModal = new EventEmitter<void>();
 
   selectedTag: number | null = null;
-  originalTag: number | null = null;
   message = '';
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['ticket'] && this.ticket) {
       this.selectedTag = this.ticket.ticketTypeId;
-      this.originalTag = this.ticket.ticketTypeId;
       this.message = '';
     }
-  }
-
-  get isTagChanged(): boolean {
-    return this.selectedTag !== this.originalTag;
   }
 
   close(): void {

@@ -2,6 +2,40 @@
 @use '../../../../../styles/variables' as *;
 @use '../../../../../styles/mixins' as *;
 
+.select-tag {
+  padding: 16px;
+
+  p {
+    margin: 0;
+  }
+}
+
+.tag-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.tag {
+  padding: 6px 14px;
+  border: 1px solid #ccc;
+  border-radius: 20px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: 0.2s;
+
+  input {
+    display: none;
+  }
+
+  &:has(input:checked) {
+    border-color: #007bff;
+    background: #007bff;
+    color: white;
+  }
+}
+
 .modal-overlay {
   @include modal-overlay-styles;
 
