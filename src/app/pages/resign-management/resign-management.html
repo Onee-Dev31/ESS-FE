@@ -461,6 +461,7 @@
                     (ngModelChange)="lastDate.set($event)"
                     nzFormat="dd/MM/yyyy"
                     nzDropdownClassName="custom-picker-popup"
+                    [nzDisabledDate]="disableModalLastDate"
                   >
                   </nz-date-picker>
                 </div>
@@ -473,6 +474,8 @@
                     (ngModelChange)="effectiveDate.set($event)"
                     nzFormat="dd/MM/yyyy"
                     nzDropdownClassName="custom-picker-popup"
+                    [nzDisabledDate]="disableModalEffectiveDate"
+                    [nzDefaultPickerValue]="lastDate()"
                   >
                   </nz-date-picker>
                 </div>

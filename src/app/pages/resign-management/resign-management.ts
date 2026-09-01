@@ -312,6 +312,16 @@ export class ResignManagement {
     };
   }
 
+  disableModalLastDate = (current: Date): boolean => {
+    const effective = this.effectiveDate();
+    return !!effective && dayjs(current).isAfter(dayjs(effective), 'day');
+  };
+
+  disableModalEffectiveDate = (current: Date): boolean => {
+    const last = this.lastDate();
+    return !!last && dayjs(current).isBefore(dayjs(last), 'day');
+  };
+
   setDate(emp: any, type: 'lastDate' | 'effectiveDate', value: Date) {
     // console.log(emp)
 
