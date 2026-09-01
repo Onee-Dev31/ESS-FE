@@ -35,6 +35,7 @@ import { LoadingService } from '../../services/loading';
 import { SignalrService } from '../../services/signalr.service';
 import { ToastService } from '../../services/toast';
 import { createListingComputeds, createListingState } from '../../utils/listing.util';
+import { ExportService } from '../../services/export';
 
 @Component({
   selector: 'app-approval-it-request',
@@ -62,6 +63,7 @@ export class ApprovalItRequestComponent implements OnInit {
   private cdr = inject(ChangeDetectorRef);
   private destroyRef = inject(DestroyRef);
   private errorService = inject(ErrorService);
+  private exportService = inject(ExportService);
   private itService = inject(ItServiceService);
   private loadingService = inject(LoadingService);
   private route = inject(ActivatedRoute);
