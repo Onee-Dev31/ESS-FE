@@ -95,7 +95,7 @@ export class TimeOffService {
     }
 
     if (payload.action === 'Cancel') {
-      return this.http.post(`${this.baseUrl}/leave/LeaveRequests`, formData);
+      return this.http.post(`${this.baseUrl}/leave/LeaveRequestsV2`, formData);
     }
 
     if (payload.leave_type_id !== undefined) {
@@ -136,7 +136,7 @@ export class TimeOffService {
     payload.files?.forEach((file) => formData.append('files', file, file.name));
     payload.file_remarks?.forEach((remark) => formData.append('file_remarks', remark));
 
-    return this.http.post(`${this.baseUrl}/leave/LeaveRequests`, formData);
+    return this.http.post(`${this.baseUrl}/leave/LeaveRequestsV2`, formData);
   }
 
   getLeaveRequests(
@@ -207,6 +207,10 @@ export class TimeOffService {
 
   approveLeaveRequest(payload: LeaveApprovalActionPayload): Observable<unknown> {
     return this.http.post(`${this.baseUrl}/leave/requests/approve`, payload);
+  }
+
+  approveLeaveRequestV2(payload: LeaveApprovalActionPayload): Observable<unknown> {
+    return this.http.post(`${this.baseUrl}/leave/requests/approveV2`, payload);
   }
 
   private mapLeaveRequest(

@@ -374,11 +374,15 @@ export class NotificationService {
             payloadData?.['ticketNumber'] ??
             payloadData?.['ticket_number'],
         ) ?? null;
+      const targetId = this.toNumber(
+        record?.target_id ?? record?.targetId ?? payloadData?.['requestId'],
+      );
 
       const routeInfo = this.resolveRoute({
         notificationType: this.toText(record?.notification_type ?? record?.notificationType) ?? '',
         recipientRole: this.toText(record?.recipient_role ?? record?.recipientRole) ?? '',
         targetType: this.toText(record?.target_type ?? record?.targetType) ?? '',
+        targetId,
         ticketId,
         ticketNumber,
         title,
@@ -426,11 +430,15 @@ export class NotificationService {
       this.toText(item.notification_created_at ?? item.notificationCreatedAt) ??
       this.toText(item.recipient_created_at ?? item.recipientCreatedAt) ??
       null;
+    const targetId = this.toNumber(
+      item['target_id'] ?? item['targetId'] ?? payload?.['requestId'],
+    );
 
     const routeInfo = this.resolveRoute({
       notificationType: this.toText(item.notification_type ?? item.notificationType) ?? '',
       recipientRole: this.toText(item.recipient_role ?? item.recipientRole) ?? '',
       targetType: this.toText(item.target_type ?? item.targetType) ?? '',
+      targetId,
       ticketId,
       ticketNumber,
       title: this.toText(item.title) ?? '',
@@ -468,6 +476,7 @@ export class NotificationService {
     notificationType: string;
     recipientRole: string;
     targetType: string;
+    targetId?: number | null;
     ticketId: number | null;
     ticketNumber: string | null;
     title?: string;
@@ -492,6 +501,25 @@ export class NotificationService {
     ) {
       return {
         route: '/resign-management/detail',
+        queryParams: { _t: Date.now() },
+      };
+    }
+
+    if (input.notificationType === 'leave_request_submitted') {
+      return {
+        route: '/approvals-timeoff',
+        queryParams: {
+          requestId: input.targetId ?? undefined,
+          _t: Date.now(),
+        },
+      };
+    }
+
+    if (input.targetType === 'leave_request') {
+      // leave_request_approved / leave_request_rejected / leave_request_sendback
+      // ส่งกลับหาผู้ยื่นใบลาเอง ไม่ใช่ผู้อนุมัติ
+      return {
+        route: '/timeoff',
         queryParams: { _t: Date.now() },
       };
     }

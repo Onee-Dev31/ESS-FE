@@ -97,7 +97,11 @@
             track request.request_id ? 'request-' + request.request_id : 'row-' + $index
           ) {
             @let statusMeta = getStatusMeta(request.status);
-            <div class="mobile-card">
+            <div
+              class="mobile-card"
+              [id]="'timeoff-request-mobile-' + request.request_id"
+              [class.highlight]="highlightedRequestId() === request.request_id"
+            >
               <div class="card-header">
                 <div class="header-content">
                   <span class="ticket-no">{{ request.leaveType }}</span>
@@ -213,7 +217,10 @@
             ) {
               @let statusMeta = getStatusMeta(request.status);
               <tbody>
-                <tr>
+                <tr
+                  [id]="'timeoff-request-' + request.request_id"
+                  [class.highlight]="highlightedRequestId() === request.request_id"
+                >
                   <td class="request-meta-cell">
                     <span class="created-at">{{ formatCreatedAt(getCreatedAt(request)) }}</span>
                     <strong class="leave-number">{{ getLeaveNumber(request) }}</strong>

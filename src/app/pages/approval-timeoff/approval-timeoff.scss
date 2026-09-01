@@ -1,6 +1,27 @@
 @use '../../../styles/variables' as *;
 @use '../../../styles/mixins' as *;
 
+@keyframes leave-request-highlight {
+  0% {
+    box-shadow:
+      inset 0 0 0 2px $primary,
+      0 0 12px rgba(99, 102, 241, 0.5);
+  }
+  40% {
+    box-shadow:
+      inset 0 0 0 2px $primary,
+      0 0 6px rgba(99, 102, 241, 0.2);
+  }
+  60% {
+    box-shadow:
+      inset 0 0 0 2px $primary,
+      0 0 12px rgba(99, 102, 241, 0.4);
+  }
+  100% {
+    box-shadow: none;
+  }
+}
+
 .approval-timeoff-page {
   min-height: 100vh;
   padding: 24px;
@@ -112,6 +133,10 @@
   border: 1px solid var(--border-table-head);
   border-radius: 12px;
   background: var(--bg-card);
+
+  &.highlight {
+    animation: leave-request-highlight 8s ease-out forwards;
+  }
 }
 
 .item-heading,
