@@ -105,6 +105,20 @@ export class TaxiService extends BaseRequestService<TaxiRequest> {
     return this._http.get(`${this.baseUrl}/taxi-claim/locations`);
   }
 
+  /** GET api/taxi-claim/policy-texts */
+  getPolicyTexts(): Observable<{ success: boolean; data: { text_key: string; content: string }[] }> {
+    return this._http.get<{ success: boolean; data: { text_key: string; content: string }[] }>(
+      `${this.baseUrl}/taxi-claim/policy-texts`,
+    );
+  }
+
+  /** GET api/taxi-claim/conditions */
+  getConditions(): Observable<{ success: boolean; data: { daily_limit: number } }> {
+    return this._http.get<{ success: boolean; data: { daily_limit: number } }>(
+      `${this.baseUrl}/taxi-claim/conditions`,
+    );
+  }
+
   getEligibleDates(empCode: string, year: number, month: number): Observable<any> {
     return this._http.get(`${this.baseUrl}/taxi-claim/eligible-dates`, {
       params: {
