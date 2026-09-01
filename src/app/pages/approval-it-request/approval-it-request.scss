@@ -332,6 +332,7 @@ $border: var(--border);
     font-weight: 600;
     line-height: 1;
     white-space: nowrap;
+    margin-top: 6px;
 
     &.it-director {
       border-color: #eab308;
@@ -527,6 +528,34 @@ $border: var(--border);
     box-shadow: $shadow;
     overflow: hidden;
     margin-top: 24px;
+  }
+
+  .export-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    height: 36px;
+    padding: 0 14px;
+    border: 0;
+    border-radius: 8px;
+    color: #fff;
+    background: #217346;
+    font-size: 0.875rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition:
+      opacity 0.2s,
+      transform 0.2s;
+
+    &:hover:not(:disabled) {
+      opacity: 0.9;
+      transform: translateY(-1px);
+    }
+
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
   }
 
   .table-controls {

@@ -16,6 +16,8 @@ import { createAngularTable, getCoreRowModel } from '@tanstack/angular-table';
 import { NzInputModule } from 'ng-zorro-antd/input';
 import { NzDatePickerModule } from 'ng-zorro-antd/date-picker';
 import { NzSelectModule } from 'ng-zorro-antd/select';
+import * as XLSX from 'xlsx-js-style';
+import { saveAs } from 'file-saver';
 import { listAnimation } from '../../animations/animations';
 import { ItRequestDetailModal } from '../../components/modals/it-request-detail-modal/it-request-detail-modal';
 import { EmptyStateComponent } from '../../components/shared/empty-state/empty-state';
@@ -28,12 +30,12 @@ import { ApprovalsHelperService } from '../../services/approvals-helper.service'
 import { AuthService } from '../../services/auth.service';
 import { DateUtilityService } from '../../services/date-utility.service';
 import { ErrorService } from '../../services/error';
-import { ExportService } from '../../services/export';
 import { ItServiceService } from '../../services/it-service.service';
 import { LoadingService } from '../../services/loading';
 import { SignalrService } from '../../services/signalr.service';
 import { ToastService } from '../../services/toast';
 import { createListingComputeds, createListingState } from '../../utils/listing.util';
+import { ExportService } from '../../services/export';
 
 @Component({
   selector: 'app-approval-it-request',
@@ -90,7 +92,6 @@ export class ApprovalItRequestComponent implements OnInit {
   selectedItem = signal<ApprovalItem | null>(null);
   initialAction = signal<'Approved' | 'Rejected' | 'Referred Back' | null>(null);
   pageTitle = signal('IT Request Approvals');
-  showExportMenu = signal(false);
   canFilterApprovalStage = computed(() =>
     (this.authService.userRole() ?? '')
       .split(',')
@@ -298,9 +299,9 @@ export class ApprovalItRequestComponent implements OnInit {
     if (!item) return;
 
     this.listing.filterStatus.set(item.status);
-    const sortedIndex = this.comps.filteredData().findIndex(
-      (approval) => approval.requestId === item.requestId,
-    );
+    const sortedIndex = this.comps
+      .filteredData()
+      .findIndex((approval) => approval.requestId === item.requestId);
     this.listing.currentPage.set(
       sortedIndex < 0 ? 0 : Math.floor(sortedIndex / this.listing.pageSize()),
     );
@@ -374,57 +375,112 @@ export class ApprovalItRequestComponent implements OnInit {
     return `${item.requestNo}-${index}`;
   }
 
-  toggleExportMenu(): void {
-    this.showExportMenu.update((value) => !value);
-  }
-
-  async exportPDF(): Promise<void> {
-    this.showExportMenu.set(false);
-    this.loadingService.start('export');
-    try {
-      await this.exportService.exportToPDF('approvals-it-table', 'approvals-it-request');
-      this.toastService.success('Export PDF สำเร็จ');
-    } catch (error) {
-      this.errorService.handle(error, { component: 'ApprovalItRequest', action: 'export-pdf' });
-    } finally {
-      this.loadingService.stop('export');
-    }
-  }
-
   async exportExcel(): Promise<void> {
-    this.showExportMenu.set(false);
+    const search = this.listing.searchText().trim().toLowerCase();
+    const stage = this.approvalStageFilter();
+    const items = this.approvals().filter((item) => {
+      const matchesSearch =
+        !search ||
+        item.requestNo.toLowerCase().includes(search) ||
+        item.requestBy.name.toLowerCase().includes(search);
+      const matchesStage =
+        stage === 'all' ||
+        (stage === 'director' && !!item.isPendingItDirectorApproval) ||
+        (stage === 'approver' && !item.isPendingItDirectorApproval);
+      return matchesSearch && matchesStage;
+    });
+    if (!items.length) return;
+
     this.loadingService.start('export');
     try {
-      const data = this.comps.filteredData().map((item) => ({
-        requestNo: item.requestNo,
-        requestDate: item.requestDate,
-        requestBy: item.requestBy.name,
-        requestFor: item.originalData?.requestFor || '-',
-        requestCategory: item.originalData?.requestCategory || '-',
-        status: item.status,
-      }));
-      await this.exportService.exportToExcel(
-        data,
-        [
-          { header: 'Request No.', key: 'requestNo', width: 20 },
-          { header: 'Request Date', key: 'requestDate', width: 20 },
-          { header: 'Request By', key: 'requestBy', width: 20 },
-          { header: 'Request For', key: 'requestFor', width: 20 },
-          { header: 'Request Category', key: 'requestCategory', width: 30 },
-          { header: 'Status', key: 'status', width: 15 },
-        ],
-        'approvals-it-request',
-      );
+      const border = {
+        top: { style: 'thin', color: { rgb: 'D1D5DB' } },
+        bottom: { style: 'thin', color: { rgb: 'D1D5DB' } },
+        left: { style: 'thin', color: { rgb: 'D1D5DB' } },
+        right: { style: 'thin', color: { rgb: 'D1D5DB' } },
+      };
+      const workbook = XLSX.utils.book_new();
+      const statuses = ['Pending', 'Approved', 'Rejected', 'Referred Back'];
+
+      for (const status of statuses) {
+        const rows = items
+          .filter((item) => item.status === status)
+          .map((item) => ({
+            'Request No.': item.requestNo,
+            'Request Date': this.dateUtil.formatDateToBE(item.requestDate, 'DD/MM/YYYY HH:mm'),
+            'Request By': item.requestBy.name,
+            'Employee ID': item.requestBy.employeeId,
+            Department: item.requestBy.department,
+            'Request For': item.originalData?.requestFor || '-',
+            'Request Category': item.originalData?.requestCategory || '-',
+            Status: item.status,
+            'Approval Stage': item.isPendingItDirectorApproval ? 'IT Director' : 'Approver',
+          }));
+        const headers = [
+          'Request No.',
+          'Request Date',
+          'Request By',
+          'Employee ID',
+          'Department',
+          'Request For',
+          'Request Category',
+          'Status',
+          'Approval Stage',
+        ];
+        const worksheet = XLSX.utils.aoa_to_sheet([headers]);
+        if (rows.length) {
+          XLSX.utils.sheet_add_json(worksheet, rows, { origin: 'A2', skipHeader: true });
+        }
+        worksheet['!cols'] = [
+          { wch: 20 },
+          { wch: 22 },
+          { wch: 28 },
+          { wch: 16 },
+          { wch: 24 },
+          { wch: 28 },
+          { wch: 30 },
+          { wch: 18 },
+          { wch: 18 },
+        ];
+
+        const range = XLSX.utils.decode_range(worksheet['!ref']!);
+        for (let row = range.s.r; row <= range.e.r; row++) {
+          for (let col = range.s.c; col <= range.e.c; col++) {
+            const cell = worksheet[XLSX.utils.encode_cell({ r: row, c: col })];
+            if (!cell) continue;
+            cell.s = { ...(cell.s ?? {}), border, alignment: { vertical: 'center' } };
+          }
+        }
+
+        for (let col = range.s.c; col <= range.e.c; col++) {
+          const header = worksheet[XLSX.utils.encode_cell({ r: 0, c: col })];
+          if (!header) continue;
+          header.s = {
+            ...(header.s ?? {}),
+            font: { bold: true, color: { rgb: 'FFFFFF' } },
+            fill: { patternType: 'solid', fgColor: { rgb: '217346' } },
+            alignment: { horizontal: 'center', vertical: 'center' },
+            border,
+          };
+        }
+
+        XLSX.utils.book_append_sheet(workbook, worksheet, status);
+      }
+      const excelBuffer = XLSX.write(workbook, {
+        bookType: 'xlsx',
+        type: 'array',
+        cellStyles: true,
+      });
+      const blob = new Blob([excelBuffer], {
+        type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      });
+      const exportDate = new Date().toISOString().slice(0, 10);
+      saveAs(blob, `it-approval-${exportDate}.xlsx`);
       this.toastService.success('Export Excel สำเร็จ');
     } catch (error) {
       this.errorService.handle(error, { component: 'ApprovalItRequest', action: 'export-excel' });
     } finally {
       this.loadingService.stop('export');
     }
-  }
-
-  print(): void {
-    this.showExportMenu.set(false);
-    this.exportService.printElement('approvals-it-table');
   }
 }

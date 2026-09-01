@@ -2,7 +2,6 @@ import {
   Component,
   computed,
   EventEmitter,
-  inject,
   Input,
   Output,
   signal,
@@ -12,16 +11,10 @@ import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzIconModule } from 'ng-zorro-antd/icon';
 import { NzModalModule } from 'ng-zorro-antd/modal';
 import { NzSelectModule } from 'ng-zorro-antd/select';
-import { SwalService } from '../../../../services/swal.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { environment } from '../../../../../environments/environment';
-import dayjs from 'dayjs';
-import {
-  FilePreviewItem,
-  FilePreviewModalComponent,
-} from '../../../../components/modals/file-preview-modal/file-preview-modal';
-import { IT_ATTACHMENT_FILE_CONFIG } from '../../../../constants/it-attachment-file.constant';
+import { ModalShellComponent } from '../../../../components/shared/modal-shell/modal-shell';
 
 @Component({
   selector: 'app-assign-modal',
@@ -32,7 +25,7 @@ import { IT_ATTACHMENT_FILE_CONFIG } from '../../../../constants/it-attachment-f
     NzButtonModule,
     NzIconModule,
     NzModalModule,
-    FilePreviewModalComponent,
+    ModalShellComponent,
   ],
   templateUrl: './assign-modal.html',
   styleUrl: './assign-modal.scss',
@@ -41,8 +34,6 @@ export class AssignModal {
   getEmployeeImage(empCode: string): string {
     return `${environment.employeeImageUrl}/${empCode}.jpg`;
   }
-  private swalService = inject(SwalService);
-
   @Input() ticket: any;
   @Input() visible = false;
   // @Input() assigneeGroups: any[] = [];
@@ -62,24 +53,31 @@ export class AssignModal {
   selectedAssigneeEmpCodes: any[] = [];
   selectedTag: number | null = null;
   originalTag: number | null = null;
-  repairCostType: 'paid' | 'free' | null = null;
-  message = '';
   reason = '';
-  attachments: any[] = [];
-  readonly FILE_CONFIG = IT_ATTACHMENT_FILE_CONFIG;
-  isPreviewModalOpen = signal(false);
-  previewFiles = signal<FilePreviewItem[]>([]);
   // assignSearchKeyword = '';
   ticketId: number | null = null;
+
+  get isApproved(): boolean {
+    return String(this.ticket?.approval_status ?? this.ticket?.approvalStatus ?? '')
+      .trim()
+      .toLowerCase() === 'approved';
+  }
+
+  get ticketTypeLabel(): string {
+    const ticketTypeId = Number(this.ticket?.ticketTypeId ?? this.ticket?.ticket_type_id);
+    const labels: Record<number, string> = {
+      1: 'แจ้งซ่อม',
+      2: 'แจ้งปัญหา',
+      3: 'ขอใช้บริการ',
+    };
+    return labels[ticketTypeId] ?? '-';
+  }
 
   ngOnChanges(changes: SimpleChanges) {
     if (changes['ticket'] && this.ticket) {
       this.selectedTag = Number(this.ticket.ticketTypeId);
       this.originalTag = Number(this.ticket.ticketTypeId);
-      this.repairCostType = null;
-      this.message = '';
       this.reason = '';
-      this.attachments = [];
       if (this.ticket.assignments) {
         this.ticketId = this.ticket.ticketId;
         this.selectedAssigneeEmpCodes = this.ticket.assignments.map((a: any) => ({
@@ -96,59 +94,7 @@ export class AssignModal {
   }
 
   onTagChange() {
-    this.repairCostType = null;
-    this.message = '';
-    this.attachments = [];
-  }
-
-  onFileSelected(event: Event) {
-    const input = event.target as HTMLInputElement;
-    if (input.files) this.addFiles(input.files);
-    input.value = '';
-  }
-
-  private addFiles(files: FileList) {
-    const errors: string[] = [];
-    const validFiles: { name: string; size: number; file: File }[] = [];
-
-    for (const file of Array.from(files)) {
-      const reasons: string[] = [];
-      if (this.attachments.length + validFiles.length >= this.FILE_CONFIG.maxFiles) {
-        reasons.push(`เกินจำนวนสูงสุด ${this.FILE_CONFIG.maxFiles} ไฟล์`);
-      }
-      if (file.size / (1024 * 1024) > this.FILE_CONFIG.maxSizeMB) {
-        reasons.push(`ขนาดเกิน ${this.FILE_CONFIG.maxSizeMB} MB`);
-      }
-      const extension = file.name.split('.').pop()?.toLowerCase() ?? '';
-      if (
-        !this.FILE_CONFIG.allowedTypes.includes(file.type) &&
-        !this.FILE_CONFIG.allowedExtensions.includes(extension)
-      ) {
-        reasons.push('ประเภทไฟล์ไม่รองรับ');
-      }
-      if (reasons.length) errors.push(`${file.name} (${reasons.join(', ')})`);
-      else validFiles.push({ name: file.name, size: file.size, file });
-    }
-
-    if (errors.length) this.swalService.warning(errors.join('\n'));
-    this.attachments = [...this.attachments, ...validFiles];
-  }
-
-  removeAttachment(index: number) {
-    this.attachments.splice(index, 1);
-  }
-
-  viewFile(file: any) {
-    const url = file.file ? URL.createObjectURL(file.file) : file.filePath || '';
-    this.previewFiles.set([
-      {
-        fileName: file.name || file.fileName,
-        date: dayjs().format('DD/MM/YYYY HH:mm'),
-        url,
-        type: file.file?.type || file.type || 'application/octet-stream',
-      },
-    ]);
-    this.isPreviewModalOpen.set(true);
+    this.reason = '';
   }
 
   close() {
@@ -233,14 +179,15 @@ export class AssignModal {
   }
 
   save() {
+    const ticketTypeId = this.isApproved
+      ? Number(this.ticket?.ticketTypeId ?? this.ticket?.ticket_type_id)
+      : this.selectedTag;
     this.submitModal.emit({
       assignees: this.selectedAssigneeEmpCodes,
-      ticketTypeId: this.selectedTag,
+      ticketTypeId,
       ticketId: this.ticketId,
-      message: this.message,
-      attachments: this.attachments,
       reason: this.reason.trim() || undefined,
-      ...(this.isChangedToRepair && { repairCostType: this.repairCostType }),
+      ...(this.isChangedToRepair && { repairCostType: 'free' }),
     });
   }
 }

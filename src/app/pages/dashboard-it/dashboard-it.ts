@@ -393,6 +393,7 @@ export class DashboardIT implements OnInit {
   }
   private initialized = false;
   IS_DENY_TICKET = signal(false);
+  IS_CLOSE_TICKET = signal(false);
   IS_CHANGE_TICKET_TYPE = signal(false);
   IS_ONHOLD_TICKET = signal(false);
   IS_ACKNOWLEDGE_TICKET = signal(false);
@@ -537,7 +538,7 @@ export class DashboardIT implements OnInit {
           ),
         );
         if (this.selectedTicket()?.ticketId == ticketId) {
-          this.selectTicket(String(ticketId));
+          this.selectTicket(String(ticketId), { scrollToList: false });
         }
       });
   }
@@ -606,7 +607,7 @@ export class DashboardIT implements OnInit {
     this.selectTicket(String(ticketId), hasNewNote ? { openChat: true } : undefined);
   }
 
-  selectTicket(ticketId: string, options?: { openChat?: boolean }) {
+  selectTicket(ticketId: string, options?: { openChat?: boolean; scrollToList?: boolean }) {
     const previousTicketId = this.selectedTicket()?.ticketId;
 
     this.getTicketById(ticketId).subscribe(async (res: any) => {
@@ -670,6 +671,7 @@ export class DashboardIT implements OnInit {
         status: ticket.IT_Status,
         repair_cost_type: ticket.repair_cost_type,
         it_satus: getStatusLabel(statusForIt), //ticket.IT_Status
+        user_status: ticket.user_status,
         approval_status: ticket.approval_status,
         attachments: attachments,
         assignments: assignments,
@@ -717,16 +719,18 @@ export class DashboardIT implements OnInit {
         this.isTicketDetailOpen.set(true);
       }
 
-      // ✅ Scroll to ticket in sidebar (with retry logic in case list is still loading)
-      const scrollToTicket = (id: string, retries = 10) => {
-        const el = document.getElementById('ticket-' + id);
-        if (el) {
-          el.scrollIntoView({ behavior: 'smooth' });
-        } else if (retries > 0) {
-          setTimeout(() => scrollToTicket(id, retries - 1), 300);
-        }
-      };
-      scrollToTicket(ticketId);
+      if (options?.scrollToList !== false) {
+        // Scroll to ticket in sidebar (with retry logic in case list is still loading)
+        const scrollToTicket = (id: string, retries = 10) => {
+          const el = document.getElementById('ticket-' + id);
+          if (el) {
+            el.scrollIntoView({ behavior: 'smooth' });
+          } else if (retries > 0) {
+            setTimeout(() => scrollToTicket(id, retries - 1), 300);
+          }
+        };
+        scrollToTicket(ticketId);
+      }
     });
   }
 
@@ -1406,7 +1410,10 @@ export class DashboardIT implements OnInit {
   }
 
   // GET MASTER
-  getAllTickets(trackNew = false) {
+  getAllTickets(trackNew = false, preserveScroll = false, focusTicketId?: string) {
+    const preservedScrollTop = preserveScroll
+      ? (this.ticketList?.nativeElement?.scrollTop ?? 0)
+      : 0;
     const showPageLoader = !this.initialized && this.Tickets().length === 0;
     if (showPageLoader) this.isPageLoading.set(true);
 
@@ -1463,7 +1470,11 @@ export class DashboardIT implements OnInit {
 
             if (!el) return;
 
-            if (typeof el.scrollTo === 'function') {
+            if (focusTicketId) {
+              this.scrollTicketInList(focusTicketId);
+            } else if (preserveScroll) {
+              el.scrollTop = preservedScrollTop;
+            } else if (typeof el.scrollTo === 'function') {
               el.scrollTo({ top: 0, behavior: 'smooth' });
             } else {
               el.scrollTop = 0;
@@ -1493,6 +1504,26 @@ export class DashboardIT implements OnInit {
           console.error('Error fetching data:', error);
         },
       });
+  }
+
+  private scrollTicketInList(ticketId: string, retries = 10): void {
+    const container = this.ticketList?.nativeElement;
+    const ticketElement = document.getElementById(`ticket-${ticketId}`);
+    if (container && ticketElement) {
+      const containerRect = container.getBoundingClientRect();
+      const ticketRect = ticketElement.getBoundingClientRect();
+      const targetTop =
+        container.scrollTop +
+        ticketRect.top -
+        containerRect.top -
+        (container.clientHeight - ticketElement.clientHeight) / 2;
+      container.scrollTo({ top: Math.max(0, targetTop), behavior: 'smooth' });
+      return;
+    }
+
+    if (retries > 0) {
+      setTimeout(() => this.scrollTicketInList(ticketId, retries - 1), 200);
+    }
   }
 
   fetchUnreadIds() {
@@ -1601,6 +1632,7 @@ export class DashboardIT implements OnInit {
 
     if (command === 'close') {
       formData.append('itResult', 'Closed');
+      if (comment) formData.append('reason', comment);
     }
 
     if (command === 'deny') {
@@ -1642,7 +1674,8 @@ export class DashboardIT implements OnInit {
     const ticket = this.selectedTicket();
     const condition1 =
       ticket?.repair_cost_type === 'paid' && ticket?.approval_status !== 'Approved'; //แจ้งซ่อมแบบเสียตัง ยังไม่ได้ approve/resubmit มา
-    const configuredActions = (condition1
+    const condition2 = ticket?.user_status === 'Pending' && ticket?.repair_cost_type !== 'free'; //รอ user resubmit > approval > it
+    const configuredActions = (condition1 || condition2
       ? this.actionConfig['waiting-user-resubmit']
       : this.actionConfig[ticket?.status]) ?? { left: [], right: [] };
     const actions = {
@@ -1728,6 +1761,8 @@ export class DashboardIT implements OnInit {
     const tag = data.ticketTypeId;
     const repairCostType =
       Number(data.ticketTypeId) === 1 ? (data.repairCostType ?? 'free') : undefined;
+
+    // console.log('acknowledge', ticketId, tag, null, data.message, data.attachments, repairCostType);
 
     this.swalService.loading('กำลังบันทึกข้อมูล...');
     this.IS_ACKNOWLEDGE_TICKET.set(false);
@@ -1890,7 +1925,29 @@ export class DashboardIT implements OnInit {
     this.IS_DENY_TICKET.set(false);
   }
 
+  private isTicketTypeChangeLocked(ticket: any): boolean {
+    const isApproved =
+      String(ticket?.approval_status ?? ticket?.approvalStatus ?? '')
+        .trim()
+        .toLowerCase() === 'approved';
+    const ticketTypeId = Number(ticket?.ticketTypeId ?? ticket?.ticket_type_id);
+    const isServiceRequest = ticketTypeId === 3;
+    const isPaidRepair =
+      ticketTypeId === 1 &&
+      String(ticket?.repair_cost_type ?? ticket?.repairCostType ?? '')
+        .trim()
+        .toLowerCase() === 'paid';
+
+    return isApproved && (isServiceRequest || isPaidRepair);
+  }
+
   openChangeTicketTypeModal() {
+    if (this.isTicketTypeChangeLocked(this.selectedTicket())) {
+      this.swalService.warning(
+        'ขอใช้บริการหรือแจ้งซ่อมแบบเสียเงินที่อนุมัติแล้ว ไม่สามารถเปลี่ยนประเภทคำขอได้',
+      );
+      return;
+    }
     this.checkBeforeAction(() => {
       this.IS_CHANGE_TICKET_TYPE.set(true);
     });
@@ -1910,6 +1967,17 @@ export class DashboardIT implements OnInit {
     const ticketId = ticket?.ticketId;
     if (!ticketId) {
       this.swalService.warning('ไม่พบ Ticket');
+      return;
+    }
+
+    if (this.isTicketTypeChangeLocked(ticket)) {
+      this.swalService.warning(
+        'ขอใช้บริการหรือแจ้งซ่อมแบบเสียเงินที่อนุมัติแล้ว ไม่สามารถเปลี่ยนประเภทคำขอได้',
+      );
+      return;
+    }
+    if (data.ticketTypeId === 3 && ticket?.viaEmail !== true) {
+      this.swalService.warning('ขอใช้บริการสามารถเลือกได้เฉพาะ Ticket ที่มาจาก Email');
       return;
     }
 
@@ -1980,10 +2048,10 @@ export class DashboardIT implements OnInit {
 
         this.swalService.success(res.message || 'บันทึกสำเร็จ');
 
+        this.signalrService.ticketStatusTrigger.next({ ticketId, status: 'Denied' });
         this.signalrService.ticketStatusNotify(ticketId, ticket?.requesterAduser ?? '', 'Denied');
-
-        this.selectTicket(ticketId);
-        this.getAllTickets();
+        this.filterStatus = 'all';
+        this.getAllTickets(false, false, String(ticketId));
       },
 
       error: (error) => {
@@ -2107,49 +2175,44 @@ export class DashboardIT implements OnInit {
 
   closeTicket() {
     this.checkBeforeAction(() => {
-      this.swalService.confirm('ยืนยันการปิดงาน').then((result) => {
-        if (!result.isConfirmed) return;
+      this.IS_CLOSE_TICKET.set(true);
+    });
+  }
 
-        const ticket = this.selectedTicket();
-        const ticketId = ticket?.ticketId;
+  closeCloseTicketModal(): void {
+    this.IS_CLOSE_TICKET.set(false);
+  }
 
-        if (!ticketId) {
-          this.msg.warning('ไม่พบ Ticket');
+  submitCloseTicket(data: { reason: string }): void {
+    const ticket = this.selectedTicket();
+    const ticketId = ticket?.ticketId;
+    if (!ticketId) {
+      this.msg.warning('ไม่พบ Ticket');
+      return;
+    }
+
+    this.IS_CLOSE_TICKET.set(false);
+    this.swalService.loading('กำลังบันทึกข้อมูล...');
+    this.updateTicket('close', ticketId, '', null, data.reason).subscribe({
+      next: (res) => {
+        if (!res?.success) {
+          this.swalService.warning('ไม่สามารถบันทึกข้อมูลได้');
           return;
         }
 
-        this.swalService.loading('กำลังบันทึกข้อมูล...');
-
-        this.updateTicket('close', ticketId, '', null, null).subscribe({
-          next: (res) => {
-            if (!res?.success) {
-              this.swalService.warning('ไม่สามารถบันทึกข้อมูลได้');
-              return;
-            }
-
-            this.swalService.success(res.message || 'บันทึกสำเร็จ');
-
-            this.signalrService.ticketStatusTrigger.next({ ticketId, status: 'Closed' });
-            this.signalrService.ticketStatusNotify(
-              ticketId,
-              this.selectedTicket()?.requesterAduser ?? '',
-              'Closed',
-            );
-
-            this.selectTicket(ticketId);
-            this.getAllTickets();
-          },
-
-          error: (error) => {
-            console.error('Closed Ticket Error:', error);
-
-            this.swalService.warning(
-              'เกิดข้อผิดพลาด',
-              error?.message || 'ไม่สามารถติดต่อเซิร์ฟเวอร์ได้',
-            );
-          },
-        });
-      });
+        this.swalService.success(res.message || 'บันทึกสำเร็จ');
+        this.signalrService.ticketStatusTrigger.next({ ticketId, status: 'Closed' });
+        this.signalrService.ticketStatusNotify(ticketId, ticket?.requesterAduser ?? '', 'Closed');
+        this.filterStatus = 'all';
+        this.getAllTickets(false, false, String(ticketId));
+      },
+      error: (error) => {
+        console.error('Closed Ticket Error:', error);
+        this.swalService.warning(
+          'เกิดข้อผิดพลาด',
+          error?.message || 'ไม่สามารถติดต่อเซิร์ฟเวอร์ได้',
+        );
+      },
     });
   }
 

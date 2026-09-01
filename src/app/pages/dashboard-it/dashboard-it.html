@@ -335,7 +335,12 @@
             {{ btn.label }}
           </button>
         }
-        <div *ngIf="t.status === 'Assigned' && t.repair_cost_type === 'paid'" class="warning-text">
+        <div
+          *ngIf="
+            t.status === 'Assigned' && t.user_status === 'Pending' && t.repair_cost_type !== 'free'
+          "
+          class="warning-text"
+        >
           รอ user ส่งข้อมูลเพิ่มเติม
         </div>
       </div>
@@ -472,6 +477,17 @@
       (submitModal)="submitDeny($event)"
     >
     </app-deny-modal>
+  }
+
+  @if (IS_CLOSE_TICKET()) {
+    <app-deny-modal
+      [ticket]="selectedTicket()"
+      title="เหตุผลในการปิดงาน"
+      placeholder="กรอกเหตุผลในการปิดงาน..."
+      validationMessage="กรุณากรอกเหตุผลในการปิดงาน"
+      (closeModal)="closeCloseTicketModal()"
+      (submitModal)="submitCloseTicket($event)"
+    />
   }
 
   @if (IS_CHANGE_TICKET_TYPE()) {
