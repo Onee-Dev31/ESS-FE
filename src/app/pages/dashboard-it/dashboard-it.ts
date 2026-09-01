@@ -393,6 +393,7 @@ export class DashboardIT implements OnInit {
   }
   private initialized = false;
   IS_DENY_TICKET = signal(false);
+  IS_CLOSE_TICKET = signal(false);
   IS_CHANGE_TICKET_TYPE = signal(false);
   IS_ONHOLD_TICKET = signal(false);
   IS_ACKNOWLEDGE_TICKET = signal(false);
@@ -1602,6 +1603,7 @@ export class DashboardIT implements OnInit {
 
     if (command === 'close') {
       formData.append('itResult', 'Closed');
+      if (comment) formData.append('reason', comment);
     }
 
     if (command === 'deny') {
@@ -1895,6 +1897,15 @@ export class DashboardIT implements OnInit {
   }
 
   openChangeTicketTypeModal() {
+    const approvalStatus = String(
+      this.selectedTicket()?.approval_status ?? this.selectedTicket()?.approvalStatus ?? '',
+    )
+      .trim()
+      .toLowerCase();
+    if (approvalStatus === 'approved') {
+      this.swalService.warning('Ticket ที่อนุมัติแล้วไม่สามารถเปลี่ยนประเภทคำขอได้');
+      return;
+    }
     this.checkBeforeAction(() => {
       this.IS_CHANGE_TICKET_TYPE.set(true);
     });
@@ -1914,6 +1925,19 @@ export class DashboardIT implements OnInit {
     const ticketId = ticket?.ticketId;
     if (!ticketId) {
       this.swalService.warning('ไม่พบ Ticket');
+      return;
+    }
+
+    const isApproved =
+      String(ticket?.approval_status ?? ticket?.approvalStatus ?? '')
+        .trim()
+        .toLowerCase() === 'approved';
+    if (isApproved) {
+      this.swalService.warning('Ticket ที่อนุมัติแล้วไม่สามารถเปลี่ยนประเภทคำขอได้');
+      return;
+    }
+    if (data.ticketTypeId === 3 && ticket?.viaEmail !== true) {
+      this.swalService.warning('ขอใช้บริการสามารถเลือกได้เฉพาะ Ticket ที่มาจาก Email');
       return;
     }
 
@@ -2111,49 +2135,44 @@ export class DashboardIT implements OnInit {
 
   closeTicket() {
     this.checkBeforeAction(() => {
-      this.swalService.confirm('ยืนยันการปิดงาน').then((result) => {
-        if (!result.isConfirmed) return;
+      this.IS_CLOSE_TICKET.set(true);
+    });
+  }
 
-        const ticket = this.selectedTicket();
-        const ticketId = ticket?.ticketId;
+  closeCloseTicketModal(): void {
+    this.IS_CLOSE_TICKET.set(false);
+  }
 
-        if (!ticketId) {
-          this.msg.warning('ไม่พบ Ticket');
+  submitCloseTicket(data: { reason: string }): void {
+    const ticket = this.selectedTicket();
+    const ticketId = ticket?.ticketId;
+    if (!ticketId) {
+      this.msg.warning('ไม่พบ Ticket');
+      return;
+    }
+
+    this.IS_CLOSE_TICKET.set(false);
+    this.swalService.loading('กำลังบันทึกข้อมูล...');
+    this.updateTicket('close', ticketId, '', null, data.reason).subscribe({
+      next: (res) => {
+        if (!res?.success) {
+          this.swalService.warning('ไม่สามารถบันทึกข้อมูลได้');
           return;
         }
 
-        this.swalService.loading('กำลังบันทึกข้อมูล...');
-
-        this.updateTicket('close', ticketId, '', null, null).subscribe({
-          next: (res) => {
-            if (!res?.success) {
-              this.swalService.warning('ไม่สามารถบันทึกข้อมูลได้');
-              return;
-            }
-
-            this.swalService.success(res.message || 'บันทึกสำเร็จ');
-
-            this.signalrService.ticketStatusTrigger.next({ ticketId, status: 'Closed' });
-            this.signalrService.ticketStatusNotify(
-              ticketId,
-              this.selectedTicket()?.requesterAduser ?? '',
-              'Closed',
-            );
-
-            this.selectTicket(ticketId);
-            this.getAllTickets();
-          },
-
-          error: (error) => {
-            console.error('Closed Ticket Error:', error);
-
-            this.swalService.warning(
-              'เกิดข้อผิดพลาด',
-              error?.message || 'ไม่สามารถติดต่อเซิร์ฟเวอร์ได้',
-            );
-          },
-        });
-      });
+        this.swalService.success(res.message || 'บันทึกสำเร็จ');
+        this.signalrService.ticketStatusTrigger.next({ ticketId, status: 'Closed' });
+        this.signalrService.ticketStatusNotify(ticketId, ticket?.requesterAduser ?? '', 'Closed');
+        this.selectTicket(ticketId);
+        this.getAllTickets();
+      },
+      error: (error) => {
+        console.error('Closed Ticket Error:', error);
+        this.swalService.warning(
+          'เกิดข้อผิดพลาด',
+          error?.message || 'ไม่สามารถติดต่อเซิร์ฟเวอร์ได้',
+        );
+      },
     });
   }
 

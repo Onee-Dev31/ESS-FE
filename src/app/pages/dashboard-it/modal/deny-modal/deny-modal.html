@@ -1,6 +1,6 @@
 <form #denyForm="ngForm" (ngSubmit)="save(denyForm)">
   <app-modal-shell
-    title="เหตุผลในการยกเลิก"
+    [title]="title"
     size="sm"
     [padded]="false"
     [showClose]="false"
@@ -13,11 +13,11 @@
         name="reason"
         ngModel
         required
-        placeholder="อธิบายรายละเอียด..."
+        [placeholder]="placeholder"
       ></textarea>
 
       @if (denyForm.submitted && denyForm.invalid) {
-        <div class="validation-message">กรุณากรอกเหตุผลในการยกเลิก</div>
+        <div class="validation-message">{{ validationMessage }}</div>
       }
     </div>
 

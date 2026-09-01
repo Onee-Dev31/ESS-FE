@@ -31,6 +31,20 @@ export class ChangeTicketTypeModal implements OnChanges {
     { id: 3, label: 'ขอใช้บริการ' },
   ];
 
+  get isViaEmail(): boolean {
+    return this.ticket?.viaEmail === true;
+  }
+
+  get isApproved(): boolean {
+    return String(this.ticket?.approval_status ?? this.ticket?.approvalStatus ?? '')
+      .trim()
+      .toLowerCase() === 'approved';
+  }
+
+  get availableTicketTypes(): typeof this.ticketTypes {
+    return this.isViaEmail ? this.ticketTypes : this.ticketTypes.filter((type) => type.id !== 3);
+  }
+
   selectedTypeId = 2;
   originalTypeId = 2;
   repairCostType: 'paid' | 'free' | null = null;
@@ -53,6 +67,7 @@ export class ChangeTicketTypeModal implements OnChanges {
   }
 
   selectType(ticketTypeId: number): void {
+    if (this.isApproved || (ticketTypeId === 3 && !this.isViaEmail)) return;
     this.selectedTypeId = ticketTypeId;
     if (ticketTypeId !== 1) {
       this.repairCostType = null;
@@ -62,6 +77,7 @@ export class ChangeTicketTypeModal implements OnChanges {
   }
 
   selectRepairCostType(value: 'paid' | 'free'): void {
+    if (this.isApproved) return;
     this.repairCostType = value;
     this.showAttachmentError = false;
     if (value !== 'paid') this.attachments = [];
@@ -115,6 +131,7 @@ export class ChangeTicketTypeModal implements OnChanges {
   }
 
   get canSubmit(): boolean {
+    if (this.isApproved || (this.selectedTypeId === 3 && !this.isViaEmail)) return false;
     const hasChanged =
       this.selectedTypeId !== this.originalTypeId ||
       (this.selectedTypeId === 1 && this.repairCostType !== this.originalRepairCostType);
