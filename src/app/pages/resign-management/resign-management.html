@@ -1,3 +1,6 @@
+@if (isLoading()) {
+  <app-page-loader message="กำลังโหลดข้อมูลพนักงาน..." />
+} @else {
 <div class="page">
   <app-page-header [title]="pageTitle()"> </app-page-header>
 
@@ -509,4 +512,5 @@
     (closeModal)="closeConfirmModal()"
     (submitModal)="submitConfirm($event)"
   ></app-confirm-modal>
+}
 }

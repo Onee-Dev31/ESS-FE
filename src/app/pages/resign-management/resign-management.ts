@@ -17,12 +17,13 @@ import { EmptyStateComponent } from '../../components/shared/empty-state/empty-s
 import { PaginationComponent } from '../../components/shared/pagination/pagination';
 import { MasterDataService } from '../../services/master-data.service';
 import { NzSelectModule } from 'ng-zorro-antd/select';
-import { finalize } from 'rxjs';
+import { finalize, forkJoin } from 'rxjs';
 import dayjs from 'dayjs';
 import { NzTooltipModule } from 'ng-zorro-antd/tooltip';
 import { ConfirmModal } from './modal/confirm-modal/confirm-modal';
 import { AuthService } from '../../services/auth.service';
 import { environment } from '../../../environments/environment';
+import { PageLoaderComponent } from '../../components/shared/page-loader/page-loader';
 
 interface EmployeeFormData {
   empCode: string; //CODEMPID
@@ -54,11 +55,13 @@ interface EmployeeFormData {
     NzSelectModule,
     ConfirmModal,
     NzTooltipModule,
+    PageLoaderComponent,
   ],
   templateUrl: './resign-management.html',
   styleUrl: './resign-management.scss',
 })
 export class ResignManagement {
+  private readonly loadingKey = 'resign-management-table';
   getEmployeeImage(empCode: string): string {
     return `${environment.employeeImageUrl}/${empCode}.jpg`;
   }
@@ -71,7 +74,7 @@ export class ResignManagement {
   private masterService = inject(MasterDataService);
   private authService = inject(AuthService);
 
-  isLoading = this.loadingService.loading('resign-table');
+  isLoading = this.loadingService.loading(this.loadingKey);
 
   // MASTER
   companyList = signal<any[]>([]);
@@ -542,7 +545,7 @@ export class ResignManagement {
   }
 
   loadInitialData() {
-    this.loadingService.start('freelance-list');
+    this.loadingService.start(this.loadingKey);
 
     const pageA = this.activeListing.currentPage() + 1;
     const sizeA = this.activeListing.pageSize();
@@ -550,16 +553,20 @@ export class ResignManagement {
     const pageR = this.resignListing.currentPage() + 1;
     const sizeR = this.resignListing.pageSize();
 
-    this.fetchEmployeeByStatus('Active', pageA, sizeA).subscribe((res) => {
-      // console.log("Active >>", res)
-      this.dataActiveFromApi(res);
-    });
-
-    this.fetchEmployeeByStatus('Resigned', pageR, sizeR).subscribe((res) => {
-      // console.log("Resigned >>", res)
-      this.dataResignFromApi(res);
-      this.loadingService.stop('freelance-list');
-    });
+    forkJoin({
+      active: this.fetchEmployeeByStatus('Active', pageA, sizeA),
+      resigned: this.fetchEmployeeByStatus('Resigned', pageR, sizeR),
+    })
+      .pipe(finalize(() => this.loadingService.stop(this.loadingKey)))
+      .subscribe({
+        next: ({ active, resigned }) => {
+          this.dataActiveFromApi(active);
+          this.dataResignFromApi(resigned);
+        },
+        error: (error) => {
+          console.error('Error loading resign management data:', error);
+        },
+      });
   }
 
   //GET
