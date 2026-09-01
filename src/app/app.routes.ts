@@ -251,6 +251,14 @@ export const routes: Routes = [
         data: { animation: 'Dashboard' },
       },
       {
+        path: 'vehicle-policy-setting',
+        loadComponent: () =>
+          import('./pages/setting-vehicle-policy/setting-vehicle-policy').then(
+            (m) => m.SettingVehiclePolicy,
+          ),
+        data: { animation: 'Dashboard' },
+      },
+      {
         path: 'approval-it-request',
         loadComponent: () =>
           import('./pages/approval-it-request/approval-it-request').then(

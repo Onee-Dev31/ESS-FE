@@ -4,6 +4,40 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { AuthService } from './auth.service';
 import { Observable } from 'rxjs';
 
+export interface VehicleRate {
+  rate_id: number;
+  description: string;
+  rate_amount: number;
+}
+
+export interface VehicleRatesResponse {
+  success: boolean;
+  data: VehicleRate[];
+}
+
+export interface VehicleConditions {
+  condition_set_id: number;
+  early_checkin_time: string;
+  late_checkout_hour: number;
+  late_tolerance_min: number;
+  description: string | null;
+}
+
+export interface VehicleConditionsResponse {
+  success: boolean;
+  data: VehicleConditions;
+}
+
+export interface VehiclePolicyText {
+  text_key: string;
+  content: string;
+}
+
+export interface VehiclePolicyTextsResponse {
+  success: boolean;
+  data: VehiclePolicyText[];
+}
+
 @Injectable({
   providedIn: 'root',
 })
@@ -66,6 +100,21 @@ export class VehicleService {
     return this._http.get(`${this.baseUrl}/transport-claim/claims`, {
       params: queryParams,
     });
+  }
+
+  /** GET api/transport-claim/rates */
+  getRates(): Observable<VehicleRatesResponse> {
+    return this._http.get<VehicleRatesResponse>(`${this.baseUrl}/transport-claim/rates`);
+  }
+
+  /** GET api/transport-claim/conditions */
+  getConditions(): Observable<VehicleConditionsResponse> {
+    return this._http.get<VehicleConditionsResponse>(`${this.baseUrl}/transport-claim/conditions`);
+  }
+
+  /** GET api/transport-claim/policy-texts */
+  getPolicyTexts(): Observable<VehiclePolicyTextsResponse> {
+    return this._http.get<VehiclePolicyTextsResponse>(`${this.baseUrl}/transport-claim/policy-texts`);
   }
 
   getVehicleByEmpcode(year: string, month: string): Observable<any> {
