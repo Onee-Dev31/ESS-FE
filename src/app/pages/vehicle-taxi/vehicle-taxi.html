@@ -1,5 +1,14 @@
 <div class="vehicle-taxi-page">
-  <app-page-header title="เบิกค่าพาหนะ (Taxi)"></app-page-header>
+  <app-page-header title="เบิกค่าพาหนะ (Taxi)">
+    <button
+      type="button"
+      class="btn-icon-sky"
+      (click)="isPolicyModalOpen.set(true)"
+      title="เงื่อนไขการเบิกค่าพาหนะ (Taxi)"
+    >
+      <i class="fas fa-info-circle"></i>
+    </button>
+  </app-page-header>
 
   <div class="content-card">
     <div class="card-header-row">
@@ -292,6 +301,103 @@
       <div class="modal-container">
         <app-vehicle-taxi-form [requests]="selectedRequest" (onClose)="closeModal()">
         </app-vehicle-taxi-form>
+      </div>
+    </div>
+  }
+
+  @if (isPolicyModalOpen()) {
+    <div class="policy-popup-overlay" (click)="isPolicyModalOpen.set(false)">
+      <div class="policy-popup-content" (click)="$event.stopPropagation()">
+        <div class="policy-popup-header">
+          <h3><i class="fas fa-info-circle"></i> เงื่อนไขการเบิกค่าพาหนะ (Taxi)</h3>
+          <button
+            type="button"
+            class="btn-close-popup"
+            (click)="isPolicyModalOpen.set(false)"
+            title="ปิด"
+          >
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+        <div class="policy-popup-body">
+          <ul class="policy-conditions-list">
+            <li class="condition-item">
+              <i class="fas fa-calendar-check"></i>
+              <div>
+                <div class="condition-title">
+                  @for (seg of renderSegments('taxi_cond1_title'); track $index) {
+                    @if (seg.bold) {<strong>{{ seg.text }}</strong>} @else {{{ seg.text }}}
+                  }
+                </div>
+                <div class="condition-desc">
+                  @for (seg of renderSegments('taxi_cond1_desc'); track $index) {
+                    @if (seg.bold) {<strong>{{ seg.text }}</strong>} @else {{{ seg.text }}}
+                  }
+                </div>
+              </div>
+            </li>
+            <li class="condition-item">
+              <i class="fas fa-wallet"></i>
+              <div>
+                <div class="condition-title">
+                  @for (seg of renderSegments('taxi_cond2_title'); track $index) {
+                    @if (seg.bold) {<strong>{{ seg.text }}</strong>} @else {{{ seg.text }}}
+                  }
+                </div>
+                <div class="condition-desc">
+                  @for (seg of renderSegments('taxi_cond2_desc'); track $index) {
+                    @if (seg.bold) {<strong>{{ seg.text }}</strong>} @else {{{ seg.text }}}
+                  }
+                </div>
+              </div>
+            </li>
+            <li class="condition-item">
+              <i class="fas fa-route"></i>
+              <div>
+                <div class="condition-title">
+                  @for (seg of renderSegments('taxi_cond3_title'); track $index) {
+                    @if (seg.bold) {<strong>{{ seg.text }}</strong>} @else {{{ seg.text }}}
+                  }
+                </div>
+                <div class="condition-desc">
+                  @for (seg of renderSegments('taxi_cond3_desc'); track $index) {
+                    @if (seg.bold) {<strong>{{ seg.text }}</strong>} @else {{{ seg.text }}}
+                  }
+                </div>
+              </div>
+            </li>
+            <li class="condition-item">
+              <i class="fas fa-pen-to-square"></i>
+              <div>
+                <div class="condition-title">
+                  @for (seg of renderSegments('taxi_cond4_title'); track $index) {
+                    @if (seg.bold) {<strong>{{ seg.text }}</strong>} @else {{{ seg.text }}}
+                  }
+                </div>
+                <div class="condition-desc">
+                  @for (seg of renderSegments('taxi_cond4_desc'); track $index) {
+                    @if (seg.bold) {<strong>{{ seg.text }}</strong>} @else {{{ seg.text }}}
+                  }
+                </div>
+              </div>
+            </li>
+            <li class="condition-item">
+              <i class="fas fa-lock"></i>
+              <div>
+                <div class="condition-title">
+                  @for (seg of renderSegments('taxi_cond5_title'); track $index) {
+                    @if (seg.bold) {<strong>{{ seg.text }}</strong>} @else {{{ seg.text }}}
+                  }
+                </div>
+                <div class="condition-desc">
+                  @for (seg of renderSegments('taxi_cond5_desc'); track $index) {
+                    @if (seg.bold) {<strong>{{ seg.text }}</strong>} @else {{{ seg.text }}}
+                  }
+                </div>
+              </div>
+            </li>
+          </ul>
+        </div>
       </div>
     </div>
   }
