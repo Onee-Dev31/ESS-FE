@@ -1,3 +1,7 @@
+@if (isLoading() || isExporting()) {
+  <app-page-loader [message]="isExporting() ? 'กำลังสร้างไฟล์ Excel...' : 'กำลังโหลดรายการอนุมัติ IT...'" />
+}
+
 <div class="approvals-wrapper">
   <app-page-header [title]="pageTitle()">
     <div class="utility-btns">
@@ -63,10 +67,7 @@
     </div>
 
     <div class="table-responsive">
-      @if (isLoading()) {
-        <app-skeleton type="table" [rows]="5"></app-skeleton>
-      } @else {
-        <table class="modern-table">
+      <table class="modern-table">
           <thead>
             <tr>
               <th class="col-requestNo">
@@ -186,8 +187,7 @@
               </tr>
             </tbody>
           }
-        </table>
-      }
+      </table>
     </div>
 
     <div class="card-list-view">

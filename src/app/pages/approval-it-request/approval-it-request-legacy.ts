@@ -26,8 +26,8 @@ import { ErrorService } from '../../services/error';
 import { ItServiceService } from '../../services/it-service.service';
 import { APPROVAL_STATUS_TABS } from '../../config/approval.config';
 import { PageHeaderComponent } from '../../components/shared/page-header/page-header';
+import { PageLoaderComponent } from '../../components/shared/page-loader/page-loader';
 import { PaginationComponent } from '../../components/shared/pagination/pagination';
-// import { SkeletonComponent } from '../../components/shared/skeleton/skeleton';
 import {
   createListingState,
   createListingComputeds,
@@ -35,7 +35,6 @@ import {
 } from '../../utils/listing.util';
 import { EmptyStateComponent } from '../../components/shared/empty-state/empty-state';
 import { listAnimation } from '../../animations/animations';
-import { SkeletonComponent } from '../../components/shared/skeleton/skeleton';
 import { AuthService } from '../../services/auth.service';
 import { NzInputModule } from 'ng-zorro-antd/input';
 import { NzDatePickerModule } from 'ng-zorro-antd/date-picker';
@@ -50,9 +49,9 @@ import { NzSelectModule } from 'ng-zorro-antd/select';
     FormsModule,
     ItRequestDetailModal,
     PageHeaderComponent,
+    PageLoaderComponent,
     PaginationComponent,
     EmptyStateComponent,
-    SkeletonComponent,
     NzInputModule,
     NzDatePickerModule,
     NzSelectModule,
