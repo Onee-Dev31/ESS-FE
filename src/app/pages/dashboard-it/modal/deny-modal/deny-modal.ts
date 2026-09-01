@@ -11,6 +11,9 @@ import { ModalShellComponent } from '../../../../components/shared/modal-shell/m
 })
 export class DenyModal {
   @Input() ticket: any;
+  @Input() title = 'เหตุผลในการยกเลิก';
+  @Input() placeholder = 'อธิบายรายละเอียด...';
+  @Input() validationMessage = 'กรุณากรอกเหตุผลในการยกเลิก';
   @Output() submitModal = new EventEmitter<any>();
   @Output() closeModal = new EventEmitter<void>();
 

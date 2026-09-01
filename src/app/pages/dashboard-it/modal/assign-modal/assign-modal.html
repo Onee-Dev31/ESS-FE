@@ -1,221 +1,125 @@
-<div class="modal-overlay assign">
-  <div class="modal-container">
-    <header class="top-header-strip">
-      <h2>
-        Assign Ticket
-        <span class="amh-count" *ngIf="selectedAssigneeEmpCodes.length > 0">
-          {{ selectedAssigneeEmpCodes.length }} selected
-        </span>
-      </h2>
-    </header>
+<app-modal-shell
+  title="ส่งต่อ"
+  size="sm"
+  [padded]="false"
+  [showClose]="false"
+  [mobileFullscreen]="true"
+  (closeModal)="close()"
+>
+  @if (selectedAssigneeEmpCodes.length > 0) {
+    <span modalHeaderAction class="amh-count">{{ selectedAssigneeEmpCodes.length }} selected</span>
+  }
 
-    <div class="content-card">
-      <div class="select-tag">
-        <div>
-          <p>เลือกประเภทงาน<span class="required">*</span></p>
+  <div class="content-card">
+    <div class="select-tag">
+      @if (isApproved) {
+        <div class="approved-ticket-type">
+          <span>ประเภทงาน</span>
+          <strong>{{ ticketTypeLabel }}</strong>
         </div>
-
+      } @else {
+        <p>เลือกประเภทงาน<span class="required">*</span></p>
         <div class="tag-group">
           <label class="tag">
-            <input
-              type="radio"
-              name="tag"
-              [value]="2"
-              [(ngModel)]="selectedTag"
-              (ngModelChange)="onTagChange()"
-            />
+            <input type="radio" name="tag" [value]="2" [(ngModel)]="selectedTag" (ngModelChange)="onTagChange()" />
             <span>แจ้งปัญหา</span>
           </label>
-
           <label class="tag">
-            <input
-              type="radio"
-              name="tag"
-              [value]="1"
-              [(ngModel)]="selectedTag"
-              (ngModelChange)="onTagChange()"
-            />
+            <input type="radio" name="tag" [value]="1" [(ngModel)]="selectedTag" (ngModelChange)="onTagChange()" />
             <span>แจ้งซ่อม</span>
           </label>
-
-          <label class="tag">
-            <input
-              type="radio"
-              name="tag"
-              [value]="3"
-              [(ngModel)]="selectedTag"
-              (ngModelChange)="onTagChange()"
-            />
-            <span>ขอใช้บริการ</span>
-          </label>
-        </div>
-      </div>
-      @if (isChangedToRepair) {
-        <div class="repair-details">
-          <p>ประเภทค่าใช้จ่าย<span class="required">*</span></p>
-          <div class="tag-group">
+          @if (ticket?.viaEmail === true) {
             <label class="tag">
-              <input type="radio" name="repairCost" value="paid" [(ngModel)]="repairCostType" />
-              <span>ขออนุมัติ Budget ต้นสังกัด</span>
+              <input type="radio" name="tag" [value]="3" [(ngModel)]="selectedTag" (ngModelChange)="onTagChange()" />
+              <span>ขอใช้บริการ</span>
             </label>
-            <label class="tag">
-              <input type="radio" name="repairCost" value="free" [(ngModel)]="repairCostType" />
-              <span>ดำเนินการตามปกติ</span>
-            </label>
-          </div>
-
-          <textarea
-            name="message"
-            class="form-input note"
-            placeholder="อธิบายรายละเอียด..."
-            [(ngModel)]="message"
-          ></textarea>
-
-          <input
-            type="file"
-            multiple
-            hidden
-            #fileInput
-            [accept]="'.' + FILE_CONFIG.allowedExtensions.join(',.')"
-            (change)="onFileSelected($event)"
-          />
-          <button type="button" class="attach-btn" (click)="fileInput.click()">
-            <i class="fas fa-paperclip"></i> แนบไฟล์
-          </button>
-
-          @if (repairCostType === 'paid' && attachments.length === 0) {
-            <p class="attachment-warning">
-              <i class="fas fa-exclamation-circle"></i> กรุณาแนบไฟล์ใบเสนอราคา /
-              เอกสารประกอบการขออนุมัติ Budget
-            </p>
           }
-          @if (attachments.length > 0) {
-            <div class="file-chips">
-              @for (file of attachments; track file.name; let i = $index) {
-                <div class="file-chip" (click)="viewFile(file)">
-                  <i class="far fa-file"></i><span class="file-name">{{ file.name }}</span>
-                  <button
-                    type="button"
-                    class="chip-remove"
-                    (click)="removeAttachment(i); $event.stopPropagation()"
-                  >
-                    <i class="fas fa-times"></i>
-                  </button>
-                </div>
-              }
+        </div>
+      }
+    </div>
+
+    <div class="assign-reason">
+      <label for="assignReason">เหตุผล <span class="optional-label">(ไม่บังคับ)</span></label>
+      <textarea
+        id="assignReason"
+        name="reason"
+        class="form-input note"
+        placeholder="กรอกเหตุผลในการส่งต่อ..."
+        [(ngModel)]="reason"
+      ></textarea>
+    </div>
+
+    <div class="form-field search">
+      <input
+        nz-input
+        placeholder="ค้นหาชื่อคน"
+        [ngModel]="assignSearchKeyword()"
+        (ngModelChange)="assignSearchKeyword.set($event)"
+        name="assign"
+        class="form-input"
+      />
+    </div>
+
+    <div class="assign-modal-body">
+      @if (selectedAssigneeEmpCodes.length > 0) {
+        <div class="selected-chips">
+          @for (emp of selectedAssigneeEmpCodes; track emp.id) {
+            <div class="chip">
+              <img [src]="getEmployeeImage(emp.id)" (error)="onImgError($event)" />
+              <span>{{ emp.id }}</span>
+              <span class="material-symbols-outlined close-ic" (click)="removeAssignee(emp.id)">close</span>
             </div>
           }
         </div>
       }
-      <div class="assign-reason">
-        <label for="assignReason">เหตุผล <span class="optional-label">(ไม่บังคับ)</span></label>
-        <textarea
-          id="assignReason"
-          name="reason"
-          class="form-input note"
-          placeholder="กรอกเหตุผลในการส่งต่อ..."
-          [(ngModel)]="reason"
-        ></textarea>
-      </div>
-      <div class="form-field search">
-        <input
-          nz-input
-          placeholder="ค้นหาชื่อคน"
-          [ngModel]="assignSearchKeyword()"
-          (ngModelChange)="assignSearchKeyword.set($event)"
-          name="assign"
-          class="form-input"
-        />
-      </div>
 
-      <div class="assign-modal-body">
-        <div class="selected-chips" *ngIf="selectedAssigneeEmpCodes.length > 0">
-          <div class="chip" *ngFor="let emp of selectedAssigneeEmpCodes">
-            <img [src]="getEmployeeImage(emp.id)" (error)="onImgError($event)" />
-
-            <span>{{ emp.id }}</span>
-
-            <span class="material-symbols-outlined close-ic" (click)="removeAssignee(emp.id)">
-              close
-            </span>
-          </div>
-        </div>
-
-        <div class="assign-list-container">
-          <div class="assign-group" *ngFor="let g of filteredAssigneeGroups()">
+      <div class="assign-list-container">
+        @for (group of filteredAssigneeGroups(); track group.name) {
+          <div class="assign-group">
             <div class="assign-group-header">
-              <div class="assign-group-label">{{ g.name }}</div>
-
-              <button class="grp-toggle-btn" (click)="toggleGroup(g)">
-                {{ isGroupSelected(g) ? 'Unselect All' : 'Select All' }}
+              <div class="assign-group-label">{{ group.name }}</div>
+              <button type="button" class="grp-toggle-btn" (click)="toggleGroup(group)">
+                {{ isGroupSelected(group) ? 'Unselect All' : 'Select All' }}
               </button>
             </div>
 
-            <div
-              class="assign-item"
-              *ngFor="let emp of g.members"
-              [class.selected]="isSelected(emp.id)"
-              (click)="toggleAssignee(emp)"
-            >
-              <div class="assign-chk">
-                <span class="material-symbols-outlined" *ngIf="isSelected(emp.id)">check_box</span>
-                <span class="material-symbols-outlined" *ngIf="!isSelected(emp.id)"
-                  >check_box_outline_blank</span
-                >
+            @for (emp of group.members; track emp.id) {
+              <div class="assign-item" [class.selected]="isSelected(emp.id)" (click)="toggleAssignee(emp)">
+                <div class="assign-chk">
+                  <span class="material-symbols-outlined">{{ isSelected(emp.id) ? 'check_box' : 'check_box_outline_blank' }}</span>
+                </div>
+                <div class="assign-avatar">
+                  <img
+                    [src]="getEmployeeImage(emp.id)"
+                    loading="lazy"
+                    (error)="onImgError($event)"
+                    (click)="openImage(emp.id); $event.stopPropagation()"
+                  />
+                </div>
+                <div class="assign-info"><div class="assign-name">{{ emp.name }}</div></div>
               </div>
-
-              <div class="assign-avatar">
-                <img
-                  [src]="getEmployeeImage(emp.id)"
-                  loading="lazy"
-                  (error)="onImgError($event)"
-                  (click)="openImage(emp.id); $event.stopPropagation()"
-                />
-              </div>
-
-              <div class="assign-info">
-                <div class="assign-name">{{ emp.name }}</div>
-              </div>
-            </div>
+            }
           </div>
-
-          <div class="no-results" *ngIf="filteredAssigneeGroups.length === 0">
+        } @empty {
+          <div class="no-results">
             <span class="material-symbols-outlined">person_off</span>
             <div class="msg">ไม่พบรายชื่อพนักงาน</div>
           </div>
-        </div>
-
-        <div class="form-actions-footer">
-          <button type="button" class="btn-back-custom" (click)="close()">
-            <i class="fas fa-times"></i> ยกเลิก
-          </button>
-
-          <button
-            nz-button
-            class="btn-save-custom"
-            [disabled]="
-              selectedAssigneeEmpCodes.length === 0 ||
-              selectedTag === null ||
-              (isChangedToRepair &&
-                (!repairCostType ||
-                  !message.trim() ||
-                  (repairCostType === 'paid' && attachments.length === 0)))
-            "
-            (click)="save()"
-          >
-            <i class="fas fa-paper-plane"></i>
-            {{
-              selectedAssigneeEmpCodes.length > 0
-                ? 'Assign ' + selectedAssigneeEmpCodes.length + ' People'
-                : 'Assign Ticket'
-            }}
-          </button>
-        </div>
+        }
       </div>
     </div>
   </div>
-</div>
 
-@if (isPreviewModalOpen()) {
-  <app-file-preview-modal [files]="previewFiles()" (onClose)="isPreviewModalOpen.set(false)" />
-}
+  <div modalFooter>
+    <button type="button" class="modal-button" (click)="close()"><i class="fas fa-times"></i> ยกเลิก</button>
+    <button
+      type="button"
+      class="modal-button primary"
+      [disabled]="selectedAssigneeEmpCodes.length === 0 || selectedTag === null"
+      (click)="save()"
+    >
+      <i class="fas fa-paper-plane"></i>
+      {{ selectedAssigneeEmpCodes.length > 0 ? 'Assign ' + selectedAssigneeEmpCodes.length + ' People' : 'Assign Ticket' }}
+    </button>
+  </div>
+</app-modal-shell>

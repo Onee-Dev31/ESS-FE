@@ -49,7 +49,23 @@ export class TicketDetailCardComponent implements OnChanges {
   }
 
   get canChangeTicketType(): boolean {
-    return this.audience === 'it' && ['In Progress', 'Assigned'].includes(this.ticket?.status);
+    const isApproved =
+      String(this.ticket?.approval_status ?? this.ticket?.approvalStatus ?? '')
+        .trim()
+        .toLowerCase() === 'approved';
+    const ticketTypeId = Number(this.ticket?.ticketTypeId ?? this.ticket?.ticket_type_id);
+    const isTypeChangeLocked =
+      isApproved &&
+      (ticketTypeId === 3 ||
+        (ticketTypeId === 1 &&
+          String(this.ticket?.repair_cost_type ?? this.ticket?.repairCostType ?? '')
+            .trim()
+            .toLowerCase() === 'paid'));
+    return (
+      this.audience === 'it' &&
+      !isTypeChangeLocked &&
+      ['In Progress', 'Assigned'].includes(this.ticket?.status)
+    );
   }
 
   confirmImages() {

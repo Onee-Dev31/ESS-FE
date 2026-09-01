@@ -9,11 +9,12 @@
   <div class="content">
     <div class="field-label">เลือกประเภทงาน<span>*</span></div>
     <div class="type-options">
-      @for (type of ticketTypes; track type.id) {
+      @for (type of availableTicketTypes; track type.id) {
         <button
           type="button"
           class="type-option"
           [class.selected]="selectedTypeId === type.id"
+          [disabled]="isTypeChangeLocked"
           (click)="selectType(type.id)"
         >
           {{ type.label }}
@@ -29,6 +30,7 @@
             type="button"
             class="type-option"
             [class.selected]="repairCostType === 'paid'"
+            [disabled]="isTypeChangeLocked"
             (click)="selectRepairCostType('paid')"
           >
             ขออนุมัติ Budget ต้นสังกัด
@@ -37,6 +39,7 @@
             type="button"
             class="type-option"
             [class.selected]="repairCostType === 'free'"
+            [disabled]="isTypeChangeLocked"
             (click)="selectRepairCostType('free')"
           >
             ดำเนินการตามปกติ
