@@ -604,10 +604,21 @@ export class DashboardIT implements OnInit {
       s.delete(Number(ticketId));
       return new Set(s);
     });
-    this.selectTicket(String(ticketId), hasNewNote ? { openChat: true } : undefined);
+    this.focusTicketsZone();
+    requestAnimationFrame(() => this.scrollTicketInList(String(ticketId)));
+    this.selectTicket(String(ticketId), {
+      openChat: hasNewNote,
+      scrollToList: false,
+    });
   }
 
-  selectTicket(ticketId: string, options?: { openChat?: boolean; scrollToList?: boolean }) {
+  selectTicket(
+    ticketId: string,
+    options?: {
+      openChat?: boolean;
+      scrollToList?: boolean;
+    },
+  ) {
     const previousTicketId = this.selectedTicket()?.ticketId;
 
     this.getTicketById(ticketId).subscribe(async (res: any) => {
@@ -720,16 +731,7 @@ export class DashboardIT implements OnInit {
       }
 
       if (options?.scrollToList !== false) {
-        // Scroll to ticket in sidebar (with retry logic in case list is still loading)
-        const scrollToTicket = (id: string, retries = 10) => {
-          const el = document.getElementById('ticket-' + id);
-          if (el) {
-            el.scrollIntoView({ behavior: 'smooth' });
-          } else if (retries > 0) {
-            setTimeout(() => scrollToTicket(id, retries - 1), 300);
-          }
-        };
-        scrollToTicket(ticketId);
+        this.scrollTicketInList(ticketId);
       }
     });
   }
@@ -1512,11 +1514,13 @@ export class DashboardIT implements OnInit {
     if (container && ticketElement) {
       const containerRect = container.getBoundingClientRect();
       const ticketRect = ticketElement.getBoundingClientRect();
+      const previousTicket = ticketElement.previousElementSibling as HTMLElement | null;
+      const secondPositionOffset = previousTicket?.offsetHeight ?? 0;
       const targetTop =
         container.scrollTop +
         ticketRect.top -
         containerRect.top -
-        (container.clientHeight - ticketElement.clientHeight) / 2;
+        secondPositionOffset;
       container.scrollTo({ top: Math.max(0, targetTop), behavior: 'smooth' });
       return;
     }
