@@ -967,6 +967,15 @@ $table-label-bg: var(--border-toolbar);
   background-color: transparent !important;
   border-color: transparent !important;
   box-shadow: none !important;
+  padding-inline: 0 !important;
+}
+
+// Override the shared single-select spacing for this form in every state.
+:host
+  ::ng-deep
+  nz-select.form-input.ant-select-single.ant-select:not(.ant-select-customize-input)
+  .ant-select-selector {
+  padding-inline: 0 !important;
 }
 
 nz-select.form-input:not(.ant-select-disabled):hover {
