@@ -376,7 +376,12 @@ export class FreelanceFormComponent implements OnInit, OnChanges {
   }
 
   confirmResign() {
-    if (!this.formResignData.resignDate || !this.formResignData.lastWorkingDate) return;
+    if (
+      !this.formResignData.resignDate ||
+      !this.formResignData.lastWorkingDate ||
+      this.isResignDateInvalid()
+    )
+      return;
 
     this.onSave.emit({
       ...this.formData,
@@ -436,14 +441,19 @@ export class FreelanceFormComponent implements OnInit, OnChanges {
   }
 
   disabledResignDate = (current: Date): boolean => {
-    if (!this.formResignData.lastWorkingDate) return false;
-    return current < this.formResignData.lastWorkingDate;
+    return isDateBefore(current, this.formResignData.lastWorkingDate);
   };
 
   disabledLastWorkingDate = (current: Date): boolean => {
-    if (!this.formResignData.resignDate) return false;
-    return current > this.formResignData.resignDate;
+    return isDateAfter(current, this.formResignData.resignDate);
   };
+
+  isResignDateInvalid(): boolean {
+    return !isValidDateRange(
+      this.formResignData.lastWorkingDate,
+      this.formResignData.resignDate,
+    );
+  }
 
   // MASTER
   getBanks() {

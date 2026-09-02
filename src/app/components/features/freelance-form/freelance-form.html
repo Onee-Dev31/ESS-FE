@@ -488,6 +488,7 @@
                 name="lastWorkingDate"
                 class="form-input custom-picker"
                 nzDropdownClassName="custom-picker-popup"
+                [nzDisabledDate]="disabledLastWorkingDate"
                 required
                 #lastWorkingDate="ngModel"
                 [class.input-error]="lastWorkingDate.invalid && lastWorkingDate.touched"
@@ -503,14 +504,22 @@
                 [(ngModel)]="formResignData.resignDate"
                 nzFormat="dd/MM/yyyy"
                 name="resignDate"
-                class="form-input"
+                class="form-input custom-picker"
+                nzDropdownClassName="custom-picker-popup"
+                [nzDisabledDate]="disabledResignDate"
+                [nzDefaultPickerValue]="formResignData.lastWorkingDate"
                 required
                 #resignDate="ngModel"
-                [class.input-error]="resignDate.invalid && resignDate.touched"
+                [class.input-error]="
+                  (resignDate.invalid && resignDate.touched) || isResignDateInvalid()
+                "
               >
               </nz-date-picker>
               <div class="error" *ngIf="resignDate.invalid && resignDate.touched">
                 กรุณาเลือกวันที่ลาออก
+              </div>
+              <div class="error" *ngIf="isResignDateInvalid()">
+                Effective Date ต้องไม่น้อยกว่า Last Date
               </div>
             </div>
 
@@ -541,7 +550,18 @@
       </div>
       <div class="form-actions">
         <button type="button" class="btn-clear" (click)="closeResignModal()">ยกเลิก</button>
-        <button type="button" class="btn-confirm-resign" (click)="confirmResign()">ยืนยัน</button>
+        <button
+          type="button"
+          class="btn-confirm-resign"
+          [disabled]="
+            !formResignData.lastWorkingDate ||
+            !formResignData.resignDate ||
+            isResignDateInvalid()
+          "
+          (click)="confirmResign()"
+        >
+          ยืนยัน
+        </button>
       </div>
     </div>
   </div>
