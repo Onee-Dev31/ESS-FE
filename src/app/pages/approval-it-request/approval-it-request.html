@@ -145,18 +145,39 @@
               </td>
 
               <td class="text-center">
-                <div>
+                <div class="status-with-waiting">
                   <span class="status-badge" [ngClass]="getStatusClass(row.original.status)">
                     {{ row.original.status }}
                   </span>
                   @if (canSeeWaitingApprover() && row.original.originalData?.waitingApprover) {
-                    <span
-                      class="waiting-approver-badge"
-                      [class.it-director]="
-                        row.original.originalData?.waitingApprover === 'IT Director'
-                      "
-                      >รอ {{ row.original.originalData?.waitingApprover }}</span
-                    >
+                    @let waitingApprovers =
+                      getWaitingApprovers(row.original.originalData?.waitingApprover);
+                    <div class="waiting-approver-list">
+                      @for (approver of waitingApprovers; track approver; let index = $index) {
+                        @if (index === 0 || isWaitingApproverExpanded(row.original.requestNo)) {
+                          <span
+                            class="waiting-approver-badge"
+                            [title]="'รอ ' + approver"
+                            [class.it-director]="approver === 'IT Director'"
+                          >
+                            รอ {{ approver }}
+                          </span>
+                        }
+                      }
+                      @if (waitingApprovers.length > 1) {
+                        <button
+                          type="button"
+                          class="waiting-approver-toggle"
+                          (click)="toggleWaitingApprovers(row.original.requestNo, $event)"
+                        >
+                          {{
+                            isWaitingApproverExpanded(row.original.requestNo)
+                              ? 'ซ่อน'
+                              : 'ดูเพิ่มเติม (+' + (waitingApprovers.length - 1) + ')'
+                          }}
+                        </button>
+                      }
+                    </div>
                   }
                 </div>
 

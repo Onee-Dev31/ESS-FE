@@ -90,6 +90,7 @@ export class ApprovalItRequestComponent implements OnInit {
   isModalOpen = signal(false);
   selectedItem = signal<ApprovalItem | null>(null);
   initialAction = signal<'Approved' | 'Rejected' | 'Referred Back' | null>(null);
+  expandedWaitingApprovers = signal<Set<string>>(new Set());
   pageTitle = signal('IT Request Approvals');
   canFilterApprovalStage = computed(() =>
     (this.authService.userRole() ?? '')
@@ -103,6 +104,31 @@ export class ApprovalItRequestComponent implements OnInit {
       .map((role) => role.trim().toLowerCase())
       .includes('system-admin'),
   );
+
+  getWaitingApprovers(value: unknown): string[] {
+    if (typeof value !== 'string') return [];
+    return value
+      .split(',')
+      .map((approver) => approver.trim())
+      .filter(Boolean);
+  }
+
+  isWaitingApproverExpanded(requestNo: string): boolean {
+    return this.expandedWaitingApprovers().has(requestNo);
+  }
+
+  toggleWaitingApprovers(requestNo: string, event: Event): void {
+    event.stopPropagation();
+    this.expandedWaitingApprovers.update((current) => {
+      const next = new Set(current);
+      if (next.has(requestNo)) {
+        next.delete(requestNo);
+      } else {
+        next.add(requestNo);
+      }
+      return next;
+    });
+  }
 
   comps = createListingComputeds(this.approvals, this.listing, (item, search, status) => {
     const matchStatus = !status || item.status === status;
