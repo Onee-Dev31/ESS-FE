@@ -17,32 +17,14 @@
             <div class="filter-group">
               <span class="filter-label">ปีที่สร้างรายการ</span>
               <div class="date-input-group">
-                <nz-select
-                  class="timeoff-filter-select year-filter-select"
-                  nzShowSearch
-                  [ngModel]="draftYearFrom()"
-                  (ngModelChange)="onCreatedDateFilterChange('start', $event)"
-                >
-                  @for (year of filterYears; track year) {
-                    <nz-option [nzValue]="year.toString()" [nzLabel]="year.toString()" />
-                  }
-                </nz-select>
-              </div>
-            </div>
-
-            <div class="filter-group">
-              <span class="filter-label">ถึงปี</span>
-              <div class="date-input-group">
-                <nz-select
-                  class="timeoff-filter-select year-filter-select"
-                  nzShowSearch
-                  [ngModel]="draftYearTo()"
-                  (ngModelChange)="onCreatedDateFilterChange('end', $event)"
-                >
-                  @for (year of filterYears; track year) {
-                    <nz-option [nzValue]="year.toString()" [nzLabel]="year.toString()" />
-                  }
-                </nz-select>
+                <nz-range-picker
+                  class="year-range-picker"
+                  nzMode="year"
+                  nzFormat="yyyy"
+                  [nzPlaceHolder]="['Start year', 'End year']"
+                  [ngModel]="draftYearRange()"
+                  (ngModelChange)="onCreatedYearRangeChange($event)"
+                />
               </div>
             </div>
 

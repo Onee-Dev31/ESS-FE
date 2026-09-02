@@ -363,6 +363,16 @@ $status-cancelled-text: var(--text-table-head);
     min-width: 1180px;
     table-layout: fixed;
 
+    thead th,
+    tbody td {
+      text-align: left;
+    }
+
+    thead th.actions-column,
+    tbody td:last-child {
+      text-align: center;
+    }
+
     tbody + tbody td {
       border-top: 1px solid color-mix(in srgb, var(--text-muted) 22%, var(--border-table-head)) !important;
     }
@@ -699,8 +709,25 @@ select.form-control {
   box-shadow: 0 0 0 4px color-mix(in srgb, var(--primary) 10%, transparent) !important;
 }
 
-::ng-deep .year-filter-select.ant-select {
-  width: 100px;
+::ng-deep .year-range-picker.ant-picker {
+  width: 230px;
+  height: 44px;
+  padding: 0 12px;
+  border: 1.5px solid var(--border-table-head);
+  border-radius: 10px;
+  background: var(--bg-table-head);
+  box-shadow: none;
+
+  &:hover,
+  &.ant-picker-focused {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 4px color-mix(in srgb, var(--primary) 10%, transparent);
+  }
+
+  @include tablet {
+    width: 100%;
+    height: 42px;
+  }
 }
 
 ::ng-deep .status-filter-select.ant-select {
