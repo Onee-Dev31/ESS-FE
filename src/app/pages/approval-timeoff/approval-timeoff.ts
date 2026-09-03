@@ -1,6 +1,15 @@
-import { ChangeDetectionStrategy, Component, OnInit, inject, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  DestroyRef,
+  OnInit,
+  inject,
+  signal,
+} from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { ActivatedRoute } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import {
   LeaveApprovalAction,
@@ -53,6 +62,8 @@ export class ApprovalTimeoff implements OnInit {
   private readonly fileConverter = inject(FileConverterService);
   private readonly toastService = inject(ToastService);
   private readonly dialogService = inject(DialogService);
+  private readonly route = inject(ActivatedRoute);
+  private readonly destroyRef = inject(DestroyRef);
   readonly dateUtil = inject(DateUtilityService);
 
   readonly isLoading = this.loadingService.loading('timeoff-approvals-list');
@@ -91,6 +102,8 @@ export class ApprovalTimeoff implements OnInit {
 
   readonly isPreviewModalOpen = signal(false);
   readonly expandedRequestIds = signal<Set<number>>(new Set());
+  readonly highlightedRequestId = signal<number | null>(null);
+  private pendingFocusRequestId = signal<number | null>(null);
   readonly actionRequestId = signal<number | null>(null);
   readonly pendingAction = signal<LeaveApprovalAction | null>(null);
   readonly actionComment = signal('');
@@ -104,7 +117,45 @@ export class ApprovalTimeoff implements OnInit {
   }
 
   ngOnInit(): void {
+    // เมื่อกด noti ซ้ำขณะอยู่ในหน้านี้อยู่แล้ว (route เดิม แค่ query param เปลี่ยน) ต้อง refresh
+    // ข้อมูลใหม่ด้วย ไม่ใช่แค่ focus รายการ — ข้าม emission แรกเพราะ loadApprovals() ท้าย ngOnInit จัดการอยู่แล้ว
+    let isFirstEmit = true;
+    this.route.queryParams.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((params) => {
+      const requestId = Number(params['requestId']);
+      if (requestId) this.pendingFocusRequestId.set(requestId);
+      if (!isFirstEmit) this.loadApprovals(true);
+      isFirstEmit = false;
+    });
+
     this.loadApprovals();
+  }
+
+  private applyPendingFocus(): void {
+    const targetId = this.pendingFocusRequestId();
+    if (targetId == null) return;
+    this.pendingFocusRequestId.set(null);
+
+    const index = this.comps.filteredData().findIndex((item) => item.request_id === targetId);
+    if (index === -1) return;
+
+    this.listing.currentPage.set(Math.floor(index / this.listing.pageSize()));
+
+    const next = new Set(this.expandedRequestIds());
+    next.add(targetId);
+    this.expandedRequestIds.set(next);
+
+    this.highlightedRequestId.set(targetId);
+    setTimeout(() => this.highlightedRequestId.set(null), 8000);
+
+    const scrollToRequest = (retries = 10) => {
+      const el = document.getElementById('leave-request-' + targetId);
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      } else if (retries > 0) {
+        setTimeout(() => scrollToRequest(retries - 1), 300);
+      }
+    };
+    setTimeout(() => scrollToRequest(), 0);
   }
 
   loadApprovals(refresh = false): void {
@@ -141,6 +192,7 @@ export class ApprovalTimeoff implements OnInit {
           this.listing.currentPage.set(0);
           this.loadingService.stop('timeoff-approvals-list');
           this.isRefreshing.set(false);
+          this.applyPendingFocus();
         },
         error: (error) => {
           this.loadingService.stop('timeoff-approvals-list');
@@ -321,7 +373,7 @@ export class ApprovalTimeoff implements OnInit {
       comment,
     };
     console.log(payload);
-    this.timeOffService.approveLeaveRequest(payload).subscribe({
+    this.timeOffService.approveLeaveRequestV2(payload).subscribe({
       next: () => {
         this.toastService.success('บันทึกผลการอนุมัติเรียบร้อย');
         this.isSubmittingAction.set(false);

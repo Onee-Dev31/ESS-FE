@@ -2,6 +2,16 @@
 @use '../../../styles/variables' as *;
 @use '../../../styles/mixins' as *;
 
+@keyframes timeoff-request-highlight {
+  0%,
+  100% {
+    background-color: var(--ticket-highlight-bg-0);
+  }
+  50% {
+    background-color: var(--ticket-highlight-bg-50);
+  }
+}
+
 // ============================================
 // Timeoff Page Styles
 // ============================================
@@ -97,6 +107,10 @@ $status-cancelled-text: var(--text-table-head);
     display: flex;
     flex-direction: column;
     -webkit-tap-highlight-color: transparent;
+
+    &.highlight {
+      animation: timeoff-request-highlight 8s ease-out forwards;
+    }
 
     .card-header {
       background: var(--bg-card);
@@ -375,6 +389,10 @@ $status-cancelled-text: var(--text-table-head);
 
     tbody + tbody td {
       border-top: 1px solid color-mix(in srgb, var(--text-muted) 22%, var(--border-table-head)) !important;
+    }
+
+    tbody tr.highlight td {
+      animation: timeoff-request-highlight 8s ease-out forwards;
     }
 
     .request-column {
