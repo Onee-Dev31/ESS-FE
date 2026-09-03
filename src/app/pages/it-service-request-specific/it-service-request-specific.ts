@@ -1183,7 +1183,7 @@ export class ITServiceRequestSpecificComponent implements OnInit {
             <tr><th>บริษัท</th><td>${person.freelance.company?.COMPANY_NAME} (${person.freelance.company?.COMPANY_CODE})</td></tr>
             <tr><th>แผนก</th><td>${person.freelance.department?.COSTCENT}-${person.freelance.department?.NAMECOSTCENT}</td></tr>
             <tr><th>ตำแหน่ง</th><td>${person.freelance.position}</td></tr>
-            <tr><th>อีเมล</th><td>${person.freelance.email}</td></tr>
+            <tr><th>อีเมล</th><td>${person.freelance.email ?? '-'}</td></tr>
             <tr><th>เบอร์</th><td>${person.phone}</td></tr>
           </table><br>
         `;
@@ -1197,7 +1197,7 @@ export class ITServiceRequestSpecificComponent implements OnInit {
             <tr><th>บริษัท</th><td>${person.openFor?.COMPANY_NAME}</td></tr>
             <tr><th>แผนก</th><td>${person.openFor?.DEPARTMENT}</td></tr>
             <tr><th>ตำแหน่ง</th><td>${person.openFor?.POST}</td></tr>
-            <tr><th>อีเมล</th><td>${person.openFor?.EMAIL}</td></tr>
+            <tr><th>อีเมล</th><td>${person.openFor?.EMAIL ?? '-'}</td></tr>
             <tr><th>เบอร์</th><td>${person.phone}</td></tr>
           </table><br>
         `;

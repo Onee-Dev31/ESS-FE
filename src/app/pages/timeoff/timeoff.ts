@@ -41,6 +41,7 @@ import { PageLoaderComponent } from '../../components/shared/page-loader/page-lo
 import { EmptyStateComponent } from '../../components/shared/empty-state/empty-state';
 import { createAngularTable, getCoreRowModel, SortingState } from '@tanstack/angular-table';
 import { NzSelectModule } from 'ng-zorro-antd/select';
+import { NzDatePickerModule } from 'ng-zorro-antd/date-picker';
 
 type StatusDisplayMeta =
   { label: string; className: string } | { labelTH: string; labelEN: string; className: string };
@@ -59,6 +60,7 @@ type StatusDisplayMeta =
     EmptyStateComponent,
     PageHeaderComponent,
     NzSelectModule,
+    NzDatePickerModule,
   ],
   templateUrl: './timeoff.html',
   styleUrl: './timeoff.scss',
@@ -84,9 +86,13 @@ export class TimeoffComponent implements OnInit {
 
   listing = createListingState();
   readonly currentFilterYear = new Date().getFullYear();
-  readonly filterYears = Array.from({ length: 6 }, (_, index) => this.currentFilterYear - index);
   readonly draftYearFrom = signal<string>('');
   readonly draftYearTo = signal<string>('');
+  readonly draftYearRange = computed<[Date, Date]>(() => {
+    const from = Number(this.draftYearFrom()) || this.currentFilterYear;
+    const to = Number(this.draftYearTo()) || from;
+    return [new Date(from, 0, 1), new Date(to, 0, 1)];
+  });
   readonly draftStatus = signal<string>('');
   readonly draftSearchText = signal<string>('');
   readonly statuses = [
@@ -364,13 +370,10 @@ export class TimeoffComponent implements OnInit {
     this.loadRequests();
   }
 
-  onCreatedDateFilterChange(type: 'start' | 'end', value: string | number | null): void {
-    const year = value == null ? '' : String(value).replace(/\D/g, '').slice(0, 4);
-    if (type === 'start') {
-      this.draftYearFrom.set(year);
-    } else {
-      this.draftYearTo.set(year);
-    }
+  onCreatedYearRangeChange(value: Array<Date | null> | null): void {
+    const [from, to] = value ?? [];
+    this.draftYearFrom.set(from ? String(from.getFullYear()) : '');
+    this.draftYearTo.set(to ? String(to.getFullYear()) : '');
   }
 
   onStatusFilterChange(status: string | null): void {

@@ -375,7 +375,7 @@ export class ItServiceService {
     dateTo?: string;
     isReal?: boolean;
   }) {
-    console.log(params);
+    console.log('getTicketByStatus()', params);
     let httpParams = new HttpParams();
     if (params.status) httpParams = httpParams.set('status', params.status);
     if (params.page) httpParams = httpParams.set('page', String(params.page));

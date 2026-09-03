@@ -1,64 +1,72 @@
-<div class="modal-overlay" *ngIf="isOpen">
-  <!-- <div class="modal-overlay" *ngIf="isOpen" (click)="handleClose()"> -->
-  <form class="modal-container" (click)="$event.stopPropagation()" #f="ngForm">
-    <!-- Header with close button -->
-    <div class="modal-header">
-      <h2>ข้อมูลพนักงาน</h2>
-      <button type="button" class="btn-close" (click)="handleClose()">
-        <i class="fas fa-times"></i>
-      </button>
-    </div>
-
-    <div class="modal-content">
+<ng-container *ngIf="isOpen">
+  <app-modal-shell
+    title="ข้อมูลพนักงาน"
+    size="xl"
+    width="1080px"
+    [padded]="false"
+    [mobileFullscreen]="true"
+    [closeOnBackdrop]="false"
+    footerAlign="between"
+    (closeModal)="handleClose()"
+  >
+    <form class="freelance-modal-form" #f="ngForm">
       <div class="freelance-form">
         <div class="form-row">
           <div class="form-field">
             <label>ชื่อจริง</label>
             <input
               nz-input
+              appThaiOnly
               placeholder="ชื่อจริงภาษาไทย"
               [(ngModel)]="formData.firstNameTh"
               name="firstNameTh"
               class="form-input"
               required
+              [pattern]="validationPatterns.thaiName"
               #firstNameTh="ngModel"
               [class.input-error]="firstNameTh.invalid && firstNameTh.touched"
             />
             <div class="error" *ngIf="firstNameTh.invalid && firstNameTh.touched">
-              กรุณากรอกชื่อจริง
+              {{ firstNameTh.errors?.['required'] ? 'กรุณากรอกชื่อจริง' : 'ชื่อจริงต้องเป็นภาษาไทยเท่านั้น' }}
             </div>
           </div>
           <div class="form-field">
             <label>นามสกุล</label>
             <input
               nz-input
+              appThaiOnly
               type="text"
               class="form-input"
               placeholder="นามสกุลภาษาไทย"
               [(ngModel)]="formData.lastNameTh"
               name="lastNameTh"
               required
+              [pattern]="validationPatterns.thaiName"
               #lastNameTh="ngModel"
               [class.input-error]="lastNameTh.invalid && lastNameTh.touched"
             />
             <div class="error" *ngIf="lastNameTh.invalid && lastNameTh.touched">
-              กรุณากรอกนามสกุล
+              {{ lastNameTh.errors?.['required'] ? 'กรุณากรอกนามสกุล' : 'นามสกุลต้องเป็นภาษาไทยเท่านั้น' }}
             </div>
           </div>
           <div class="form-field">
             <label>ชื่อเล่น</label>
             <input
               nz-input
+              appThaiOnly
               type="text"
               class="form-input"
               placeholder="ชื่อเล่น"
               [(ngModel)]="formData.nickname"
               name="nickname"
               required
+              [pattern]="validationPatterns.thaiName"
               #nickname="ngModel"
               [class.input-error]="nickname.invalid && nickname.touched"
             />
-            <div class="error" *ngIf="nickname.invalid && nickname.touched">กรุณากรอกชื่อเล่น</div>
+            <div class="error" *ngIf="nickname.invalid && nickname.touched">
+              {{ nickname.errors?.['required'] ? 'กรุณากรอกชื่อเล่น' : 'ชื่อเล่นต้องเป็นภาษาไทยเท่านั้น' }}
+            </div>
           </div>
         </div>
         <div class="form-row">
@@ -66,50 +74,60 @@
             <label>First name</label>
             <input
               nz-input
+              appEnglishOnly
               type="text"
               class="form-input"
               placeholder="ชื่อจริงภาษาอังกฤษ"
               [(ngModel)]="formData.firstNameEn"
               name="firstNameEn"
               required
+              [pattern]="validationPatterns.englishName"
               #firstNameEn="ngModel"
               [class.input-error]="firstNameEn.invalid && firstNameEn.touched"
             />
             <div class="error" *ngIf="firstNameEn.invalid && firstNameEn.touched">
-              กรุณากรอกชื่อภาษาอังกฤษ
+              {{ firstNameEn.errors?.['required'] ? 'กรุณากรอกชื่อภาษาอังกฤษ' : 'First name ต้องเป็นภาษาอังกฤษเท่านั้น' }}
             </div>
           </div>
           <div class="form-field">
             <label>Last name</label>
             <input
               nz-input
+              appEnglishOnly
               type="text"
               class="form-input"
               placeholder="นามสกุลภาษาอังกฤษ"
               [(ngModel)]="formData.lastNameEn"
               name="lastNameEn"
               required
+              [pattern]="validationPatterns.englishName"
               #lastNameEn="ngModel"
               [class.input-error]="lastNameEn.invalid && lastNameEn.touched"
             />
             <div class="error" *ngIf="lastNameEn.invalid && lastNameEn.touched">
-              กรุณากรอกนามสกุลภาษาอังกฤษ
+              {{ lastNameEn.errors?.['required'] ? 'กรุณากรอกนามสกุลภาษาอังกฤษ' : 'Last name ต้องเป็นภาษาอังกฤษเท่านั้น' }}
             </div>
           </div>
           <div class="form-field">
             <label>เบอร์โทรศัพท์</label>
             <input
               nz-input
+              appPhoneNumber
               type="tel"
+              inputmode="numeric"
+              maxlength="12"
               class="form-input"
               placeholder="เบอร์โทรศัพท์"
               [(ngModel)]="formData.phone"
               name="phone"
               required
+              [pattern]="validationPatterns.phone"
               #phone="ngModel"
               [class.input-error]="phone.invalid && phone.touched"
             />
-            <div class="error" *ngIf="phone.invalid && phone.touched">กรุณากรอกเบอร์โทรศัพท์</div>
+            <div class="error" *ngIf="phone.invalid && phone.touched">
+              {{ phone.errors?.['required'] ? 'กรุณากรอกเบอร์โทรศัพท์' : 'เบอร์โทรศัพท์ต้องเป็นตัวเลข 10 หลัก' }}
+            </div>
           </div>
         </div>
         <div class="form-row">
@@ -123,10 +141,13 @@
               [(ngModel)]="formData.email"
               name="email"
               required
+              [pattern]="validationPatterns.email"
               #email="ngModel"
               [class.input-error]="email.invalid && email.touched"
             />
-            <div class="error" *ngIf="email.invalid && email.touched">กรุณากรอกอีเมล</div>
+            <div class="error" *ngIf="email.invalid && email.touched">
+              {{ email.errors?.['required'] ? 'กรุณากรอกอีเมล' : 'รูปแบบอีเมลไม่ถูกต้อง' }}
+            </div>
           </div>
           <div class="form-field">
             <label>วันที่เริ่มสัญญา</label>
@@ -136,6 +157,7 @@
               name="startDate"
               class="form-input custom-picker"
               nzDropdownClassName="custom-picker-popup"
+              [nzDisabledDate]="disabledContractStartDate"
               required
               #startDate="ngModel"
               [class.input-error]="startDate.invalid && startDate.touched"
@@ -153,13 +175,18 @@
               name="endDate"
               class="form-input custom-picker"
               nzDropdownClassName="custom-picker-popup"
+              [nzDisabledDate]="disabledContractEndDate"
+              [nzDefaultPickerValue]="formData.startDate"
               required
               #endDate="ngModel"
-              [class.input-error]="endDate.invalid && endDate.touched"
+              [class.input-error]="(endDate.invalid && endDate.touched) || isContractDateInvalid()"
             >
             </nz-date-picker>
             <div class="error" *ngIf="endDate.invalid && endDate.touched">
               กรุณาเลือกวันที่สิ้นสุดสัญญา
+            </div>
+            <div class="error" *ngIf="isContractDateInvalid()">
+              วันที่สิ้นสุดสัญญาต้องไม่น้อยกว่าวันที่เริ่มสัญญา
             </div>
           </div>
         </div>
@@ -276,7 +303,9 @@
             <label>เลขที่บัญชี</label>
             <input
               nz-input
+              appNumbersOnly
               type="text"
+              inputmode="numeric"
               class="form-input"
               placeholder=""
               [(ngModel)]="formData.accountNumber"
@@ -407,13 +436,12 @@
           </div>
         </div>
       </div>
-    </div>
+    </form>
 
-    <!-- Action buttons - NOW OUTSIDE modal-content -->
-    <div class="form-actions">
+    <div modalFooter class="freelance-footer-actions">
       <button
         type="button"
-        class="btn-resign"
+        class="modal-button danger"
         (click)="handleResign()"
         *ngIf="!!editData && formData.emp_status !== 'Resigned'"
       >
@@ -421,7 +449,7 @@
       </button>
       <button
         type="button"
-        class="btn-active"
+        class="modal-button"
         (click)="handleActive()"
         *ngIf="!!editData && formData.emp_status === 'Resigned'"
       >
@@ -429,15 +457,15 @@
       </button>
       <button
         type="button"
-        class="btn-save"
+        class="modal-button primary save-action"
         (click)="handleSave()"
-        [disabled]="f.invalid"
-        [class.disable]="f.invalid"
+        [disabled]="f.invalid || isContractDateInvalid()"
+        [class.disable]="f.invalid || isContractDateInvalid()"
       >
         Save
       </button>
     </div>
-  </form>
+  </app-modal-shell>
 
   <!-- Resign Date Modal -->
   <div class="modal-overlay resign-modal-overlay" *ngIf="showResignModal">
@@ -460,6 +488,7 @@
                 name="lastWorkingDate"
                 class="form-input custom-picker"
                 nzDropdownClassName="custom-picker-popup"
+                [nzDisabledDate]="disabledLastWorkingDate"
                 required
                 #lastWorkingDate="ngModel"
                 [class.input-error]="lastWorkingDate.invalid && lastWorkingDate.touched"
@@ -475,14 +504,22 @@
                 [(ngModel)]="formResignData.resignDate"
                 nzFormat="dd/MM/yyyy"
                 name="resignDate"
-                class="form-input"
+                class="form-input custom-picker"
+                nzDropdownClassName="custom-picker-popup"
+                [nzDisabledDate]="disabledResignDate"
+                [nzDefaultPickerValue]="formResignData.lastWorkingDate"
                 required
                 #resignDate="ngModel"
-                [class.input-error]="resignDate.invalid && resignDate.touched"
+                [class.input-error]="
+                  (resignDate.invalid && resignDate.touched) || isResignDateInvalid()
+                "
               >
               </nz-date-picker>
               <div class="error" *ngIf="resignDate.invalid && resignDate.touched">
                 กรุณาเลือกวันที่ลาออก
+              </div>
+              <div class="error" *ngIf="isResignDateInvalid()">
+                Effective Date ต้องไม่น้อยกว่า Last Date
               </div>
             </div>
 
@@ -513,7 +550,18 @@
       </div>
       <div class="form-actions">
         <button type="button" class="btn-clear" (click)="closeResignModal()">ยกเลิก</button>
-        <button type="button" class="btn-confirm-resign" (click)="confirmResign()">ยืนยัน</button>
+        <button
+          type="button"
+          class="btn-confirm-resign"
+          [disabled]="
+            !formResignData.lastWorkingDate ||
+            !formResignData.resignDate ||
+            isResignDateInvalid()
+          "
+          (click)="confirmResign()"
+        >
+          ยืนยัน
+        </button>
       </div>
     </div>
   </div>
@@ -524,4 +572,4 @@
     (onClose)="closePreview()"
   >
   </app-file-preview-modal>
-</div>
+</ng-container>
