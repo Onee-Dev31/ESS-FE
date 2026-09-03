@@ -60,11 +60,11 @@ export class ResignManagementService {
   }
 
   resignEmployees(payload: any): Observable<any> {
-    return this._http.post(`${this.baseUrl}/employee-resignations/bulk`, payload);
+    return this._http.post(`${this.baseUrl}/employee-resignations/bulkV2`, payload);
   }
 
   updateADManagementResign(payload: any): Observable<any> {
-    return this._http.post(`${this.baseUrl}/ADManagement/set-account-expire-batch`, payload);
+    return this._http.post(`${this.baseUrl}/ADManagement/set-account-expire-batchV2`, payload);
   }
 
   getReportResignEmployees(params: {

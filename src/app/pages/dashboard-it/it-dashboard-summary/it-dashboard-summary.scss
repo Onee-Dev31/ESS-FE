@@ -549,8 +549,9 @@
   width: 200px;
 }
 
-.search-select-company {
-  width: 120px;
+.search-select-company,
+.search-select-service-type {
+  width: 180px;
 }
 
 .search-select {
@@ -859,5 +860,50 @@ body[data-theme='dark'] {
   .error {
     color: rgb(255, 166, 166);
     text-align: center;
+  }
+}
+
+// Ant Design controls use the global theme; this page only owns sizing/layout.
+.log-filter {
+  .form-field {
+    min-width: 0;
+  }
+
+  nz-select {
+    display: block;
+    height: 44px;
+    padding: 0;
+    border: 0;
+    background: transparent;
+  }
+
+  .custom-range-picker {
+    width: 240px;
+    height: 44px;
+  }
+}
+
+:host ::ng-deep .log-filter nz-select.ant-select-single .ant-select-selector {
+  height: 44px;
+  padding-inline: 14px 36px !important;
+  border-radius: 10px;
+}
+
+:host ::ng-deep .log-filter nz-select.ant-select-single .ant-select-selection-item,
+:host ::ng-deep .log-filter nz-select.ant-select-single .ant-select-selection-placeholder,
+:host ::ng-deep .log-filter nz-select.ant-select-single .ant-select-selection-search {
+  line-height: 42px;
+}
+
+@media (max-width: 768px) {
+  .log-filter {
+    .form-field,
+    .search-input,
+    .search-select,
+    .search-select-company,
+    .search-select-service-type,
+    .custom-range-picker {
+      width: 100%;
+    }
   }
 }

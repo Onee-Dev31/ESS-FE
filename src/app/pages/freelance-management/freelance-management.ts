@@ -22,6 +22,7 @@ import { finalize, firstValueFrom } from 'rxjs';
 import { FileConverterService } from '../../services/file-converter';
 import * as XLSX from 'xlsx-js-style';
 import { saveAs } from 'file-saver';
+import { formatPhoneNumber } from '../../utils/form-validation.util';
 
 interface FreelanceMember {
   id: string;
@@ -417,7 +418,7 @@ export class FreelanceManagementComponent implements OnInit {
       firstNameEn: info.FIRSTNAME_EN,
       lastNameEn: info.LASTNAME_EN,
       nickname: info.NICKNAME,
-      phone: info.MOBILE,
+      phone: formatPhoneNumber(info.MOBILE),
       email: info.EMAIL,
       company: info.COMPANY_CODE,
       department: info.COSTCENT,
@@ -758,7 +759,7 @@ export class FreelanceManagementComponent implements OnInit {
       employeeId: item.EMP_NO,
       name: `${item.FIRSTNAME_TH} ${item.LASTNAME_TH}`,
       nickname: item.NICKNAME,
-      phone: item.MOBILE,
+      phone: formatPhoneNumber(item.MOBILE),
       company: item.COMPANY_CODE,
       department: `${item.COSTCENT} - ${item.NAMECOSTCENT}`,
       salary: item.SALARY,

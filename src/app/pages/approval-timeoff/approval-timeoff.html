@@ -45,7 +45,11 @@
 
       <div class="approval-list">
         @for (item of comps.paginatedData(); track item.request_id) {
-          <article class="leave-approval-item">
+          <article
+            class="leave-approval-item"
+            [id]="'leave-request-' + item.request_id"
+            [class.highlight]="highlightedRequestId() === item.request_id"
+          >
             <div class="item-heading">
               <div class="leave-identity">
                 <div class="leave-icon"><i class="fas fa-calendar-minus"></i></div>

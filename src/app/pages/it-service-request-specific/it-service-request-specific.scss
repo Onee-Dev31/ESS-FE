@@ -1900,6 +1900,16 @@ $table-label-bg: var(--border-toolbar);
   background-color: transparent !important;
   border-color: transparent !important;
   box-shadow: none !important;
+  padding-inline: 0 !important;
+}
+
+// Match the shared ANTD selector specificity so the no-padding style also
+// applies in the normal state, not only while hovering or focusing.
+:host
+  ::ng-deep
+  nz-select.form-input.ant-select-single.ant-select:not(.ant-select-customize-input)
+  .ant-select-selector {
+  padding-inline: 0 !important;
 }
 
 nz-select.form-input:not(.ant-select-disabled):hover {

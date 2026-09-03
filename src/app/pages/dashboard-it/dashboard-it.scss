@@ -662,6 +662,7 @@
   height: calc(100vh - 70px);
   align-items: stretch;
   overflow: hidden;
+  overflow-anchor: none;
 
   .empty-selection-placeholder {
     flex: 1;
@@ -765,6 +766,7 @@
     -webkit-user-select: none;
     user-select: none;
     -webkit-tap-highlight-color: transparent;
+    overflow-anchor: none;
 
     &::-webkit-scrollbar {
       display: none;

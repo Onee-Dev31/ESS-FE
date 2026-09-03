@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+import { CommonModule, Location } from '@angular/common';
 import {
   ChangeDetectionStrategy,
   ChangeDetectorRef,
@@ -22,8 +22,8 @@ import { listAnimation } from '../../animations/animations';
 import { ItRequestDetailModal } from '../../components/modals/it-request-detail-modal/it-request-detail-modal';
 import { EmptyStateComponent } from '../../components/shared/empty-state/empty-state';
 import { PageHeaderComponent } from '../../components/shared/page-header/page-header';
+import { PageLoaderComponent } from '../../components/shared/page-loader/page-loader';
 import { PaginationComponent } from '../../components/shared/pagination/pagination';
-import { SkeletonComponent } from '../../components/shared/skeleton/skeleton';
 import { APPROVAL_STATUS_TABS } from '../../config/approval.config';
 import { ApprovalItem } from '../../interfaces/approval.interface';
 import { ApprovalsHelperService } from '../../services/approvals-helper.service';
@@ -35,7 +35,6 @@ import { LoadingService } from '../../services/loading';
 import { SignalrService } from '../../services/signalr.service';
 import { ToastService } from '../../services/toast';
 import { createListingComputeds, createListingState } from '../../utils/listing.util';
-import { ExportService } from '../../services/export';
 
 @Component({
   selector: 'app-approval-it-request',
@@ -45,9 +44,9 @@ import { ExportService } from '../../services/export';
     FormsModule,
     ItRequestDetailModal,
     PageHeaderComponent,
+    PageLoaderComponent,
     PaginationComponent,
     EmptyStateComponent,
-    SkeletonComponent,
     NzInputModule,
     NzDatePickerModule,
     NzSelectModule,
@@ -63,9 +62,9 @@ export class ApprovalItRequestComponent implements OnInit {
   private cdr = inject(ChangeDetectorRef);
   private destroyRef = inject(DestroyRef);
   private errorService = inject(ErrorService);
-  private exportService = inject(ExportService);
   private itService = inject(ItServiceService);
   private loadingService = inject(LoadingService);
+  private location = inject(Location);
   private route = inject(ActivatedRoute);
   private signalrService = inject(SignalrService);
   private toastService = inject(ToastService);
@@ -91,6 +90,7 @@ export class ApprovalItRequestComponent implements OnInit {
   isModalOpen = signal(false);
   selectedItem = signal<ApprovalItem | null>(null);
   initialAction = signal<'Approved' | 'Rejected' | 'Referred Back' | null>(null);
+  expandedWaitingApprovers = signal<Set<string>>(new Set());
   pageTitle = signal('IT Request Approvals');
   canFilterApprovalStage = computed(() =>
     (this.authService.userRole() ?? '')
@@ -104,6 +104,31 @@ export class ApprovalItRequestComponent implements OnInit {
       .map((role) => role.trim().toLowerCase())
       .includes('system-admin'),
   );
+
+  getWaitingApprovers(value: unknown): string[] {
+    if (typeof value !== 'string') return [];
+    return value
+      .split(',')
+      .map((approver) => approver.trim())
+      .filter(Boolean);
+  }
+
+  isWaitingApproverExpanded(requestNo: string): boolean {
+    return this.expandedWaitingApprovers().has(requestNo);
+  }
+
+  toggleWaitingApprovers(requestNo: string, event: Event): void {
+    event.stopPropagation();
+    this.expandedWaitingApprovers.update((current) => {
+      const next = new Set(current);
+      if (next.has(requestNo)) {
+        next.delete(requestNo);
+      } else {
+        next.add(requestNo);
+      }
+      return next;
+    });
+  }
 
   comps = createListingComputeds(this.approvals, this.listing, (item, search, status) => {
     const matchStatus = !status || item.status === status;
@@ -307,6 +332,10 @@ export class ApprovalItRequestComponent implements OnInit {
     );
     this.viewRequestDetail(item);
 
+    if (ticketId != null || ticketNumber) {
+      this.location.replaceState(this.location.path().split('?')[0]);
+    }
+
     setTimeout(() => {
       this.highlightedTicketId.set(item.requestId);
       document
@@ -393,6 +422,9 @@ export class ApprovalItRequestComponent implements OnInit {
 
     this.loadingService.start('export');
     try {
+      await new Promise<void>((resolve) => {
+        requestAnimationFrame(() => requestAnimationFrame(() => resolve()));
+      });
       const border = {
         top: { style: 'thin', color: { rgb: 'D1D5DB' } },
         bottom: { style: 'thin', color: { rgb: 'D1D5DB' } },

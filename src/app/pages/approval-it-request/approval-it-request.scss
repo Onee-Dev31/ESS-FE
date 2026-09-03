@@ -316,13 +316,16 @@ $border: var(--border);
   .status-badge-stack {
     display: flex;
     flex-direction: column;
-    align-items: center;
+    align-items: left;
     gap: 12px;
   }
 
   .waiting-approver-badge {
     display: inline-flex;
     align-items: center;
+    max-width: 140px;
+    overflow: hidden;
+    text-overflow: ellipsis;
     padding: 4px 8px;
     border: 1px solid #9b8bc4;
     border-radius: 999px;
@@ -339,6 +342,38 @@ $border: var(--border);
       background: #fef9c3;
       color: #854d0e;
       box-shadow: 0 1px 3px rgba(202, 138, 4, 0.18);
+    }
+  }
+
+  .status-with-waiting {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+
+    .waiting-approver-badge {
+      margin-top: 0;
+    }
+  }
+
+  .waiting-approver-list {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+  }
+
+  .waiting-approver-toggle {
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: var(--primary);
+    font-size: 0.7rem;
+    font-weight: 600;
+    cursor: pointer;
+
+    &:hover {
+      text-decoration: underline;
     }
   }
 
@@ -575,6 +610,11 @@ $border: var(--border);
       flex-direction: column;
       align-items: stretch;
       padding: 20px;
+
+      .form-field {
+        flex: 0 0 auto;
+        width: 100%;
+      }
     }
 
     @include mobile {
@@ -598,13 +638,13 @@ $border: var(--border);
 
     .date-range-picker {
       width: 270px;
-      height: 38px;
+      height: 44px;
       border-radius: 8px;
-      background: var(--bg-card);
+      background: var(--bg-table-head);
     }
 
     .year-search-button {
-      height: 38px;
+      height: 44px;
       padding: 0 14px;
       border: 0;
       border-radius: 8px;

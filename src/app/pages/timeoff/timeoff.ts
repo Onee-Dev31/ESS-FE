@@ -1,6 +1,16 @@
-import { Component, OnInit, signal, inject, computed, ChangeDetectorRef } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  signal,
+  inject,
+  computed,
+  ChangeDetectorRef,
+  DestroyRef,
+} from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { ActivatedRoute } from '@angular/router';
 import {
   TimeOffService,
   TimeOffRequest,
@@ -31,6 +41,7 @@ import { PageLoaderComponent } from '../../components/shared/page-loader/page-lo
 import { EmptyStateComponent } from '../../components/shared/empty-state/empty-state';
 import { createAngularTable, getCoreRowModel, SortingState } from '@tanstack/angular-table';
 import { NzSelectModule } from 'ng-zorro-antd/select';
+import { NzDatePickerModule } from 'ng-zorro-antd/date-picker';
 
 type StatusDisplayMeta =
   { label: string; className: string } | { labelTH: string; labelEN: string; className: string };
@@ -49,6 +60,7 @@ type StatusDisplayMeta =
     EmptyStateComponent,
     PageHeaderComponent,
     NzSelectModule,
+    NzDatePickerModule,
   ],
   templateUrl: './timeoff.html',
   styleUrl: './timeoff.scss',
@@ -61,6 +73,8 @@ export class TimeoffComponent implements OnInit {
   private errorService = inject(ErrorService);
   private authService = inject(AuthService);
   private fileConverter = inject(FileConverterService);
+  private route = inject(ActivatedRoute);
+  private destroyRef = inject(DestroyRef);
   protected readonly dateUtil = inject(DateUtilityService);
 
   isLoading = this.loadingService.loading('timeoff-list');
@@ -72,9 +86,13 @@ export class TimeoffComponent implements OnInit {
 
   listing = createListingState();
   readonly currentFilterYear = new Date().getFullYear();
-  readonly filterYears = Array.from({ length: 6 }, (_, index) => this.currentFilterYear - index);
   readonly draftYearFrom = signal<string>('');
   readonly draftYearTo = signal<string>('');
+  readonly draftYearRange = computed<[Date, Date]>(() => {
+    const from = Number(this.draftYearFrom()) || this.currentFilterYear;
+    const to = Number(this.draftYearTo()) || from;
+    return [new Date(from, 0, 1), new Date(to, 0, 1)];
+  });
   readonly draftStatus = signal<string>('');
   readonly draftSearchText = signal<string>('');
   readonly statuses = [
@@ -172,6 +190,9 @@ export class TimeoffComponent implements OnInit {
   isPreviewModalOpen = signal<boolean>(false);
   previewFiles = signal<FilePreviewItem[]>([]);
 
+  highlightedRequestId = signal<number | null>(null);
+  private pendingFocusRequestId = signal<number | null>(null);
+
   // statuses = COMMON_STATUS_OPTIONS;
   private readonly statusDisplay: Record<string, StatusDisplayMeta> = {
     NEW: { labelTH: 'คำขอใหม่', labelEN: 'New', className: 'status-new' },
@@ -200,7 +221,48 @@ export class TimeoffComponent implements OnInit {
     this.draftYearTo.set(currentYear);
     this.listing.filterStartDate.set(currentYear);
     this.listing.filterEndDate.set(currentYear);
+
+    // เมื่อกด noti ซ้ำขณะอยู่ในหน้านี้อยู่แล้ว (route เดิม แค่ query param เปลี่ยน) ต้อง refresh
+    // ข้อมูลใหม่ด้วย ไม่ใช่แค่ focus รายการ — ข้าม emission แรกเพราะ loadRequests() ท้ายนี้จัดการอยู่แล้ว
+    let isFirstEmit = true;
+    this.route.queryParams.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((params) => {
+      const requestId = Number(params['requestId']);
+      if (requestId) this.pendingFocusRequestId.set(requestId);
+      if (!isFirstEmit) this.loadRequests();
+      isFirstEmit = false;
+    });
+
     this.loadRequests();
+  }
+
+  private applyPendingFocus(): void {
+    const targetId = this.pendingFocusRequestId();
+    if (targetId == null) return;
+    this.pendingFocusRequestId.set(null);
+
+    const index = this.comps.filteredData().findIndex((item) => item.request_id === targetId);
+    if (index === -1) return;
+
+    this.listing.currentPage.set(Math.floor(index / this.listing.pageSize()));
+
+    this.highlightedRequestId.set(targetId);
+    setTimeout(() => this.highlightedRequestId.set(null), 8000);
+
+    const scrollToRequest = (retries = 10) => {
+      // ตาราง desktop กับการ์ด mobile คนละ element กัน ขึ้นอยู่กับขนาดจอ (CSS media query)
+      // ต้องเลือก element ที่ visible จริง ไม่ใช่แค่ element แรกที่เจอ
+      const candidates = [
+        document.getElementById('timeoff-request-' + targetId),
+        document.getElementById('timeoff-request-mobile-' + targetId),
+      ];
+      const el = candidates.find((c) => c && c.offsetParent !== null);
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      } else if (retries > 0) {
+        setTimeout(() => scrollToRequest(retries - 1), 300);
+      }
+    };
+    setTimeout(() => scrollToRequest(), 0);
   }
 
   /** โหลดข้อมูลรายการคำขอลาผ่าน Service */
@@ -226,6 +288,7 @@ export class TimeoffComponent implements OnInit {
         console.log('[getLeaveRequests] Response', data);
         this.requests.set(data);
         this.loadingService.stop('timeoff-list');
+        this.applyPendingFocus();
       },
       error: (error) => {
         this.loadingService.stop('timeoff-list');
@@ -307,13 +370,10 @@ export class TimeoffComponent implements OnInit {
     this.loadRequests();
   }
 
-  onCreatedDateFilterChange(type: 'start' | 'end', value: string | number | null): void {
-    const year = value == null ? '' : String(value).replace(/\D/g, '').slice(0, 4);
-    if (type === 'start') {
-      this.draftYearFrom.set(year);
-    } else {
-      this.draftYearTo.set(year);
-    }
+  onCreatedYearRangeChange(value: Array<Date | null> | null): void {
+    const [from, to] = value ?? [];
+    this.draftYearFrom.set(from ? String(from.getFullYear()) : '');
+    this.draftYearTo.set(to ? String(to.getFullYear()) : '');
   }
 
   onStatusFilterChange(status: string | null): void {

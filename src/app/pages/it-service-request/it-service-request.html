@@ -524,11 +524,10 @@
                 {{ requestDetails() }}
               </div> -->
                 <div
-                  class="detail-text p-3 bg-light rounded text-muted"
-                  style="white-space: pre-wrap"
-                >
-                  {{ requestDetails() }}
-                </div>
+                  class="detail-text bg-light rounded text-muted"
+                  style="white-space: pre-line"
+                  [textContent]="requestDetails()"
+                ></div>
               </div>
             }
 
