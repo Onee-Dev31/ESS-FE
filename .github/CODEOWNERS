@@ -1,0 +1,7 @@
+# กำหนดว่าใครต้อง approve ก่อน merge PR เข้า master
+
+# อ้างอิงด้วย email ต้องเป็นอีเมลที่ verify ไว้กับ GitHub account ของคนนั้นแล้ว
+
+# ดู: https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
+
+- praewythefirst@gmail.com

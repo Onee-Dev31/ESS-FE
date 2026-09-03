@@ -120,11 +120,12 @@ export class NotificationService {
         .subscribe((data: any) => {
           if (!this.activeUserKey) return;
           this.zone.run(() => {
-            this.lastToastTime = Date.now();
             this.realtimeTick.update((tick) => tick + 1);
             this.refreshAll();
-            // แสดง toast เฉพาะเมื่อ NotificationCreated ไม่ได้ส่ง toast ภายใน 800ms ที่ผ่านมา
-            if (!document.hidden) {
+            // แสดง toast เฉพาะเมื่อ NotificationCreated ไม่ได้ส่ง toast ภายใน 1.5s ที่ผ่านมา
+            // (บาง event เช่น ticket ใหม่ backend ยิงมาทั้ง legacy event นี้ + NotificationCreated ซ้ำกัน)
+            const isDuplicateToast = Date.now() - this.lastToastTime < 1500;
+            if (!document.hidden && !isDuplicateToast) {
               const msg = buildMsg(data);
               if (msg) {
                 const routeInfo = this.resolveRoute({
@@ -141,6 +142,7 @@ export class NotificationService {
                   routeInfo.route ?? undefined,
                   routeInfo.queryParams ?? undefined,
                 );
+                this.lastToastTime = Date.now();
               }
             }
           });
@@ -170,15 +172,9 @@ export class NotificationService {
     this.http.get<any>(`${this.baseUrl}/unread-count`, { params }).subscribe({
       next: (response) => {
         const newCount = Number(response?.unreadCount ?? response?.count ?? response ?? 0);
-        const prevCount = this.unreadCount();
         const safeCount = Number.isFinite(newCount) ? newCount : 0;
         this.unreadCount.set(safeCount);
         this.isCountLoading.set(false);
-
-        // Trigger sound only if SignalR hasn't already fired within 2s (prevents double-fire)
-        if (safeCount > prevCount && Date.now() - this.lastToastTime > 2000) {
-          this.realtimeTick.update((t) => t + 1);
-        }
       },
       error: () => {
         this.countError.set('ไม่สามารถโหลดจำนวนแจ้งเตือนใหม่ได้');
@@ -388,14 +384,17 @@ export class NotificationService {
         title,
       });
 
-      this.lastToastTime = Date.now();
-      if (!document.hidden)
+      // แสดง toast เฉพาะเมื่อ legacy event ตัวเดิม (เช่น NewTicket) ไม่ได้ส่ง toast ภายใน 1.5s ที่ผ่านมา
+      const isDuplicateToast = Date.now() - this.lastToastTime < 1500;
+      if (!document.hidden && !isDuplicateToast) {
         this.toastService.info(
           title,
           undefined,
           routeInfo.route ?? undefined,
           routeInfo.queryParams ?? undefined,
         );
+        this.lastToastTime = Date.now();
+      }
     });
   }
 
@@ -430,9 +429,7 @@ export class NotificationService {
       this.toText(item.notification_created_at ?? item.notificationCreatedAt) ??
       this.toText(item.recipient_created_at ?? item.recipientCreatedAt) ??
       null;
-    const targetId = this.toNumber(
-      item['target_id'] ?? item['targetId'] ?? payload?.['requestId'],
-    );
+    const targetId = this.toNumber(item['target_id'] ?? item['targetId'] ?? payload?.['requestId']);
 
     const routeInfo = this.resolveRoute({
       notificationType: this.toText(item.notification_type ?? item.notificationType) ?? '',
