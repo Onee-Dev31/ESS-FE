@@ -1,18 +1,34 @@
-import { Component, OnInit, signal, inject, computed, ChangeDetectorRef } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  signal,
+  inject,
+  computed,
+  ChangeDetectorRef,
+  DestroyRef,
+} from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { TimeOffService, TimeOffRequest } from '../../services/time-off.service';
+import { ActivatedRoute } from '@angular/router';
+import {
+  TimeOffService,
+  TimeOffRequest,
+  SaveLeaveRequestPayload,
+} from '../../services/time-off.service';
 import { LoadingService } from '../../services/loading';
 import { ToastService } from '../../services/toast';
 import { DialogService } from '../../services/dialog';
 import { ErrorService } from '../../services/error';
 import { TimeOffForm } from '../../components/features/time-off-form/time-off-form';
-import { FilePreviewModalComponent } from '../../components/modals/file-preview-modal/file-preview-modal';
+import {
+  FilePreviewItem,
+  FilePreviewModalComponent,
+} from '../../components/modals/file-preview-modal/file-preview-modal';
 import { DateUtilityService } from '../../services/date-utility.service';
+import { AuthService } from '../../services/auth.service';
+import { FileConverterService } from '../../services/file-converter';
 
-import { StatusLabelPipe } from '../../pipes/status-label.pipe';
-import { StatusUtil } from '../../utils/status.util';
-import { COMMON_STATUS_OPTIONS } from '../../constants/request-status.constant';
 import {
   createListingState,
   createListingComputeds,
@@ -21,9 +37,14 @@ import {
 } from '../../utils/listing.util';
 import { PaginationComponent } from '../../components/shared/pagination/pagination';
 import { PageHeaderComponent } from '../../components/shared/page-header/page-header';
-import { SkeletonComponent } from '../../components/shared/skeleton/skeleton';
+import { PageLoaderComponent } from '../../components/shared/page-loader/page-loader';
 import { EmptyStateComponent } from '../../components/shared/empty-state/empty-state';
 import { createAngularTable, getCoreRowModel, SortingState } from '@tanstack/angular-table';
+import { NzSelectModule } from 'ng-zorro-antd/select';
+import { NzDatePickerModule } from 'ng-zorro-antd/date-picker';
+
+type StatusDisplayMeta =
+  { label: string; className: string } | { labelTH: string; labelEN: string; className: string };
 
 /** หน้าแสดงรายการคำขอลา (Time Off Request List) พร้อมระบบกรองและค้นหา */
 @Component({
@@ -34,11 +55,12 @@ import { createAngularTable, getCoreRowModel, SortingState } from '@tanstack/ang
     FormsModule,
     TimeOffForm,
     FilePreviewModalComponent,
-    StatusLabelPipe,
     PaginationComponent,
-    SkeletonComponent,
+    PageLoaderComponent,
     EmptyStateComponent,
     PageHeaderComponent,
+    NzSelectModule,
+    NzDatePickerModule,
   ],
   templateUrl: './timeoff.html',
   styleUrl: './timeoff.scss',
@@ -49,15 +71,38 @@ export class TimeoffComponent implements OnInit {
   private toastService = inject(ToastService);
   private dialogService = inject(DialogService);
   private errorService = inject(ErrorService);
-  private dateUtil = inject(DateUtilityService);
+  private authService = inject(AuthService);
+  private fileConverter = inject(FileConverterService);
+  private route = inject(ActivatedRoute);
+  private destroyRef = inject(DestroyRef);
+  protected readonly dateUtil = inject(DateUtilityService);
 
   isLoading = this.loadingService.loading('timeoff-list');
 
   requests = signal<TimeOffRequest[]>([]);
   isFormOpen = signal<boolean>(false);
   selectedRequestStatus = signal<string>('คำขอใหม่');
+  selectedRequest = signal<TimeOffRequest | null>(null);
 
   listing = createListingState();
+  readonly currentFilterYear = new Date().getFullYear();
+  readonly draftYearFrom = signal<string>('');
+  readonly draftYearTo = signal<string>('');
+  readonly draftYearRange = computed<[Date, Date]>(() => {
+    const from = Number(this.draftYearFrom()) || this.currentFilterYear;
+    const to = Number(this.draftYearTo()) || from;
+    return [new Date(from, 0, 1), new Date(to, 0, 1)];
+  });
+  readonly draftStatus = signal<string>('');
+  readonly draftSearchText = signal<string>('');
+  readonly statuses = [
+    { value: 'NEW', label: 'คำขอใหม่' },
+    { value: 'PENDING', label: 'อยู่ระหว่างการอนุมัติ' },
+    { value: 'APPROVED', label: 'อนุมัติแล้ว' },
+    { value: 'REJECTED', label: 'ถูกปฏิเสธ' },
+    { value: 'SENDBACK', label: 'ถูกส่งกลับ' },
+    { value: 'CANCELLED', label: 'ยกเลิกคำขอ' },
+  ];
 
   sorting = signal<SortingState>([{ id: 'createDate', desc: true }]);
 
@@ -78,9 +123,11 @@ export class TimeoffComponent implements OnInit {
           req.reason.toLowerCase().includes(search) ||
           req.leaveType.toLowerCase().includes(search);
 
-        const matchStatus = !status || req.status === status;
-        const matchStart = !start || req.createDate >= start;
-        const matchEnd = !end || req.createDate <= end;
+        const matchStatus =
+          !status || this.normalizeStatusKey(req.status) === this.normalizeStatusKey(status);
+        const createdYear = this.toDateKey(this.getCreatedAt(req)).slice(0, 4);
+        const matchStart = !start || (!!createdYear && Number(createdYear) >= Number(start));
+        const matchEnd = !end || (!!createdYear && Number(createdYear) <= Number(end));
 
         return matchSearch && matchStatus && matchStart && matchEnd;
       });
@@ -121,7 +168,7 @@ export class TimeoffComponent implements OnInit {
   table = createAngularTable(() => ({
     data: this.comps.paginatedData(),
     columns: [
-      { accessorKey: 'id', header: 'รหัสคำขอ' },
+      { accessorKey: 'createDate', header: 'วันที่ทำรายการ / เลขที่ใบลา' },
       { accessorKey: 'startDate', header: 'วันที่เริ่มลา' },
       { accessorKey: 'endDate', header: 'วันที่สิ้นสุดลา' },
       { accessorKey: 'days', header: 'จำนวนวัน' },
@@ -141,21 +188,107 @@ export class TimeoffComponent implements OnInit {
   }));
 
   isPreviewModalOpen = signal<boolean>(false);
-  previewFiles = signal<{ fileName: string; date: string }[]>([]);
+  previewFiles = signal<FilePreviewItem[]>([]);
 
-  statuses = COMMON_STATUS_OPTIONS;
+  highlightedRequestId = signal<number | null>(null);
+  private pendingFocusRequestId = signal<number | null>(null);
+
+  // statuses = COMMON_STATUS_OPTIONS;
+  private readonly statusDisplay: Record<string, StatusDisplayMeta> = {
+    NEW: { labelTH: 'คำขอใหม่', labelEN: 'New', className: 'status-new' },
+    PENDING: {
+      labelTH: 'อยู่ระหว่างการอนุมัติ',
+      labelEN: 'Pending',
+      className: 'status-pending',
+    },
+    APPROVED: { labelTH: 'อนุมัติแล้ว', labelEN: 'Approved', className: 'status-approved' },
+    REJECTED: { labelTH: 'ถูกปฏิเสธ', labelEN: 'Rejected', className: 'status-rejected' },
+    SENDBACK: {
+      labelTH: 'ถูกส่งกลับ',
+      labelEN: 'Sendback',
+      className: 'status-referred',
+    },
+    CANCELLED: {
+      labelTH: 'ยกเลิกคำขอ',
+      labelEN: 'Cancelled',
+      className: 'status-cancelled',
+    },
+  };
 
   ngOnInit() {
+    const currentYear = String(this.currentFilterYear);
+    this.draftYearFrom.set(currentYear);
+    this.draftYearTo.set(currentYear);
+    this.listing.filterStartDate.set(currentYear);
+    this.listing.filterEndDate.set(currentYear);
+
+    // เมื่อกด noti ซ้ำขณะอยู่ในหน้านี้อยู่แล้ว (route เดิม แค่ query param เปลี่ยน) ต้อง refresh
+    // ข้อมูลใหม่ด้วย ไม่ใช่แค่ focus รายการ — ข้าม emission แรกเพราะ loadRequests() ท้ายนี้จัดการอยู่แล้ว
+    let isFirstEmit = true;
+    this.route.queryParams.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((params) => {
+      const requestId = Number(params['requestId']);
+      if (requestId) this.pendingFocusRequestId.set(requestId);
+      if (!isFirstEmit) this.loadRequests();
+      isFirstEmit = false;
+    });
+
     this.loadRequests();
+  }
+
+  private applyPendingFocus(): void {
+    const targetId = this.pendingFocusRequestId();
+    if (targetId == null) return;
+    this.pendingFocusRequestId.set(null);
+
+    const index = this.comps.filteredData().findIndex((item) => item.request_id === targetId);
+    if (index === -1) return;
+
+    this.listing.currentPage.set(Math.floor(index / this.listing.pageSize()));
+
+    this.highlightedRequestId.set(targetId);
+    setTimeout(() => this.highlightedRequestId.set(null), 8000);
+
+    const scrollToRequest = (retries = 10) => {
+      // ตาราง desktop กับการ์ด mobile คนละ element กัน ขึ้นอยู่กับขนาดจอ (CSS media query)
+      // ต้องเลือก element ที่ visible จริง ไม่ใช่แค่ element แรกที่เจอ
+      const candidates = [
+        document.getElementById('timeoff-request-' + targetId),
+        document.getElementById('timeoff-request-mobile-' + targetId),
+      ];
+      const el = candidates.find((c) => c && c.offsetParent !== null);
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      } else if (retries > 0) {
+        setTimeout(() => scrollToRequest(retries - 1), 300);
+      }
+    };
+    setTimeout(() => scrollToRequest(), 0);
   }
 
   /** โหลดข้อมูลรายการคำขอลาผ่าน Service */
   loadRequests() {
+    const employeeCode = this.authService.userData()?.CODEMPID?.trim() ?? '';
+    const currentYear = new Date().getFullYear();
+    const yearFrom = Number(this.listing.filterStartDate()) || currentYear;
+    const yearTo = Number(this.listing.filterEndDate()) || yearFrom;
+
+    if (!employeeCode) {
+      this.requests.set([]);
+      this.errorService.handle(new Error('ไม่พบรหัสพนักงานของผู้ใช้งาน'), {
+        component: 'TimeOff',
+        action: 'load-requests',
+      });
+      return;
+    }
+
     this.loadingService.start('timeoff-list');
-    this.timeoffService.getRequests().subscribe({
+    console.log('[getLeaveRequests] Response', { yearFrom, yearTo, employeeCode });
+    this.timeoffService.getLeaveRequests(yearFrom, yearTo, employeeCode).subscribe({
       next: (data: TimeOffRequest[]) => {
+        console.log('[getLeaveRequests] Response', data);
         this.requests.set(data);
         this.loadingService.stop('timeoff-list');
+        this.applyPendingFocus();
       },
       error: (error) => {
         this.loadingService.stop('timeoff-list');
@@ -173,10 +306,24 @@ export class TimeoffComponent implements OnInit {
       confirmText: 'ลบรายการ',
     });
 
-    if (confirmed) {
-      this.requests.set(this.requests().filter((r) => r.id !== request.id));
-      this.toastService.success('ลบรายการสำเร็จ');
-    }
+    if (!confirmed) return;
+
+    this.loadingService.start('timeoff-list');
+    const payload: SaveLeaveRequestPayload = {
+      action: 'Cancel' as const,
+      request_id: (request.request_id ?? Number(request.id)) || 0,
+      request_by: request.employee_code || request.employeeId,
+    };
+    this.timeoffService.saveLeaveRequest(payload).subscribe({
+      next: () => {
+        this.toastService.success('ลบรายการสำเร็จ');
+        this.loadRequests();
+      },
+      error: (error) => {
+        this.loadingService.stop('timeoff-list');
+        this.errorService.handle(error, { component: 'TimeOff', action: 'cancel-request' });
+      },
+    });
   }
 
   setPageSize(size: number) {
@@ -189,23 +336,21 @@ export class TimeoffComponent implements OnInit {
   }
 
   /** เปิดฟอร์มสำหรับยื่นคำขอลาใหม่ */
-  openForm(status: string = 'NEW') {
-    this.selectedRequestStatus.set(status);
+  openForm(request?: TimeOffRequest) {
+    this.selectedRequest.set(request ?? null);
+    this.selectedRequestStatus.set(request?.status ?? 'NEW');
     this.isFormOpen.set(true);
   }
 
   closeForm() {
     this.isFormOpen.set(false);
+    this.selectedRequest.set(null);
     this.loadRequests();
   }
 
-  openPreview(attachments: { name: string }[]) {
-    if (!attachments || attachments.length === 0) return;
-    const previewItems = attachments.map((att) => ({
-      fileName: att.name || 'Attachment',
-      date: '',
-    }));
-    this.previewFiles.set(previewItems);
+  openPreview(attachments: TimeOffRequest['attachments']): void {
+    if (!attachments?.length) return;
+    this.previewFiles.set(this.fileConverter.buildPreviewFiles(attachments));
     this.isPreviewModalOpen.set(true);
   }
 
@@ -215,6 +360,47 @@ export class TimeoffComponent implements OnInit {
 
   clearFilters() {
     clearListingFilters(this.listing);
+    const currentYear = String(this.currentFilterYear);
+    this.draftYearFrom.set(currentYear);
+    this.draftYearTo.set(currentYear);
+    this.draftStatus.set('');
+    this.draftSearchText.set('');
+    this.listing.filterStartDate.set(currentYear);
+    this.listing.filterEndDate.set(currentYear);
+    this.loadRequests();
+  }
+
+  onCreatedYearRangeChange(value: Array<Date | null> | null): void {
+    const [from, to] = value ?? [];
+    this.draftYearFrom.set(from ? String(from.getFullYear()) : '');
+    this.draftYearTo.set(to ? String(to.getFullYear()) : '');
+  }
+
+  onStatusFilterChange(status: string | null): void {
+    this.draftStatus.set(status ?? '');
+  }
+
+  searchRequests(): void {
+    const currentYear = new Date().getFullYear();
+    const yearFrom = Number(this.draftYearFrom()) || currentYear;
+    const yearTo = Number(this.draftYearTo()) || yearFrom;
+
+    if (yearFrom > yearTo) {
+      this.toastService.warning('ปีเริ่มต้นต้องไม่มากกว่าปีสิ้นสุด');
+      return;
+    }
+
+    this.listing.filterStartDate.set(String(yearFrom));
+    this.listing.filterEndDate.set(String(yearTo));
+    this.listing.filterStatus.set(this.draftStatus());
+    this.listing.searchText.set(this.draftSearchText().trim());
+    this.listing.currentPage.set(0);
+    this.loadRequests();
+  }
+
+  private toDateKey(value: string): string {
+    const match = value?.match(/^(\d{4}-\d{2}-\d{2})/);
+    return match?.[1] ?? '';
   }
 
   toggleSort(columnId: string) {
@@ -225,29 +411,69 @@ export class TimeoffComponent implements OnInit {
     return TableSortHelper.getSortIcon(this.table, columnId);
   }
 
-  getStatusClass(status: string): string {
-    return StatusUtil.getStatusBadgeClass(status);
+  getStatusMeta(status: string): { label: string; className: string } {
+    const key = this.normalizeStatusKey(status);
+    const meta = this.statusDisplay[key];
+
+    if (!meta) {
+      return {
+        label: key || 'ไม่ระบุสถานะ',
+        className: 'status-neutral',
+      };
+    }
+
+    return {
+      label: 'label' in meta ? meta.label : meta.labelTH,
+      className: meta.className,
+    };
   }
 
-  getLeaveTypeIcon(leaveType: string): string {
-    const iconMap: { [key: string]: string } = {
-      ลาพักร้อน: 'fas fa-plane-departure',
-      ลากิจ: 'fas fa-briefcase',
-      ลาป่วย: 'fas fa-stethoscope',
-      ลาทำหมัน: 'fas fa-user-md',
-      ลาเพื่อจัดการงานศพ: 'fas fa-ribbon',
+  isEditableRequest(status: string): boolean {
+    return ['NEW', 'SENDBACK', 'SEND_BACK', 'REFERRED_BACK'].includes(
+      this.normalizeStatusKey(status),
+    );
+  }
+
+  private normalizeStatusKey(status: string): string {
+    const value = status?.trim() ?? '';
+    if (value === 'คำขอใหม่') return 'NEW';
+    const key = value.toUpperCase().replace(/[\s-]+/g, '_');
+    const aliases: Record<string, string> = {
+      PENDING_APPROVAL: 'PENDING',
+      PENDING_ACTION: 'PENDING',
+      SEND_BACK: 'SENDBACK',
+      REFERRED_BACK: 'SENDBACK',
+      CANCELED: 'CANCELLED',
     };
-    return iconMap[leaveType] || 'fas fa-calendar';
+    return aliases[key] ?? key;
+  }
+
+  getCreatedAt(request: TimeOffRequest): string {
+    return request.create_at || request.createDate;
+  }
+
+  getLeaveNumber(request: TimeOffRequest): string {
+    return request.leave_number || request.id;
+  }
+
+  formatCreatedAt(dateStr: string): string {
+    if (!dateStr) return '-';
+    return this.dateUtil.formatDateToBE(dateStr, 'DD/MM/YYYY');
+  }
+
+  isSameLeaveDate(request: TimeOffRequest): boolean {
+    return request.startDate === request.endDate;
   }
 
   getPeriodLabel(period: string | undefined): string {
     if (!period) return '';
-    const periodMap: { [key: string]: string } = {
-      'full-day': 'เต็มวัน',
-      morning: 'ครึ่งวันเช้า',
-      afternoon: 'ครึ่งวันบ่าย',
+    const periodMap: Record<string, string> = {
+      FULL: 'เต็มวัน',
+      '1ST': 'ครึ่งวันเช้า',
+      '2ND': 'ครึ่งวันบ่าย',
     };
-    return periodMap[period] || period;
+    const key = period.trim().toUpperCase().replace(/\s+/g, '_');
+    return periodMap[key] ?? period;
   }
 
   formatDate(dateStr: string): string {

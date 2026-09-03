@@ -1,0 +1,78 @@
+@use './variables' as *;
+
+// Shared status badges for the time-off request and approval flow.
+.status-badge {
+  display: inline-flex;
+  min-height: 26px;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 10px;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  font-size: $font-size-hint;
+  font-weight: 600;
+  line-height: 1;
+  white-space: nowrap;
+
+  &::before {
+    display: block;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background-color: currentColor;
+    content: '';
+  }
+
+  &.status-new,
+  &.status-waiting,
+  &.NEW,
+  &.WAITING_CHECK {
+    border-color: color-mix(in srgb, var(--status-new-text) 22%, transparent);
+    background: var(--status-new-bg);
+    color: var(--status-new-text);
+  }
+
+  &.status-approved,
+  &.status-verified,
+  &.APPROVED,
+  &.VERIFIED {
+    border-color: color-mix(in srgb, var(--status-approved-text) 22%, transparent);
+    background: var(--status-approved-bg);
+    color: var(--status-approved-text);
+  }
+
+  &.status-rejected,
+  &.REJECTED {
+    border-color: color-mix(in srgb, var(--status-rejected-text) 22%, transparent);
+    background: var(--status-rejected-bg);
+    color: var(--status-rejected-text);
+  }
+
+  &.status-pending,
+  &.PENDING_APPROVAL {
+    border-color: color-mix(in srgb, var(--status-pending-text) 22%, transparent);
+    background: var(--status-pending-bg);
+    color: var(--status-pending-text);
+  }
+
+  &.status-referred,
+  &.status-sendback,
+  &.SENDBACK {
+    border-color: color-mix(in srgb, var(--warning) 38%, transparent);
+    background: color-mix(in srgb, var(--warning) 16%, var(--bg-card));
+    color: var(--warning);
+  }
+
+  &.status-cancelled,
+  &.CANCELLED {
+    border-color: var(--border-table-head);
+    background: var(--bg-table-head);
+    color: var(--text-table-head);
+  }
+
+  &.status-neutral {
+    border-color: var(--border);
+    background: var(--bg-table-head);
+    color: var(--text-sub);
+  }
+}

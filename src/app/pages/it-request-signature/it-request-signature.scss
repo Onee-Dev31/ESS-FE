@@ -50,14 +50,14 @@
 
   .page-title {
     margin: 0;
-    font-size: 1.5rem;
+    font-size: $font-size-title;
     font-weight: 700;
     color: var(--text);
   }
 
   .page-subtitle {
     margin: 2px 0 0;
-    font-size: 0.85rem;
+    font-size: $font-size-label;
     color: var(--text-sub);
   }
 
@@ -69,7 +69,7 @@
     background: var(--bg-card);
     border: 1px solid var(--border-table-head);
     border-radius: 99px;
-    font-size: 0.9rem;
+    font-size: $font-size-label;
     font-weight: 700;
     color: var(--primary);
     box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
@@ -92,7 +92,7 @@
   }
 
   p {
-    font-size: 1rem;
+    font-size: $font-size-body;
     color: var(--text-sub);
   }
 }
@@ -100,7 +100,7 @@
 // ==================== 2-COLUMN LAYOUT ====================
 .content-layout {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
   gap: 24px;
   align-items: stretch;
 
@@ -114,6 +114,7 @@
   display: flex;
   flex-direction: column;
   gap: 16px;
+  min-width: 0;
   height: 100%;
 
   .info-section:last-child {
@@ -138,7 +139,7 @@
   background: var(--bg-slate);
   border-bottom: 1px solid var(--border-color);
   font-weight: 600;
-  font-size: 0.95rem;
+  font-size: $font-size-header;
   color: var(--text);
 
   i {
@@ -149,7 +150,7 @@
   .sub {
     font-weight: 400;
     color: var(--text-sub);
-    font-size: 0.82rem;
+    font-size: $font-size-hint;
     margin-left: 2px;
   }
 }
@@ -170,7 +171,7 @@
     .info-label {
       width: 160px;
       flex-shrink: 0;
-      font-size: 0.85rem;
+      font-size: $font-size-label;
       font-weight: 500;
       color: var(--text-sub);
 
@@ -181,7 +182,8 @@
 
     .info-value {
       flex: 1;
-      font-size: 0.9rem;
+      min-width: 0;
+      font-size: $font-size-body;
       font-weight: 500;
       color: var(--text);
       line-height: 1.5;
@@ -216,7 +218,7 @@
         border: 1px solid color-mix(in srgb, var(--primary) 20%, transparent);
         color: var(--primary);
         border-radius: 6px;
-        font-size: 0.85rem;
+        font-size: $font-size-label;
         font-weight: 600;
       }
 
@@ -233,7 +235,7 @@
           align-items: center;
           gap: 8px;
           color: var(--text);
-          font-size: 0.9rem;
+          font-size: $font-size-body;
 
           i.fa-check {
             color: var(--success);
@@ -252,6 +254,10 @@
         gap: 8px;
 
         li {
+          list-style: none;
+        }
+
+        .attachment-item {
           display: inline-flex;
           align-items: center;
           gap: 6px;
@@ -259,8 +265,9 @@
           background: var(--bg-card);
           border: 1px solid var(--border-color);
           border-radius: 8px;
-          font-size: 0.85rem;
+          font-size: $font-size-label;
           color: var(--text);
+          font-family: inherit;
           transition: all 0.2s;
           cursor: pointer;
 
@@ -282,6 +289,22 @@
   }
 }
 
+// Keep rich-text media inside the 60% detail column.
+.info-value ::ng-deep {
+  img,
+  video,
+  iframe,
+  table {
+    max-width: 100% !important;
+  }
+
+  img,
+  video {
+    height: auto !important;
+    object-fit: contain;
+  }
+}
+
 // ==================== SIGNATURE PANEL ====================
 .signature-panel {
   background: var(--bg-card);
@@ -291,6 +314,7 @@
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
   display: flex;
   flex-direction: column;
+  min-width: 0;
   height: 100%;
 
   > .section-header {
@@ -345,7 +369,7 @@
   }
 
   span {
-    font-size: 0.9rem;
+    font-size: $font-size-label;
     opacity: 0.5;
   }
 }
@@ -364,7 +388,7 @@
     gap: 8px;
     padding: 10px 20px;
     border-radius: 8px;
-    font-size: 0.9rem;
+    font-size: $font-size-label;
     font-weight: 600;
     cursor: pointer;
     transition: all 0.2s;
@@ -387,12 +411,16 @@
   }
 
   .btn-edit-action {
-    background: transparent;
-    border: 1px solid var(--warning);
-    color: var(--warning);
+    flex: 0 0 auto;
+    padding-inline: 12px;
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    color: var(--text);
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
 
     &:hover {
-      background: rgba(245, 158, 11, 0.08);
+      background: var(--bg-slate);
+      border-color: var(--border-table-head);
     }
   }
 
@@ -414,7 +442,7 @@
 
 .signature-note {
   margin: 0 20px 20px;
-  font-size: 0.78rem;
+  font-size: $font-size-hint;
   color: var(--text-muted);
   display: flex;
   align-items: center;
@@ -452,7 +480,7 @@
     border: 1.5px solid var(--border-table-head);
     border-radius: 10px;
     background: var(--bg-slate);
-    font-size: 0.95rem;
+    font-size: $font-size-body;
     font-weight: 500;
     color: var(--text);
     outline: none;
@@ -481,7 +509,7 @@
 
   .name-label {
     margin-top: 6px;
-    font-size: 0.72rem;
+    font-size: $font-size-mini;
     color: var(--text-muted);
     letter-spacing: 0.05em;
     text-transform: uppercase;

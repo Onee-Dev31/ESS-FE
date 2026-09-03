@@ -118,7 +118,7 @@
                 </div> -->
                 <div class="info-row">
                   <div class="info-label align-top">ลักษณะอาการที่พบ</div>
-                  <div class="info-value">{{ req.symptom }}</div>
+                  <div class="info-value" [innerHTML]="req.symptom"></div>
                 </div>
                 @if (req.attachments && req.attachments.length) {
                   <div class="info-row">
@@ -126,7 +126,16 @@
                     <div class="info-value">
                       <ul class="attachment-list">
                         @for (file of req.attachments; track file) {
-                          <li><i class="fas fa-paperclip"></i> {{ file }}</li>
+                          <li>
+                            <button
+                              type="button"
+                              class="attachment-item"
+                              (click)="viewAttachment(file)"
+                            >
+                              <i class="fas fa-paperclip"></i>
+                              {{ file.fileName || file.name }}
+                            </button>
+                          </li>
                         }
                       </ul>
                     </div>
@@ -192,6 +201,10 @@
               <i class="fas fa-eraser"></i> ล้างลายเซนต์
             </button>
 
+            <button type="button" class="btn-edit-action" (click)="editAction()">
+              <i class="fas fa-pen"></i> แก้ไข
+            </button>
+
             <button
               class="btn-submit"
               (click)="submit()"
@@ -214,3 +227,7 @@
     </div>
   }
 </div>
+
+@if (isPreviewModalOpen()) {
+  <app-file-preview-modal [files]="previewFiles()" (onClose)="closePreview()" />
+}

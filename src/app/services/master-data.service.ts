@@ -2,12 +2,19 @@
 import { Injectable } from '@angular/core';
 import { Observable, of } from 'rxjs';
 import { shareReplay, delay } from 'rxjs/operators';
-import { LEAVE_TYPES, LeaveType } from '../interfaces/time-off.interface';
 
 import { DateConfig } from '../interfaces/core.interface';
 import { environment } from '../../environments/environment';
 import { HttpClient, HttpContext, HttpParams } from '@angular/common/http';
 import { SKIP_ERROR_TOAST } from '../interceptors/error.interceptor';
+import {
+  ClaimAllowanceRate,
+  UpsertClaimAllowanceRatePayload,
+} from '../interfaces/allowance.interface';
+import {
+  MedicalBenefitPlan,
+  UpsertMedicalBenefitPlanPayload,
+} from '../interfaces/medical.interface';
 
 export interface ClaimType {
   id: string;
@@ -30,19 +37,10 @@ export interface ClaimType {
 export class MasterDataService {
   private baseUrl = environment.api_url;
 
-  private leaveTypesCache$: Observable<LeaveType[]> | null = null;
   private claimTypesCache$: Observable<ClaimType[]> | null = null;
   private dateConfigCache$: Observable<DateConfig> | null = null;
 
   constructor(private _http: HttpClient) {}
-
-  /** ดึงรายการประเภทการลาทั้งหมด (รองรับการทำ Cache) */
-  getLeaveTypes(): Observable<LeaveType[]> {
-    if (!this.leaveTypesCache$) {
-      this.leaveTypesCache$ = of(LEAVE_TYPES).pipe(delay(500), shareReplay(1));
-    }
-    return this.leaveTypesCache$;
-  }
 
   /** ดึงรายการประเภทการเบิกค่ารักษาพยาบาล */
   getMedicalClaimTypes(): Observable<ClaimType[]> {
@@ -147,5 +145,29 @@ export class MasterDataService {
     return this._http.post(`${this.baseUrl}/Master/manage-holiday/import`, formData, {
       context: new HttpContext().set(SKIP_ERROR_TOAST, true),
     });
+  }
+
+  MasterPermission(): Observable<any> {
+    return this._http.get(`${this.baseUrl}/Master/MasterPermission`);
+  }
+
+  /** GET api/Master/GetClaimAllowanceRates */
+  getClaimAllowanceRates(): Observable<ClaimAllowanceRate[]> {
+    return this._http.get<ClaimAllowanceRate[]>(`${this.baseUrl}/Master/GetClaimAllowanceRates`);
+  }
+
+  /** POST api/Master/UpsertClaimAllowanceRates */
+  upsertClaimAllowanceRate(payload: UpsertClaimAllowanceRatePayload): Observable<any> {
+    return this._http.post(`${this.baseUrl}/Master/UpsertClaimAllowanceRates`, payload);
+  }
+
+  /** GET api/Master/GetMedicalBenefitPlans */
+  getMedicalBenefitPlans(): Observable<MedicalBenefitPlan[]> {
+    return this._http.get<MedicalBenefitPlan[]>(`${this.baseUrl}/Master/GetMedicalBenefitPlans`);
+  }
+
+  /** POST api/Master/UpsertMedicalBenefitPlans */
+  upsertMedicalBenefitPlan(payload: UpsertMedicalBenefitPlanPayload): Observable<any> {
+    return this._http.post(`${this.baseUrl}/Master/UpsertMedicalBenefitPlans`, payload);
   }
 }

@@ -15,11 +15,12 @@ import { ToastService } from '../../services/toast';
 import { AuthService } from '../../services/auth.service';
 import { environment } from '../../../environments/environment';
 import { HttpClient } from '@angular/common/http';
+import { PageHeaderComponent } from '../../components/shared/page-header/page-header';
 
 @Component({
   selector: 'app-save-signature',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, PageHeaderComponent],
   templateUrl: './save-signature.html',
   styleUrl: './save-signature.scss',
 })
@@ -58,6 +59,7 @@ export class SaveSignature implements OnInit, AfterViewInit, OnDestroy {
   private lastX = 0;
   private lastY = 0;
   private themeObserver?: MutationObserver;
+  private resizeHandler = () => this.onResize();
 
   ngOnInit() {
     const nameFromParam = this.route.snapshot.queryParamMap.get('name') ?? '';
@@ -75,11 +77,11 @@ export class SaveSignature implements OnInit, AfterViewInit, OnDestroy {
   ngAfterViewInit() {
     this.initCanvas();
     this.loadSignature();
-    window.addEventListener('resize', this.onResize.bind(this));
+    window.addEventListener('resize', this.resizeHandler);
   }
 
   ngOnDestroy() {
-    window.removeEventListener('resize', this.onResize.bind(this));
+    window.removeEventListener('resize', this.resizeHandler);
     this.themeObserver?.disconnect();
   }
 
@@ -102,6 +104,7 @@ export class SaveSignature implements OnInit, AfterViewInit, OnDestroy {
 
   private resizeCanvas() {
     const canvas = this.canvasRef?.nativeElement;
+    console.log(canvas);
     if (!canvas || !this.ctx) return;
     const imageData = this.ctx.getImageData(0, 0, canvas.width, canvas.height);
     canvas.width = canvas.offsetWidth;

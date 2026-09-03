@@ -71,6 +71,26 @@ export interface MealAllowanceRatesResponse {
   data: MealAllowanceRate[];
 }
 
+// ─── Claim Allowance Rate (Master/GetClaimAllowanceRates, Master/UpsertClaimAllowanceRates) ──
+
+export interface ClaimAllowanceRate {
+  rate_id: number;
+  min_hours: number;
+  max_hours: number;
+  rate_amount: number;
+  description: string;
+}
+
+export interface UpsertClaimAllowanceRatePayload {
+  rate_id?: number;
+  min_hours?: number;
+  max_hours?: number;
+  rate_amount?: number;
+  description?: string;
+  isDelete: boolean;
+  excuteby: string;
+}
+
 // ─── Create Claim ─────────────────────────────────────────────────────────────
 
 export interface CreateClaimDetail {

@@ -359,6 +359,7 @@ export class AllowanceFormComponent implements OnInit, OnChanges {
       this.swalService.loading('กำลังบันทึกข้อมูล...');
       this.allowanceService
         .updateClaim(this.requests.claimId, {
+          resubmit: this.requests?.status === 'Referred Back',
           details: selectedLogs.map((log) => ({
             work_date: log.date,
             shift_code: log.shiftCode,

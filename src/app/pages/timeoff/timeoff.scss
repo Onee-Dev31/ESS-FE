@@ -2,6 +2,16 @@
 @use '../../../styles/variables' as *;
 @use '../../../styles/mixins' as *;
 
+@keyframes timeoff-request-highlight {
+  0%,
+  100% {
+    background-color: var(--ticket-highlight-bg-0);
+  }
+  50% {
+    background-color: var(--ticket-highlight-bg-50);
+  }
+}
+
 // ============================================
 // Timeoff Page Styles
 // ============================================
@@ -77,7 +87,7 @@ $status-cancelled-text: var(--text-table-head);
 @mixin mobile-cards-view {
   display: none;
 
-  @include large-tablet {
+  @include tablet {
     display: flex !important;
     flex-direction: column;
     gap: 16px;
@@ -96,21 +106,10 @@ $status-cancelled-text: var(--text-table-head);
     overflow: hidden;
     display: flex;
     flex-direction: column;
+    -webkit-tap-highlight-color: transparent;
 
-    &:hover {
-      transform: translateY(-4px);
-      box-shadow:
-        0 20px 25px -5px rgba(0, 0, 0, 0.1),
-        0 10px 10px -5px rgba(0, 0, 0, 0.04);
-      border-color: rgba(0, 0, 0, 0.08);
-
-      .card-header {
-        background: var(--status-new-bg);
-      }
-
-      .card-header::after {
-        opacity: 1;
-      }
+    &.highlight {
+      animation: timeoff-request-highlight 8s ease-out forwards;
     }
 
     .card-header {
@@ -123,23 +122,11 @@ $status-cancelled-text: var(--text-table-head);
       position: relative;
       transition: background 0.3s ease;
 
-      &::after {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        height: 4px;
-        background: linear-gradient(90deg, $primary, color-mix(in srgb, $primary, white 20%));
-        opacity: 0;
-        transition: opacity 0.3s;
-      }
-
       .header-content {
         .ticket-no {
           font-weight: 700;
           color: $primary;
-          font-size: 1.05rem;
+          font-size: $font-size-header;
         }
       }
 
@@ -160,7 +147,7 @@ $status-cancelled-text: var(--text-table-head);
         display: flex;
         justify-content: space-between;
         margin-bottom: 14px;
-        font-size: 0.9rem;
+        font-size: $font-size-label;
 
         .label {
           color: var(--text-table-head);
@@ -172,6 +159,15 @@ $status-cancelled-text: var(--text-table-head);
         .value {
           font-weight: 600;
           color: var(--text-header);
+          text-align: right;
+
+          &.leave-date-value small {
+            display: block;
+            margin-top: 3px;
+            color: var(--text-muted);
+            font-size: $font-size-hint;
+            font-weight: 500;
+          }
         }
       }
 
@@ -190,14 +186,14 @@ $status-cancelled-text: var(--text-table-head);
           gap: 8px;
           padding: 9px 16px;
           border-radius: 12px;
-          font-size: 0.9rem;
+          font-size: $font-size-label;
           font-weight: 600;
           cursor: pointer;
           transition: all 0.2s;
           border: none;
 
           i {
-            font-size: 1rem;
+            font-size: $font-size-body;
           }
 
           &:active {
@@ -236,63 +232,6 @@ $status-cancelled-text: var(--text-table-head);
         }
       }
     }
-  }
-}
-
-// Status Badges
-.status-badge {
-  padding: 6px 12px;
-  border-radius: 20px;
-  font-size: 0.8rem;
-  font-weight: 600;
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  line-height: 1;
-  white-space: nowrap;
-  border: 1px solid transparent;
-
-  &::before {
-    content: '';
-    display: block;
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    background-color: currentColor;
-  }
-
-  &.status-new,
-  &.status-waiting,
-  &.NEW,
-  &.WAITING_CHECK {
-    background: var(--status-new-bg);
-    color: var(--status-new-text);
-    border-color: var(--border);
-  }
-
-  &.status-approved,
-  &.status-verified,
-  &.APPROVED,
-  &.VERIFIED {
-    background: var(--status-success-bg);
-    color: var(--status-success-text);
-    border-color: var(--border);
-  }
-
-  &.status-rejected,
-  &.status-cancelled,
-  &.REJECTED,
-  &.CANCELLED {
-    background: var(--status-danger-bg);
-    color: var(--status-danger-text);
-    border-color: var(--border);
-  }
-
-  &.status-pending,
-  &.PENDING_APPROVAL {
-    background: var(--status-pending-bg);
-    color: var(--status-pending-text);
-    border-color: var(--border);
   }
 }
 
@@ -378,9 +317,9 @@ $status-cancelled-text: var(--text-table-head);
   padding: 24px;
   padding-bottom: 24px;
   background-color: $bg-page;
-  min-height: 100vh;
+  // min-height: 100vh;
 
-  @include large-tablet {
+  @include tablet {
     padding: 12px;
     padding-bottom: 5px;
   }
@@ -392,6 +331,23 @@ $status-cancelled-text: var(--text-table-head);
 
   .card-header-title {
     @include card-header-title;
+  }
+
+  .card-title-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+    gap: 12px;
+
+    .card-header-title {
+      margin-bottom: 0;
+    }
+
+    .btn-create {
+      flex: 0 0 auto;
+      white-space: nowrap;
+    }
   }
 
   .toolbar-container {
@@ -408,7 +364,9 @@ $status-cancelled-text: var(--text-table-head);
   }
 
   .table-responsive {
-    @include large-tablet {
+    overflow-x: auto;
+
+    @include tablet {
       display: none;
     }
   }
@@ -416,6 +374,88 @@ $status-cancelled-text: var(--text-table-head);
   // ==================== TABLE STYLES ====================
   .modern-table {
     @include modern-table;
+    min-width: 1180px;
+    table-layout: fixed;
+
+    thead th,
+    tbody td {
+      text-align: left;
+    }
+
+    thead th.actions-column,
+    tbody td:last-child {
+      text-align: center;
+    }
+
+    tbody + tbody td {
+      border-top: 1px solid color-mix(in srgb, var(--text-muted) 22%, var(--border-table-head)) !important;
+    }
+
+    tbody tr.highlight td {
+      animation: timeoff-request-highlight 8s ease-out forwards;
+    }
+
+    .request-column {
+      width: 150px;
+    }
+
+    .date-column {
+      width: 125px;
+      white-space: nowrap;
+    }
+
+    .time-column {
+      width: 90px;
+      white-space: nowrap;
+    }
+
+    .leave-type-column {
+      width: 190px;
+    }
+
+    .reason-column {
+      width: 230px;
+    }
+
+    .status-column {
+      width: 200px;
+    }
+
+    .actions-column {
+      width: 120px;
+      text-align: center;
+    }
+
+    .request-meta-cell {
+      .created-at,
+      .leave-number {
+        display: block;
+      }
+
+      .created-at {
+        color: var(--text-sub);
+        font-size: $font-size-label;
+        line-height: 1.45;
+      }
+
+      .leave-number {
+        margin-top: 4px;
+        color: var(--primary);
+        font-size: $font-size-body;
+        font-weight: 500;
+      }
+    }
+
+    .date-value,
+    .time-value {
+      color: var(--text-header);
+      font-weight: 500;
+      white-space: nowrap;
+    }
+
+    .time-value {
+      text-align: center;
+    }
 
     // Column widths are now handled by utility classes in HTML (e.g., .w-px-120, .w-auto)
 
@@ -427,6 +467,19 @@ $status-cancelled-text: var(--text-table-head);
       i {
         color: $primary;
         font-size: 1rem;
+      }
+
+      span,
+      small {
+        display: block;
+      }
+
+      small {
+        margin-top: 4px;
+        color: var(--text-sub);
+        font-size: $font-size-label;
+        font-weight: 400;
+        white-space: nowrap;
       }
 
       &.centered {
@@ -450,10 +503,10 @@ $status-cancelled-text: var(--text-table-head);
     }
 
     .reason-cell {
-      max-width: 250px;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
+      width: auto;
+      max-width: 300px;
+      color: var(--text-sub);
+      line-height: 1.5;
     }
   }
 
@@ -516,9 +569,34 @@ $status-cancelled-text: var(--text-table-head);
   gap: 6px;
 }
 
+.attachment-link {
+  display: flex;
+  width: fit-content;
+  align-items: center;
+  gap: 6px;
+  margin-top: 7px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--primary);
+  font: inherit;
+  font-size: $font-size-label;
+  cursor: pointer;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
 .btn-icon {
   &.view {
     @include icon-btn-ghost(var(--text-table-head)); // Slate
+    background: var(--bg-table-head);
+
+    &:hover {
+      background: color-mix(in srgb, var(--primary) 9%, var(--bg-card));
+      color: var(--primary);
+    }
   }
 
   &.edit {
@@ -528,6 +606,12 @@ $status-cancelled-text: var(--text-table-head);
   &.delete {
     @include icon-btn-ghost(var(--danger)); // Red
   }
+}
+
+.action-btns .btn-icon {
+  width: 34px;
+  height: 34px;
+  border-radius: 9px;
 }
 
 // Keep legacy classes for backward compatibility if needed, but override styling
@@ -556,6 +640,124 @@ select.form-control {
   @include select-dropdown;
 }
 
+::ng-deep .timeoff-filter-select.ant-select {
+  position: relative;
+  width: 100%;
+  min-width: 100px;
+  height: 44px;
+  line-height: 44px;
+
+  @include tablet {
+    height: 42px;
+    line-height: 42px;
+  }
+
+  @include mobile {
+    min-width: 0;
+    height: 38px;
+    line-height: 38px;
+  }
+}
+
+::ng-deep
+  .timeoff-filter-select.ant-select.ant-select-single:not(.ant-select-customize-input)
+  .ant-select-selector {
+  display: flex !important;
+  height: 44px !important;
+  align-items: center !important;
+  padding-block: 0 !important;
+  padding-inline-start: 16px !important;
+  border: 1.5px solid var(--border-table-head) !important;
+  border-radius: 10px !important;
+  background: var(--bg-table-head) !important;
+  box-shadow: none !important;
+
+  @include tablet {
+    height: 42px !important;
+  }
+
+  @include mobile {
+    height: 38px !important;
+  }
+}
+
+::ng-deep
+  .timeoff-filter-select.ant-select.ant-select-single
+  .ant-select-selector
+  .ant-select-selection-item,
+::ng-deep
+  .timeoff-filter-select.ant-select.ant-select-single
+  .ant-select-selector
+  .ant-select-selection-placeholder {
+  overflow: hidden !important;
+  color: var(--text) !important;
+  line-height: 42px !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+
+  @include tablet {
+    line-height: 40px !important;
+  }
+
+  @include mobile {
+    line-height: 36px !important;
+  }
+}
+
+::ng-deep
+  .timeoff-filter-select.ant-select.ant-select-single
+  .ant-select-selector
+  .ant-select-selection-search {
+  inset-inline-start: 16px !important;
+  inset-inline-end: 44px !important;
+}
+
+::ng-deep .timeoff-filter-select.ant-select .ant-select-arrow {
+  top: 50% !important;
+  right: 16px !important;
+  margin-top: 0 !important;
+  color: var(--text-muted) !important;
+  transform: translateY(-50%) !important;
+  inset-inline-end: 16px !important;
+}
+
+::ng-deep .timeoff-filter-select.ant-select.ant-select-focused .ant-select-selector,
+::ng-deep .timeoff-filter-select.ant-select:hover .ant-select-selector {
+  border-color: var(--primary) !important;
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--primary) 10%, transparent) !important;
+}
+
+::ng-deep .year-range-picker.ant-picker {
+  width: 230px;
+  height: 44px;
+  padding: 0 12px;
+  border: 1.5px solid var(--border-table-head);
+  border-radius: 10px;
+  background: var(--bg-table-head);
+  box-shadow: none;
+
+  &:hover,
+  &.ant-picker-focused {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 4px color-mix(in srgb, var(--primary) 10%, transparent);
+  }
+
+  @include tablet {
+    width: 100%;
+    height: 42px;
+  }
+}
+
+::ng-deep .status-filter-select.ant-select {
+  width: 220px;
+  min-width: 220px;
+
+  @include tablet {
+    width: 100%;
+    min-width: 0;
+  }
+}
+
 // Search input group
 .search-input-group {
   display: flex;
@@ -579,6 +781,26 @@ select.form-control {
       width: auto;
       padding: 0 20px;
     }
+  }
+}
+
+.search-input-group .btn-clear-icon {
+  width: 44px;
+  min-width: 44px;
+  flex: 0 0 44px;
+  padding: 0;
+
+  @include tablet {
+    width: 42px;
+    min-width: 42px;
+    flex-basis: 42px;
+    padding: 0;
+  }
+
+  @include mobile {
+    width: 38px;
+    min-width: 38px;
+    flex-basis: 38px;
   }
 }
 
@@ -613,9 +835,127 @@ select.form-control {
 // Modal Styling
 .modal-overlay {
   @include modal-overlay-styles;
+
+  .modal-container {
+    height: 90vh;
+
+    @include mobile {
+      height: 100dvh;
+    }
+  }
 }
 
 // Pagination wrapper spacing
 .pagination-wrapper {
   margin-top: 24px;
+}
+
+@include mobile {
+  .timeoff-page {
+    padding: 8px;
+
+    .content-card {
+      margin-top: 10px;
+      padding: 10px;
+      border-radius: 10px;
+    }
+
+    .card-header-title {
+      margin-bottom: 14px;
+      padding-left: 10px;
+      font-size: $font-size-header;
+    }
+
+    .toolbar-container {
+      gap: 12px;
+      margin-bottom: 12px;
+      padding: 12px;
+
+      .toolbar-top-row {
+        padding-bottom: 10px;
+
+        .left-action,
+        .btn-create {
+          width: 100%;
+        }
+      }
+
+      .toolbar-bottom-row {
+        gap: 12px;
+
+        .right-filters {
+          display: grid;
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+          gap: 10px;
+
+          .filter-group,
+          .btn-clear {
+            width: 100%;
+            min-width: 0;
+          }
+        }
+      }
+
+      .search-input-group {
+        gap: 8px;
+
+        .btn-search {
+          padding-inline: 14px;
+        }
+      }
+    }
+
+    .card-list-view {
+      gap: 10px;
+      padding: 0;
+
+      .mobile-card {
+        border-radius: 12px;
+        box-shadow: 0 2px 6px rgba(15, 23, 42, 0.06);
+
+        .card-header {
+          padding: 12px;
+        }
+
+        .card-body {
+          padding: 12px;
+
+          .info-row {
+            align-items: flex-start;
+            gap: 12px;
+            margin-bottom: 10px;
+
+            .label {
+              flex: 0 0 auto;
+            }
+
+            .value {
+              min-width: 0;
+              overflow-wrap: anywhere;
+            }
+          }
+
+          .reason-box {
+            margin-top: 2px;
+            padding: 9px;
+            font-size: $font-size-label;
+          }
+
+          .card-footer-actions {
+            gap: 8px;
+            padding-top: 12px;
+
+            button {
+              min-height: 38px;
+              padding: 7px 10px;
+            }
+          }
+        }
+      }
+    }
+
+    .pagination-wrapper {
+      margin-top: 14px;
+    }
+  }
 }

@@ -25,12 +25,13 @@ export class SwalService {
     });
   }
 
-  warning(title: string, text?: string) {
+  warning(title: string, text?: string, html?: string) {
     Swal.close();
     return Swal.fire({
       icon: 'warning',
       title,
       text,
+      html,
       confirmButtonColor: '#f59e0b',
     });
   }
@@ -51,6 +52,24 @@ export class SwalService {
       title,
       text,
       html,
+      showCancelButton: true,
+      confirmButtonText: 'ตกลง',
+      cancelButtonText: 'ยกเลิก',
+      confirmButtonColor: '#6366f1',
+      cancelButtonColor: '#9ca3af',
+    });
+  }
+
+  promptReason(title: string) {
+    return Swal.fire({
+      icon: 'question',
+      title,
+      input: 'textarea',
+      inputLabel: 'เหตุผล',
+      inputPlaceholder: 'กรุณากรอกเหตุผล...',
+      inputAttributes: {
+        'aria-label': 'เหตุผล',
+      },
       showCancelButton: true,
       confirmButtonText: 'ตกลง',
       cancelButtonText: 'ยกเลิก',

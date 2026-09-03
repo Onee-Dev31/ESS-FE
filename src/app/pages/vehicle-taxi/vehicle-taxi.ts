@@ -1,4 +1,4 @@
-import { Component, OnInit, signal, inject } from '@angular/core';
+import { Component, OnInit, signal, computed, inject } from '@angular/core';
 
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -30,6 +30,21 @@ import { NzSelectModule } from 'ng-zorro-antd/select';
 import { NzInputModule } from 'ng-zorro-antd/input';
 import dayjs from 'dayjs';
 import { SwalService } from '../../services/swal.service';
+
+/** ข้อความ fallback ของ popup เงื่อนไข Taxi (ใช้ก่อน API ตอบกลับ หรือถ้าเรียก API ไม่สำเร็จ) */
+const DEFAULT_POLICY_TEXTS: Record<string, string> = {
+  taxi_cond1_title: 'เบิกได้เฉพาะวันที่ยังมีวงเงินเหลือเท่านั้น',
+  taxi_cond1_desc: 'วันที่เบิกเต็มวงเงินแล้วจะไม่แสดงในรายการให้เลือก',
+  taxi_cond2_title: 'วงเงินสูงสุด **{dailyLimit}/วัน**',
+  taxi_cond2_desc:
+    'รวมทุกเที่ยวในวันเดียวกันต้องไม่เกิน {dailyLimit} คำนวณจากยอดที่เบิกไปแล้วในวันนั้น (ไม่นับรายการที่ถูกปฏิเสธหรือยกเลิก)',
+  taxi_cond3_title: 'เพิ่มได้หลายเที่ยวต่อวัน',
+  taxi_cond3_desc: 'เลือกวันที่เดิมแล้วกด "เพิ่มเที่ยว" ซ้ำได้ เช่น ขาไป-ขากลับ',
+  taxi_cond4_title: 'ระบุรายละเอียดให้ครบถ้วน',
+  taxi_cond4_desc: 'ต้องกรอกรายละเอียดการเบิก จากที่ไหน ไปที่ไหน และจำนวนเงินให้ครบทุกเที่ยว',
+  taxi_cond5_title: 'แก้ไข/ลบได้เฉพาะสถานะ "คำขอใหม่"',
+  taxi_cond5_desc: 'รายการที่ได้รับการอนุมัติแล้วจะไม่สามารถแก้ไขหรือลบได้',
+};
 
 /** หน้าแสดงรายการคำขอเบี้ยเลี้ยงค่าแท็กซี่ (Vehicle Taxi) */
 @Component({
@@ -69,6 +84,18 @@ export class VehicleTaxiComponent implements OnInit {
   statusOptions = COMMON_STATUS_OPTIONS;
 
   isModalOpen = signal<boolean>(false);
+  isPolicyModalOpen = signal<boolean>(false);
+  policyTexts = signal<Record<string, string>>({});
+  conditions = signal<{ daily_limit: number } | null>(null);
+
+  dailyLimitLabel = computed(() => {
+    const c = this.conditions();
+    return c ? `${c.daily_limit} บาท` : '500 บาท';
+  });
+
+  private tokenValues = computed(() => ({
+    dailyLimit: this.dailyLimitLabel(),
+  }));
   // selectedRequestId = signal<string>('');
   selectedRequestId = '';
   selectedRequest: any = null;
@@ -93,6 +120,43 @@ export class VehicleTaxiComponent implements OnInit {
 
   ngOnInit() {
     this.loadData();
+    this.getPolicyTexts();
+    this.getConditions();
+  }
+
+  getPolicyTexts() {
+    this.taxiService.getPolicyTexts().subscribe({
+      next: (res) => {
+        const map: Record<string, string> = {};
+        for (const t of res.data ?? []) map[t.text_key] = t.content;
+        this.policyTexts.set(map);
+      },
+      error: () => {},
+    });
+  }
+
+  getConditions() {
+    this.taxiService.getConditions().subscribe({
+      next: (res) => this.conditions.set(res.data),
+      error: () => {},
+    });
+  }
+
+  renderSegments(key: string): { text: string; bold: boolean }[] {
+    const raw = this.policyTexts()[key] ?? DEFAULT_POLICY_TEXTS[key] ?? '';
+    const tokens = this.tokenValues();
+    const substituted = raw.replace(
+      /\{(\w+)\}/g,
+      (_, name) => (tokens as Record<string, string>)[name] ?? '',
+    );
+    return substituted
+      .split(/(\*\*.+?\*\*)/g)
+      .filter((s) => s.length > 0)
+      .map((s) =>
+        s.startsWith('**') && s.endsWith('**')
+          ? { text: s.slice(2, -2), bold: true }
+          : { text: s, bold: false },
+      );
   }
 
   loadData() {
@@ -145,6 +209,8 @@ export class VehicleTaxiComponent implements OnInit {
           return {
             date: d.work_date ?? '',
             description: d.description ?? '',
+            locationFrom: fromName,
+            locationTo: toName,
             destination: fromName && toName ? `${fromName} → ${toName}` : fromName || toName,
             distance: 0,
             amount: d.rate_amount ?? 0,

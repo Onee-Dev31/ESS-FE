@@ -26,6 +26,7 @@ import { TooltipModalComponent } from '../../components/modals/tooltip-modal/too
 import { TimeOffForm } from '../../components/features/time-off-form/time-off-form';
 import { AuthService } from '../../services/auth.service';
 import { SkeletonComponent } from '../../components/shared/skeleton/skeleton';
+import { PageLoaderComponent } from '../../components/shared/page-loader/page-loader';
 
 import dayjs from 'dayjs';
 import 'dayjs/locale/th';
@@ -71,6 +72,7 @@ dayjs.locale('th');
     MedicalPolicyModalComponent,
     TooltipModalComponent,
     TimeOffForm,
+    PageLoaderComponent,
   ],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.scss',
@@ -385,12 +387,14 @@ export class DashboardComponent implements OnInit {
     if (arg.view.type === 'dayGridMonth' && !arg.dayEl.classList.contains('fc-day')) return;
 
     this.zone.run(() => {
-      const dateStr = dayjs(arg.date).format('YYYY-MM-DD');
+      // Use FullCalendar's date-only value to avoid a timezone shift from Date conversion.
+      const dateStr = arg.dateStr.slice(0, 10);
 
       // ✅ ถ้าวันหยุด/เสาร์อาทิตย์ แล้วไม่อยากให้เปิดฟอร์ม ก็ใส่เงื่อนไขได้
       // if (this.holidayMap?.[dateStr]) return;
 
       this.selectedDate.set(dateStr);
+      this.selectedLeaveTypeId.set('ลาพักร้อน');
       this.selectedRequestStatus.set('NEW'); // หรือค่า default ที่คุณใช้
       this.isFormOpen.set(true);
 
@@ -458,7 +462,6 @@ export class DashboardComponent implements OnInit {
 
   ngOnInit() {
     this.performanceList = this.dashboardService.getPerformanceList();
-    this.getTeamCalendar();
 
     this.loadInitialData().subscribe({
       next: ([
@@ -679,7 +682,7 @@ export class DashboardComponent implements OnInit {
   }
 
   getItAssetByAduser(adUser: string) {
-    return this.itAssetService.GetItAssetByAD('SNIPE-IT', adUser);
+    return this.itAssetService.getEmployeeAssets(adUser);
   }
 
   getOneeuserByAduser(adUser: string) {
@@ -718,7 +721,7 @@ export class DashboardComponent implements OnInit {
   }
 
   mapItStory() {
-    const assets = this.itAsset().data.rows || [];
+    const assets = this.itAsset().data || [];
     const user = this.oneeUser() || [];
     const map = [
       {
@@ -730,8 +733,8 @@ export class DashboardComponent implements OnInit {
         value: user.PasswordExpirationDate,
       },
       ...assets.map((item: any) => ({
-        label: item.category.name,
-        value: item.model.name,
+        label: item.Category,
+        value: item.Model,
       })),
     ];
 
@@ -739,10 +742,7 @@ export class DashboardComponent implements OnInit {
   }
 
   openTimeOffForm(leaveLabel: string) {
-    const mapping = BUSINESS_CONFIG.LEAVE_TYPE_MAP;
-
-    const typeId = mapping[leaveLabel] || '';
-    this.selectedLeaveTypeId.set(typeId);
+    this.selectedLeaveTypeId.set(leaveLabel);
     this.isTimeOffModalOpen.set(true);
   }
 
@@ -786,5 +786,7 @@ export class DashboardComponent implements OnInit {
 
   closeForm() {
     this.isFormOpen.set(false);
+    this.selectedDate.set('');
+    this.selectedLeaveTypeId.set('');
   }
 }

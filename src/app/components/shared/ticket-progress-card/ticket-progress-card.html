@@ -1,0 +1,130 @@
+<section class="progress-card">
+  <div class="progress-header" [class.has-note-action]="showNoteButton">
+    <app-ticket-status-pill [ticket]="ticket" [audience]="audience" />
+    @if (showNoteButton) {
+      <button
+        type="button"
+        class="note-button"
+        [class.has-note]="!!ticket.noteForIt"
+        [attr.aria-label]="ticket.noteForIt ? 'เปิดหรือแก้ไข Note for IT' : 'เพิ่ม Note for IT'"
+        [attr.data-tooltip]="ticket.noteForIt ? 'เปิดหรือแก้ไข Note for IT' : 'เพิ่ม Note for IT'"
+        (click)="noteClick.emit()"
+      >
+        <i class="fa-solid fa-note-sticky" aria-hidden="true"></i>
+      </button>
+    }
+  </div>
+
+  @if (ticket.assignTimeline?.length) {
+    <div class="timeline">
+      @if (showWaitingItTemplate && ticket.assignTimeline.length === 1) {
+        <div class="timeline-item timeline-item--waiting-it">
+          <div class="timeline-icon active"></div>
+          <div class="timeline-content">
+            <div class="timeline-title">
+              {{ +ticket.ticketTypeId === 3 ? 'รอการอนุมัติ' : 'รอ IT รับเรื่อง' }}<br />
+            </div>
+          </div>
+        </div>
+      }
+      @for (
+        step of ticket.assignTimeline.slice().reverse();
+        track step.step + '|' + step.createdDate;
+        let first = $first
+      ) {
+        <div class="timeline-item">
+          <div
+            class="timeline-icon"
+            [class.done]="
+              !first || ticket.assignTimeline.length === 1 || step.title.includes('ปิด')
+            "
+            [class.active]="
+              first &&
+              ticket.assignTimeline.length !== 1 &&
+              !step.title.includes('ปิด') &&
+              !step.title.includes('ปฏิเสธ') &&
+              !step.title.toLowerCase().includes('rejected') &&
+              !step.title.toLowerCase().includes('hold')
+            "
+            [class.deny]="
+              step.title.includes('ปฏิเสธ') || step.title.toLowerCase().includes('rejected')
+            "
+            [class.hold]="step.title.toLowerCase().includes('hold')"
+          ></div>
+          <div class="timeline-content">
+            <div class="timeline-title">
+              Step {{ step.step }} - {{ step.title }}<br />
+              <small>
+                by {{ step.createBy.nickName }}
+                @if (audience === 'it' && step.createBy.department?.includes('10806')) {
+                  (IT)
+                }
+                •
+                @if (isToday(step.createdDate)) {
+                  {{ step.createdDate | date: 'HH:mm' }}
+                } @else {
+                  {{ step.createdDate | date: 'EEE dd - HH:mm' : '' : 'en' }}
+                }
+              </small>
+              @if (step.reason?.trim()) {
+                <div class="timeline-reason">
+                  <i class="fa-regular fa-comment-dots" aria-hidden="true"></i>
+                  {{ step.reason }}
+                </div>
+              }
+            </div>
+            @if (step.Assignee?.length) {
+              <div class="timeline-assignee">
+                @for (assignee of step.Assignee; track assignee.empCode) {
+                  <button type="button" class="assignee-item" (click)="selectAssignee(assignee)">
+                    <img
+                      [src]="
+                        'https://empimg.oneeclick.co:8048/employeeimage/' +
+                        assignee.empCode +
+                        '.jpg'
+                      "
+                      alt=""
+                    />
+                    <span>{{ assignee.nickName }}</span>
+                  </button>
+                }
+              </div>
+            }
+          </div>
+        </div>
+      }
+    </div>
+  } @else {
+    <div class="no-assignee">
+      <div class="empty-avatar">?</div>
+      <strong>ยังไม่มีผู้รับผิดชอบ</strong>
+      <span>กรุณากดรับเรื่อง</span>
+    </div>
+  }
+</section>
+
+@if (selectedAssignee(); as assignee) {
+  <div class="assignee-overlay" (click)="selectedAssignee.set(null)">
+    <div class="assignee-card" (click)="$event.stopPropagation()">
+      <button
+        type="button"
+        class="close-button"
+        aria-label="ปิด"
+        (click)="selectedAssignee.set(null)"
+      >
+        <i class="fas fa-times"></i>
+      </button>
+      <div class="assignee-avatar">
+        <app-avatar-preview-modal
+          [src]="'https://empimg.oneeclick.co:8048/employeeimage/' + assignee.empCode + '.jpg'"
+          [name]="assignee.fullname || assignee.nickName"
+        />
+      </div>
+      <h3>{{ assignee.nickName }}</h3>
+      <div class="assignee-contact">
+        <div><i class="fa-regular fa-envelope"></i>{{ assignee.email || '-' }}</div>
+        <div><i class="fa-solid fa-phone"></i>{{ assignee.phone || '-' }}</div>
+      </div>
+    </div>
+  </div>
+}

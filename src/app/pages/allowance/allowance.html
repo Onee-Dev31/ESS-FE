@@ -1,5 +1,14 @@
 <div class="allowance-page">
-  <app-page-header title="ค่าเบี้ยเลี้ยง"> </app-page-header>
+  <app-page-header title="ค่าเบี้ยเลี้ยง">
+    <button
+      type="button"
+      class="btn-icon-sky"
+      (click)="isPolicyModalOpen.set(true)"
+      title="เงื่อนไขการคำนวณเบี้ยเลี้ยง"
+    >
+      <i class="fas fa-info-circle"></i>
+    </button>
+  </app-page-header>
 
   <div class="content-card">
     <div class="card-header-row">
@@ -232,6 +241,33 @@
   }
 
   @if (isPolicyModalOpen()) {
-    <app-medical-policy-modal (onClose)="isPolicyModalOpen.set(false)"> </app-medical-policy-modal>
+    <div class="policy-popup-overlay" (click)="isPolicyModalOpen.set(false)">
+      <div class="policy-popup-content" (click)="$event.stopPropagation()">
+        <div class="policy-popup-header">
+          <h3><i class="fas fa-info-circle"></i> เงื่อนไขการคำนวณเบี้ยเลี้ยง</h3>
+          <button
+            type="button"
+            class="btn-close-popup"
+            (click)="isPolicyModalOpen.set(false)"
+            title="ปิด"
+          >
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+        <div class="policy-popup-body">
+          <p class="policy-description">ทำงานวันปกติ หลังจากครบ 9 ชม. อัตราการจ่ายเงินล่วงเวลา :</p>
+          <div class="policy-rates-list">
+            @for (rate of rates(); track rate.rate_id) {
+              <div class="rate-item">
+                <span class="rate-hours">{{ rate.description }}</span>
+                <span class="rate-amount">{{ rate.rate_amount | number }} บาท</span>
+              </div>
+            } @empty {
+              <p class="rates-loading"><i class="fas fa-spinner fa-spin"></i> กำลังโหลดข้อมูล...</p>
+            }
+          </div>
+        </div>
+      </div>
+    </div>
   }
 </div>

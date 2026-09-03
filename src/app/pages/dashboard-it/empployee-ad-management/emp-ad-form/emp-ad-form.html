@@ -85,13 +85,14 @@
     <form class="form-body" (ngSubmit)="saveEmployee()">
       <div class="section-title">Basic Information</div>
       <div class="form-grid">
-        <div class="field-group">
+        <div class="field-group" *ngIf="!isRequestUser">
           <label>Employee Code <span class="req">*</span></label>
           <input
             type="text"
             [(ngModel)]="addForm.employeeCode"
             name="employeeCode"
             placeholder="Enter Employee Code"
+            disabled
             [class.invalid]="isInvalid('employeeCode')"
           />
         </div>
@@ -131,6 +132,16 @@
             [class.invalid]="isInvalid('surNameThai')"
           />
         </div>
+        <div class="field-group" *ngIf="isRequestUser">
+          <label>Nickname <span class="req">*</span></label>
+          <input
+            type="text"
+            [(ngModel)]="addForm.nickname"
+            name="nickname"
+            placeholder="Enter Nickname"
+            [class.invalid]="isInvalid('nickname')"
+          />
+        </div>
         <div class="field-group">
           <label>TitleName (English) <span class="req">*</span></label>
           <nz-select
@@ -167,7 +178,7 @@
             [class.invalid]="isInvalid('surNameEng')"
           />
         </div>
-        <div class="field-group">
+        <div class="field-group" *ngIf="!isRequestUser">
           <label>Nickname <span class="req">*</span></label>
           <input
             type="text"
@@ -179,8 +190,8 @@
         </div>
       </div>
 
-      <div class="section-title">Job Information</div>
-      <div class="form-grid">
+      <div class="section-title" *ngIf="!isRequestUser">Job Information</div>
+      <div class="form-grid" *ngIf="!isRequestUser">
         <div class="field-group span-2">
           <label>Job Position <span class="req">*</span></label>
           <nz-select
@@ -274,23 +285,16 @@
           </nz-select>
         </div>
         <div class="field-group span-2">
-          <label>Email <span class="req">*</span></label>
-          <input
-            type="email"
-            [(ngModel)]="addForm.email"
-            name="email"
-            placeholder="Enter Email"
-            [class.invalid]="isInvalid('email')"
-          />
+          <label>Email</label>
+          <input type="email" [(ngModel)]="addForm.email" name="email" placeholder="Enter Email" />
         </div>
         <div class="field-group span-2">
-          <label>Mobile <span class="req">*</span></label>
+          <label>Mobile</label>
           <input
             type="text"
             [(ngModel)]="addForm.mobile"
             name="mobile"
             placeholder="Enter Mobile"
-            [class.invalid]="isInvalid('mobile')"
           />
         </div>
       </div>
@@ -313,7 +317,7 @@
             }
           </nz-select>
         </div>
-        <div class="field-group span-2">
+        <div class="field-group span-2" *ngIf="!isRequestUser">
           <label>AD User <span class="req">*</span></label>
           <input
             type="text"

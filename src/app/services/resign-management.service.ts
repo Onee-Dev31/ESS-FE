@@ -23,6 +23,8 @@ export class ResignManagementService {
     costCent?: any;
     empStatus?: string;
     adExpiredDate?: string;
+    yearFrom?: number;
+    yearTo?: number;
   }): Observable<any> {
     const queryParams: any = {};
 
@@ -33,8 +35,10 @@ export class ResignManagementService {
     if (params.costCent) queryParams.costCent = params.costCent;
     if (params.empStatus) queryParams.empStatus = params.empStatus;
     if (params.adExpiredDate === 'true') queryParams.adExpiredDate = params.adExpiredDate;
+    if (params.yearFrom) queryParams.yearFrom = params.yearFrom;
+    if (params.yearTo) queryParams.yearTo = params.yearTo;
 
-    console.log('params >>> ', queryParams);
+    // console.log('params >>> ', queryParams);
 
     return this._http.get<any>(`${this.baseUrl}/employees`, {
       params: queryParams,
@@ -56,11 +60,11 @@ export class ResignManagementService {
   }
 
   resignEmployees(payload: any): Observable<any> {
-    return this._http.post(`${this.baseUrl}/employee-resignations/bulk`, payload);
+    return this._http.post(`${this.baseUrl}/employee-resignations/bulkV2`, payload);
   }
 
   updateADManagementResign(payload: any): Observable<any> {
-    return this._http.post(`${this.baseUrl}/ADManagement/set-account-expire-batch`, payload);
+    return this._http.post(`${this.baseUrl}/ADManagement/set-account-expire-batchV2`, payload);
   }
 
   getReportResignEmployees(params: {
@@ -70,6 +74,9 @@ export class ResignManagementService {
     companyCode?: any;
     costCent?: any;
     empStatus?: string;
+    adExpiredDate?: string;
+    yearFrom?: number;
+    yearTo?: number;
   }): Observable<any> {
     const queryParams: any = {};
 
@@ -79,6 +86,9 @@ export class ResignManagementService {
     if (params.companyCode) queryParams.companyCode = params.companyCode;
     if (params.costCent) queryParams.costCent = params.costCent;
     if (params.empStatus) queryParams.empStatus = params.empStatus;
+    if (params.adExpiredDate === 'true') queryParams.adExpiredDate = params.adExpiredDate;
+    if (params.yearFrom) queryParams.yearFrom = params.yearFrom;
+    if (params.yearTo) queryParams.yearTo = params.yearTo;
 
     // const headers = new HttpHeaders({
     //   'Authorization': `Bearer ${this.authservice.allData().accessToken}`,

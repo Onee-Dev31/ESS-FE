@@ -3,7 +3,6 @@ import {
   EventEmitter,
   OnInit,
   OnChanges,
-  AfterViewChecked,
   Output,
   Input,
   inject,
@@ -21,6 +20,8 @@ import { MasterDataService } from '../../../services/master-data.service';
 import { AuthService } from '../../../services/auth.service';
 import { FileConverterService } from '../../../services/file-converter';
 import { SwalService } from '../../../services/swal.service';
+import { finalize } from 'rxjs';
+import { mapTaxiClaimDetail, TaxiClaimDetailResponse } from '../../../interfaces/taxi.interface';
 
 @Component({
   selector: 'app-vehicle-taxi-form',
@@ -29,7 +30,7 @@ import { SwalService } from '../../../services/swal.service';
   templateUrl: './vehicle-taxi-form.html',
   styleUrl: './vehicle-taxi-form.scss',
 })
-export class VehicleTaxiFormComponent implements OnInit, OnChanges, AfterViewChecked {
+export class VehicleTaxiFormComponent implements OnInit, OnChanges {
   @Input() requests: any = null;
 
   @Output() onClose = new EventEmitter<void>();
@@ -44,6 +45,8 @@ export class VehicleTaxiFormComponent implements OnInit, OnChanges, AfterViewChe
   private swalService = inject(SwalService);
 
   items: TaxiLogItem[] = [];
+  eligibleDates: TaxiLogItem[] = [];
+  selectedEligibleDate = '';
   locations: TaxiLocation[] = [];
 
   thaiMonths: string[] = [];
@@ -53,13 +56,17 @@ export class VehicleTaxiFormComponent implements OnInit, OnChanges, AfterViewChe
   selectedYear: number = new Date().getFullYear() + 543;
 
   isLoading = false;
+  isSubmitting = false;
   isShowUploadModal: boolean = false;
   currentUploadItem: TaxiLogItem | null = null;
 
   isEditMode = false;
   originalClaimId?: number;
+  originalDetailCount = 0;
 
-  private pendingFocusId: string | null = null;
+  private clientIdSequence = 0;
+  private locationsLoaded = false;
+  private loadSequence = 0;
 
   get pageTitle(): string {
     return this.isEditMode ? 'แก้ไขข้อมูลค่าเดินทาง (Taxi)' : 'บันทึกข้อมูลค่าเดินทาง (Taxi)';
@@ -78,6 +85,7 @@ export class VehicleTaxiFormComponent implements OnInit, OnChanges, AfterViewChe
     this.taxiService.getLocations().subscribe({
       next: (res: any) => {
         this.locations = res.data ?? [];
+        this.locationsLoaded = true;
         this.checkAndLoadData();
       },
       error: () => this.toastService.error('ไม่สามารถโหลดข้อมูลสถานที่ได้'),
@@ -86,15 +94,18 @@ export class VehicleTaxiFormComponent implements OnInit, OnChanges, AfterViewChe
 
   ngOnChanges(changes: SimpleChanges) {
     if (changes['requests']) {
-      this.checkAndLoadData();
+      // Inputs are available before the first template check. Establish the
+      // complete view mode now so it never flips after the initial render.
+      this.isEditMode = Boolean(this.requests);
+      this.originalClaimId = this.requests?.claimId;
+      this.isLoading = true;
+
+      if (this.locationsLoaded) this.checkAndLoadData();
     }
   }
 
-  ngAfterViewChecked() {
-    if (this.pendingFocusId) {
-      const id = this.pendingFocusId;
-      this.pendingFocusId = null;
-
+  private focusFieldAfterRender(id: string): void {
+    setTimeout(() => {
       const desktop = document.getElementById(id) as HTMLInputElement | null;
       const mobile = document.getElementById(`mob-${id}`) as HTMLInputElement | null;
       const el = (desktop?.offsetParent !== null ? desktop : null) ?? mobile ?? desktop;
@@ -103,7 +114,7 @@ export class VehicleTaxiFormComponent implements OnInit, OnChanges, AfterViewChe
         el.focus();
         if (el instanceof HTMLInputElement) el.select();
       }
-    }
+    });
   }
 
   private checkAndLoadData() {
@@ -119,6 +130,7 @@ export class VehicleTaxiFormComponent implements OnInit, OnChanges, AfterViewChe
 
   // ====================== EDIT MODE ======================
   private loadClaimForEdit(claimId: number) {
+    const loadId = ++this.loadSequence;
     this.isLoading = true;
     this.items = [];
     const param = {
@@ -130,51 +142,83 @@ export class VehicleTaxiFormComponent implements OnInit, OnChanges, AfterViewChe
 
     this.taxiService.getTaxiClaims(param).subscribe({
       next: (res: any) => {
+        if (loadId !== this.loadSequence) return;
         const claim = res.data[0] || res;
+        const originalTotalsByDate = new Map<string, number>();
+        const claimDetails = ((claim.details ?? []) as TaxiClaimDetailResponse[]).map(
+          mapTaxiClaimDetail,
+        );
+        claimDetails.forEach((detail) => {
+          const date = this.toDateKey(detail.workDate);
+          const amount = detail.rateAmount;
+          originalTotalsByDate.set(date, (originalTotalsByDate.get(date) || 0) + amount);
+        });
 
-        const itemPromises = (claim.details || []).map(async (d: any) => {
-          const attachedFiles = d.attachments
-            ? await this.fileConvertService.convertUrlsToFiles(d.attachments)
+        const itemPromises = claimDetails.map(async (detail) => {
+          const attachedFiles = detail.attachments.length
+            ? await this.fileConvertService.convertUrlsToFiles(detail.attachments)
             : [];
 
           return {
-            date: d.work_date || d.workDate,
-            description: d.description || '',
+            clientId: this.createClientId(),
+            detailId: detail.detailId,
+            date: detail.workDate,
+            description: detail.description,
             destination: '',
             distance: 0,
-            locationFromId: d.location_from_id || d.locationFromId,
-            locationToId: d.location_to_id || d.locationToId,
-            otherFrom: d.other_from || d.otherFrom || '',
-            otherTo: d.other_to || d.otherTo || '',
-            amount: Number(d.rate_amount || d.amount || 0),
-            shiftCode: d.shift_code || d.shiftCode || '',
+            locationFromId: detail.locationFromId,
+            locationToId: detail.locationToId,
+            otherFrom: detail.otherFrom,
+            otherTo: detail.otherTo,
+            amount: detail.rateAmount,
+            shiftCode: detail.shiftCode ?? '',
             selected: true,
+            attachedFileNames: attachedFiles.map((file: File) => file.name),
             attachedFiles: attachedFiles,
             fileToUpload: null,
-            checkIn: d.check_in || d.time_in,
-            checkOut: d.check_out || d.time_out,
-            dayType: d.day_type || d.dayType,
-            remainingAmount: d.remaining_amount,
+            checkIn: detail.timeIn ?? undefined,
+            checkOut: detail.timeOut ?? undefined,
+            dayType: detail.dayType ?? undefined,
+            remainingAmount: detail.remainingAmount,
+            usedAmount: detail.usedAmount,
+            dailyLimit: detail.dailyLimit,
+            availableAmount:
+              detail.remainingAmount +
+              (originalTotalsByDate.get(this.toDateKey(detail.workDate)) || 0),
+            isEligible: true,
           };
         });
 
-        // ใช้ Promise.all หลัง map เพื่อ resolve ทุก promise
-        Promise.all(itemPromises).then((items) => {
-          this.items = items;
+        Promise.all(itemPromises)
+          .then((items) => {
+            if (loadId !== this.loadSequence) return;
+            // Promise callbacks may resolve between Angular's development-mode
+            // verification passes. Commit the complete snapshot on the next task.
+            setTimeout(() => {
+              if (loadId !== this.loadSequence) return;
+              this.items = items;
+              this.originalDetailCount = items.length;
 
-          if (this.items.length > 0) {
-            const firstDate = new Date(this.items[0].date);
-            this.selectedMonthIndex = firstDate.getMonth();
-            this.selectedYear = firstDate.getFullYear() + 543;
-          }
-        });
+              if (this.items.length > 0) {
+                const [year, month] = this.items[0].date.split('-').map(Number);
+                this.selectedMonthIndex = month - 1;
+                this.selectedYear = year + 543;
+              }
 
-        setTimeout(() => {
-          this.isLoading = false;
-          this.cdr.markForCheck();
-        }, 500);
+              this.isLoading = false;
+              this.cdr.markForCheck();
+            });
+          })
+          .catch((error) => {
+            if (loadId !== this.loadSequence) return;
+            console.error(error);
+            this.isLoading = false;
+            this.toastService.error('ไม่สามารถโหลดไฟล์แนบของรายการเบิกได้');
+            this.onClose.emit();
+          });
       },
       error: (err: any) => {
+        if (loadId !== this.loadSequence) return;
         console.error(err);
         this.isLoading = false;
         this.toastService.error('ไม่สามารถโหลดข้อมูลการเบิกเพื่อแก้ไขได้');
@@ -185,31 +229,46 @@ export class VehicleTaxiFormComponent implements OnInit, OnChanges, AfterViewChe
 
   // ====================== CREATE MODE ======================
   loadEligibleDates() {
+    const loadId = ++this.loadSequence;
     const empCode = this.authService.userData().CODEMPID;
     const month = this.selectedMonthIndex + 1;
 
     this.isLoading = true;
     this.items = [];
+    this.eligibleDates = [];
+    this.selectedEligibleDate = '';
 
     this.taxiService.getEligibleDates(empCode, this.selectedYear, month).subscribe({
       next: (res: any) => {
+        if (loadId !== this.loadSequence) return;
         const rows: any[] = res.data ?? [];
-        this.items = rows.map(
+        this.eligibleDates = rows.map(
           (row: any) =>
             ({
               date: row.workDate ?? row.work_date,
+              clientId: this.createClientId(),
               description: '',
               destination: '',
               distance: 0,
               amount: 0,
               shiftCode: row.shiftCode ?? row.shift_code,
               selected: false,
+              attachedFileNames: [],
               attachedFile: null,
               fileToUpload: null,
               checkIn: row.timeIn ?? row.time_in,
               checkOut: row.timeOut ?? row.time_out,
               dayType: row.dayType ?? row.day_type,
               remainingAmount: row.remainingAmount ?? row.remaining_amount ?? 500,
+              usedAmount: Number(row.usedAmount ?? row.used_amount ?? 0),
+              dailyLimit: Number(
+                row.dailyLimit ??
+                  row.daily_limit ??
+                  (row.remainingAmount ?? row.remaining_amount ?? 500) +
+                    (row.usedAmount ?? row.used_amount ?? 0),
+              ),
+              availableAmount: Number(row.remainingAmount ?? row.remaining_amount ?? 500),
+              isEligible: ![false, 0, '0'].includes(row.isEligible ?? row.is_eligible ?? true),
               locationFromId: undefined,
               locationToId: undefined,
               otherFrom: '',
@@ -221,6 +280,7 @@ export class VehicleTaxiFormComponent implements OnInit, OnChanges, AfterViewChe
         this.cdr.markForCheck();
       },
       error: () => {
+        if (loadId !== this.loadSequence) return;
         this.isLoading = false;
         this.toastService.error('ไม่สามารถโหลดข้อมูลวันที่ได้');
         this.cdr.markForCheck();
@@ -229,6 +289,137 @@ export class VehicleTaxiFormComponent implements OnInit, OnChanges, AfterViewChe
   }
 
   // ====================== Helper Methods ======================
+  private createClientId(): string {
+    this.clientIdSequence += 1;
+    return `taxi-trip-${Date.now()}-${this.clientIdSequence}`;
+  }
+
+  private toDateKey(date: string): string {
+    return date?.split('T')[0] || '';
+  }
+
+  trackByClientId(_index: number, item: TaxiLogItem): string | number {
+    return item.detailId ?? item.clientId;
+  }
+
+  addSelectedDate(): void {
+    const selectedDate = this.eligibleDates.find(
+      (item) => this.toDateKey(item.date) === this.selectedEligibleDate,
+    );
+    if (!selectedDate || !this.canAddTrip(selectedDate)) return;
+    this.addTrip(selectedDate);
+  }
+
+  getTripsForDate(item: TaxiLogItem): TaxiLogItem[] {
+    const date = this.toDateKey(item.date);
+    return this.items.filter((candidate) => this.toDateKey(candidate.date) === date);
+  }
+
+  getTripNumber(item: TaxiLogItem): number {
+    return (
+      this.getTripsForDate(item).findIndex((candidate) => candidate.clientId === item.clientId) + 1
+    );
+  }
+
+  addTrip(source: TaxiLogItem): void {
+    const trip: TaxiLogItem = {
+      ...source,
+      clientId: this.createClientId(),
+      detailId: undefined,
+      description: '',
+      amount: 0,
+      selected: true,
+      locationFromId: undefined,
+      locationToId: undefined,
+      otherFrom: '',
+      otherTo: '',
+      attachedFile: null,
+      attachedFileNames: [],
+      attachedFiles: [],
+      existingFiles: [],
+      fileToUpload: null,
+      amountError: null,
+    };
+    const lastIndexForDate = this.items.reduce(
+      (lastIndex, item, index) =>
+        this.toDateKey(item.date) === this.toDateKey(source.date) ? index : lastIndex,
+      -1,
+    );
+    this.items.splice(lastIndexForDate + 1, 0, trip);
+  }
+
+  removeTrip(item: TaxiLogItem): void {
+    const sameDateTrips = this.getTripsForDate(item);
+    if (!this.isEditMode && sameDateTrips.length === 1) {
+      Object.assign(item, {
+        description: '',
+        amount: 0,
+        selected: false,
+        locationFromId: undefined,
+        locationToId: undefined,
+        otherFrom: '',
+        otherTo: '',
+        attachedFileNames: [],
+        attachedFiles: [],
+        amountError: null,
+      });
+      return;
+    }
+    this.items = this.items.filter((candidate) => candidate.clientId !== item.clientId);
+  }
+
+  getAvailableAmount(item: TaxiLogItem): number {
+    return Number(item.availableAmount ?? item.remainingAmount ?? 0);
+  }
+
+  getDailySelectedTotal(item: TaxiLogItem): number {
+    const date = this.toDateKey(item.date);
+    return this.items
+      .filter((candidate) => candidate.selected && this.toDateKey(candidate.date) === date)
+      .reduce((total, candidate) => total + (Number(candidate.amount) || 0), 0);
+  }
+
+  getDailyAmountError(item: TaxiLogItem): string | null {
+    const total = this.getDailySelectedTotal(item);
+    const available = this.getAvailableAmount(item);
+    return total > available
+      ? `ยอดรวมของวันนี้ ${this.formatNumber(total)} บาท เกินวงเงินที่ใช้ได้ ${this.formatNumber(available)} บาท`
+      : null;
+  }
+
+  getEligibilityText(item: TaxiLogItem): string {
+    if (item.isEligible === false || this.getAvailableAmount(item) <= 0) return 'ใช้วงเงินครบแล้ว';
+    const used = Number(item.usedAmount || 0);
+    const limit = Number(item.dailyLimit || used + Number(item.remainingAmount || 0));
+    return `ใช้แล้ว ${this.formatNumber(used)} / ${this.formatNumber(limit)} บาท — คงเหลือ ${this.formatNumber(Number(item.remainingAmount || 0))} บาท`;
+  }
+
+  getShiftTimeLabel(item: TaxiLogItem): string {
+    const shiftCode = item.shiftCode?.trim();
+    const checkIn = item.checkIn?.trim();
+    const checkOut = item.checkOut?.trim();
+
+    if (!shiftCode && !checkIn && !checkOut) return 'ไม่มีข้อมูลกะ';
+
+    const shiftLabel = shiftCode ? `กะ ${shiftCode}` : '';
+    const timeRange = checkIn || checkOut ? `${checkIn || '-'} - ${checkOut || '-'}` : '';
+    return [shiftLabel, timeRange].filter(Boolean).join(' — ');
+  }
+
+  dayTypeLabel(code: string | undefined): string {
+    const labels: Record<string, string> = {
+      W: 'วันทำงานปกติ',
+      H: 'วันหยุด',
+      T: 'วันหยุดประเพณี',
+      L: 'วันลา',
+    };
+    return code ? (labels[code] ?? code) : '-';
+  }
+
+  canAddTrip(item: TaxiLogItem): boolean {
+    return item.isEligible !== false && this.getAvailableAmount(item) > 0;
+  }
+
   isOtherLocation(locationId: number | undefined): boolean {
     if (!locationId) return false;
     const loc = this.locations.find((l) => l.location_id === locationId);
@@ -252,7 +443,7 @@ export class VehicleTaxiFormComponent implements OnInit, OnChanges, AfterViewChe
         item.otherTo = '';
       }
 
-      this.pendingFocusId = `other-from-${rowIndex}`;
+      this.focusFieldAfterRender(`other-from-${rowIndex}`);
       return;
     }
 
@@ -262,7 +453,7 @@ export class VehicleTaxiFormComponent implements OnInit, OnChanges, AfterViewChe
       item.locationToId = other.location_id;
     }
 
-    this.pendingFocusId = `other-to-${rowIndex}`;
+    this.focusFieldAfterRender(`other-to-${rowIndex}`);
   }
 
   onToLocationChange(item: TaxiLogItem, rowIndex: number) {
@@ -281,7 +472,7 @@ export class VehicleTaxiFormComponent implements OnInit, OnChanges, AfterViewChe
         item.otherFrom = '';
       }
 
-      this.pendingFocusId = `other-to-${rowIndex}`;
+      this.focusFieldAfterRender(`other-to-${rowIndex}`);
       return;
     }
 
@@ -291,7 +482,7 @@ export class VehicleTaxiFormComponent implements OnInit, OnChanges, AfterViewChe
       item.locationFromId = other.location_id;
     }
 
-    this.pendingFocusId = `other-from-${rowIndex}`;
+    this.focusFieldAfterRender(`other-from-${rowIndex}`);
   }
 
   onInputChange(item: TaxiLogItem) {
@@ -318,22 +509,12 @@ export class VehicleTaxiFormComponent implements OnInit, OnChanges, AfterViewChe
     const input = event.target as HTMLInputElement;
 
     // เอาเฉพาะตัวเลข
-    let value = input.value.replace(/[^0-9]/g, '');
+    const value = input.value.replace(/[^0-9]/g, '');
 
     const numericValue = Number(value || 0);
 
-    // 👉 max จาก remaining
-    const maxAmount = item.remainingAmount ?? 0;
-
-    // ❌ ถ้าเกิน
-    if (numericValue > maxAmount) {
-      item.amountError = `จำนวนเงินต้องไม่เกิน ${this.formatNumber(maxAmount)} บาท`;
-    } else {
-      item.amountError = null;
-    }
-
-    // set ค่า
     item.amount = numericValue;
+    item.amountError = this.getDailyAmountError(item);
 
     // format ใส่ comma
     input.value = this.formatNumber(numericValue);
@@ -392,17 +573,23 @@ export class VehicleTaxiFormComponent implements OnInit, OnChanges, AfterViewChe
 
   // ====================== SAVE ======================
   save() {
+    if (this.isSubmitting) return;
+
     const selectedItems = this.items.filter((item) => item.selected);
     const empCode = this.authService.userData().CODEMPID;
-    const details = selectedItems.map((item) => ({
-      work_date: item.date.split('T')[0],
-      description: item.description ?? '',
-      location_from_id: item.locationFromId ?? 0,
-      location_to_id: item.locationToId ?? 0,
-      other_from: item.otherFrom ?? '',
-      other_to: item.otherTo ?? '',
-      rate_amount: Number(item.amount) || 0,
-    }));
+    const details = selectedItems.map((item) => {
+      const detail = {
+        work_date: this.toDateKey(item.date),
+        description: item.description ?? '',
+        location_from_id: item.locationFromId ?? 0,
+        location_to_id: item.locationToId ?? 0,
+        other_from: item.otherFrom ?? '',
+        other_to: item.otherTo ?? '',
+        rate_amount: Number(item.amount) || 0,
+      } as Record<string, string | number>;
+      if (this.isEditMode && item.detailId != null) detail['detail_id'] = item.detailId;
+      return detail;
+    });
 
     const files: any[] = [];
     const detail_indexes: number[] = [];
@@ -437,42 +624,50 @@ export class VehicleTaxiFormComponent implements OnInit, OnChanges, AfterViewChe
       this.swalService.confirm('ยืนยันการลบรายการเบิกทั้งหมด').then((result) => {
         if (!result.isConfirmed) return;
         this.swalService.loading('กำลังบันทึกข้อมูล...');
+        this.isSubmitting = true;
 
-        this.taxiService.deleteTaxiClaim(this.requests.id, empCode).subscribe({
-          next: (res) => {
-            if (!res?.success) {
-              this.swalService.warning('ไม่สามารถบันทึกข้อมูลได้');
-              return;
-            }
+        this.taxiService
+          .deleteTaxiClaim(this.requests.id, empCode)
+          .pipe(finalize(() => (this.isSubmitting = false)))
+          .subscribe({
+            next: (res) => {
+              if (!res?.success) {
+                this.swalService.warning('ไม่สามารถบันทึกข้อมูลได้');
+                return;
+              }
 
-            this.swalService.success(res.message || 'ลบรายการเบิกสำเร็จ');
-            this.onClose.emit();
-          },
+              this.swalService.success(res.message || 'ลบรายการเบิกสำเร็จ');
+              this.onClose.emit();
+            },
 
-          error: (error) => {
-            console.error('Delete Taxi Claim Error:', error);
+            error: (error) => {
+              console.error('Delete Taxi Claim Error:', error);
 
-            this.swalService.warning(
-              'เกิดข้อผิดพลาด',
-              error?.message || 'ไม่สามารถติดต่อเซิร์ฟเวอร์ได้',
-            );
-          },
-        });
+              this.swalService.warning(
+                'เกิดข้อผิดพลาด',
+                error?.message || 'ไม่สามารถติดต่อเซิร์ฟเวอร์ได้',
+              );
+            },
+          });
       });
       return;
     }
 
     // EDIT
     if (this.isEditMode && this.originalClaimId) {
-      this.taxiService.updateTaxiClaim(this.originalClaimId, formData).subscribe({
-        next: () => {
-          this.toastService.success('แก้ไขรายการเบิกเรียบร้อยแล้ว');
-          this.onClose.emit();
-        },
-        error: (error) => {
-          this.toastService.warning(error.error.message);
-        },
-      });
+      this.isSubmitting = true;
+      this.taxiService
+        .updateTaxiClaim(this.originalClaimId, formData)
+        .pipe(finalize(() => (this.isSubmitting = false)))
+        .subscribe({
+          next: () => {
+            this.toastService.success('แก้ไขรายการเบิกเรียบร้อยแล้ว');
+            this.onClose.emit();
+          },
+          error: (error) => {
+            this.toastService.warning(this.getApiErrorMessage(error));
+          },
+        });
       return;
     }
 
@@ -481,16 +676,19 @@ export class VehicleTaxiFormComponent implements OnInit, OnChanges, AfterViewChe
       this.swalService.warning('กรุณาเลือกวันที่ต้องการดำเนินการเบิก');
     } else {
       // Create
-      this.taxiService.createTaxiClaim(formData).subscribe({
-        next: () => {
-          this.toastService.success('สร้างรายการเบิกเรียบร้อยแล้ว');
-          this.onClose.emit();
-        },
-        error: (error) => {
-          // this.swalService.warning(error.error.message)
-          this.toastService.warning(error.error.message);
-        },
-      });
+      this.isSubmitting = true;
+      this.taxiService
+        .createTaxiClaim(formData)
+        .pipe(finalize(() => (this.isSubmitting = false)))
+        .subscribe({
+          next: () => {
+            this.toastService.success('สร้างรายการเบิกเรียบร้อยแล้ว');
+            this.onClose.emit();
+          },
+          error: (error) => {
+            this.toastService.warning(this.getApiErrorMessage(error));
+          },
+        });
     }
   }
 
@@ -516,10 +714,27 @@ export class VehicleTaxiFormComponent implements OnInit, OnChanges, AfterViewChe
   }
 
   // Validate
+  private getApiErrorMessage(error: any): string {
+    return (
+      error?.error?.message ||
+      error?.response?.data?.message ||
+      error?.message ||
+      'ไม่สามารถบันทึกข้อมูลได้'
+    );
+  }
+
   isItemValid(item: any): boolean {
+    if (!this.toDateKey(item.date)) return false;
+
+    if (item.isEligible === false && !this.isEditMode) return false;
+
     if (!item.description?.trim()) return false;
 
     if (!item.locationFromId || !item.locationToId) return false;
+
+    const from = this.locations.find((location) => location.location_id === item.locationFromId);
+    const to = this.locations.find((location) => location.location_id === item.locationToId);
+    if (!from?.is_office && !to?.is_office) return false;
 
     if (this.isOtherLocation(item.locationFromId) && !item.otherFrom?.trim()) return false;
 
@@ -527,13 +742,20 @@ export class VehicleTaxiFormComponent implements OnInit, OnChanges, AfterViewChe
 
     if (!item.amount || item.amount <= 0) return false;
 
-    if (item.amount > item.remainingAmount) return false;
+    if (this.getDailyAmountError(item)) return false;
 
     return true;
   }
 
   areAllItemsValid(): boolean {
-    return this.items.filter((item) => item.selected).every((item) => this.isItemValid(item));
+    const selectedItems = this.items.filter((item) => item.selected);
+    return selectedItems.length > 0 && selectedItems.every((item) => this.isItemValid(item));
+  }
+
+  isSubmitDisabled(): boolean {
+    if (this.isSubmitting) return true;
+    if (this.isEditMode && this.hasDelete()) return false;
+    return !this.areAllItemsValid();
   }
 
   isKeep(): number {
@@ -542,8 +764,11 @@ export class VehicleTaxiFormComponent implements OnInit, OnChanges, AfterViewChe
   }
 
   isDelete(): number {
-    const selectedLogs = this.items.filter((item) => !item.selected);
-    return selectedLogs.length;
+    if (this.isEditMode) {
+      const keptExistingItems = this.items.filter((item) => item.selected && item.detailId != null);
+      return Math.max(0, this.originalDetailCount - keptExistingItems.length);
+    }
+    return this.items.filter((item) => !item.selected).length;
   }
 
   totalClaims(): string {

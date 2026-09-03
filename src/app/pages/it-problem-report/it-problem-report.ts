@@ -7,6 +7,7 @@ import {
   ChangeDetectorRef,
   effect,
   Input,
+  ViewChild,
 } from '@angular/core';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
@@ -26,6 +27,12 @@ import { AuthService } from '../../services/auth.service';
 import { finalize } from 'rxjs';
 import { NzSelectModule } from 'ng-zorro-antd/select';
 import { SignalrService } from '../../services/signalr.service';
+import { QuillEditorComponent, QuillModule } from 'ngx-quill';
+import Quill from 'quill';
+import { TextEditorImageService } from '../../services/text-editor-image.service';
+import { TextEditorComponent } from '../../components/shared/text-editor/text-editor';
+import { IT_ATTACHMENT_FILE_CONFIG } from '../../constants/it-attachment-file.constant';
+import { PageLoaderComponent } from '../../components/shared/page-loader/page-loader';
 
 @Component({
   selector: 'app-it-problem-report',
@@ -36,6 +43,9 @@ import { SignalrService } from '../../services/signalr.service';
     PageHeaderComponent,
     FilePreviewModalComponent,
     NzSelectModule,
+    QuillModule,
+    TextEditorComponent,
+    PageLoaderComponent,
   ],
   templateUrl: './it-problem-report.html',
   styleUrl: './it-problem-report.scss',
@@ -48,6 +58,7 @@ export class ItProblemReportComponent implements OnInit {
   private signalrService = inject(SignalrService);
   private itServiceMock = inject(ItServiceMockService);
   private itServiceService = inject(ItServiceService);
+  private textEditorImageService = inject(TextEditorImageService);
   private authService = inject(AuthService);
   private cdr = inject(ChangeDetectorRef);
 
@@ -77,20 +88,19 @@ export class ItProblemReportComponent implements OnInit {
   ccSearched = signal<boolean>(false);
   readonly CC_CATEGORIES = ['BMS', 'Oracle', 'Onee App'];
 
-  readonly FILE_CONFIG = {
-    maxFiles: 5,
-    maxSizeMB: 5,
-    allowedTypes: [
-      'image/jpeg',
-      'image/png',
-      'image/gif',
-      'application/pdf',
-      'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-      'application/vnd.ms-excel',
-    ],
-    allowedExtensions: ['jpg', 'jpeg', 'png', 'gif', 'pdf', 'docx', 'xlsx', 'xls'],
-  };
+  // Editor
+  // editorImagePaths: string[] = [];
+  @ViewChild(TextEditorComponent)
+  textEditor!: TextEditorComponent;
+
+  readonly FILE_CONFIG = IT_ATTACHMENT_FILE_CONFIG;
+  formErrors = signal<Record<string, string>>({});
+  private initialLoadsPending = signal(2);
+  isPageLoading = computed(() => this.initialLoadsPending() > 0);
+
+  private completeInitialLoad() {
+    this.initialLoadsPending.update((count) => Math.max(0, count - 1));
+  }
 
   ngOnInit() {
     this.getSubProblem();
@@ -140,6 +150,7 @@ export class ItProblemReportComponent implements OnInit {
       this.phoneError = 'เบอร์โทรศัพท์ต้องมี 4 หรือ 10 หลักเท่านั้น';
     } else {
       this.phoneError = '';
+      this.clearFormError('phone');
     }
   }
 
@@ -150,11 +161,12 @@ export class ItProblemReportComponent implements OnInit {
 
   isFormValid = computed(() => {
     const { topic, detail, categories, phoneNumber } = this.problemFormData();
+    const phoneDigits = phoneNumber.replace(/\D/g, '');
     return (
-      topic.trim().length > 0 &&
-      detail.trim().length > 0 &&
+      topic?.trim().length > 0 &&
+      this.hasText(detail) &&
       categories.length > 0 &&
-      phoneNumber !== '' &&
+      (phoneDigits.length === 4 || phoneDigits.length === 10) &&
       !this.phoneError
     );
   });
@@ -170,6 +182,7 @@ export class ItProblemReportComponent implements OnInit {
       ...current,
       categories: isSelected ? [] : [cat],
     });
+    if (!isSelected) this.clearFormError('categories');
   }
 
   onDragOver(event: DragEvent) {
@@ -189,8 +202,53 @@ export class ItProblemReportComponent implements OnInit {
     this.addFiles(files);
   }
 
-  private addFiles(files: FileList) {
-    if (!files || files.length === 0) return;
+  // private addFiles(files: FileList) {
+  //   if (!files || files.length === 0) return;
+
+  //   const current = this.problemFormData().attachments;
+  //   const errors: string[] = [];
+  //   const validFiles: { name: string; size: number; file: File }[] = [];
+
+  //   for (const f of Array.from(files)) {
+  //     const reasons: string[] = [];
+
+  //     // เช็คจำนวน
+  //     if (current.length + validFiles.length >= this.FILE_CONFIG.maxFiles) {
+  //       reasons.push(`เกินจำนวนสูงสุด ${this.FILE_CONFIG.maxFiles} ไฟล์`);
+  //     }
+
+  //     // เช็คขนาด
+  //     const sizeMB = f.size / (1024 * 1024);
+  //     if (sizeMB > this.FILE_CONFIG.maxSizeMB) {
+  //       reasons.push(`ขนาดเกิน ${this.FILE_CONFIG.maxSizeMB} MB`);
+  //     }
+
+  //     // เช็ค type
+  //     const ext = f.name.split('.').pop()?.toLowerCase() ?? '';
+  //     if (
+  //       !this.FILE_CONFIG.allowedTypes.includes(f.type) &&
+  //       !this.FILE_CONFIG.allowedExtensions.includes(ext)
+  //     ) {
+  //       reasons.push(`ประเภทไฟล์ไม่รองรับ`);
+  //     }
+
+  //     if (reasons.length > 0) {
+  //       errors.push(`${f.name} (${reasons.join(', ')})`);
+  //       this.swalService.warning(errors.join('\n'));
+  //     } else {
+  //       validFiles.push({ name: f.name, size: f.size, file: f });
+  //     }
+  //   }
+
+  //   if (validFiles.length > 0) {
+  //     this.problemFormData.update((data) => ({
+  //       ...data,
+  //       attachments: [...current, ...validFiles],
+  //     }));
+  //   }
+  // }
+  private addFiles(files: FileList): boolean {
+    if (!files || files.length === 0) return false;
 
     const current = this.problemFormData().attachments;
     const errors: string[] = [];
@@ -199,58 +257,49 @@ export class ItProblemReportComponent implements OnInit {
     for (const f of Array.from(files)) {
       const reasons: string[] = [];
 
-      // เช็คจำนวน
       if (current.length + validFiles.length >= this.FILE_CONFIG.maxFiles) {
         reasons.push(`เกินจำนวนสูงสุด ${this.FILE_CONFIG.maxFiles} ไฟล์`);
       }
 
-      // เช็คขนาด
       const sizeMB = f.size / (1024 * 1024);
       if (sizeMB > this.FILE_CONFIG.maxSizeMB) {
         reasons.push(`ขนาดเกิน ${this.FILE_CONFIG.maxSizeMB} MB`);
       }
 
-      // เช็ค type
       const ext = f.name.split('.').pop()?.toLowerCase() ?? '';
       if (
         !this.FILE_CONFIG.allowedTypes.includes(f.type) &&
         !this.FILE_CONFIG.allowedExtensions.includes(ext)
       ) {
-        reasons.push(`ประเภทไฟล์ไม่รองรับ`);
+        reasons.push('ประเภทไฟล์ไม่รองรับ');
       }
 
       if (reasons.length > 0) {
         errors.push(`${f.name} (${reasons.join(', ')})`);
-        this.swalService.warning(errors.join('\n'));
       } else {
-        validFiles.push({ name: f.name, size: f.size, file: f });
+        validFiles.push({
+          name: f.name,
+          size: f.size,
+          file: f,
+        });
       }
     }
 
-    if (validFiles.length > 0) {
+    if (errors.length) {
+      this.swalService.warning(errors.join('\n'));
+    }
+
+    if (validFiles.length) {
       this.problemFormData.update((data) => ({
         ...data,
         attachments: [...current, ...validFiles],
       }));
+
+      return true;
     }
+
+    return false;
   }
-
-  // private addFiles(files: FileList) {
-  //   if (files && files.length > 0) {
-  //     const newAttachments = Array.from(files).map((f) => ({
-  //       name: f.name,
-  //       size: f.size,
-  //       file: f,
-  //     }));
-
-  //     const currentAttachments = this.problemFormData().attachments;
-
-  //     this.problemFormData.set({
-  //       ...this.problemFormData(),
-  //       attachments: [...currentAttachments, ...newAttachments],
-  //     });
-  //   }
-  // }
 
   viewFile(fileObj: any) {
     if (fileObj.file) {
@@ -283,6 +332,8 @@ export class ItProblemReportComponent implements OnInit {
     });
   }
 
+  // STEP 2
+
   showSummaryModal = signal(false);
 
   submittedRequests = signal<any[]>([
@@ -305,9 +356,14 @@ export class ItProblemReportComponent implements OnInit {
   }
 
   submit() {
-    const data = this.problemFormData();
-    if (!data.topic.trim() || !data.detail.trim()) {
-      this.swalService.warning('แจ้งเตือน', 'กรุณากรอกข้อมูลให้ครบทุกช่อง');
+    // console.log('problemFormData', this.problemFormData());
+    // console.log('detail', this.problemFormData().detail);
+    if (!this.isFormValid() || (this.openBy === 'IT' && !this.selectedOpenFor())) {
+      this.markSubmitErrors();
+      this.swalService.warning('ข้อมูลไม่ครบ', 'กรุณาตรวจสอบช่องที่มีข้อความแจ้งเตือน').then(() => {
+        (document.activeElement as HTMLElement | null)?.blur();
+        setTimeout(() => this.focusFirstInvalidField(), 300);
+      });
       return;
     }
     this.problemFormData.update((data) => ({ ...data, phoneNumber: this.phoneModel }));
@@ -315,6 +371,8 @@ export class ItProblemReportComponent implements OnInit {
   }
 
   clearForm() {
+    this.formErrors.set({});
+    this.textEditor.clear();
     const original = this.authData.employee.TELOFF;
     this.phoneModel = '';
     this.cdr.detectChanges();
@@ -341,7 +399,7 @@ export class ItProblemReportComponent implements OnInit {
     const data = this.problemFormData();
     const formData = new FormData();
     formData.append('subject', data.topic);
-    formData.append('description', data.detail);
+    // formData.append('description', data.detail);
     formData.append('requesterAduser', this.authService.currentUser() || '-');
     formData.append('subCategoryId', data.categories[0].id);
     formData.append('contactPhone', data.phoneNumber);
@@ -375,6 +433,20 @@ export class ItProblemReportComponent implements OnInit {
     console.log('formData', [...formData.entries()]);
 
     this.swalService.loading('กำลังบันทึกข้อมูล...');
+
+    this.textEditor.confirmImages().subscribe({
+      next: (description) => {
+        formData.append('description', description);
+
+        this.createTicket(formData);
+      },
+      error: (err) => {
+        console.error(err);
+      },
+    });
+  }
+
+  private createTicket(formData: FormData) {
     this.itServiceService
       .createTicket(formData)
       .pipe(
@@ -385,7 +457,6 @@ export class ItProblemReportComponent implements OnInit {
       .subscribe({
         next: (res) => {
           if (res.success) {
-            // this.signalrService.sendNewTicketNotification(res.ticketNumber);
             this.swalService.success('แจ้งปัญหาสำเร็จ', res.ticketNumber).then(() => {
               this.clearForm();
               this.router.navigate(['/it-service-list']);
@@ -393,12 +464,12 @@ export class ItProblemReportComponent implements OnInit {
           }
         },
         error: (error) => {
-          console.error('Error fetching data:', error.error.message);
+          console.error(error.error.message);
+
           this.swalService.warning('เกิดข้อผิดพลาด', error.error.message).then(() => {
             this.clearForm();
             this.router.navigate(['/it-service-list']);
           });
-          // const message = error?.error?.message || '';
         },
       });
   }
@@ -418,23 +489,27 @@ export class ItProblemReportComponent implements OnInit {
 
   // GET MASTER
   getSubProblem() {
-    this.itServiceService.getSubProblem().subscribe({
-      next: (res) => {
-        // console.log(res);
-        this.availableCategories = (res.data ?? []).sort(
-          (a: any, b: any) => Number(a.display_order ?? 0) - Number(b.display_order ?? 0),
-        );
-        this.cdr.detectChanges();
-      },
-      error: (error) => {
-        console.error('Error fetching data:', error);
-      },
-    });
+    this.itServiceService
+      .getSubProblem()
+      .pipe(finalize(() => this.completeInitialLoad()))
+      .subscribe({
+        next: (res) => {
+          // console.log(res);
+          this.availableCategories = (res.data ?? []).sort(
+            (a: any, b: any) => Number(a.display_order ?? 0) - Number(b.display_order ?? 0),
+          );
+          this.cdr.detectChanges();
+        },
+        error: (error) => {
+          console.error('Error fetching data:', error);
+        },
+      });
   }
 
   getOpenFor() {
     this.itServiceService
       .getOpenFor({ currentEmpId: this.authService.userData().CODEMPID })
+      .pipe(finalize(() => this.completeInitialLoad()))
       .subscribe({
         next: (res) => {
           this.openForOptions.set(res.data);
@@ -449,4 +524,63 @@ export class ItProblemReportComponent implements OnInit {
     const { categories } = this.problemFormData();
     return categories.some((cat) => this.CC_CATEGORIES.includes(cat.sub_category_name));
   });
+
+  onOpenForChange(value: string) {
+    this.selectedOpenFor.set(value);
+    if (value) this.clearFormError('openFor');
+  }
+
+  onTopicChange(value: string) {
+    this.problemFormData.update((data) => ({ ...data, topic: value }));
+    if (value.trim()) this.clearFormError('topic');
+  }
+
+  onDetailChange(value: string) {
+    this.problemFormData.update((data) => ({ ...data, detail: value }));
+    if (this.hasText(value)) this.clearFormError('detail');
+  }
+
+  private markSubmitErrors() {
+    const data = this.problemFormData();
+    const phoneDigits = (data.phoneNumber || this.phoneModel).replace(/\D/g, '');
+    const errors: Record<string, string> = {};
+
+    if (this.openBy === 'IT' && !this.selectedOpenFor())
+      errors['openFor'] = 'กรุณาเลือกผู้ขอใช้บริการ';
+    if (!data.topic.trim()) errors['topic'] = 'กรุณากรอกหัวข้อปัญหา';
+    if (!data.categories.length) errors['categories'] = 'กรุณาเลือกหมวดหมู่ปัญหา';
+    if (!this.hasText(data.detail)) errors['detail'] = 'กรุณากรอกรายละเอียดปัญหา';
+    if (phoneDigits.length !== 4 && phoneDigits.length !== 10) {
+      errors['phone'] = 'กรุณากรอกเบอร์โทรศัพท์ 4 หรือ 10 หลัก';
+    }
+
+    this.formErrors.set(errors);
+  }
+
+  private hasText(value: string) {
+    return (
+      value
+        .replace(/<[^>]*>/g, '')
+        .replace(/&nbsp;/g, ' ')
+        .trim().length > 0
+    );
+  }
+
+  private clearFormError(key: string) {
+    if (!this.formErrors()[key]) return;
+    const errors = { ...this.formErrors() };
+    delete errors[key];
+    this.formErrors.set(errors);
+  }
+
+  private focusFirstInvalidField() {
+    const invalid = document.querySelector<HTMLElement>('.it-request-page .validation-row-error');
+    if (!invalid) return;
+    invalid.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    setTimeout(() => {
+      invalid
+        .querySelector<HTMLElement>('input, textarea, button, [contenteditable="true"], nz-select')
+        ?.focus({ preventScroll: true });
+    }, 400);
+  }
 }

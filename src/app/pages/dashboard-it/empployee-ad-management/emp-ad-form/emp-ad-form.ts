@@ -22,7 +22,8 @@ import { SwalService } from '../../../../services/swal.service';
 export class EmpAdForm implements OnChanges {
   @Input() mode: 'view' | 'add' = 'view';
   @Input() employeeId: string = '';
-  @Output() onSaveSuccess = new EventEmitter<void>();
+  @Output() onSaveSuccess = new EventEmitter<any>();
+  @Input() isRequestUser = false;
 
   isLoading = false;
   isSaving = false;
@@ -45,8 +46,6 @@ export class EmpAdForm implements OnChanges {
     'department',
     'headEmployeeCode',
     'adUser',
-    'email',
-    'mobile',
   ];
 
   // View form
@@ -126,10 +125,27 @@ export class EmpAdForm implements OnChanges {
     this.selectedCompany = company;
     this.addForm.companyCode = company?.COMPANY_CODE ?? '';
     this.addForm.companyName = company?.COMPANY_NAME ?? '';
+    this.addForm.employeeCode = '';
     this.addForm.department = '';
     this.filteredDepartmentList = company
       ? this.departmentList.filter((d) => d.COMPANY_CODE === company.COMPANY_CODE)
       : [];
+
+    if (!this.addForm.companyCode) return;
+
+    const companyCode = this.addForm.companyCode;
+    this.empAdService.getfreelanceCode(companyCode).subscribe({
+      next: (res) => {
+        if (this.addForm.companyCode !== companyCode) return;
+        this.addForm.employeeCode = res?.data?.CODEMPID ?? '';
+        this.cdr.detectChanges();
+      },
+      error: () => {
+        if (this.addForm.companyCode !== companyCode) return;
+        this.addForm.employeeCode = '';
+        this.cdr.detectChanges();
+      },
+    });
   }
 
   ngOnChanges() {
@@ -195,7 +211,15 @@ export class EmpAdForm implements OnChanges {
 
   saveEmployee() {
     this.submitted = true;
-    const hasError = this.requiredFields.some((f) => !this.addForm[f]);
+    // const hasError = this.requiredFields.some((f) => !this.addForm[f]);
+    const excludedFields = this.isRequestUser
+      ? ['employeeCode', 'jobPosition', 'statusEmployee', 'floor', 'adUser']
+      : [];
+
+    const requiredFields = this.requiredFields.filter((f) => !excludedFields.includes(f));
+
+    const hasError = requiredFields.some((f) => !this.addForm[f]);
+
     if (hasError) return;
 
     const selectedJob = this.jobPositionList.find(
@@ -233,13 +257,16 @@ export class EmpAdForm implements OnChanges {
       NUMBANK: this.addForm.numberBank,
       COMPANY_CODE: this.addForm.companyCode,
       COMPANY_NAME: this.addForm.companyName,
-      EMAIL: this.addForm.email,
-      USR_MOBILE: this.addForm.mobile,
       DEPARTMENT: this.addForm.department,
       CODEMPIDH: this.addForm.headEmployeeCode,
       HEAD_NAME: selectedHead?.NAMETHAI ?? '',
       AD_USER: this.addForm.adUser,
     };
+
+    if (this.isRequestUser) {
+      this.onSaveSuccess.emit(payload);
+      return;
+    }
 
     this.isSaving = true;
     this.onSaveSuccess.emit(); // ปิด modal ก่อน

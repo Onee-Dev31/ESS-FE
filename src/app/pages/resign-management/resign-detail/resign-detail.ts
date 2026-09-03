@@ -88,6 +88,9 @@ interface FreelanceFormData {
   styleUrl: './resign-detail.scss',
 })
 export class ResignDetail {
+  readonly currentYear = new Date().getFullYear();
+  readonly currentBuddhistYear = this.currentYear + 543;
+
   getEmployeeImage(empCode: string): string {
     return `${environment.employeeImageUrl}/${empCode}.jpg`;
   }
@@ -142,15 +145,18 @@ export class ResignDetail {
   effectiveDate = signal<Date | null>(null);
 
   tabs = [
-    { name: 'Approved', key: 'approved' },
-    { name: 'Waiting', key: 'waiting' },
+    { name: 'Waiting', key: 'waiting', icon: 'fa-solid fa-clock' },
+    { name: 'Approved', key: 'approved', icon: 'fa-solid fa-circle-check' },
   ];
-  activeTab: string = 'approved';
+
+  activeTab: string = 'waiting';
   activeTabIndex: number = 0;
 
   selectTab(index: number) {
     this.activeTabIndex = index;
     this.activeTab = this.tabs[index].key;
+    this.selectedEmployees.set(new Map());
+    this.selectedFreelance.set(new Map());
     this.loadInitialData();
   }
 
@@ -232,7 +238,6 @@ export class ResignDetail {
 
       this.resignService.updateADManagementResign(payload).subscribe({
         next: (res) => {
-          console.log(res);
           this.swalService.success('สำเร็จ', '');
           this.loadInitialData();
         },
@@ -521,7 +526,7 @@ export class ResignDetail {
 
   // Function
   private mapApiData(items: any[]): EmployeeFormData[] {
-    // console.log("items >> ", items)
+    // console.log('items >> ', items);
     return items.map((item: any) => ({
       empCode: item.CODEMPID,
       firstNameTh: item.NAMFIRSTT,
@@ -629,8 +634,8 @@ export class ResignDetail {
   }
 
   viewReportResign(command: 'fulltime' | 'freelance') {
-    console.log(command);
-    window.open(`/resign-management/report?type=${command}`, '_blank');
+    const status = this.activeTab === 'approved' ? 'true' : 'false';
+    window.open(`/resign-management/report?type=${command}&status=${status}`, '_blank');
     //  window.open(`/it-dashboard/report-detail?id=${encodeURIComponent(encryptedId)}`, '_blank');
   }
 
@@ -672,6 +677,8 @@ export class ResignDetail {
       costCent: department?.COSTCENT,
       empStatus: status,
       adExpiredDate: this.activeTab === 'approved' ? 'true' : 'false',
+      yearFrom: this.currentYear,
+      yearTo: this.currentYear,
     });
   }
 

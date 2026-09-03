@@ -1,0 +1,213 @@
+<div class="page">
+  <app-page-header title="ตั้งค่าข้อความเงื่อนไขการเบิกค่าพาหนะ"></app-page-header>
+
+  <p class="hint-note">
+    <i class="fas fa-circle-info"></i>
+    ใช้ <code>{{ '{earlyCheckin}' }}</code> / <code>{{ '{lateCheckout}' }}</code> /
+    <code>{{ '{lateTolerance}' }}</code> แทนค่าตัวเลขจากเงื่อนไขปัจจุบัน และ
+    <code>**ข้อความ**</code> เพื่อแสดงเป็นตัวหนา
+  </p>
+
+  <div class="content-card taxi-limit-card">
+    <h3 class="taxi-limit-title"><i class="fas fa-car"></i> เงื่อนไขการเบิกค่าพาหนะ</h3>
+
+    @if (voucherConditionsLoading()) {
+      <app-skeleton type="table" [rows]="1"></app-skeleton>
+    } @else if (isEditingVoucherCondition()) {
+      <div class="taxi-limit-edit">
+        <label>
+          เข้างานก่อนเวลา
+          <input type="time" class="inline-input" [(ngModel)]="draftEarlyCheckin" />
+        </label>
+        <label>
+          ออกงานหลังชั่วโมง
+          <input
+            type="number"
+            class="inline-input"
+            [(ngModel)]="draftLateCheckoutHour"
+            min="0"
+            max="23"
+          />
+        </label>
+        <label>
+          เข้างานสายได้ไม่เกิน (นาที)
+          <input type="number" class="inline-input" [(ngModel)]="draftLateToleranceMin" min="0" />
+        </label>
+        <label>
+          มีผลตั้งแต่วันที่
+          <input type="date" class="inline-input" [(ngModel)]="draftVoucherEffectiveFrom" />
+        </label>
+        <button
+          class="btn-save"
+          (click)="saveVoucherCondition()"
+          [disabled]="voucherConditionSaving()"
+          type="button"
+        >
+          @if (voucherConditionSaving()) {
+            <i class="fas fa-spinner fa-spin"></i>
+          } @else {
+            <i class="fas fa-check"></i>
+          }
+          บันทึก
+        </button>
+        <button class="btn-cancel" (click)="cancelEditVoucherCondition()" type="button">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+    } @else {
+      <div class="taxi-limit-view">
+        <span class="taxi-limit-value">
+          เข้าก่อน {{ activeVoucherCondition()?.early_checkin_time?.slice(0, 5) ?? '-' }} น. /
+          ออกหลัง {{ activeVoucherCondition()?.late_checkout_hour ?? '-' }}:00 น. / สายได้ไม่เกิน
+          {{ activeVoucherCondition()?.late_tolerance_min ?? '-' }} นาที
+        </span>
+        @if (activeVoucherCondition()?.effective_from) {
+          <span class="taxi-limit-effective">
+            (มีผลตั้งแต่ {{ activeVoucherCondition()?.effective_from }})
+          </span>
+        }
+        <button class="btn-edit" (click)="startEditVoucherCondition()" type="button">
+          <i class="fas fa-pen"></i> แก้ไข
+        </button>
+      </div>
+    }
+  </div>
+
+  <div class="content-card taxi-limit-card">
+    <h3 class="taxi-limit-title"><i class="fas fa-taxi"></i> วงเงินสูงสุดต่อวัน (Taxi)</h3>
+
+    @if (taxiConditionsLoading()) {
+      <app-skeleton type="table" [rows]="1"></app-skeleton>
+    } @else if (isEditingTaxiLimit()) {
+      <div class="taxi-limit-edit">
+        <label>
+          วงเงินสูงสุด/วัน (บาท)
+          <input type="number" class="inline-input" [(ngModel)]="draftTaxiDailyLimit" min="1" />
+        </label>
+        <label>
+          มีผลตั้งแต่วันที่
+          <input type="date" class="inline-input" [(ngModel)]="draftTaxiEffectiveFrom" />
+        </label>
+        <button
+          class="btn-save"
+          (click)="saveTaxiLimit()"
+          [disabled]="taxiConditionSaving()"
+          type="button"
+        >
+          @if (taxiConditionSaving()) {
+            <i class="fas fa-spinner fa-spin"></i>
+          } @else {
+            <i class="fas fa-check"></i>
+          }
+          บันทึก
+        </button>
+        <button class="btn-cancel" (click)="cancelEditTaxiLimit()" type="button">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+    } @else {
+      <div class="taxi-limit-view">
+        <span class="taxi-limit-value">
+          {{ activeTaxiCondition()?.daily_limit ?? '-' }} บาท/วัน
+        </span>
+        @if (activeTaxiCondition()?.effective_from) {
+          <span class="taxi-limit-effective">
+            (มีผลตั้งแต่ {{ activeTaxiCondition()?.effective_from }})
+          </span>
+        }
+        <button class="btn-edit" (click)="startEditTaxiLimit()" type="button">
+          <i class="fas fa-pen"></i> แก้ไข
+        </button>
+      </div>
+    }
+  </div>
+
+  <div class="content-card">
+    @if (loading()) {
+      <app-skeleton type="table" [rows]="6"></app-skeleton>
+    } @else if (rows().length === 0) {
+      <app-empty-state
+        title="ไม่พบข้อมูล"
+        description="ไม่พบข้อความเงื่อนไขการเบิกค่าพาหนะ"
+        icon="fas fa-file-circle-exclamation"
+      ></app-empty-state>
+    } @else {
+      <div class="table-responsive">
+        <table class="modern-table">
+          <thead>
+            <tr>
+              <th class="col-label">ตำแหน่ง</th>
+              <th class="col-content">ข้อความ</th>
+              <th class="col-vars">ตัวแปร</th>
+              <th class="col-actions">จัดการ</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (row of rows(); track row.id) {
+              <tr [class.row--editing]="isEditing(row.id)">
+                <td class="col-label">
+                  <span class="row-label">{{ row.label }}</span>
+                  <code class="text-key">{{ row.text_key }}</code>
+                </td>
+
+                <td class="col-content">
+                  @if (isEditing(row.id)) {
+                    <textarea
+                      class="inline-input"
+                      [(ngModel)]="draftContent"
+                      rows="3"
+                      placeholder="ข้อความ..."
+                    ></textarea>
+                  } @else {
+                    <span class="field-value">{{ row.content }}</span>
+                  }
+                </td>
+
+                <td class="col-vars">
+                  <div class="var-chips">
+                    @for (
+                      v of extractVars(isEditing(row.id) ? draftContent : row.content);
+                      track v
+                    ) {
+                      <span class="var-chip">{{ v }}</span>
+                    }
+                  </div>
+                </td>
+
+                <td class="col-actions">
+                  @if (isEditing(row.id)) {
+                    <button
+                      class="btn-save"
+                      (click)="save(row)"
+                      [disabled]="isSaving(row.id)"
+                      type="button"
+                    >
+                      @if (isSaving(row.id)) {
+                        <i class="fas fa-spinner fa-spin"></i>
+                      } @else {
+                        <i class="fas fa-check"></i>
+                      }
+                      บันทึก
+                    </button>
+                    <button class="btn-cancel" (click)="cancelEdit()" type="button">
+                      <i class="fas fa-times"></i>
+                    </button>
+                  } @else {
+                    <button
+                      class="btn-edit"
+                      (click)="startEdit(row)"
+                      [disabled]="editingId() !== null"
+                      type="button"
+                    >
+                      <i class="fas fa-pen"></i> แก้ไข
+                    </button>
+                  }
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </div>
+</div>

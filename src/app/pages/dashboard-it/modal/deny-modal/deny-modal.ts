@@ -1,15 +1,19 @@
 import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { FormsModule, NgForm } from '@angular/forms';
+import { ModalShellComponent } from '../../../../components/shared/modal-shell/modal-shell';
 
 @Component({
   selector: 'app-deny-modal',
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, ModalShellComponent],
   templateUrl: './deny-modal.html',
   styleUrl: './deny-modal.scss',
 })
 export class DenyModal {
   @Input() ticket: any;
+  @Input() title = 'เหตุผลในการยกเลิก';
+  @Input() placeholder = 'อธิบายรายละเอียด...';
+  @Input() validationMessage = 'กรุณากรอกเหตุผลในการยกเลิก';
   @Output() submitModal = new EventEmitter<any>();
   @Output() closeModal = new EventEmitter<void>();
 

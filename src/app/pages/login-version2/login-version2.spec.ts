@@ -1,16 +1,17 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { ITServiceRequestComponent } from './it-service-request';
 
-describe('ITServiceRequestComponent', () => {
-  let component: ITServiceRequestComponent;
-  let fixture: ComponentFixture<ITServiceRequestComponent>;
+import { LoginVersion2 } from './login-version2';
+
+describe('LoginVersion2', () => {
+  let component: LoginVersion2;
+  let fixture: ComponentFixture<LoginVersion2>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [ITServiceRequestComponent],
+      imports: [LoginVersion2],
     }).compileComponents();
 
-    fixture = TestBed.createComponent(ITServiceRequestComponent);
+    fixture = TestBed.createComponent(LoginVersion2);
     component = fixture.componentInstance;
     await fixture.whenStable();
   });

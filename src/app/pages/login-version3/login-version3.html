@@ -1,0 +1,156 @@
+<main class="login-page">
+  <div class="ambient ambient-one"></div>
+  <div class="ambient ambient-two"></div>
+
+  <section class="login-shell">
+    <aside class="brand-panel">
+      <div class="brand-mark">
+        <img src="/logo/logo_ONE.png" alt="ONEE" />
+      </div>
+
+      <div class="brand-title">
+        <span>Welcome to</span>
+        <h1>ESS</h1>
+      </div>
+
+      <div class="brand-orbit orbit-one"></div>
+      <div class="brand-orbit orbit-two"></div>
+    </aside>
+
+    <section class="auth-panel">
+      <div class="auth-card">
+        <header class="auth-header">
+          <div class="mobile-logo">
+            <img src="/logo/logo_ONE.png" alt="ONEE" />
+          </div>
+          <span class="eyebrow">EMPLOYEE SELF-SERVICE</span>
+          <h2>เข้าสู่ระบบ</h2>
+        </header>
+
+        <div class="login-methods" role="tablist" aria-label="เลือกวิธีเข้าสู่ระบบ">
+          <button
+            type="button"
+            role="tab"
+            class="method-tab"
+            [class.active]="!showQr"
+            [attr.aria-selected]="!showQr"
+            (click)="switchToForm()"
+          >
+            <span class="method-icon"><i class="fas fa-user-lock"></i></span>
+            <span>Username</span>
+          </button>
+          <button
+            type="button"
+            role="tab"
+            class="method-tab"
+            [class.active]="showQr"
+            [attr.aria-selected]="showQr"
+            (click)="switchToQr()"
+          >
+            <span class="method-icon"><i class="fas fa-qrcode"></i></span>
+            <span>QR Code</span>
+          </button>
+        </div>
+
+        @if (loginMessage) {
+          <div class="login-alert" [class.error-alert]="isError" [class.success-alert]="!isError">
+            {{ loginMessage }}
+          </div>
+        }
+
+        @if (!showQr) {
+          <form class="login-form" [formGroup]="loginForm" (ngSubmit)="onLogin()" autocomplete="on">
+            <div class="form-control">
+              <label for="username">Username</label>
+              <div
+                class="input-shell"
+                [class.invalid]="
+                  loginForm.controls.username.touched && loginForm.controls.username.invalid
+                "
+              >
+                <i class="far fa-user"></i>
+                <input
+                  id="username"
+                  name="username"
+                  type="text"
+                  formControlName="username"
+                  autocomplete="username"
+                  placeholder="Enter your username"
+                />
+              </div>
+            </div>
+
+            <div class="form-control">
+              <label for="password">Password</label>
+              <div
+                class="input-shell"
+                [class.invalid]="
+                  loginForm.controls.password.touched && loginForm.controls.password.invalid
+                "
+              >
+                <i class="fas fa-lock"></i>
+                <input
+                  id="password"
+                  name="password"
+                  [type]="passwordFieldType"
+                  formControlName="password"
+                  autocomplete="current-password"
+                  placeholder="Enter your password"
+                />
+                <button
+                  type="button"
+                  class="password-toggle"
+                  aria-label="แสดงหรือซ่อนรหัสผ่าน"
+                  (click)="togglePasswordVisibility()"
+                >
+                  <i
+                    [class]="passwordFieldType === 'password' ? 'far fa-eye' : 'far fa-eye-slash'"
+                  ></i>
+                </button>
+              </div>
+            </div>
+
+            <button type="submit" class="submit-button" [disabled]="!loginForm.valid || isLoading">
+              @if (!isLoading) {
+                <span>Sign In</span>
+                <i class="fas fa-arrow-right"></i>
+              } @else {
+                <span class="button-loader"></span>
+              }
+            </button>
+          </form>
+        } @else {
+          <div class="qr-login">
+            <div class="qr-frame" [class.expired]="qrExpired">
+              <span class="corner top-left"></span>
+              <span class="corner top-right"></span>
+              <span class="corner bottom-left"></span>
+              <span class="corner bottom-right"></span>
+
+              @if (qrLoading) {
+                <span class="qr-loader"></span>
+              } @else if (qrExpired) {
+                <div class="qr-expired">
+                  <i class="fas fa-clock"></i>
+                  <strong>QR Code Expired</strong>
+                  <button type="button" (click)="loadQr()">Refresh QR</button>
+                </div>
+              } @else if (qrImage) {
+                <img [src]="qrImage" alt="QR Code สำหรับเข้าสู่ระบบ" />
+              }
+            </div>
+
+            @if (!qrExpired && !qrLoading) {
+              <div class="qr-status"><span></span> Waiting for confirmation</div>
+            }
+          </div>
+        }
+
+        <!-- <footer class="auth-footer">
+          <i class="fas fa-shield-alt"></i>
+          <span>Secure access by ONEE</span>
+        </footer> -->
+      </div>
+    </section>
+  </section>
+</main>

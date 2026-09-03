@@ -27,7 +27,7 @@
           >
             <!-- <nz-option nzLabel="เลือกบริษัท" nzValue="" nzDisabled /> -->
             <nz-option
-              *ngFor="let company of companyList"
+              *ngFor="let company of companyList()"
               [nzLabel]="company.COMPANY_NAME + ' (' + company.COMPANY_CODE + ')'"
               [nzValue]="company"
             />

@@ -349,8 +349,8 @@
                         </h3>
                         <div class="leave-icon">
                           <i
-                            [class]="leave.iconClass"
-                            [style.color]="leave.iconColor || '#888'"
+                            [class]="leave.icon_name || leave.iconClass"
+                            [style.color]="leave.color_hex || leave.iconColor || '#888'"
                           ></i>
                         </div>
                       </div>
@@ -436,8 +436,15 @@
   }
 
   @if (isTimeOffModalOpen()) {
-    <app-time-off-form [initialLeaveTypeId]="selectedLeaveTypeId()" (onClose)="closeTimeOffForm()">
-    </app-time-off-form>
+    <div class="modal-overlay">
+      <div class="modal-container">
+        <app-time-off-form
+          [initialLeaveTypeId]="selectedLeaveTypeId()"
+          (onClose)="closeTimeOffForm()"
+        >
+        </app-time-off-form>
+      </div>
+    </div>
   }
 
   @if (profileLightbox()) {
@@ -526,9 +533,7 @@
 </div>
 
 <ng-template #loadingTpl>
-  <div class="loading-overlay">
-    <div class="loader"></div>
-  </div>
+  <app-page-loader />
 </ng-template>
 
 @if (isFormOpen()) {
@@ -537,6 +542,7 @@
       @defer {
         <app-time-off-form
           [selectedDate]="selectedDate()"
+          [initialLeaveTypeId]="selectedLeaveTypeId()"
           [requestStatus]="selectedRequestStatus()"
           (onClose)="closeForm()"
         >

@@ -7,6 +7,7 @@ export interface DialogConfig {
   confirmText?: string;
   cancelText?: string;
   type?: 'danger' | 'warning' | 'info';
+  showCancel?: boolean;
 }
 
 export interface DialogData extends DialogConfig {
@@ -30,10 +31,19 @@ export class DialogService {
         confirmText: config.confirmText || 'ยืนยัน',
         cancelText: config.cancelText || 'ยกเลิก',
         type: config.type || 'info',
+        showCancel: config.showCancel ?? true,
         resolve,
       };
 
       this.activeDialog.set(dialogData);
+    });
+  }
+
+  alert(config: Omit<DialogConfig, 'showCancel'>): Promise<boolean> {
+    return this.confirm({
+      ...config,
+      confirmText: config.confirmText || 'OK',
+      showCancel: false,
     });
   }
 

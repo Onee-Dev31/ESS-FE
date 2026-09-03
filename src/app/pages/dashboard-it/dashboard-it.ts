@@ -11,10 +11,11 @@ import {
   DestroyRef,
   ViewChild,
   ElementRef,
+  ChangeDetectorRef,
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { EMPTY, interval, firstValueFrom } from 'rxjs';
-import { filter } from 'rxjs/operators';
+import { filter, finalize } from 'rxjs/operators';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { Attachment, StatusKey, TicketItem } from '../../interfaces/it-dashboard.interface';
@@ -32,6 +33,7 @@ import {
   StatusColor_Reverse,
   StatusColor_text,
   getStatusLabel,
+  getStatusForIt,
 } from '../../utils/status.util';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import {
@@ -41,11 +43,13 @@ import {
 import dayjs from 'dayjs';
 import { ItProblemReportComponent } from '../it-problem-report/it-problem-report';
 import { ItRepairRequestComponent } from '../it-repair-request/it-repair-request';
-import { ITServiceRequestComponent } from '../it-service-request/it-service-request';
+import { ITServiceRequestCombinedComponent } from '../it-service-request-combined/it-service-request-combined';
 import { SwalService } from '../../services/swal.service';
 import { tickets } from '../../utils/it-dashboard-mock';
 import { AcknowledgeModal } from './modal/acknowledge-modal/acknowledge-modal';
+import { EmailReplyModal } from './modal/email-reply-modal/email-reply-modal';
 import { DenyModal } from './modal/deny-modal/deny-modal';
+import { ChangeTicketTypeModal } from './modal/change-ticket-type-modal/change-ticket-type-modal';
 import { AssignModal } from './modal/assign-modal/assign-modal';
 import { NoteModal } from './modal/note-modal/note-modal';
 import { DateUtilityService } from '../../services/date-utility.service';
@@ -56,18 +60,20 @@ import { NzCheckboxModule } from 'ng-zorro-antd/checkbox';
 import { SignalrService } from '../../services/signalr.service';
 import { CcModal } from './modal/cc-modal/cc-modal';
 import { NoteForItModal } from './modal/note-for-it-modal/note-for-it-modal';
-import { AvatarPreviewModal } from '../../components/modals/avatar-preview-modal/avatar-preview-modal';
 import { NzDatePickerModule } from 'ng-zorro-antd/date-picker';
 import { en_US, NzI18nService } from 'ng-zorro-antd/i18n';
-import { environment } from '../../../environments/environment';
-
-interface ReplyReader {
-  userCodeempid: string;
-  aduser: string;
-  nickName: string;
-  lastReadReplyId: number;
-  readAt: string;
-}
+import { TicketService } from '../../services/ticket.service';
+import { TicketRequesterCardComponent } from '../../components/shared/ticket-requester-card/ticket-requester-card';
+import { TicketOpenForCardComponent } from '../../components/shared/ticket-open-for-card/ticket-open-for-card';
+import { TicketProgressCardComponent } from '../../components/shared/ticket-progress-card/ticket-progress-card';
+import { TicketDetailCardComponent } from '../../components/shared/ticket-detail-card/ticket-detail-card';
+import {
+  TicketChatComponent,
+  TicketChatReader,
+  isSameTicketId,
+} from '../../components/shared/ticket-chat/ticket-chat';
+import { formatElapsedTime } from '../../utils/time.util';
+import { PageLoaderComponent } from '../../components/shared/page-loader/page-loader';
 
 @Component({
   selector: 'app-dashboard-it',
@@ -83,17 +89,24 @@ interface ReplyReader {
     FilePreviewModalComponent,
     ItProblemReportComponent,
     ItRepairRequestComponent,
-    ITServiceRequestComponent,
+    ITServiceRequestCombinedComponent,
     AcknowledgeModal,
+    EmailReplyModal,
     DenyModal,
+    ChangeTicketTypeModal,
     AssignModal,
     NoteModal,
     ServicesDetailModal,
     NzCheckboxModule,
     CcModal,
     NoteForItModal,
-    AvatarPreviewModal,
     NzDatePickerModule,
+    TicketRequesterCardComponent,
+    TicketOpenForCardComponent,
+    TicketProgressCardComponent,
+    TicketDetailCardComponent,
+    TicketChatComponent,
+    PageLoaderComponent,
   ],
   templateUrl: './dashboard-it.html',
   styleUrl: './dashboard-it.scss',
@@ -275,6 +288,7 @@ export class DashboardIT implements OnInit {
   isSmallMobile = false;
   isTicketDetailOpen = signal(false);
   IS_CHAT_OPEN = signal(false);
+  private cdr = inject(ChangeDetectorRef);
 
   private readonly CHAT_READ_KEY = 'ess_it_chat_read';
 
@@ -294,7 +308,8 @@ export class DashboardIT implements OnInit {
 
   private chatReadCounts = signal<Map<number, number>>(new Map());
 
-  replyReaders = signal<ReplyReader[]>([]);
+  replyReaders = signal<TicketChatReader[]>([]);
+  replyingTo = signal<any>(null);
 
   unreadChatCount = computed(() => {
     const ticket = this.selectedTicket();
@@ -304,46 +319,12 @@ export class DashboardIT implements OnInit {
     return Math.max(0, total - read);
   });
 
-  mentionResults = signal<any[]>([]);
-  mentionVisible = signal(false);
-  mentionActiveIndex = 0;
-  private mentionQuery = '';
-  private mentionAtIndex = -1;
-  private mentionDebounce: ReturnType<typeof setTimeout> | null = null;
-  private pendingMentionAdUsers = new Set<string>();
-
-  @ViewChild('chatTextareaRef') chatTextareaRef?: ElementRef<HTMLTextAreaElement>;
-  @ViewChild('floatingChatRef') floatingChatRef?: ElementRef<HTMLElement>;
-
-  private _chatMessage = '';
-  get chatMessage() { return this._chatMessage; }
-  set chatMessage(value: string) {
-    this._chatMessage = value;
-    this.detectMentionTrigger(value);
-  }
-
-  chatAttachments: { name: string; size: number; file: File }[] = [];
-
-  readonly CHAT_FILE_CONFIG = {
-    maxFiles: 5,
-    maxSizeMB: 5,
-    allowedTypes: [
-      'image/jpeg',
-      'image/png',
-      'image/gif',
-      'application/pdf',
-      'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-      'application/vnd.ms-excel',
-    ],
-    allowedExtensions: ['jpg', 'jpeg', 'png', 'gif', 'pdf', 'docx', 'xlsx', 'xls'],
-  };
+  @ViewChild(TicketChatComponent) ticketChat?: TicketChatComponent;
 
   filter = {
-    dateRange: [dayjs().subtract(3, 'month').toDate(), dayjs().toDate()] as [Date, Date] | null,
+    dateRange: [dayjs().startOf('year').toDate(), dayjs().toDate()] as [Date, Date] | null,
   };
 
-  @ViewChild('cardBody') cardBodyEl?: ElementRef<HTMLElement>;
   @ViewChild('ticketList') ticketList!: ElementRef;
 
   @HostListener('window:resize')
@@ -353,9 +334,12 @@ export class DashboardIT implements OnInit {
 
   @HostListener('document:click', ['$event'])
   onDocumentClick(event: MouseEvent) {
+    // ถ้ามี Preview เปิดอยู่ ไม่ต้องปิด Chat
+    if (this.isPreviewModalOpen()) return;
+
     if (!this.IS_CHAT_OPEN()) return;
-    const el = this.floatingChatRef?.nativeElement;
-    if (el && !el.contains(event.target as Node)) {
+
+    if (this.ticketChat && !this.ticketChat.contains(event.target)) {
       this.closeChat();
     }
   }
@@ -372,6 +356,7 @@ export class DashboardIT implements OnInit {
   private swalService = inject(SwalService);
   private fileConverter = inject(FileConverterService);
   private signalrService = inject(SignalrService);
+  private ticketService = inject(TicketService);
   private destroyRef = inject(DestroyRef);
   private route = inject(ActivatedRoute);
   dateUtil = inject(DateUtilityService);
@@ -385,7 +370,8 @@ export class DashboardIT implements OnInit {
 
   currentUserEmpCode = this.authService.userData().CODEMPID;
 
-  Tickets = signal<any[]>(tickets);
+  Tickets = signal<any[]>([]);
+  isPageLoading = signal(true);
   summaryRes = signal<any>(null);
   selectedTicket = signal<any | undefined>(undefined);
   isPreviewModalOpen = signal<boolean>(false);
@@ -407,9 +393,12 @@ export class DashboardIT implements OnInit {
   }
   private initialized = false;
   IS_DENY_TICKET = signal(false);
+  IS_CLOSE_TICKET = signal(false);
+  IS_CHANGE_TICKET_TYPE = signal(false);
   IS_ONHOLD_TICKET = signal(false);
   IS_ACKNOWLEDGE_TICKET = signal(false);
   IS_NOTE_TICKET = signal(false);
+  IS_EMAIL_REPLY_MODAL = signal(false);
   IS_ASSIGN_TICKET = signal(false);
   IS_NOTEFORIT_TICKET = signal(false);
   isCcModalVisible = false;
@@ -498,7 +487,7 @@ export class DashboardIT implements OnInit {
           if ((data.note ?? data.message ?? '').startsWith('Re-Open')) {
             this.Tickets.update((list) =>
               list.map((t: any) =>
-                t.ticketId === data.ticketId
+                isSameTicketId(t.ticketId, data.ticketId)
                   ? { ...t, IT_Status: getStatusLabel('ReOpened'), status: 'Re-Opened' }
                   : t,
               ),
@@ -506,7 +495,7 @@ export class DashboardIT implements OnInit {
           }
 
           // 3. If viewing this ticket, refresh details to show new note instantly
-          if (this.selectedTicket()?.ticketId === data.ticketId) {
+          if (isSameTicketId(this.selectedTicket()?.ticketId, data.ticketId)) {
             this.selectTicket(String(data.ticketId));
           }
         }
@@ -516,7 +505,7 @@ export class DashboardIT implements OnInit {
       .on('ChatRead')
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((data: any) => {
-        if (data.ticketId !== this.selectedTicket()?.ticketId) return;
+        if (!isSameTicketId(data.ticketId, this.selectedTicket()?.ticketId)) return;
         this.replyReaders.update((readers) => {
           const others = readers.filter((r) => r.userCodeempid !== data.userCodeempid);
           return [
@@ -533,7 +522,7 @@ export class DashboardIT implements OnInit {
       });
 
     // Poll for new notes every 5s while chat panel is open (fallback when SignalR doesn't reach all parties)
-    interval(5000)
+    interval(2000)
       .pipe(
         takeUntilDestroyed(this.destroyRef),
         filter(() => this.IS_CHAT_OPEN() && !!this.selectedTicket()),
@@ -549,7 +538,7 @@ export class DashboardIT implements OnInit {
           ),
         );
         if (this.selectedTicket()?.ticketId == ticketId) {
-          this.selectTicket(String(ticketId));
+          this.selectTicket(String(ticketId), { scrollToList: false });
         }
       });
   }
@@ -562,6 +551,10 @@ export class DashboardIT implements OnInit {
     this.prevTicketIds = new Set(this.Tickets().map((t: any) => t.ticketId));
     // console.log(this.prevTicketIds);
     this.getAllTickets(true);
+    const zone = document.getElementById('tickets-zone');
+    if (zone) {
+      zone.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
   }
 
   onStatusChange(status: string | null) {
@@ -606,14 +599,26 @@ export class DashboardIT implements OnInit {
   }
 
   onTicketClick(ticketId: any) {
+    const hasNewNote = this.newNoteTicketIds().has(Number(ticketId));
     this.newNoteTicketIds.update((s) => {
       s.delete(Number(ticketId));
       return new Set(s);
     });
-    this.selectTicket(String(ticketId));
+    this.focusTicketsZone();
+    requestAnimationFrame(() => this.scrollTicketInList(String(ticketId)));
+    this.selectTicket(String(ticketId), {
+      openChat: hasNewNote,
+      scrollToList: false,
+    });
   }
 
-  selectTicket(ticketId: string, options?: { openChat?: boolean }) {
+  selectTicket(
+    ticketId: string,
+    options?: {
+      openChat?: boolean;
+      scrollToList?: boolean;
+    },
+  ) {
     const previousTicketId = this.selectedTicket()?.ticketId;
 
     this.getTicketById(ticketId).subscribe(async (res: any) => {
@@ -633,18 +638,29 @@ export class DashboardIT implements OnInit {
       const itNotes = await this.buildItNotes(replies, replyAttachments, ticket.requester_aduser);
       const result = this.buildTimeline(res.timeline, res.timelineAssignees);
 
-      const status_for_it =
-        assignments.length === 1 &&
-        assignments[0].codeempid === this.authService.userData().CODEMPID &&
-        ticket.IT_Status === 'Assigned'
-          ? 'In Progress'
-          : ticket.IT_Status;
+      const statusForIt = getStatusForIt(
+        assignments,
+        this.authService.userData().CODEMPID,
+        ticket.IT_Status,
+      );
+
+      const isOpenForSelf =
+        res.requestFor?.emp_code && res.requestFor.emp_code === res.requester?.emp_code;
+
+      const hasOpenFor = !!res.requestFor?.emp_code;
+
+      const openFor = isOpenForSelf
+        ? { fullname: 'เปิดให้ตนเอง' }
+        : hasOpenFor
+          ? res.requestFor
+          : null;
 
       const objectData = {
         ticketId: ticket.id,
         ticketNumber: ticket.ticket_number,
         subject: ticket.subject,
         description: ticket.description,
+        viaEmail: ticket.is_from_email,
         noteForIt: ticket.noteForIt,
         ticketType: ticket.ticket_type_name_th,
         ticketTypeId: ticket.ticket_type_id,
@@ -652,6 +668,8 @@ export class DashboardIT implements OnInit {
         priority: ticket.priority,
         source: ticket.source,
         createdDate: new Date(ticket.created_at).toISOString(),
+        elapsed_time: ticket.elapsed_time,
+        // updatedDate: new Date(ticket.updated_at).toISOString(),
         requesterCode: ticket.requester_code,
         requesterAduser: ticket.requester_aduser,
         requesterName: ticket.requester_name,
@@ -663,7 +681,8 @@ export class DashboardIT implements OnInit {
         requesterColor: ticketTypyColor.getColor(ticket.ticket_type_id),
         status: ticket.IT_Status,
         repair_cost_type: ticket.repair_cost_type,
-        it_satus: getStatusLabel(status_for_it), //ticket.IT_Status
+        it_satus: getStatusLabel(statusForIt), //ticket.IT_Status
+        user_status: ticket.user_status,
         approval_status: ticket.approval_status,
         attachments: attachments,
         assignments: assignments,
@@ -671,7 +690,8 @@ export class DashboardIT implements OnInit {
         assignTimeline: result,
         services: services,
         requester: res.requester,
-        openFor: res.requestFor.emp_code ? res.requestFor : null,
+        openFor: openFor,
+        // openFor: res.requestFor.emp_code ? res.requestFor : null,
         rejection_reason: ticket.rejection_reason,
         ccList: ccList || [],
       };
@@ -682,9 +702,12 @@ export class DashboardIT implements OnInit {
       }
       if (options?.openChat) {
         this.IS_CHAT_OPEN.set(true);
-        setTimeout(() => this.chatTextareaRef?.nativeElement.focus(), 100);
+        setTimeout(() => this.ticketChat?.focusComposer(), 100);
       }
-      if (this.IS_CHAT_OPEN()) this.markChatAsRead();
+      if (this.IS_CHAT_OPEN()) {
+        this.markChatAsRead();
+        this.markLatestReplyRead(objectData.ticketId, objectData.itNotes ?? []);
+      }
       this.scrollToBottom();
 
       console.log(objectData);
@@ -695,12 +718,6 @@ export class DashboardIT implements OnInit {
           complete: () => this.signalrService.ticketReadTrigger.next({ ticketId }),
         });
 
-        const lastReply = itNotes[itNotes.length - 1];
-        if (lastReply) {
-          this.itServiceService
-            .markReplyRead(ticketId, codeempid, lastReply.id)
-            .subscribe({ error: () => {} });
-        }
         this.loadReplyReadStatus(ticketId);
         this.unreadTicketIds.update((s) => {
           const next = new Set(s);
@@ -708,20 +725,14 @@ export class DashboardIT implements OnInit {
           return next;
         });
       }
+
       if (this.isMobile) {
         this.isTicketDetailOpen.set(true);
       }
 
-      // ✅ Scroll to ticket in sidebar (with retry logic in case list is still loading)
-      const scrollToTicket = (id: string, retries = 10) => {
-        const el = document.getElementById('ticket-' + id);
-        if (el) {
-          el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        } else if (retries > 0) {
-          setTimeout(() => scrollToTicket(id, retries - 1), 300);
-        }
-      };
-      scrollToTicket(ticketId);
+      if (options?.scrollToList !== false) {
+        this.scrollTicketInList(ticketId);
+      }
     });
   }
 
@@ -733,6 +744,10 @@ export class DashboardIT implements OnInit {
   private markChatAsRead() {
     const ticket = this.selectedTicket();
     if (!ticket) return;
+    this.newNoteTicketIds.update((s) => {
+      s.delete(ticket.ticketId);
+      return new Set(s);
+    });
     const total = (ticket.itNotes ?? []).length;
     this.chatReadCounts.update((m) => {
       const next = new Map(m);
@@ -748,9 +763,70 @@ export class DashboardIT implements OnInit {
       if (next) {
         this.scrollToBottom();
         this.markChatAsRead();
+        const ticket = this.selectedTicket();
+        if (ticket) {
+          this.markLatestReplyRead(ticket.ticketId, ticket.itNotes ?? []);
+        }
       }
       return next;
     });
+  }
+
+  canReplyToEmailTicket(ticket: any): boolean {
+    const viaEmail =
+      ticket?.viaEmail === true ||
+      ticket?.viaEmail === 1 ||
+      ticket?.viaEmail === '1' ||
+      ticket?.viaEmail === 'true';
+    const acknowledgedStatuses = ['In Progress', 'Assigned', 'ReOpened', 'Hold'];
+
+    return viaEmail && acknowledgedStatuses.includes(ticket?.status);
+  }
+
+  openEmailReply(): void {
+    this.IS_EMAIL_REPLY_MODAL.set(true);
+  }
+
+  closeEmailReplyModal(): void {
+    this.IS_EMAIL_REPLY_MODAL.set(false);
+  }
+
+  submitEmailReply(data: any): void {
+    const executedBy = this.authService.currentUser() ?? this.authService.userData()?.AD_USER ?? '';
+
+    if (!data?.id || !data?.message || !executedBy) {
+      this.swalService.warning('ข้อมูลสำหรับตอบกลับอีเมลไม่ครบถ้วน');
+      return;
+    }
+
+    console.log(data);
+
+    this.IS_EMAIL_REPLY_MODAL.set(false);
+    this.swalService.loading('กำลังส่งอีเมล...');
+    this.itServiceService
+      .replyTicketEmail(data.id, {
+        message: data.message,
+        replyAll: true,
+        executedBy,
+      })
+      .subscribe({
+        next: (res) => {
+          if (res?.success === false) {
+            this.swalService.warning(res.message || 'ไม่สามารถส่งอีเมลได้');
+            return;
+          }
+
+          this.swalService.success(res?.message || 'ส่งอีเมลเรียบร้อยแล้ว');
+          this.selectTicket(String(data.id));
+          this.getAllTickets();
+        },
+        error: (error) => {
+          this.swalService.warning(
+            'เกิดข้อผิดพลาด',
+            error?.error?.message || error?.message || 'ไม่สามารถส่งอีเมลได้',
+          );
+        },
+      });
   }
 
   closeChat() {
@@ -758,247 +834,71 @@ export class DashboardIT implements OnInit {
   }
 
   private clearChatDraft() {
-    this.chatMessage = '';
-    this.chatAttachments = [];
-    this.pendingMentionAdUsers.clear();
+    this.ticketChat?.clearDraft();
   }
 
-  sendChatMessage(ticket: any) {
-    const message = this.chatMessage.trim();
+  private focusChatComposer() {
+    requestAnimationFrame(() => {
+      setTimeout(() => this.ticketChat?.focusComposer(), 0);
+    });
+  }
 
-    if (!message) {
-      this.msg.warning('กรุณากรอกข้อความ');
+  exportChatHistory(ticket: any) {
+    const ticketId = ticket?.ticketId;
+
+    if (!ticketId || !(ticket?.itNotes?.length > 0)) {
       return;
     }
 
-    const attachments = [...this.chatAttachments];
-    const mentionedAdUsers = [...this.pendingMentionAdUsers];
-    this.chatMessage = '';
-    this.chatAttachments = [];
-    this.pendingMentionAdUsers.clear();
-    this.submitNote({
-      id: ticket.ticketId,
-      message,
-      attachments,
-      mentionedAdUsers,
-    }, { silent: true });
-  }
+    this.ticketService.exportChatHistory(ticketId).subscribe({
+      next: (response) => {
+        const blob = response.body;
 
-  handleChatKeydown(event: KeyboardEvent, ticket: any) {
-    if (this.mentionVisible()) {
-      if (event.key === 'ArrowDown') {
-        event.preventDefault();
-        this.mentionActiveIndex = Math.min(this.mentionActiveIndex + 1, this.mentionResults().length - 1);
-        return;
-      }
-      if (event.key === 'ArrowUp') {
-        event.preventDefault();
-        this.mentionActiveIndex = Math.max(this.mentionActiveIndex - 1, 0);
-        return;
-      }
-      if (event.key === 'Enter') {
-        event.preventDefault();
-        const emp = this.mentionResults()[this.mentionActiveIndex];
-        if (emp) this.selectMention(emp);
-        return;
-      }
-      if (event.key === 'Escape') {
-        event.preventDefault();
-        this.closeMention();
-        return;
-      }
-    }
-    if (event.key === 'Enter' && !event.shiftKey) {
-      event.preventDefault();
-      this.sendChatMessage(ticket);
-    }
-  }
-
-  private detectMentionTrigger(value: string) {
-    const atMatch = value.match(/@([^\s@]*)$/);
-    if (atMatch) {
-      this.mentionAtIndex = value.lastIndexOf('@');
-      this.mentionQuery = atMatch[1];
-      this.mentionActiveIndex = 0;
-      this.searchMentionEmployees(this.mentionQuery);
-    } else {
-      this.closeMention();
-    }
-  }
-
-  private searchMentionEmployees(query: string) {
-    if (this.mentionDebounce) clearTimeout(this.mentionDebounce);
-
-    const participants = this.getTicketParticipants();
-
-    if (!query.trim() || !environment.allowMentionAnyone) {
-      const filtered = query.trim()
-        ? participants.filter((p) => {
-            const q = query.toLowerCase();
-            return (
-              p.Nickname?.toLowerCase().includes(q) ||
-              p.FullNameThai?.toLowerCase().includes(q)
-            );
-          })
-        : participants;
-      this.mentionResults.set(filtered);
-      this.mentionVisible.set(filtered.length > 0);
-      this.mentionActiveIndex = 0;
-      return;
-    }
-
-    this.mentionDebounce = setTimeout(() => {
-      this.itServiceService.searchEmployees({ search: query || undefined, pageSize: 8 }).subscribe({
-        next: (res) => {
-          const list = (res.data || []).map((e: any) => ({
-            Nickname: e.Nickname || e.nickname || '',
-            FullNameThai: e.FullNameThai || e.fullname || '',
-            CODEEMPID: e.CODEEMPID || e.codeempid || '',
-          }));
-          this.mentionResults.set(list);
-          this.mentionVisible.set(list.length > 0);
-          this.mentionActiveIndex = 0;
-        },
-        error: () => this.closeMention(),
-      });
-    }, 200);
-  }
-
-  private getTicketParticipants(): any[] {
-    const ticket = this.selectedTicket();
-    if (!ticket) return [];
-
-    const myCode = this.currentUserEmpCode;
-    const participants: any[] = [];
-    const seen = new Set<string>([myCode]); // exclude self
-
-    // requester
-    if (ticket.requester?.emp_code && !seen.has(ticket.requester.emp_code)) {
-      seen.add(ticket.requester.emp_code);
-      participants.push({
-        Nickname: ticket.requester.nickname || ticket.requester.fullname || '',
-        FullNameThai: ticket.requester.fullname || '',
-        CODEEMPID: ticket.requester.emp_code,
-        adUser: ticket.requesterAduser || ticket.requester.aduser || '',
-      });
-    }
-
-    // assignees of the latest step only (not historical approvers)
-    const timeline: any[] = ticket.assignTimeline || [];
-    const latestStep = timeline.length > 0 ? timeline[timeline.length - 1] : null;
-    if (latestStep) {
-      for (const a of latestStep.Assignee || []) {
-        if (a.empCode && !seen.has(a.empCode)) {
-          seen.add(a.empCode);
-          participants.push({
-            Nickname: a.nickName || a.fullName || '',
-            FullNameThai: a.fullName || '',
-            CODEEMPID: a.empCode,
-            adUser: a.adUser || a.aduser || '',
-          });
+        if (!blob) {
+          return;
         }
-      }
-    }
 
-    return [{ Nickname: 'All', FullNameThai: 'แจ้งทุกคน', CODEEMPID: '__all__' }, ...participants];
+        const contentType = response.headers.get('content-type') || blob.type;
+        if (contentType.toLowerCase().includes('application/json')) {
+          return;
+        }
+
+        this.downloadChatHistoryBlob(
+          blob,
+          this.getExportFileName(response.headers.get('content-disposition'), ticketId),
+        );
+      },
+      error: () => this.msg.warning('ไม่สามารถ export ประวัติการแชทได้'),
+    });
   }
 
-  selectMention(emp: any) {
-    const name = emp.Nickname || emp.FullNameThai || '';
-    const before = this.chatMessage.substring(0, this.mentionAtIndex);
-    const after = this.chatMessage.substring(this.mentionAtIndex + 1 + this.mentionQuery.length);
-    this._chatMessage = `${before}@${name} ${after}`;
+  private downloadChatHistoryBlob(blob: Blob, fileName: string) {
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
 
-    // Track who was mentioned so we can notify them
-    if (emp.CODEEMPID === '__all__') {
-      for (const p of this.getTicketParticipants()) {
-        const au = (p.adUser || '').toLowerCase();
-        if (au && p.CODEEMPID !== '__all__') this.pendingMentionAdUsers.add(au);
-      }
-    } else {
-      const au = (emp.adUser || emp.AD_USER || emp.aduser || '').toLowerCase();
-      if (au) this.pendingMentionAdUsers.add(au);
-    }
+    link.href = url;
+    link.download = fileName;
+    link.style.display = 'none';
 
-    this.closeMention();
-    setTimeout(() => this.chatTextareaRef?.nativeElement.focus(), 0);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
   }
 
-  closeMention() {
-    this.mentionVisible.set(false);
-    this.mentionResults.set([]);
-    this.mentionQuery = '';
-    this.mentionAtIndex = -1;
-    if (this.mentionDebounce) {
-      clearTimeout(this.mentionDebounce);
-      this.mentionDebounce = null;
-    }
-  }
-
-  handleChatEnter(event: Event, ticket: any) {
-    const keyboardEvent = event as KeyboardEvent;
-
-    if (keyboardEvent.shiftKey) {
-      return;
+  private getExportFileName(contentDisposition: string | null, ticketId: string | number): string {
+    if (!contentDisposition) {
+      return `chat-history-${ticketId}.xlsx`;
     }
 
-    keyboardEvent.preventDefault();
-    this.sendChatMessage(ticket);
-  }
-
-  onChatFileSelected(event: Event) {
-    const input = event.target as HTMLInputElement;
-    if (input.files) {
-      this.addChatFiles(input.files);
-    }
-    input.value = '';
-  }
-
-  removeChatAttachment(index: number) {
-    this.chatAttachments.splice(index, 1);
-  }
-
-  private addChatFiles(files: FileList) {
-    if (!files || files.length === 0) return;
-
-    const errors: string[] = [];
-    const validFiles: { name: string; size: number; file: File }[] = [];
-
-    for (const file of Array.from(files)) {
-      const reasons: string[] = [];
-
-      if (this.chatAttachments.length + validFiles.length >= this.CHAT_FILE_CONFIG.maxFiles) {
-        reasons.push(`เกินจำนวนสูงสุด ${this.CHAT_FILE_CONFIG.maxFiles} ไฟล์`);
-      }
-
-      const sizeMB = file.size / (1024 * 1024);
-      if (sizeMB > this.CHAT_FILE_CONFIG.maxSizeMB) {
-        reasons.push(`ขนาดเกิน ${this.CHAT_FILE_CONFIG.maxSizeMB} MB`);
-      }
-
-      const ext = file.name.split('.').pop()?.toLowerCase() ?? '';
-      if (
-        !this.CHAT_FILE_CONFIG.allowedTypes.includes(file.type) &&
-        !this.CHAT_FILE_CONFIG.allowedExtensions.includes(ext)
-      ) {
-        reasons.push('ประเภทไฟล์ไม่รองรับ');
-      }
-
-      if (reasons.length > 0) {
-        errors.push(`${file.name} (${reasons.join(', ')})`);
-        continue;
-      }
-
-      validFiles.push({ name: file.name, size: file.size, file });
+    const utf8FileName = contentDisposition.match(/filename\*=UTF-8''([^;]+)/i)?.[1];
+    if (utf8FileName) {
+      return decodeURIComponent(utf8FileName.replace(/"/g, ''));
     }
 
-    if (errors.length > 0) {
-      this.swalService.warning(errors.join('\n'));
-    }
-
-    if (validFiles.length > 0) {
-      this.chatAttachments = [...this.chatAttachments, ...validFiles];
-    }
+    return (
+      contentDisposition.match(/filename="?([^";]+)"?/i)?.[1] || `chat-history-${ticketId}.xlsx`
+    );
   }
 
   showAllServices: boolean = false;
@@ -1075,11 +975,137 @@ export class DashboardIT implements OnInit {
   }
 
   isDetailModalOpen = signal(false);
+  selectedTicketId = signal('');
   selectedDetail = signal('');
 
-  openDetail(description: string) {
+  openDetail(id: any, description: string) {
+    // console.log('id', id);
+    this.selectedTicketId.set(id);
     this.selectedDetail.set(description);
     this.isDetailModalOpen.set(true);
+  }
+
+  copiedTicketId: string | null = null;
+
+  copyDescription(ticketId: string, html: string) {
+    const text = this.toPlainText(html);
+
+    const textarea = document.createElement('textarea');
+    textarea.value = text;
+
+    document.body.appendChild(textarea);
+    textarea.select();
+
+    document.execCommand('copy');
+
+    document.body.removeChild(textarea);
+
+    this.copiedTicketId = ticketId;
+
+    setTimeout(() => {
+      this.copiedTicketId = '';
+      this.cdr.detectChanges();
+    }, 2000);
+  }
+
+  private toPlainText(html: string): string {
+    const doc = new DOMParser().parseFromString(html, 'text/html');
+
+    const lines: string[] = [];
+
+    const walk = (node: Node) => {
+      if (node.nodeType === Node.TEXT_NODE) {
+        const text = node.textContent?.replace(/\s+/g, ' ').trim();
+        if (text) {
+          lines.push(text);
+        }
+        return;
+      }
+
+      if (!(node instanceof HTMLElement)) return;
+
+      switch (node.tagName) {
+        case 'IMG': {
+          const src = node.getAttribute('src');
+          if (src) {
+            lines.push(src);
+            lines.push('');
+          }
+          break;
+        }
+
+        case 'LI': {
+          lines.push(`• ${node.textContent?.trim()}`);
+          break;
+        }
+
+        case 'P': {
+          node.childNodes.forEach(walk);
+          lines.push('');
+          break;
+        }
+
+        case 'BR': {
+          lines.push('');
+          break;
+        }
+
+        case 'A': {
+          const text = node.textContent?.trim() ?? '';
+          const href = node.getAttribute('href');
+
+          lines.push(href ? `${text} (${href})` : text);
+          break;
+        }
+
+        case 'TABLE':
+        case 'TBODY': {
+          node.childNodes.forEach(walk);
+          lines.push('');
+          break;
+        }
+
+        case 'TR': {
+          const th = node.querySelector('th')?.textContent?.trim();
+          const td = node.querySelector('td')?.textContent?.trim();
+
+          if (th || td) {
+            lines.push(`${th}: ${td}`);
+          }
+
+          break;
+        }
+
+        case 'H3': {
+          lines.push('');
+          lines.push(node.textContent?.trim() ?? '');
+          lines.push('--------------------');
+          break;
+        }
+
+        case 'H4': {
+          lines.push('');
+          lines.push(`[ ${node.textContent?.trim()} ]`);
+          break;
+        }
+
+        case 'DIV': {
+          node.childNodes.forEach(walk);
+          lines.push('');
+          break;
+        }
+
+        default:
+          node.childNodes.forEach(walk);
+      }
+    };
+
+    doc.body.childNodes.forEach(walk);
+
+    return lines
+      .join('\n')
+      .replace(/\n{3,}/g, '\n\n')
+      .trim();
   }
 
   openCcModal(): void {
@@ -1153,13 +1179,13 @@ export class DashboardIT implements OnInit {
   }
 
   viewFile(file: any) {
-    console.log(file);
     this.previewFiles.set([this.fileConverter.buildPreviewFile(file)]);
+    this.IS_CHAT_OPEN.set(true);
     this.isPreviewModalOpen.set(true);
   }
 
   viewFileChat(file: any) {
-    console.log(file);
+    // console.log(file);
     let url = '';
 
     if (file.file) {
@@ -1180,6 +1206,26 @@ export class DashboardIT implements OnInit {
     ]);
 
     this.isPreviewModalOpen.set(true);
+  }
+
+  isImage(file: any): boolean {
+    const type = file.type || '';
+
+    if (type.startsWith('image/')) {
+      return true;
+    }
+
+    const ext = (file.name || '').split('.').pop()?.toLowerCase();
+
+    return ['png', 'jpg', 'jpeg', 'gif', 'webp', 'bmp'].includes(ext ?? '');
+  }
+
+  getImages(files: any[] = []) {
+    return files.filter((f) => this.isImage(f));
+  }
+
+  getFiles(files: any[] = []) {
+    return files.filter((f) => !this.isImage(f));
   }
 
   getChatAttachments(ticket: any): any[] {
@@ -1223,6 +1269,7 @@ export class DashboardIT implements OnInit {
         step: t.step,
         title: t.title,
         description: t.description,
+        reason: t.reason,
         status: t.status,
         Assignee: assigneeList,
 
@@ -1244,9 +1291,9 @@ export class DashboardIT implements OnInit {
       replies.map(async (r) => {
         const files = attachments.filter((a) => a.reply_id === r.id);
         const convertedFiles = await this.fileConverter.convertUrlsToFiles(files);
+
         const senderRole =
-          requesterAduser &&
-          (r.user_aduser || '').toLowerCase() === requesterAduser.toLowerCase()
+          requesterAduser && (r.user_aduser || '').toLowerCase() === requesterAduser.toLowerCase()
             ? 'requester'
             : 'it-staff';
 
@@ -1276,13 +1323,21 @@ export class DashboardIT implements OnInit {
     try {
       const res: any = await firstValueFrom(this.getTicketById(String(ticket.ticketId)));
       const replyAttachments = (res.attachments ?? []).filter((f: any) => f.reply_id);
-      const itNotes = await this.buildItNotes(res.replies ?? [], replyAttachments, ticket.requesterAduser);
+      const itNotes = await this.buildItNotes(
+        res.replies ?? [],
+        replyAttachments,
+        ticket.requesterAduser,
+      );
+      this.loadReplyReadStatus(ticket.ticketId);
       const currentIds = new Set((ticket.itNotes ?? []).map((n: any) => n.id));
       const hasNew = itNotes.some((n: any) => !currentIds.has(n.id));
       if (!hasNew) return;
       this.selectedTicket.update((t) => (t ? { ...t, itNotes } : t));
       this.scrollToBottom();
-      if (this.IS_CHAT_OPEN()) this.markChatAsRead();
+      if (this.IS_CHAT_OPEN()) {
+        this.markChatAsRead();
+        this.markLatestReplyRead(ticket.ticketId, itNotes);
+      }
     } catch {
       // silent fail — chat still works, just won't show new messages until next poll
     }
@@ -1290,8 +1345,7 @@ export class DashboardIT implements OnInit {
 
   scrollToBottom() {
     setTimeout(() => {
-      const el = this.cardBodyEl?.nativeElement;
-      if (el) el.scrollTop = el.scrollHeight;
+      this.ticketChat?.scrollToBottom();
     }, 0);
   }
 
@@ -1304,7 +1358,17 @@ export class DashboardIT implements OnInit {
     });
   }
 
-  readersForNote(replyId: number): ReplyReader[] {
+  private markLatestReplyRead(ticketId: string | number, notes: any[]): void {
+    const codeempid = this.authService.userData()?.CODEMPID;
+    const latestReply = notes.at(-1);
+    if (!codeempid || !latestReply) return;
+    this.itServiceService.markReplyRead(ticketId, codeempid, latestReply.id).subscribe({
+      complete: () => this.loadReplyReadStatus(ticketId),
+      error: () => {},
+    });
+  }
+
+  readersForNote(replyId: number): TicketChatReader[] {
     const myCode = this.authService.userData()?.CODEMPID;
     return this.replyReaders().filter(
       (r) => r.lastReadReplyId >= replyId && r.userCodeempid !== myCode,
@@ -1348,7 +1412,13 @@ export class DashboardIT implements OnInit {
   }
 
   // GET MASTER
-  getAllTickets(trackNew = false) {
+  getAllTickets(trackNew = false, preserveScroll = false, focusTicketId?: string) {
+    const preservedScrollTop = preserveScroll
+      ? (this.ticketList?.nativeElement?.scrollTop ?? 0)
+      : 0;
+    const showPageLoader = !this.initialized && this.Tickets().length === 0;
+    if (showPageLoader) this.isPageLoading.set(true);
+
     const searchText = this.keyword.trim();
     const [from, to] = this.filter.dateRange ?? [];
     const dateFrom = dayjs(from).format('YYYY-MM-DD');
@@ -1361,29 +1431,37 @@ export class DashboardIT implements OnInit {
         dateFrom,
         dateTo,
       })
+      .pipe(
+        finalize(() => {
+          if (showPageLoader) this.isPageLoading.set(false);
+        }),
+      )
       .subscribe({
         next: (res) => {
-          // console.log(res);
+          // console.log('res', res);
           this.summaryRes.set(res);
 
           const mapped = res.data.map((ticket: any) => {
             const assignments = ticket.assignments ?? [];
-            const status_for_it =
-              assignments.length === 1 &&
-              assignments[0].codeempid === this.authService.userData().CODEMPID &&
-              ticket.IT_Status === 'Assigned'
-                ? 'In Progress'
-                : ticket.IT_Status;
+            const statusForIt = getStatusForIt(
+              assignments,
+              this.authService.userData().CODEMPID,
+              ticket.IT_Status,
+            );
+
             return {
               ...ticket,
               ticketId: ticket.id,
               ticketNumber: ticket.ticket_number,
               ticketType: ticket.ticket_type_name_th,
               status: ticket.status,
-              IT_Status: getStatusLabel(status_for_it),
-              createdDate: new Date(ticket.created_at).toISOString(),
+              IT_Status: getStatusLabel(statusForIt),
               requesterEmpId: ticket.requester_code,
               subject: ticket.subject,
+              createdDate: new Date(ticket.created_at).toISOString(),
+              updatedDate: new Date(ticket.updated_at).toISOString(),
+              elapsed_hours: ticket.elapsed_time,
+              // elapsed_hours: formatElapsedTime(ticket.hours_elapsed),
             };
           });
           this.Tickets.set(mapped);
@@ -1394,7 +1472,11 @@ export class DashboardIT implements OnInit {
 
             if (!el) return;
 
-            if (typeof el.scrollTo === 'function') {
+            if (focusTicketId) {
+              this.scrollTicketInList(focusTicketId);
+            } else if (preserveScroll) {
+              el.scrollTop = preservedScrollTop;
+            } else if (typeof el.scrollTo === 'function') {
               el.scrollTo({ top: 0, behavior: 'smooth' });
             } else {
               el.scrollTop = 0;
@@ -1424,6 +1506,25 @@ export class DashboardIT implements OnInit {
           console.error('Error fetching data:', error);
         },
       });
+  }
+
+  private scrollTicketInList(ticketId: string, retries = 10): void {
+    const container = this.ticketList?.nativeElement;
+    const ticketElement = document.getElementById(`ticket-${ticketId}`);
+    if (container && ticketElement) {
+      const containerRect = container.getBoundingClientRect();
+      const ticketRect = ticketElement.getBoundingClientRect();
+      const previousTicket = ticketElement.previousElementSibling as HTMLElement | null;
+      const secondPositionOffset = previousTicket?.offsetHeight ?? 0;
+      const targetTop =
+        container.scrollTop + ticketRect.top - containerRect.top - secondPositionOffset;
+      container.scrollTo({ top: Math.max(0, targetTop), behavior: 'smooth' });
+      return;
+    }
+
+    if (retries > 0) {
+      setTimeout(() => this.scrollTicketInList(ticketId, retries - 1), 200);
+    }
   }
 
   fetchUnreadIds() {
@@ -1492,8 +1593,6 @@ export class DashboardIT implements OnInit {
     window.open(`/employee-Info`, '_blank');
   }
 
-  showRequesterContact = false;
-
   // MODAL
   //>>> function
   updateTicket(
@@ -1504,6 +1603,7 @@ export class DashboardIT implements OnInit {
     comment?: any,
     attachments?: any[],
     repairCostType?: string,
+    reason?: string,
   ) {
     // console.log(command, ticketId, ticketTypeId, comment, attachments);
 
@@ -1520,8 +1620,20 @@ export class DashboardIT implements OnInit {
       formData.append('itResult', 'Hold');
     }
 
+    if ((command === 'onhold' || command === 'assign') && reason) {
+      formData.append('reason', reason);
+    }
+
+    if (command === 'changeType') {
+      formData.append('ITResult', 'ChangeType');
+      formData.append('newTicketTypeId', ticketTypeId || '2');
+      if (repairCostType) formData.append('repairCostType', repairCostType);
+      if (reason) formData.append('reason', reason);
+    }
+
     if (command === 'close') {
       formData.append('itResult', 'Closed');
+      if (comment) formData.append('reason', comment);
     }
 
     if (command === 'deny') {
@@ -1533,11 +1645,12 @@ export class DashboardIT implements OnInit {
       formData.append('assignJson', JSON.stringify(assignees));
     }
 
-    if (command === 'acknowledge') {
+    if (command === 'acknowledge' || (command === 'assign' && comment)) {
       formData.append('comment', comment);
-      if (repairCostType) {
-        formData.append('repairCostType', repairCostType);
-      }
+    }
+
+    if ((command === 'acknowledge' || command === 'assign') && repairCostType) {
+      formData.append('repairCostType', repairCostType);
     }
 
     if (command === 'acknowledge' || command === 'assign') {
@@ -1559,20 +1672,28 @@ export class DashboardIT implements OnInit {
   }
 
   get currentActions() {
-    if (this.selectedTicket().repair_cost_type === 'paid') {
-      return (
-        this.actionConfig['waiting-user-resubmit'] || {
-          left: [],
-          right: [],
-        }
-      );
+    const ticket = this.selectedTicket();
+    const condition1 =
+      ticket?.repair_cost_type === 'paid' && ticket?.approval_status !== 'Approved'; //แจ้งซ่อมแบบเสียตัง ยังไม่ได้ approve/resubmit มา
+    const condition2 = ticket?.user_status === 'Pending' && ticket?.repair_cost_type !== 'free'; //รอ user resubmit > approval > it
+    const configuredActions = (condition1 || condition2
+      ? this.actionConfig['waiting-user-resubmit']
+      : this.actionConfig[ticket?.status]) ?? { left: [], right: [] };
+    const actions = {
+      left: [...configuredActions.left],
+      right: [...configuredActions.right],
+    };
+
+    if (this.canReplyToEmailTicket(ticket)) {
+      actions.right.unshift({
+        label: 'ตอบกลับ',
+        icon: 'fa-reply-all',
+        class: 'btn-reply',
+        action: () => this.openEmailReply(),
+      });
     }
-    return (
-      this.actionConfig[this.selectedTicket().status] || {
-        left: [],
-        right: [],
-      }
-    );
+
+    return actions;
   }
 
   private checkBeforeAction(callback: () => void) {
@@ -1585,6 +1706,7 @@ export class DashboardIT implements OnInit {
 
     this.itServiceService.checkItAvalible(ticketId).subscribe({
       next: (res) => {
+        console.log(res);
         if (!res?.success) {
           this.swalService.warning(res.message);
 
@@ -1638,6 +1760,10 @@ export class DashboardIT implements OnInit {
     }
 
     const tag = data.ticketTypeId;
+    const repairCostType =
+      Number(data.ticketTypeId) === 1 ? (data.repairCostType ?? 'free') : undefined;
+
+    // console.log('acknowledge', ticketId, tag, null, data.message, data.attachments, repairCostType);
 
     this.swalService.loading('กำลังบันทึกข้อมูล...');
     this.IS_ACKNOWLEDGE_TICKET.set(false);
@@ -1649,7 +1775,7 @@ export class DashboardIT implements OnInit {
       null,
       data.message,
       data.attachments,
-      data.repairCostType,
+      repairCostType,
     ).subscribe({
       next: (res) => {
         if (!res?.success) {
@@ -1689,8 +1815,10 @@ export class DashboardIT implements OnInit {
   // -- onHold --
   onHoldTicket() {
     this.checkBeforeAction(() => {
-      this.swalService.confirm('ยืนยันการหยุดชั่วคราว (On Hold)').then((result) => {
+      this.swalService.promptReason('ยืนยันการหยุดชั่วคราว (On Hold)').then((result) => {
         if (!result.isConfirmed) return;
+
+        const reason = result.value?.trim() || undefined;
 
         const ticket = this.selectedTicket();
         const ticketId = ticket?.ticketId;
@@ -1702,7 +1830,16 @@ export class DashboardIT implements OnInit {
 
         this.swalService.loading('กำลังบันทึกข้อมูล...');
 
-        this.updateTicket('onhold', ticketId, '', null, null).subscribe({
+        this.updateTicket(
+          'onhold',
+          ticketId,
+          '',
+          null,
+          null,
+          undefined,
+          undefined,
+          reason,
+        ).subscribe({
           next: (res) => {
             if (!res?.success) {
               this.swalService.warning('ไม่สามารถบันทึกข้อมูลได้');
@@ -1789,6 +1926,109 @@ export class DashboardIT implements OnInit {
     this.IS_DENY_TICKET.set(false);
   }
 
+  private isTicketTypeChangeLocked(ticket: any): boolean {
+    const isApproved =
+      String(ticket?.approval_status ?? ticket?.approvalStatus ?? '')
+        .trim()
+        .toLowerCase() === 'approved';
+    const ticketTypeId = Number(ticket?.ticketTypeId ?? ticket?.ticket_type_id);
+    const isServiceRequest = ticketTypeId === 3;
+    const isPaidRepair =
+      ticketTypeId === 1 &&
+      String(ticket?.repair_cost_type ?? ticket?.repairCostType ?? '')
+        .trim()
+        .toLowerCase() === 'paid';
+
+    return isApproved && (isServiceRequest || isPaidRepair);
+  }
+
+  openChangeTicketTypeModal() {
+    if (this.isTicketTypeChangeLocked(this.selectedTicket())) {
+      this.swalService.warning(
+        'ขอใช้บริการหรือแจ้งซ่อมแบบเสียเงินที่อนุมัติแล้ว ไม่สามารถเปลี่ยนประเภทคำขอได้',
+      );
+      return;
+    }
+    this.checkBeforeAction(() => {
+      this.IS_CHANGE_TICKET_TYPE.set(true);
+    });
+  }
+
+  closeChangeTicketTypeModal() {
+    this.IS_CHANGE_TICKET_TYPE.set(false);
+  }
+
+  submitChangeTicketType(data: {
+    ticketTypeId: number;
+    repairCostType?: 'paid' | 'free';
+    reason: string;
+    attachments: { name: string; size: number; file: File }[];
+  }) {
+    const ticket = this.selectedTicket();
+    const ticketId = ticket?.ticketId;
+    if (!ticketId) {
+      this.swalService.warning('ไม่พบ Ticket');
+      return;
+    }
+
+    if (this.isTicketTypeChangeLocked(ticket)) {
+      this.swalService.warning(
+        'ขอใช้บริการหรือแจ้งซ่อมแบบเสียเงินที่อนุมัติแล้ว ไม่สามารถเปลี่ยนประเภทคำขอได้',
+      );
+      return;
+    }
+    if (data.ticketTypeId === 3 && ticket?.viaEmail !== true) {
+      this.swalService.warning('ขอใช้บริการสามารถเลือกได้เฉพาะ Ticket ที่มาจาก Email');
+      return;
+    }
+
+    this.swalService.loading('กำลังเปลี่ยนประเภทคำขอ...');
+    this.closeChangeTicketTypeModal();
+
+    this.updateTicket(
+      'changeType',
+      ticketId,
+      String(data.ticketTypeId),
+      null,
+      null,
+      data.attachments,
+      data.repairCostType,
+      data.reason,
+    ).subscribe({
+      next: (res) => {
+        if (!res?.success) {
+          this.swalService.warning(res?.message || 'ไม่สามารถเปลี่ยนประเภทคำขอได้');
+          return;
+        }
+
+        this.swalService.success(res.message || 'เปลี่ยนประเภทคำขอสำเร็จ');
+
+        const typeNameMap: Record<number, string> = {
+          1: 'แจ้งซ่อม',
+          2: 'แจ้งปัญหา',
+          3: 'ขอใช้บริการ',
+        };
+        const typeName = typeNameMap[Number(data.ticketTypeId)] ?? '';
+
+        this.signalrService.ticketStatusNotify(
+          ticketId,
+          ticket?.requesterAduser ?? '',
+          typeName ? `ChangeType|${typeName}` : 'ChangeType',
+        );
+
+        this.selectTicket(ticketId);
+        this.getAllTickets();
+      },
+      error: (error) => {
+        console.error('Change Ticket Type Error:', error);
+        this.swalService.warning(
+          'เกิดข้อผิดพลาด',
+          error?.error?.message || error?.message || 'ไม่สามารถเปลี่ยนประเภทคำขอได้',
+        );
+      },
+    });
+  }
+
   submitDeny(data: any) {
     const ticket = this.selectedTicket();
     const ticketId = ticket?.ticketId;
@@ -1809,10 +2049,10 @@ export class DashboardIT implements OnInit {
 
         this.swalService.success(res.message || 'บันทึกสำเร็จ');
 
+        this.signalrService.ticketStatusTrigger.next({ ticketId, status: 'Denied' });
         this.signalrService.ticketStatusNotify(ticketId, ticket?.requesterAduser ?? '', 'Denied');
-
-        this.selectTicket(ticketId);
-        this.getAllTickets();
+        this.filterStatus = 'all';
+        this.getAllTickets(false, false, String(ticketId));
       },
 
       error: (error) => {
@@ -1889,7 +2129,16 @@ export class DashboardIT implements OnInit {
     this.swalService.loading('กำลังบันทึกข้อมูล...');
     this.IS_ASSIGN_TICKET.set(false);
 
-    this.updateTicket('assign', ticketId, typeTicket, assignees).subscribe({
+    this.updateTicket(
+      'assign',
+      ticketId,
+      typeTicket,
+      assignees,
+      data.message,
+      data.attachments,
+      data.repairCostType,
+      data.reason,
+    ).subscribe({
       next: (res) => {
         if (!res?.success) {
           this.swalService.warning('ไม่สามารถบันทึกข้อมูลได้');
@@ -1927,49 +2176,44 @@ export class DashboardIT implements OnInit {
 
   closeTicket() {
     this.checkBeforeAction(() => {
-      this.swalService.confirm('ยืนยันการปิดงาน').then((result) => {
-        if (!result.isConfirmed) return;
+      this.IS_CLOSE_TICKET.set(true);
+    });
+  }
 
-        const ticket = this.selectedTicket();
-        const ticketId = ticket?.ticketId;
+  closeCloseTicketModal(): void {
+    this.IS_CLOSE_TICKET.set(false);
+  }
 
-        if (!ticketId) {
-          this.msg.warning('ไม่พบ Ticket');
+  submitCloseTicket(data: { reason: string }): void {
+    const ticket = this.selectedTicket();
+    const ticketId = ticket?.ticketId;
+    if (!ticketId) {
+      this.msg.warning('ไม่พบ Ticket');
+      return;
+    }
+
+    this.IS_CLOSE_TICKET.set(false);
+    this.swalService.loading('กำลังบันทึกข้อมูล...');
+    this.updateTicket('close', ticketId, '', null, data.reason).subscribe({
+      next: (res) => {
+        if (!res?.success) {
+          this.swalService.warning('ไม่สามารถบันทึกข้อมูลได้');
           return;
         }
 
-        this.swalService.loading('กำลังบันทึกข้อมูล...');
-
-        this.updateTicket('close', ticketId, '', null, null).subscribe({
-          next: (res) => {
-            if (!res?.success) {
-              this.swalService.warning('ไม่สามารถบันทึกข้อมูลได้');
-              return;
-            }
-
-            this.swalService.success(res.message || 'บันทึกสำเร็จ');
-
-            this.signalrService.ticketStatusTrigger.next({ ticketId, status: 'Closed' });
-            this.signalrService.ticketStatusNotify(
-              ticketId,
-              this.selectedTicket()?.requesterAduser ?? '',
-              'Closed',
-            );
-
-            this.selectTicket(ticketId);
-            this.getAllTickets();
-          },
-
-          error: (error) => {
-            console.error('Closed Ticket Error:', error);
-
-            this.swalService.warning(
-              'เกิดข้อผิดพลาด',
-              error?.message || 'ไม่สามารถติดต่อเซิร์ฟเวอร์ได้',
-            );
-          },
-        });
-      });
+        this.swalService.success(res.message || 'บันทึกสำเร็จ');
+        this.signalrService.ticketStatusTrigger.next({ ticketId, status: 'Closed' });
+        this.signalrService.ticketStatusNotify(ticketId, ticket?.requesterAduser ?? '', 'Closed');
+        this.filterStatus = 'all';
+        this.getAllTickets(false, false, String(ticketId));
+      },
+      error: (error) => {
+        console.error('Closed Ticket Error:', error);
+        this.swalService.warning(
+          'เกิดข้อผิดพลาด',
+          error?.message || 'ไม่สามารถติดต่อเซิร์ฟเวอร์ได้',
+        );
+      },
     });
   }
 
@@ -2011,20 +2255,34 @@ export class DashboardIT implements OnInit {
         const senderName = `${userData?.NAMFIRSTT ?? ''} ${userData?.NAMLASTT ?? ''}`.trim();
 
         if (requesterAdUser && senderAdUser) {
+          // Type 3 (ขอใช้บริการ) ที่ยังไม่ Approve: step ล่าสุดใน timeline คือ "รออนุมัติ"
+          // ซึ่ง Assignee คือกลุ่มผู้อนุมัติ ไม่ใช่คนที่ควรได้รับ noti แชท จึงข้ามการดึง assignee ตอนนี้
+          const isPendingApprovalType3 =
+            ticket?.ticketTypeId === 3 &&
+            (ticket?.approval_status === 'New' || !ticket?.approval_status);
           const timeline: any[] = ticket?.assignTimeline ?? [];
           const latestStep = timeline[timeline.length - 1];
-          const assigneeAdUsers = ((latestStep?.Assignee ?? []) as any[])
-            .map((a: any) => (a.adUser || a.aduser || '').toLowerCase())
-            .filter((u: string) => !!u && u !== senderAdUser.toLowerCase());
-          const allRecipients = [...new Set([...assigneeAdUsers, ...(data.mentionedAdUsers ?? [])])];
-          this.signalrService.noteNotify(
-            data.id,
-            requesterAdUser,
-            senderAdUser,
-            senderName,
-            data.message,
-            allRecipients,
-          );
+          const assigneeAdUsers = isPendingApprovalType3
+            ? []
+            : ((latestStep?.Assignee ?? []) as any[])
+                .map((a: any) => (a.adUser || a.aduser || '').toLowerCase())
+                .filter((u: string) => !!u && u !== senderAdUser.toLowerCase());
+          const allRecipients = [
+            ...new Set([...assigneeAdUsers, ...(data.mentionedAdUsers ?? [])]),
+          ];
+          // requester พิมพ์แชทเอง (เช่น type 3 ก่อน approve ที่ยังไม่มี assignee) และไม่มีคนอื่นให้แจ้ง
+          // → ไม่ต้องยิง noti เพราะจะกลายเป็นแจ้งเตือนตัวเอง
+          const isSelfChat = senderAdUser.toLowerCase() === requesterAdUser.toLowerCase();
+          if (!(isSelfChat && allRecipients.length === 0)) {
+            this.signalrService.noteNotify(
+              data.id,
+              requesterAdUser,
+              senderAdUser,
+              senderName,
+              data.message,
+              allRecipients,
+            );
+          }
         }
 
         if (!silent) {

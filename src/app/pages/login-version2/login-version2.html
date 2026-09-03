@@ -1,0 +1,188 @@
+<div class="layer-login-page">
+  <!-- ========================= -->
+  <!-- LOGIN CONTAINER -->
+  <!-- ========================= -->
+
+  <div class="layer-login-container">
+    <!-- ========================= -->
+    <!-- LEFT PANEL -->
+    <!-- ========================= -->
+
+    <div class="layer-left-panel">
+      <!-- main content -->
+      <div class="left-content">
+        <div class="left-top-text">Welcome to</div>
+
+        <!-- logo -->
+        <div class="brand-logo-wrap">
+          <div class="brand-logo-circle">
+            <!-- <i class="fas fa-rocket"></i> -->
+            <div class="mini-icon">
+              <img src="/logo/logo_ONE.png" alt="ONEE Logo" />
+            </div>
+          </div>
+
+          <h1>ESS</h1>
+        </div>
+
+        <p class="left-description">Employee Self-Service System</p>
+
+        <!-- feature pills -->
+        <div class="feature-pills">
+          <div class="feature-pill">
+            <i class="fas fa-ticket-alt"></i>
+            IT Ticket
+          </div>
+
+          <div class="feature-pill">
+            <i class="fas fa-heart"></i>
+            Welfare
+          </div>
+
+          <div class="feature-pill">
+            <i class="fas fa-calendar"></i>
+            Leave
+          </div>
+        </div>
+      </div>
+
+      <!-- decorative waves -->
+      <div class="wave-layer wave-1"></div>
+      <div class="wave-layer wave-2"></div>
+      <div class="wave-layer wave-3"></div>
+    </div>
+
+    <!-- ========================= -->
+    <!-- RIGHT PANEL -->
+    <!-- ========================= -->
+
+    <div class="layer-right-panel">
+      <!-- floating glass -->
+      <div class="glass-layer glass-back"></div>
+
+      <div class="login-form-card">
+        <div class="login-header">
+          <!-- <div class="mini-icon">
+            <img src="/logo/logo_ONE.png" alt="ONEE Logo" />
+          </div> -->
+
+          <h2>Login Account</h2>
+
+          <!-- <p>Employee Self-Service System</p> -->
+        </div>
+
+        <!-- alert -->
+        <div
+          *ngIf="loginMessage"
+          class="login-alert"
+          [ngClass]="{
+            'error-alert': isError,
+            'success-alert': !isError,
+          }"
+        >
+          {{ loginMessage }}
+        </div>
+
+        <!-- form -->
+        <form *ngIf="!showQr" [formGroup]="loginForm" (ngSubmit)="onLogin()" autocomplete="on">
+          <!-- username -->
+          <div class="custom-input">
+            <label>Username</label>
+
+            <div class="input-shell">
+              <i class="far fa-user"></i>
+
+              <input
+                type="text"
+                name="username"
+                id="username"
+                formControlName="username"
+                autocomplete="username"
+                placeholder="Enter your username"
+              />
+            </div>
+          </div>
+
+          <!-- password -->
+          <div class="custom-input">
+            <label>Password</label>
+
+            <div class="input-shell">
+              <i class="fas fa-lock"></i>
+
+              <input
+                [type]="passwordFieldType"
+                name="password"
+                id="password"
+                formControlName="password"
+                autocomplete="current-password"
+                placeholder="Enter your password"
+              />
+
+              <button type="button" class="password-toggle" (click)="togglePasswordVisibility()">
+                <i
+                  [class]="passwordFieldType === 'password' ? 'far fa-eye' : 'far fa-eye-slash'"
+                ></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- buttons -->
+          <div class="action-row">
+            <button type="submit" class="primary-btn" [disabled]="!loginForm.valid || isLoading">
+              <span *ngIf="!isLoading"> Sign In </span>
+
+              <span *ngIf="isLoading" class="btn-loader"></span>
+            </button>
+
+            <button type="button" class="secondary-btn" (click)="switchToQr()" *ngIf="!showQr">
+              <i class="fas fa-qrcode"></i>
+
+              QR Login
+            </button>
+          </div>
+        </form>
+
+        <!-- ===================================================== -->
+        <!-- QR LOGIN -->
+        <!-- ===================================================== -->
+
+        <div class="qr-section-modern" *ngIf="showQr">
+          <p>Scan this QR Code using your mobile device</p>
+          <!-- loading -->
+          <div *ngIf="qrLoading" class="qr-loading-modern">
+            <span class="btn-loader"></span>
+          </div>
+
+          <!-- qr image -->
+          <div class="qr-modern-box" *ngIf="!qrLoading && !qrExpired">
+            <img *ngIf="qrImage" [src]="qrImage" alt="QR Code" />
+          </div>
+
+          <!-- expired -->
+          <div *ngIf="qrExpired" class="qr-expired-modern">
+            <i class="fas fa-clock"></i>
+
+            <span>QR Code Expired</span>
+
+            <button type="button" class="qr-refresh-btn" (click)="loadQr()">Refresh QR</button>
+          </div>
+
+          <!-- waiting -->
+          <div *ngIf="!qrExpired && !qrLoading" class="qr-modern-waiting">
+            <span class="pulse-dot"></span>
+
+            Waiting for confirmation...
+          </div>
+
+          <!-- back -->
+          <button type="button" class="secondary-btn qr-back-btn" (click)="switchToForm()">
+            <i class="fas fa-arrow-left"></i>
+
+            Back to Login
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

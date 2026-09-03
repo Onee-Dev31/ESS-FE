@@ -40,11 +40,10 @@ export class FileConverterService {
       type: fileData.FILE_TYPE || fileData.file_type,
     });
 
-    // console.log("fileData", fileData)
-    return {
+    const converted: ConvertedFile = {
       fieldId: fileData.FileID || fileData.attachment_id,
       name: fileData.FILE_NAME || fileData.file_name,
-      file: file,
+      file,
       description: fileData.DESCRIPTION || fileData.file_description || '',
       uploadedByAduser: fileData.uploadedByaAduser,
       createdDate: fileData.created_at,
@@ -53,6 +52,24 @@ export class FileConverterService {
       type: fileData.file_type,
       ...fileData,
     };
+
+    return {
+      ...converted,
+      previewUrl: this.buildPreviewFile(converted).url,
+    };
+    // // console.log('fileData', fileData);
+    // return {
+    //   fieldId: fileData.FileID || fileData.attachment_id,
+    //   name: fileData.FILE_NAME || fileData.file_name,
+    //   file: file,
+    //   description: fileData.DESCRIPTION || fileData.file_description || '',
+    //   uploadedByAduser: fileData.uploadedByaAduser,
+    //   createdDate: fileData.created_at,
+    //   filePath: fileData.file_path || fileData.file_url,
+    //   size: fileData.file_size,
+    //   type: fileData.file_type,
+    //   ...fileData,
+    // };
   }
 
   // แปลงหลายไฟล์
@@ -63,7 +80,7 @@ export class FileConverterService {
 
   buildPreviewFile(file: any) {
     // console.log(file);
-    let url = file.filePath || file.fileUrl || file.url;
+    let url = file.filePath || file.file_path || file.fileUrl || file.file_url || file.url;
 
     if (!url) {
       const actualFile =
@@ -87,6 +104,10 @@ export class FileConverterService {
         url = url.replace('/uploads/freelance', '/freelance');
       }
 
+      if (url.startsWith('/uploads/leave')) {
+        url = url.replace('/uploads/leave', '/leave');
+      }
+
       //UAT
       if (url.startsWith('/uploads-uat/tickets-uat')) {
         url = url.replace('/uploads-uat/tickets-uat', '/ticket');
@@ -100,23 +121,31 @@ export class FileConverterService {
         url = url.replace('/uploads-uat/freelance-uat', '/freelance');
       }
 
+      if (url.startsWith('/uploads-uat/leave-uat')) {
+        url = url.replace('/uploads-uat/leave-uat', '/leave');
+      }
+
       url = this.FILE_URL + (url.startsWith('/') ? '' : '/') + url;
     }
 
     // console.log('buildPreviewFile (หลัง)> ', url);
 
     const date =
-      file.createdDate || file.createdAt
-        ? dayjs(file.createdDate || file.createdAt).isValid()
-          ? dayjs(file.createdDate || file.createdAt).format('DD/MM/YYYY HH:mm')
+      file.createdDate || file.createdAt || file.created_at || file.uploaded_at
+        ? dayjs(file.createdDate || file.createdAt || file.created_at || file.uploaded_at).isValid()
+          ? dayjs(file.createdDate || file.createdAt || file.created_at || file.uploaded_at).format(
+              'DD/MM/YYYY HH:mm',
+            )
           : ''
         : '';
 
     return {
-      fileName: file.fileName || file.name || 'unknown',
+      fileName: file.fileName || file.file_name || file.name || 'unknown',
       date: date,
       url: url || '',
-      type: file.fileType || file.type || file.file_type || file.file?.type || '',
+      type:
+        file.fileType || file.content_type || file.type || file.file_type || file.file?.type || '',
+      remark: file.remark,
     };
   }
 

@@ -1,0 +1,390 @@
+@use '../../../styles/variables' as *;
+@use '../../../styles/mixins' as *;
+
+.page {
+  padding: 20px;
+
+  @include mobile {
+    padding: 14px;
+  }
+}
+
+.content-card {
+  @include content-card;
+  margin-top: 16px;
+  padding: 0;
+}
+
+.card-header-title {
+  @include card-header-title;
+  padding: 1.5rem 1.5rem 1rem;
+
+  @include mobile {
+    padding: 16px;
+  }
+
+  p {
+    margin: 6px 0 0 16px;
+    color: var(--text-muted);
+    font-size: $font-size-hint;
+    font-weight: 400;
+  }
+}
+
+.header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+
+  @include mobile {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+}
+
+.card-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.table-responsive {
+  overflow-x: auto;
+  padding: 0 1.5rem 1.5rem;
+
+  @include tablet {
+    display: none !important;
+  }
+
+  @include mobile {
+    padding: 0 0 14px;
+  }
+}
+
+.modern-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+
+  thead th {
+    padding: 12px 18px;
+    background: var(--bg-table-head);
+    color: var(--text-muted);
+    font-size: $font-size-label;
+    font-weight: 400;
+    text-transform: none;
+    letter-spacing: normal;
+    text-align: left;
+    white-space: nowrap;
+    border-bottom: none;
+  }
+
+  tbody td {
+    padding: 16px 18px;
+    font-size: $font-size-body;
+    color: var(--text-sub);
+    border-bottom: none;
+    border-top: 1px solid var(--border-table-head);
+    vertical-align: middle;
+    white-space: nowrap;
+  }
+
+  tbody tr:first-child td {
+    border-top: none;
+  }
+
+  tbody tr:hover td {
+    background: color-mix(in srgb, $primary 3%, var(--bg-card));
+  }
+}
+
+tr.inactive-row td {
+  opacity: 0.55;
+}
+
+// ==================== MOBILE CARDS ====================
+.card-list-view {
+  display: none;
+
+  @include tablet {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding: 1rem;
+  }
+
+  .mobile-card {
+    background: var(--bg-card);
+    border-radius: 16px;
+    border: 1px solid rgba(0, 0, 0, 0.06);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    overflow: hidden;
+
+    &.inactive-row {
+      opacity: 0.55;
+    }
+
+    .card-header {
+      background: var(--bg-card);
+      border-bottom: 1px solid var(--border-toolbar);
+      padding: 14px 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+
+      .card-dept-name {
+        font-weight: 700;
+        color: $primary;
+        font-size: 1rem;
+        display: block;
+      }
+
+      .card-dept-code {
+        font-size: 0.75rem;
+        color: var(--text-muted);
+        margin-top: 2px;
+      }
+    }
+
+    .card-body {
+      padding: 16px;
+
+      .info-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 12px;
+        font-size: $font-size-label;
+        gap: 8px;
+
+        .label {
+          color: var(--text-sub);
+          flex-shrink: 0;
+        }
+
+        .value {
+          font-weight: 600;
+          color: var(--text-header);
+          text-align: right;
+        }
+      }
+
+      .card-footer-actions {
+        margin-top: 4px;
+        padding-top: 12px;
+        border-top: 1px solid var(--border-toolbar);
+        display: flex;
+        gap: 10px;
+
+        button {
+          flex: 1;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          gap: 8px;
+          padding: 9px 14px;
+          border-radius: 10px;
+          font-size: $font-size-label;
+          font-weight: 600;
+          cursor: pointer;
+          border: none;
+          transition: all 0.2s;
+        }
+
+        .btn-edit-sm {
+          background: color-mix(in srgb, $primary, transparent 88%);
+          color: $primary;
+
+          &:hover {
+            background: color-mix(in srgb, $primary, transparent 75%);
+          }
+        }
+
+        .btn-delete-sm {
+          background: color-mix(in srgb, $danger, transparent 88%);
+          color: $danger;
+
+          &:hover {
+            background: color-mix(in srgb, $danger, transparent 75%);
+          }
+
+          &:disabled {
+            opacity: 0.5;
+            cursor: wait;
+          }
+        }
+      }
+    }
+  }
+}
+
+.action-column {
+  width: 90px;
+  text-align: center;
+}
+
+.row-actions {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.btn-add {
+  @include btn-outline;
+}
+
+.btn-icon-edit {
+  @include icon-btn-ghost($primary);
+}
+
+.btn-icon-delete {
+  @include icon-btn-ghost($danger);
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: wait;
+  }
+}
+
+.spin {
+  animation: spin 0.7s linear infinite;
+}
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+// ── Toggle switch (same pattern as setting-notification) ──────────────────
+.toggle {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  cursor: pointer;
+
+  input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+    position: absolute;
+  }
+
+  &__slider {
+    width: 38px;
+    height: 22px;
+    background: var(--border-color);
+    border-radius: 999px;
+    position: relative;
+    transition: background 0.2s;
+
+    &::after {
+      content: '';
+      position: absolute;
+      top: 3px;
+      left: 3px;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: #fff;
+      transition: transform 0.2s;
+    }
+  }
+
+  input:checked + &__slider {
+    background: var(--primary);
+  }
+
+  input:checked + &__slider::after {
+    transform: translateX(16px);
+  }
+
+  input:disabled + &__slider {
+    opacity: 0.55;
+    cursor: wait;
+  }
+}
+
+.toggle-field {
+  align-items: flex-start;
+  justify-content: center;
+
+  .toggle {
+    height: 44px;
+  }
+}
+
+// ── Modal form fields (modal chrome itself comes from app-modal-shell) ────
+.field-group {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin: 0 0 18px;
+  padding: 16px;
+  border: 1px solid var(--border-table-head);
+  border-radius: 12px;
+
+  legend {
+    padding: 0 6px;
+    color: var(--text-header);
+    font-size: $font-size-label;
+    font-weight: 600;
+  }
+}
+
+.field-grid {
+  display: grid;
+  gap: 14px;
+
+  &.cols-2 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  &.cols-3 {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  @include mobile {
+    &.cols-2,
+    &.cols-3 {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+}
+
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 18px;
+
+  span {
+    color: var(--text-sub);
+    font-size: $font-size-label;
+    font-weight: 500;
+  }
+}
+
+.field-grid .form-field {
+  margin-bottom: 0;
+}
+
+.form-input {
+  @include input-field;
+  width: 100%;
+}
+
+.form-input.input-invalid {
+  border-color: var(--danger) !important;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--danger) 10%, transparent) !important;
+}
+
+.field-error {
+  color: var(--danger);
+  font-size: $font-size-hint;
+}

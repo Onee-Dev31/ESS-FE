@@ -13,7 +13,7 @@
     </div>
 
     <div class="modal-body">
-      @for (group of groupedServices | keyvalue; track group.key) {
+      @for (group of groupedServices | keyvalue: keepOrder; track group.key) {
         <div class="group-section">
           <div class="group-title">
             {{ group.key }}

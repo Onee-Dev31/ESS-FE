@@ -19,6 +19,7 @@
   --bg-page: #f8f9fa;
   --bg-card: #ffffff;
   --bg-slate: #f4f7f9;
+  --bg-item: #eef3f8;
   --header-bg: #f8fafc;
   --floating-chat-backdrop: #1829514d;
   --border: #dee2e6;
@@ -309,16 +310,13 @@ $status-completed-text: var(--status-completed-text);
 $status-cancelled-bg: var(--status-cancelled-bg);
 $status-cancelled-text: var(--status-cancelled-text);
 
-// font-size
-// $font-size-header: 18px;
-// $font-size-body: 16px;
-// $font-size-label: 14px;
-// $font-size-hint: 12px;
-// $font-size-mini: 10px;
-
+// Typography scale
+// display: page hero / title: page title / header: section heading
+// body: primary content / label: controls and table content
+// hint: supporting text / mini: compact badges and counters
 $font-size-display: clamp(24px, 3vw, 36px);
 $font-size-title: clamp(18px, 2.2vw, 24px);
-$font-size-header: clamp(14px, 1.8vw, 18px);
+$font-size-header: clamp(16px, 1.8vw, 18px);
 $font-size-body: clamp(14px, 1.2vw, 16px);
 $font-size-label: clamp(12px, 1vw, 14px);
 $font-size-hint: clamp(11px, 1.2vw, 12px);

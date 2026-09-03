@@ -2,7 +2,6 @@ import {
   Component,
   computed,
   EventEmitter,
-  inject,
   Input,
   Output,
   signal,
@@ -12,14 +11,22 @@ import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzIconModule } from 'ng-zorro-antd/icon';
 import { NzModalModule } from 'ng-zorro-antd/modal';
 import { NzSelectModule } from 'ng-zorro-antd/select';
-import { SwalService } from '../../../../services/swal.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { environment } from '../../../../../environments/environment';
+import { ModalShellComponent } from '../../../../components/shared/modal-shell/modal-shell';
 
 @Component({
   selector: 'app-assign-modal',
-  imports: [CommonModule, FormsModule, NzSelectModule, NzButtonModule, NzIconModule, NzModalModule],
+  imports: [
+    CommonModule,
+    FormsModule,
+    NzSelectModule,
+    NzButtonModule,
+    NzIconModule,
+    NzModalModule,
+    ModalShellComponent,
+  ],
   templateUrl: './assign-modal.html',
   styleUrl: './assign-modal.scss',
 })
@@ -27,8 +34,6 @@ export class AssignModal {
   getEmployeeImage(empCode: string): string {
     return `${environment.employeeImageUrl}/${empCode}.jpg`;
   }
-  private swalService = inject(SwalService);
-
   @Input() ticket: any;
   @Input() visible = false;
   // @Input() assigneeGroups: any[] = [];
@@ -47,12 +52,34 @@ export class AssignModal {
 
   selectedAssigneeEmpCodes: any[] = [];
   selectedTag: number | null = null;
+  originalTag: number | null = null;
+  reason = '';
   // assignSearchKeyword = '';
   ticketId: number | null = null;
 
+  get isApproved(): boolean {
+    return (
+      String(this.ticket?.approval_status ?? this.ticket?.approvalStatus ?? '')
+        .trim()
+        .toLowerCase() === 'approved'
+    );
+  }
+
+  get ticketTypeLabel(): string {
+    const ticketTypeId = Number(this.ticket?.ticketTypeId ?? this.ticket?.ticket_type_id);
+    const labels: Record<number, string> = {
+      1: 'แจ้งซ่อม',
+      2: 'แจ้งปัญหา',
+      3: 'ขอใช้บริการ',
+    };
+    return labels[ticketTypeId] ?? '-';
+  }
+
   ngOnChanges(changes: SimpleChanges) {
     if (changes['ticket'] && this.ticket) {
-      this.selectedTag = this.ticket.ticketTypeId;
+      this.selectedTag = Number(this.ticket.ticketTypeId);
+      this.originalTag = Number(this.ticket.ticketTypeId);
+      this.reason = '';
       if (this.ticket.assignments) {
         this.ticketId = this.ticket.ticketId;
         this.selectedAssigneeEmpCodes = this.ticket.assignments.map((a: any) => ({
@@ -62,6 +89,14 @@ export class AssignModal {
         }));
       }
     }
+  }
+
+  get isChangedToRepair(): boolean {
+    return this.selectedTag === 1 && this.originalTag !== 1;
+  }
+
+  onTagChange() {
+    this.reason = '';
   }
 
   close() {
@@ -146,10 +181,15 @@ export class AssignModal {
   }
 
   save() {
+    const ticketTypeId = this.isApproved
+      ? Number(this.ticket?.ticketTypeId ?? this.ticket?.ticket_type_id)
+      : this.selectedTag;
     this.submitModal.emit({
       assignees: this.selectedAssigneeEmpCodes,
-      ticketTypeId: this.selectedTag,
+      ticketTypeId,
       ticketId: this.ticketId,
+      reason: this.reason.trim() || undefined,
+      ...(this.isChangedToRepair && { repairCostType: 'free' }),
     });
   }
 }

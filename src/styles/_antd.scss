@@ -1,17 +1,21 @@
 @use './variables' as *;
 
+// Shared Ant Design overrides.
+
 /*
   ANTD : SELECT
 */
 // input
 .ant-select {
+  min-width: 0;
+  max-width: 100%;
   color: var(--input-text);
 }
 
 .ant-select:not(.ant-select-customize-input) .ant-select-selector {
   position: relative;
-  background-color: transparent;
-  border: 1px solid #cfcfcf00;
+  background-color: var(--input-bg);
+  border: 1px solid var(--input-border);
 }
 
 .ant-select-selection-placeholder {
@@ -22,26 +26,29 @@
   color: var(--text-muted);
 }
 
-//input > diable
+// focus / hover
 .ant-select:not(.ant-select-disabled).ant-select-focused .ant-select-selector {
-  border-color: #40a9ff00;
-  box-shadow: 0 0 0 2px rgb(24 144 255 / 0%);
+  border-color: var(--primary);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--primary) 10%, transparent);
 }
 
 .ant-select:not(.ant-select-disabled):hover .ant-select-selector {
-  border-color: #40a9ff00;
-  box-shadow: 0 0 0 2px rgb(24 144 255 / 0%);
+  border-color: var(--input-border-hover);
 }
 
 .ant-select-disabled.ant-select:not(.ant-select-customize-input) .ant-select-selector {
   position: relative;
   background-color: var(--input-disabled-bg);
-  border: 1px solid #cfcfcf00;
+  border: 1px solid var(--input-border);
 }
 
-// >
+// arrow
+.ant-select-arrow {
+  color: var(--text-muted);
+}
+
 .ant-select-arrow .anticon > svg {
-  color: rgba(255, 255, 255, 0);
+  color: currentColor;
 }
 
 // x
@@ -50,6 +57,13 @@
   background-color: transparent;
   color: var(--input-text) !important;
   font-size: 15px;
+}
+
+// Keep the clear-all button vertically centered when a multiple select grows.
+.ant-select-multiple .ant-select-clear {
+  top: 50%;
+  margin-top: 0;
+  transform: translateY(-50%);
 }
 
 // option
@@ -85,17 +99,62 @@
     text-overflow: ellipsis !important;
     white-space: nowrap !important;
     min-width: 0;
+    max-width: 100%;
   }
 }
 
-// select-multiple
-.ant-select-multiple.ant-select .ant-select-selection-item {
-  height: 28px;
-  background: transparent;
-  border: 1px solid #e7e7e7;
-  border-radius: 10px;
-  display: flex;
-  align-items: center;
+.ant-select-selector {
+  min-width: 0 !important;
+  max-width: 100% !important;
+}
+
+.ant-select-selection-search {
+  min-width: 0 !important;
+}
+
+.ant-select-selection-overflow {
+  min-width: 0 !important;
+  max-width: 100% !important;
+}
+
+.ant-select-selection-overflow-item {
+  min-width: 0 !important;
+  max-width: 100% !important;
+}
+
+.ant-select-selection-item-content {
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+}
+
+// Default spacing for single selects. Feature styles may extend this value
+// or opt into one of the modifiers below.
+.ant-select-single.ant-select:not(.ant-select-customize-input) .ant-select-selector {
+  padding-block: 0 !important;
+  padding-inline-start: 16px !important;
+  // padding-inline-end: 40px !important;
+}
+
+.ant-select-single.ant-select.ant-select--compact:not(.ant-select-customize-input)
+  .ant-select-selector {
+  padding-inline-start: 8px !important;
+  padding-inline-end: 28px !important;
+}
+
+.ant-select-single.ant-select.ant-select--no-padding-start:not(.ant-select-customize-input)
+  .ant-select-selector {
+  padding-inline-start: 0 !important;
+}
+
+.ant-select-single.ant-select.ant-select--no-padding-end:not(.ant-select-customize-input)
+  .ant-select-selector {
+  padding-inline-end: 0 !important;
+}
+
+.ant-select-single.ant-select.ant-select--no-padding:not(.ant-select-customize-input)
+  .ant-select-selector {
+  padding-inline: 0 !important;
 }
 
 /*
@@ -238,8 +297,6 @@
 .custom-picker-popup .ant-picker-panel-container {
   z-index: 1150 !important;
 
-  position: fixed !important;
-
   max-width: calc(100vw - 24px) !important;
 
   box-sizing: border-box;
@@ -379,7 +436,6 @@ nz-range-picker {
 .custom-range-picker-popup,
 .custom-range-picker-popup .ant-picker-panel-container {
   z-index: 1150 !important;
-  position: fixed !important;
   max-width: calc(100vw - 24px) !important;
   box-sizing: border-box;
   overflow-x: auto;

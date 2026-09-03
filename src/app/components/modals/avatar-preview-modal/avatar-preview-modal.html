@@ -10,8 +10,21 @@
         <i class="fas fa-times"></i>
       </button>
       <img [src]="src" (error)="onImgError($event)" class="preview-img" />
-      @if (name) {
-        <div class="avatar-name">{{ name }}</div>
+      @if (name || empNo || post || department) {
+        <div class="avatar-details">
+          @if (name) {
+            <div class="avatar-name">{{ name }}</div>
+          }
+          @if (empNo) {
+            <div class="avatar-emp-no">{{ empNo }}</div>
+          }
+          @if (post) {
+            <div class="avatar-post">{{ post }}</div>
+          }
+          @if (department) {
+            <div class="avatar-department">{{ department }}</div>
+          }
+        </div>
       }
     </div>
   </div>

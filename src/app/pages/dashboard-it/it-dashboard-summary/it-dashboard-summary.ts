@@ -12,7 +12,6 @@ import { ItServiceService } from '../../../services/it-service.service';
 import { NzTableModule } from 'ng-zorro-antd/table';
 import { NzModalModule } from 'ng-zorro-antd/modal';
 import { NzPaginationModule } from 'ng-zorro-antd/pagination';
-import * as XLSX from 'xlsx';
 import { DateUtilityService } from '../../../services/date-utility.service';
 import dayjs, { Dayjs } from 'dayjs';
 import { NzDatePickerModule } from 'ng-zorro-antd/date-picker';
@@ -22,6 +21,8 @@ import { MasterDataService } from '../../../services/master-data.service';
 import { ViewChildren, QueryList } from '@angular/core';
 import { PaginationComponent } from '../../../components/shared/pagination/pagination';
 import { createListingComputeds_v2, createListingState } from '../../../utils/listing.util';
+import { environment } from '../../../../environments/environment';
+import { exportTicketLogsToExcel } from '../../../utils/ticket-log-excel.util';
 
 @Component({
   selector: 'app-it-dashboard-summary',
@@ -193,6 +194,10 @@ export class ItDashboardSummary {
     private cdr: ChangeDetectorRef,
     private masterService: MasterDataService,
   ) {}
+
+  getEmployeeImage(empCode: string): string {
+    return `${environment.employeeImageUrl}/${empCode}.jpg`;
+  }
 
   ngOnInit(): void {
     this.selectStatus('all', false);
@@ -736,19 +741,22 @@ export class ItDashboardSummary {
     this.filter = {
       ...this.filter,
       status: status,
-      dateRange: [dayjs().subtract(3, 'month').toDate(), dayjs().toDate()] as [Date, Date] | null,
+      dateRange: [dayjs().startOf('year').toDate(), dayjs().endOf('year').toDate()] as
+        [Date, Date] | null,
     };
 
     this.filterOriginal = {
       ...this.filterOriginal,
       status: status,
-      dateRange: [dayjs().subtract(3, 'month').toDate(), dayjs().toDate()] as [Date, Date] | null,
+      dateRange: [dayjs().startOf('year').toDate(), dayjs().endOf('year').toDate()] as
+        [Date, Date] | null,
     };
     this.loadTickets();
   }
 
   loadTickets(): void {
     const [dateFrom, dateTo] = this.filter.dateRange ?? [];
+    console.log('loadTickets()', this.filter);
 
     const params = {
       status: this.statusLabelApi(this.currentStatus),
@@ -759,6 +767,7 @@ export class ItDashboardSummary {
       requester: this.filter.requester || undefined,
       company: this.filter.company || undefined,
       department: this.filter.department || undefined,
+      serviceType: this.filter.serviceType || undefined,
       dateFrom: dateFrom ? dayjs(dateFrom).format('YYYY-MM-DD') : undefined,
       dateTo: dateTo ? dayjs(dateTo).format('YYYY-MM-DD') : undefined,
       isReal: false,
@@ -766,7 +775,7 @@ export class ItDashboardSummary {
     // console.log(params);
     this.itServiceService.getTicketByStatus(params).subscribe({
       next: (res: any) => {
-        // console.log(res);
+        console.log(res);
         this.allRequests.set(res.data);
         this.listing.totalItems.set(res.pagination.total ?? 0);
         this.listing.totalPages.set(res.pagination.totalPages ?? 1);
@@ -779,8 +788,10 @@ export class ItDashboardSummary {
         this.filteredTicketLogs = this.ticketLogs.map((t: any) => ({
           ...t,
           assignees: t.groups_assignees_json ? JSON.parse(t.groups_assignees_json) : [],
+          assignees_mock: ['OTD01050', 'OTD01128', 'OTD01125'],
+          assignees_json: t.assignees_json ? JSON.parse(t.assignees_json) : [],
         }));
-        // console.log(this.filteredTicketLogs);
+        console.log(this.filteredTicketLogs);
 
         this.cdr.detectChanges();
       },
@@ -899,6 +910,48 @@ export class ItDashboardSummary {
   }
 
   exportData() {
+    const [dateFrom, dateTo] = this.filter.dateRange ?? [];
+    const params = {
+      status: this.statusLabelApi(this.filter.status),
+      page: 1,
+      pageSize: Math.max(this.listing.totalItems(), 1),
+      ticketNo: this.filter.ticketNo || undefined,
+      subject: this.filter.subject || undefined,
+      requester: this.filter.requester || undefined,
+      company: this.filter.company || undefined,
+      department: this.filter.department || undefined,
+      serviceType: this.filter.serviceType || undefined,
+      dateFrom: dateFrom ? dayjs(dateFrom).format('YYYY-MM-DD') : undefined,
+      dateTo: dateTo ? dayjs(dateTo).format('YYYY-MM-DD') : undefined,
+      isReal: false,
+    };
+
+    this.itServiceService.getTicketByStatus(params).subscribe({
+      next: (response: any) => {
+        const tickets = (Array.isArray(response?.data) ? response.data : []).map((ticket: any) => ({
+          ...ticket,
+          COMPANY_CODE: this.remapCompanyCode(ticket.COMPANY_CODE),
+        }));
+        if (!tickets.length) return;
+
+        const headText =
+          this.textClickFilter === 'serviceType'
+            ? tickets[0]?.name_th
+            : this.textClickFilter === 'department'
+              ? `${tickets[0]?.deptName ?? ''} (${tickets[0]?.COMPANY_CODE ?? ''})`
+              : this.textClickFilter === 'status'
+                ? this.filter.status
+                : 'all';
+        const safeHead = String(headText || 'all').replace(/[\\/:*?"<>|]/g, '-');
+        const fromText = dateFrom ? dayjs(dateFrom).format('YYYY-MM-DD') : 'all';
+        const toText = dateTo ? dayjs(dateTo).format('YYYY-MM-DD') : 'all';
+        exportTicketLogsToExcel(tickets, `tickets_${safeHead}_${fromText}_${toText}.xlsx`);
+      },
+      error: (error) => console.error('Export tickets error:', error),
+    });
+  }
+
+  exportData_old() {
     const [dateFrom, dateTo] = this.filter.dateRange ?? [];
 
     const params = {

@@ -24,6 +24,16 @@ import { NzSelectModule } from 'ng-zorro-antd/select';
 import { decryptValue } from '../../utils/crypto.js ';
 import { ExampleServiceRequestModal } from '../../components/modals/example-service-request-modal/example-service-request-modal';
 import { SignalrService } from '../../services/signalr.service';
+import {
+  FilePreviewItem,
+  FilePreviewModalComponent,
+} from '../../components/modals/file-preview-modal/file-preview-modal';
+import dayjs from 'dayjs';
+import { MasterDataService } from '../../services/master-data.service';
+import { NzModalModule } from 'ng-zorro-antd/modal';
+import { EmpAdForm } from '../dashboard-it/empployee-ad-management/emp-ad-form/emp-ad-form';
+import { IT_ATTACHMENT_FILE_CONFIG } from '../../constants/it-attachment-file.constant';
+import { PageLoaderComponent } from '../../components/shared/page-loader/page-loader';
 
 @Component({
   selector: 'app-it-service-request',
@@ -31,9 +41,12 @@ import { SignalrService } from '../../services/signalr.service';
   imports: [
     CommonModule,
     FormsModule,
-    PageHeaderComponent,
     NzSelectModule,
     ExampleServiceRequestModal,
+    FilePreviewModalComponent,
+    NzModalModule,
+    EmpAdForm,
+    PageLoaderComponent,
   ],
   templateUrl: './it-service-request.html',
   styleUrl: './it-service-request.scss',
@@ -49,6 +62,7 @@ export class ITServiceRequestComponent implements OnInit {
   private cdr = inject(ChangeDetectorRef);
   private router = inject(Router);
   private signalrService = inject(SignalrService);
+  private masterService = inject(MasterDataService);
 
   @ViewChild('detailTextarea') detailTextarea!: ElementRef;
 
@@ -58,6 +72,18 @@ export class ITServiceRequestComponent implements OnInit {
   phoneError = '';
   phoneNumber = signal('');
   requestDetails = signal('');
+  attachments = signal<{ name: string; size: number; file: File }[]>([]);
+  isPreviewModalOpen = signal<boolean>(false);
+  formErrors = signal<Record<string, string>>({});
+  private initialLoadsPending = signal(1);
+  isPageLoading = computed(() => this.initialLoadsPending() > 0);
+  previewFiles = signal<FilePreviewItem[]>([]);
+
+  readonly FILE_CONFIG = IT_ATTACHMENT_FILE_CONFIG;
+
+  private completeInitialLoad() {
+    this.initialLoadsPending.update((count) => Math.max(0, count - 1));
+  }
 
   // CONDITION
   @Input() openBy!: string;
@@ -77,13 +103,21 @@ export class ITServiceRequestComponent implements OnInit {
   IS_EXAMPLE = signal<boolean>(false);
 
   isSystemCategorySelected = signal(false);
+  private readonly BASIC_SYSTEM_SERVICE_ID = 22;
+  isBasicSystemServiceSelected = computed(() =>
+    this.serviceOptions().some(
+      (service) => service.id === this.BASIC_SYSTEM_SERVICE_ID && service.checked,
+    ),
+  );
   IsOneeJob: boolean = false;
   applicantId: string = '';
   detailJobs: any = null;
   isFormValid = computed(() => {
     const services = this.serviceOptions();
     const hasService = services.some((s) => s.checked);
-    const isRequestSystemChecked = services.find((s) => s.value === 'request_system')?.checked;
+    const isRequestSystemChecked = services.some(
+      (s) => s.checked && (s.id === this.BASIC_SYSTEM_SERVICE_ID || s.value === 'requser'),
+    );
     let subValidationPassed = true;
 
     if (isRequestSystemChecked) {
@@ -148,8 +182,15 @@ export class ITServiceRequestComponent implements OnInit {
   onOpenForChange(value: string) {
     const option = this.openForOptions().find((opt) => opt.value === value);
     this.selectedOpenFor.set({ value, label: option?.label ?? '' });
+    if (value) this.clearFormError('openFor');
     if (value === '__FREELANCE__') {
       this.isAnnounceChooseFreelance.set(true);
+
+      // เอา service id 22 ออก
+      this.serviceOptions.update((services) =>
+        services.map((s) => (s.id === 22 ? { ...s, checked: false } : s)),
+      );
+
       setTimeout(() => {
         this.detailTextarea.nativeElement.focus();
         this.detailTextarea.nativeElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -183,12 +224,140 @@ export class ITServiceRequestComponent implements OnInit {
       this.phoneError = 'เบอร์โทรศัพท์ต้องมี 4 หรือ 10 หลักเท่านั้น';
     } else {
       this.phoneError = '';
+      this.clearFormError('phone');
     }
   }
 
   onPhoneNumberChange(value: string) {
     const formatted = PhoneUtil.formatPhoneNumber(value);
     this.phoneNumber.set(formatted);
+  }
+
+  onDragOver(event: DragEvent) {
+    event.preventDefault();
+  }
+
+  onDrop(event: DragEvent) {
+    event.preventDefault();
+
+    if (event.dataTransfer?.files) {
+      this.addFiles(event.dataTransfer.files);
+    }
+  }
+
+  onFileSelected(event: Event) {
+    const input = event.target as HTMLInputElement;
+    if (input.files) {
+      this.addFiles(input.files);
+    }
+    input.value = '';
+  }
+
+  private addFiles(files: FileList) {
+    if (!files || files.length === 0) return;
+
+    const current = this.attachments();
+    const errorMap = new Map<string, string[]>();
+    const validFiles: { name: string; size: number; file: File }[] = [];
+
+    for (const file of Array.from(files)) {
+      const reasons: string[] = [];
+
+      // max files
+      if (current.length + validFiles.length >= this.FILE_CONFIG.maxFiles) {
+        reasons.push(`อัปโหลดได้สูงสุด ${this.FILE_CONFIG.maxFiles} ไฟล์`);
+      }
+
+      const sizeMB = file.size / (1024 * 1024);
+
+      if (sizeMB > this.FILE_CONFIG.maxSizeMB) {
+        reasons.push(`ขนาดเกิน ${this.FILE_CONFIG.maxSizeMB} MB`);
+      }
+
+      const ext = file.name.split('.').pop()?.toLowerCase() ?? '';
+
+      if (
+        !this.FILE_CONFIG.allowedTypes.includes(file.type) &&
+        !this.FILE_CONFIG.allowedExtensions.includes(ext)
+      ) {
+        reasons.push('ประเภทไฟล์ไม่รองรับ');
+      }
+
+      if (reasons.length > 0) {
+        reasons.forEach((reason) => {
+          // max files ไม่ต้องแสดงชื่อไฟล์
+          if (reason.includes('อัปโหลดได้สูงสุด')) {
+            if (!errorMap.has(reason)) {
+              errorMap.set(reason, []);
+            }
+            return;
+          }
+
+          const fileNames = errorMap.get(reason) ?? [];
+          fileNames.push(file.name);
+          errorMap.set(reason, fileNames);
+        });
+      } else {
+        validFiles.push({
+          name: file.name,
+          size: file.size,
+          file,
+        });
+      }
+    }
+    if (errorMap.size > 0) {
+      const html = Array.from(errorMap.entries())
+        .map(([reason, fileNames]) => {
+          // ไม่มีชื่อไฟล์
+          if (fileNames.length === 0) {
+            return `
+                  <div style="margin-bottom:12px; text-align:center;">
+                    <div style="font-weight:700;">${reason}</div>
+                  </div>
+                `;
+          }
+
+          return `
+              <div style="margin-bottom:12px; text-align:center;">
+                <div style="font-weight:700;">${reason}</div>
+
+                <div style="margin-top:4px; color:#64748b;">
+                  ${fileNames.map((name) => `• ${name}`).join('<br>')}
+                </div>
+              </div>
+            `;
+        })
+        .join('');
+
+      this.swalService.warning('', undefined, html);
+    }
+
+    if (validFiles.length > 0) {
+      this.attachments.set([...current, ...validFiles]);
+    }
+  }
+
+  viewFile(fileObj: { name: string; file: File }) {
+    const url = URL.createObjectURL(fileObj.file);
+    this.previewFiles.set([
+      {
+        fileName: fileObj.name,
+        date: dayjs().format('DD/MM/YYYY HH:mm'),
+        url,
+        type: fileObj.file.type,
+      },
+    ]);
+    this.isPreviewModalOpen.set(true);
+  }
+
+  closePreview() {
+    this.isPreviewModalOpen.set(false);
+  }
+
+  removeAttachment(index: number) {
+    const next = [...this.attachments()];
+    next.splice(index, 1);
+    this.attachments.set(next);
   }
 
   showRepairModal = signal(false);
@@ -255,13 +424,32 @@ export class ITServiceRequestComponent implements OnInit {
     const selectedValues = this.serviceOptions()
       .filter((s) => s.checked)
       .map((s) => s.value);
-    this.isSystemCategorySelected.set(selectedValues.includes('request_system'));
+    this.syncBasicSystemSelection();
+    if (this.serviceOptions().some((service) => service.checked)) {
+      this.clearFormError('services');
+    }
+    this.isSystemCategorySelected.set(
+      selectedValues.includes('requser') || this.isBasicSystemServiceSelected(),
+    );
 
-    if (!selectedValues.includes('request_system')) {
+    if (!selectedValues.includes('requser') && !this.isBasicSystemServiceSelected()) {
       this.selectedSystemTypes.set([]);
       this.userSubOptions.update((items) => items.map((i) => ({ ...i, checked: false })));
       this.systemSubOptions.update((items) => items.map((i) => ({ ...i, checked: false })));
     }
+  }
+
+  private syncBasicSystemSelection() {
+    const shouldSelectBasic = this.isBasicSystemServiceSelected();
+
+    if (!shouldSelectBasic) {
+      return;
+    }
+
+    this.selectedSystemTypes.update((types) =>
+      types.includes('user') ? types : [...types, 'user'],
+    );
+    this.userSubOptions.update((items) => items.map((item) => ({ ...item, checked: true })));
   }
 
   toggleUserSubOption(index: number) {
@@ -288,6 +476,15 @@ export class ITServiceRequestComponent implements OnInit {
   showSummaryModal = signal(false);
 
   submit() {
+    if (!this.isFormValid()) {
+      this.markSubmitErrors();
+      this.swalService.warning('ข้อมูลไม่ครบ', 'กรุณาตรวจสอบช่องที่มีข้อความแจ้งเตือน').then(() => {
+        (document.activeElement as HTMLElement | null)?.blur();
+        setTimeout(() => this.focusFirstInvalidField(), 300);
+      });
+      return;
+    }
+
     const selectedServices = this.serviceOptions().filter((s) => s.checked);
 
     if (selectedServices.length === 0) {
@@ -295,7 +492,9 @@ export class ITServiceRequestComponent implements OnInit {
       return;
     }
 
-    const isRequestSystem = selectedServices.some((s) => s.value === 'request_system');
+    const isRequestSystem = selectedServices.some(
+      (s) => s.id === this.BASIC_SYSTEM_SERVICE_ID || s.value === 'requser',
+    );
     if (isRequestSystem) {
       if (this.selectedSystemTypes().length === 0) {
         this.swalService.warning('แจ้งเตือน', 'กรุณาเลือกประเภทระบบ (Basic หรือ Specific)');
@@ -327,11 +526,84 @@ export class ITServiceRequestComponent implements OnInit {
     this.showSummaryModal.set(true);
   }
 
+  private markSubmitErrors() {
+    const errors: Record<string, string> = {};
+    const services = this.serviceOptions();
+    const selectedServices = services.filter((service) => service.checked);
+
+    if (!this.IsOneeJob && !this.selectedOpenFor().value) {
+      errors['openFor'] = 'กรุณาเลือกผู้ขอใช้บริการ';
+    }
+
+    const phoneDigits = this.phoneNumber().replace(/\D/g, '');
+    if (phoneDigits.length !== 4 && phoneDigits.length !== 10) {
+      errors['phone'] = 'กรุณากรอกเบอร์โทรศัพท์ 4 หรือ 10 หลัก';
+    }
+
+    if (!selectedServices.length) {
+      errors['services'] = 'กรุณาเลือกบริการอย่างน้อย 1 รายการ';
+    } else {
+      const requiresSystem = selectedServices.some(
+        (service) => service.id === this.BASIC_SYSTEM_SERVICE_ID || service.value === 'requser',
+      );
+      if (requiresSystem && !this.hasValidSystemSelection()) {
+        errors['services'] = 'กรุณาเลือกข้อมูลระบบที่ต้องการให้ครบ';
+      }
+    }
+
+    if (!this.requestDetails().trim()) {
+      errors['details'] = 'กรุณากรอกรายละเอียด';
+    }
+
+    this.formErrors.set(errors);
+  }
+
+  private hasValidSystemSelection() {
+    const types = this.selectedSystemTypes();
+    if (!types.length) return false;
+
+    return (
+      (!types.includes('user') || this.userSubOptions().some((option) => option.checked)) &&
+      (!types.includes('system') || this.systemSubOptions().some((option) => option.checked))
+    );
+  }
+
+  private focusFirstInvalidField() {
+    const firstInvalid = document.querySelector<HTMLElement>(
+      '.it-request-page .input-error, .it-request-page .validation-section-error, .it-request-page .validation-error',
+    );
+    if (!firstInvalid) return;
+
+    const field = firstInvalid.closest<HTMLElement>('.form-field, .form-group') ?? firstInvalid;
+    field.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+    setTimeout(() => {
+      field
+        .querySelector<HTMLElement>(
+          'input:not([disabled]), textarea:not([disabled]), button:not([disabled]), [tabindex]:not([tabindex="-1"])',
+        )
+        ?.focus({ preventScroll: true });
+    }, 400);
+  }
+
+  onRequestDetailsChange(value: string) {
+    this.requestDetails.set(value);
+    if (value.trim()) this.clearFormError('details');
+  }
+
+  private clearFormError(key: string) {
+    if (!this.formErrors()[key]) return;
+    const errors = { ...this.formErrors() };
+    delete errors[key];
+    this.formErrors.set(errors);
+  }
+
   closeSummaryModal() {
     this.showSummaryModal.set(false);
   }
 
   clearForm() {
+    this.formErrors.set({});
     this.serviceOptions.update((items) => items.map((i) => ({ ...i, checked: false })));
     this.isSystemCategorySelected.set(false);
     this.userSubOptions.update((items) => items.map((i) => ({ ...i, checked: false })));
@@ -339,6 +611,7 @@ export class ITServiceRequestComponent implements OnInit {
     // this.selectedOpenFor.set('self');
     // this.otherOpenForName.set('');
     this.requestDetails.set('');
+    this.attachments.set([]);
     this.selectedSystemTypes.set([]);
 
     this.phoneNumber.set('');
@@ -383,6 +656,8 @@ export class ITServiceRequestComponent implements OnInit {
           : 'false',
     ); //it เปิดให้ตัวเอง ?
 
+    console.log('IsSelfRequestByIT >', this.openBy, '>', this.authService.userData().DEPARTMENT);
+
     selectedServices.forEach((service) => {
       formData.append('serviceTypeIds', service.id.toString());
     });
@@ -393,6 +668,12 @@ export class ITServiceRequestComponent implements OnInit {
 
     systemOptions.forEach((service) => {
       formData.append('serviceTypeIds', service.id.toString());
+    });
+
+    this.attachments().forEach((item) => {
+      if (item?.file instanceof File) {
+        formData.append('files', item.file);
+      }
     });
 
     // console.log('formData', [...formData.entries()]);
@@ -507,61 +788,156 @@ export class ITServiceRequestComponent implements OnInit {
     this.selectedRequest.set(null);
   }
 
+  isShowSpecialForm(): boolean {
+    return this.serviceOptions().some((s) => s.id === 22 && s.checked);
+  }
+
+  showEmpAdForm = false;
+  requestUserData: any = null;
+  // onServiceChange(index: number, service: any) {
+  //   this.toggleService(index);
+
+  //   if (service.id === 22 && service.checked) {
+  //     this.showEmpAdForm = true;
+  //   }
+  // }
+
+  onServiceChange(index: number, service: any) {
+    this.toggleService(index);
+
+    const isRequestUserService = service.id === 22;
+    const isChecked = service.checked;
+    const isFreelance = this.selectedOpenFor()?.value === '__FREELANCE__';
+
+    if (isRequestUserService && isChecked && isFreelance) {
+      this.showEmpAdForm = true;
+    }
+  }
+
+  closeEmpAdForm() {
+    this.showEmpAdForm = false;
+
+    const service = this.serviceOptions().find((s) => s.id === 22);
+
+    // ถ้าไม่มีข้อมูลที่ save กลับมา
+    if (!this.requestUserData && service?.checked) {
+      const index = this.serviceOptions().findIndex((s) => s.id === 22);
+
+      if (index !== -1) {
+        this.toggleService(index);
+      }
+    }
+  }
+
+  onEmployeeFormSave(data: any) {
+    console.log(data);
+    this.requestUserData = data;
+
+    const requestUserDetail = `
+        FREELANCE
+
+        ชื่อ-นามสกุลภาษาไทย : ${data.NAMETHAI}
+
+        ชื่อ-นามสกุลภาษาอังกฤษ : ${data.TITLEENG ?? ''} ${data.NAMEENG}
+
+        ชื่อเล่น : ${data.NICKNAME}
+
+        บริษัท : ${data.COMPANY_NAME}
+
+        แผนก : ${data.DEPARTMENT}
+
+        เบอร์โทรศัพท์ : ${data.USR_MOBILE}
+
+        อีเมล : ${data.EMAIL}
+
+        หัวหน้า : ${data.HEAD_NAME}
+
+        `.trim();
+
+    this.requestDetails.set(requestUserDetail);
+    this.showEmpAdForm = false;
+  }
+
   // GET MASTER
   getServiceType() {
-    this.itServiceService.getServiceType().subscribe({
-      next: (res) => {
-        // console.log(res.data);
-        const mappedServices_main = res.data.mainServices.map((item: any) => ({
-          ...item,
-          checked: false,
-          disabled: false,
-        }));
-
-        this.serviceOptions.set(mappedServices_main);
-
-        const mappedServices_user = res.data.userSubOptions.map((item: any) => ({
-          ...item,
-          checked: false,
-        }));
-
-        this.userSubOptions.set(mappedServices_user);
-
-        const mappedServices_system = res.data.systemSubOptions.map((item: any) => ({
-          ...item,
-          checked: false,
-        }));
-
-        this.systemSubOptions.set(mappedServices_system);
-
-        // this.availableCategories = res.data
-        // this.cdr.detectChanges();
-      },
-      error: (error) => {
-        console.error('Error fetching data:', error);
-      },
-    });
-  }
-  getOpenFor() {
     this.itServiceService
-      .getOpenFor({ currentEmpId: this.authService.userData().CODEMPID })
+      .getServiceType()
+      .pipe(finalize(() => this.completeInitialLoad()))
       .subscribe({
         next: (res) => {
-          this.openForOptions.set(res.data);
-          const defaultOption = this.openForOptions().find(
-            (opt) => opt.value === this.authService.userData().CODEMPID,
-          );
-          if (defaultOption) {
-            this.selectedOpenFor.set({
-              value: defaultOption.value,
-              label: defaultOption.label,
-            });
-          }
+          console.log(res.data);
+          const mappedServices_main = res.data.mainServices
+            .filter((item: any) => item.id !== 6)
+            .map((item: any) => ({
+              ...item,
+              checked: false,
+              disabled: false,
+            }));
+
+          this.serviceOptions.set(mappedServices_main);
+
+          const mappedServices_user = res.data.userSubOptions.map((item: any) => ({
+            ...item,
+            checked: false,
+          }));
+
+          this.userSubOptions.set(mappedServices_user);
+
+          const mappedServices_system = res.data.systemSubOptions.map((item: any) => ({
+            ...item,
+            checked: false,
+          }));
+
+          this.systemSubOptions.set(mappedServices_system);
+
+          // this.availableCategories = res.data
+          // this.cdr.detectChanges();
         },
         error: (error) => {
           console.error('Error fetching data:', error);
         },
       });
+  }
+  getOpenFor() {
+    if (this.openBy === 'IT') {
+      this.initialLoadsPending.update((count) => count + 1);
+      this.itServiceService
+        .getOpenFor({ currentEmpId: this.authService.userData().CODEMPID })
+        .pipe(finalize(() => this.completeInitialLoad()))
+        .subscribe({
+          next: (res) => {
+            const options = res.data.map((item: any) => ({
+              ...item,
+              label: item.value === '__FREELANCE__' ? 'Freelance' : item.label,
+            }));
+            this.openForOptions.set(options);
+
+            const defaultOption = options.find(
+              (option: any) => option.value === this.authService.userData().CODEMPID,
+            );
+            if (defaultOption) {
+              this.selectedOpenFor.set({
+                value: defaultOption.value,
+                label: defaultOption.label,
+              });
+            }
+          },
+          error: (error) => console.error('Error fetching open-for options:', error),
+        });
+      return;
+    }
+
+    const employee = this.authService.userData();
+    const selfOption = {
+      value: employee.CODEMPID,
+      label: `${employee.CODEMPID} - ${employee.NAMFIRSTT ?? ''} ${employee.NAMLASTT ?? ''}`.trim(),
+    };
+
+    this.openForOptions.set([
+      selfOption,
+      { value: '__FREELANCE__', label: 'Freelance', isFreelance: true },
+    ]);
+    this.selectedOpenFor.set(selfOption);
   }
 
   getDetailFromJobsByApplicantId(id: string) {
@@ -571,15 +947,49 @@ export class ITServiceRequestComponent implements OnInit {
         this.detailJobs = res;
         const data = res[0];
         // console.log('data : ', data);
-        this.openforOneejob = data
-          ? `${data.FirstNameThai} ${data.LastNameThai} (พนักงานใหม่)`
-          : '';
+        this.openforOneejob = data ? `${data.FirstNameThai} ${data.LastNameThai}` : '';
         this.requestDetails.set(
-          `ชื่อ-นามสกุล: ${data.FirstNameThai} ${data.LastNameThai} (พนักงานใหม่)\n` +
+          `- พนักงานใหม่ -\n` +
+            `ชื่อ-นามสกุล: ${data.FirstNameThai} ${data.LastNameThai}\n` +
             `Email: ${data.Email}\n` +
             `ตำแหน่ง: ${data.JobTitle}\n` +
             `บริษัท: ${data.Location}`,
         );
+      },
+      error: (error) => {
+        console.error('Error fetching data:', error);
+      },
+    });
+  }
+
+  companyList: any[] = [];
+  departmentList: any[] = [];
+  filteredDepartmentList: any[] = [];
+
+  private remapCompanyCode(code: string): string {
+    if (code === 'OTD') return 'ONEE';
+    if (code === 'OTV') return 'ONE31';
+    return code;
+  }
+
+  getCompanies() {
+    this.masterService.getCompanyMaster().subscribe({
+      next: (data) => {
+        this.companyList = data.map((item: any) => ({
+          ...item,
+          COMPANY_CODE: this.remapCompanyCode(item.COMPANY_CODE),
+        }));
+      },
+      error: (error) => {
+        console.error('Error fetching data:', error);
+      },
+    });
+  }
+
+  getDepartments() {
+    this.masterService.getDepartmentMaster().subscribe({
+      next: (data) => {
+        this.departmentList = data;
       },
       error: (error) => {
         console.error('Error fetching data:', error);

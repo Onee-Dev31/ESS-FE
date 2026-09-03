@@ -1,0 +1,38 @@
+<div class="modal-overlay" (click)="onBackdropClick()">
+  <section
+    class="modal-container"
+    [class]="'size-' + size"
+    [class.mobile-fullscreen]="mobileFullscreen"
+    role="dialog"
+    aria-modal="true"
+    [attr.aria-label]="title"
+    [style.--modal-custom-width]="width || null"
+    (click)="$event.stopPropagation()"
+  >
+    <header [class.primary]="headerStyle === 'primary'">
+      <div class="heading">
+        <div class="title-row">
+          @if (icon) {
+            <i [class]="icon"></i>
+          }
+          <h2>{{ title }}</h2>
+        </div>
+        @if (subtitle) {
+          <p>{{ subtitle }}</p>
+        }
+      </div>
+      <div class="header-actions">
+        <ng-content select="[modalHeaderAction]" />
+        @if (showClose) {
+          <button type="button" class="close-button" aria-label="ปิด" (click)="closeModal.emit()">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        }
+      </div>
+    </header>
+    <main [class.padded]="padded"><ng-content /></main>
+    @if (showFooter) {
+      <footer [class]="'align-' + footerAlign"><ng-content select="[modalFooter]" /></footer>
+    }
+  </section>
+</div>

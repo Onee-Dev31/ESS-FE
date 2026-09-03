@@ -1389,3 +1389,33 @@ $border: var(--border);
 ::ng-deep .ant-tooltip-arrow::after {
   background-color: var(--text-muted) !important;
 }
+
+// Select fields use the form-control host for border and spacing.
+:host
+  ::ng-deep
+  nz-select.form-control.ant-select-single.ant-select:not(.ant-select-customize-input)
+  .ant-select-selector {
+  padding: 0 !important;
+  background-color: transparent !important;
+  border-color: transparent !important;
+  box-shadow: none !important;
+}
+
+:host ::ng-deep nz-select.form-control .ant-select-selection-item,
+:host ::ng-deep nz-select.form-control .ant-select-selection-placeholder,
+:host ::ng-deep nz-select.form-control .ant-select-selection-search {
+  padding: 0 !important;
+}
+
+:host ::ng-deep nz-select.form-control .ant-select-selection-search {
+  inset-inline: 0 !important;
+}
+
+nz-select.form-control.ant-select-focused {
+  border-color: var(--primary) !important;
+}
+
+// Keep table content left-aligned only on the resign management page.
+:host .modern-table tbody td {
+  text-align: left;
+}

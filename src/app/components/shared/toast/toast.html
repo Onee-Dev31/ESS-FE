@@ -8,9 +8,9 @@
       >
         <i class="fas {{ getIcon(toast.type) }} toast-icon"></i>
         <span class="toast-message">{{ toast.message }}</span>
-        @if (toast.route) {
+        <!-- @if (toast.route) {
           <i class="fas fa-arrow-right toast-arrow"></i>
-        }
+        } -->
       </div>
       <button class="toast-close" (click)="close(toast.id)" aria-label="ปิด">
         <i class="fas fa-times"></i>

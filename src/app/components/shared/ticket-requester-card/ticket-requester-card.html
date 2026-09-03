@@ -1,0 +1,48 @@
+<section class="requester-card">
+  <div class="card-title">ผู้ขอใช้บริการ</div>
+  <div class="requester-profile">
+    <div class="avatar">
+      <app-avatar-preview-modal
+        [src]="'https://empimg.oneeclick.co:8048/employeeimage/' + requester.emp_code + '.jpg'"
+        [name]="displayName"
+      />
+    </div>
+    <div class="requester-detail">
+      <div class="requester-name">{{ displayName }}</div>
+      <div class="requester-meta">
+        {{ requester.department_name || '-' }}
+      </div>
+      <div class="requester-meta">
+        {{ requester.company_name || '-' }}
+      </div>
+    </div>
+    <button
+      type="button"
+      class="contact-toggle"
+      [attr.aria-expanded]="showContact"
+      (click)="showContact = !showContact"
+    >
+      <span>{{ showContact ? 'ซ่อนข้อมูลติดต่อ' : 'ดูข้อมูลติดต่อ' }}</span>
+      <i [class]="showContact ? 'fa-solid fa-angle-up' : 'fa-solid fa-angle-down'"></i>
+    </button>
+  </div>
+
+  @if (showContact) {
+    <div class="requester-contact">
+      <div class="contact-item">
+        <i class="fa-regular fa-envelope" aria-hidden="true"></i>
+        <span>{{ requester.email || '-' }}</span>
+      </div>
+      <div class="contact-item">
+        <i class="fa-solid fa-phone" aria-hidden="true"></i>
+        <span>{{ requester.contact_phone || '-' }}</span>
+      </div>
+    </div>
+  }
+
+  @if (ccCount > 0) {
+    <div class="cc-row">
+      CC: <button type="button" (click)="ccClick.emit()">{{ ccCount }} คน</button>
+    </div>
+  }
+</section>

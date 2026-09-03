@@ -1,20 +1,32 @@
-export interface Approve3Emp {
+export interface HrApproverEmp {
   empNo: string;
   empName: string;
+  empPost: string;
 }
 
 export interface ApprovalSetupRow {
   costCent: string;
   costCenterName: string;
   companyCode: string;
+  companyName: string;
+  secretaryEmpNo: string | null;
+  secretaryEmpName: string | null;
+  secretaryPost: string | null;
+  secretaryDept: string | null;
   approve1EmpNo: string | null;
   approve1EmpName: string | null;
+  approve1Post: string | null;
+  approve1Dept: string | null;
   approve2EmpNo: string | null;
   approve2EmpName: string | null;
-  approve3Emps: Approve3Emp[];
-  approve4EmpNo: string | null;
-  approve4EmpName: string | null;
-  isSkipApprove1: boolean;
+  approve2Post: string | null;
+  approve2Dept: string | null;
+  hrApprovers: HrApproverEmp[];
+  itDirectorEmpNo: string | null;
+  itDirectorEmpName: string | null;
+  itDirectorPost: string | null;
+  itDirectorDept: string | null;
+  isSkipSecretary: boolean;
   modifiedDate: string | null;
   modifiedBy: string | null;
 }
@@ -34,5 +46,6 @@ export interface ApprovalCategory {
   skipApprover2: boolean;
   skipApprover3: boolean;
   skipApprover4: boolean;
+  skipApprover5: boolean;
   activeFlag: boolean;
 }

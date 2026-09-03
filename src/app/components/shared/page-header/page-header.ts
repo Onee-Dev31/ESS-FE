@@ -9,10 +9,20 @@ import { Router } from '@angular/router';
   imports: [CommonModule],
   template: `
     <div class="top-header-strip">
-      <button class="btn-back" (click)="onBack()">
+      <!-- <button class="btn-back" (click)="onBack()">
         <i class="fas fa-chevron-left"></i>
-      </button>
-      <h2>{{ title }}</h2>
+      </button> -->
+      @if (icon) {
+        <div class="page-icon" [class.success]="iconTone === 'success'">
+          <i [class]="icon"></i>
+        </div>
+      }
+      <div class="header-copy">
+        <h2>{{ title }}</h2>
+        @if (subtitle) {
+          <p>{{ subtitle }}</p>
+        }
+      </div>
       <div class="header-actions">
         <ng-content></ng-content>
       </div>
@@ -34,12 +44,42 @@ import { Router } from '@angular/router';
         top: 0;
         z-index: 10;
 
+        .header-copy {
+          min-width: 0;
+          flex: 1;
+        }
+
         h2 {
           margin: 0;
-          font-size: 1.25rem;
-          font-weight: 700;
+          font-size: $font-size-title;
+          font-weight: 600;
           color: var(--text-header);
-          flex: 1;
+          line-height: 1.3;
+        }
+
+        p {
+          margin: 3px 0 0;
+          color: var(--text-sub);
+          font-size: $font-size-label;
+          line-height: 1.4;
+        }
+
+        .page-icon {
+          display: grid;
+          width: 48px;
+          height: 48px;
+          flex: 0 0 48px;
+          place-items: center;
+          border-radius: 13px;
+          background: color-mix(in srgb, var(--primary) 88%, #fff);
+          color: #fff;
+          font-size: $font-size-header;
+          box-shadow: 0 5px 14px color-mix(in srgb, var(--primary) 20%, transparent);
+
+          &.success {
+            background: color-mix(in srgb, var(--success) 88%, #fff);
+            box-shadow: 0 5px 14px color-mix(in srgb, var(--success) 20%, transparent);
+          }
         }
 
         .btn-back {
@@ -67,17 +107,19 @@ import { Router } from '@angular/router';
       @include tablet {
         .top-header-strip {
           padding: 0.75rem 1rem;
-          h2 {
-            font-size: $font-size-body;
-          }
         }
       }
 
       @include mobile {
         .top-header-strip {
-          padding: 0.5rem 0.7rem;
-          h2 {
-            font-size: $font-size-label;
+          padding: 0.75rem;
+          gap: 0.75rem;
+
+          .page-icon {
+            width: 44px;
+            height: 44px;
+            flex-basis: 44px;
+            border-radius: 12px;
           }
         }
       }
@@ -85,9 +127,6 @@ import { Router } from '@angular/router';
       @media (max-width: 425px) {
         .top-header-strip {
           padding: 0.5rem 0.7rem;
-          h2 {
-            font-size: $font-size-hint;
-          }
         }
       }
     `,
@@ -95,6 +134,9 @@ import { Router } from '@angular/router';
 })
 export class PageHeaderComponent {
   @Input({ required: true }) title: string = '';
+  @Input() subtitle: string = '';
+  @Input() icon: string = '';
+  @Input() iconTone: 'primary' | 'success' = 'primary';
   @Input() backUrl?: string;
   @Output() back = new EventEmitter<void>();
 

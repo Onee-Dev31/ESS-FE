@@ -31,7 +31,7 @@ export const menuGuard: CanActivateFn = (route, state) => {
   const router = inject(Router);
 
   const allowedPaths = authService.getAllowedPaths();
-  const currentPath = route.routeConfig?.path;
+  const currentPath = route.routeConfig?.path?.split('/')[0];
   const allData = JSON.parse(localStorage.getItem(STORAGE_KEYS.ALL_DATA) || '');
 
   const roles = allData.permission.Role?.split(',').map((r: string) => r.trim()) ?? [];

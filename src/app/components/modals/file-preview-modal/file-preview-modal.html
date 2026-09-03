@@ -36,7 +36,10 @@
 
         <div *ngIf="selectedFile" class="preview-content">
           <div class="preview-header">
-            <h4>{{ selectedFile.fileName }}</h4>
+            <div>
+              <h4>{{ selectedFile.fileName }}</h4>
+              <p>{{ selectedFile.remark }}</p>
+            </div>
             <button
               class="btn-download"
               (click)="downloadFile(selectedFile)"

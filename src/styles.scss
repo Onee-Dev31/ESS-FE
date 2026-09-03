@@ -5,9 +5,12 @@
 @use './styles/variables' as *;
 @use './styles/mixins' as *;
 @use './styles/utilities' as *;
+@use './styles/time-off-status' as *;
 
 // ANTD
 @use './styles/antd' as *;
+
+@import 'quill/dist/quill.snow.css';
 
 // Fonts
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=IBM+Plex+Sans+Thai+Looped:wght@400;500;600&display=swap');
@@ -342,8 +345,15 @@ label {
 
 /* Text */
 .swal2-html-container {
-  font-size: $font-size-header;
+  font-size: $font-size-header !important;
   color: var(--text-sub);
+
+  li,
+  p,
+  div,
+  span {
+    font-size: inherit;
+  }
 }
 
 /* Confirm Button */
@@ -374,4 +384,17 @@ label {
 /* Remove button focus outline */
 .swal2-styled:focus {
   box-shadow: none !important;
+}
+
+// it-service-request-spectfic.ts
+.summary-system-title {
+  font-size: 16px;
+  font-weight: 700;
+}
+
+// Editor
+.ql-toolbar,
+.ql-container,
+.ql-editor {
+  font-family: 'Inter', 'IBM Plex Sans Thai Looped', sans-serif !important;
 }

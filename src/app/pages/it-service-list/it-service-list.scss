@@ -786,6 +786,7 @@ textarea.form-input {
   background: none;
   border: none;
   color: var(--primary);
+  font-size: $font-size-label;
   transition: all 0.2s;
 
   &:hover {
@@ -1461,7 +1462,7 @@ textarea.form-input {
         flex: 1;
         color: var(--text-header);
         font-weight: 600;
-        font-size: 0.85rem;
+        font-size: $font-size-label;
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
@@ -1517,6 +1518,29 @@ textarea.form-input {
   display: none;
 }
 
+/* The shared card fills its parent by default. Attachments must follow their
+   content height so they do not squeeze/cover the editable detail card. */
+.tk-card.waiting-attachments {
+  flex: 0 0 auto;
+  height: auto;
+  min-height: 0;
+
+  .tk-card__body {
+    flex: 0 0 auto;
+    overflow-y: visible;
+  }
+}
+
+@media (min-height: 701px) {
+  .tk-card.waiting-attachments {
+    min-height: calc(100vh - 600px);
+
+    .tk-card__body {
+      flex: 1;
+    }
+  }
+}
+
 .tk-card__head {
   padding: 12px 14px;
   display: flex;
@@ -1533,13 +1557,14 @@ textarea.form-input {
 .tk-card__title {
   font-weight: 900;
   color: var(--text-header);
+  font-size: $font-size-label;
 
   i {
     padding-right: 20px;
   }
 
   .files {
-    font-size: 0.8rem;
+    font-size: $font-size-hint;
     font-weight: 600;
     color: var(--primary);
     cursor: pointer;
@@ -1585,7 +1610,7 @@ textarea.form-input {
   border-radius: 50px;
   background-color: var(--bg-table-head);
   cursor: pointer;
-  font-size: 12px;
+  font-size: $font-size-hint;
 }
 
 .tk-card__body {
@@ -1624,7 +1649,7 @@ textarea.form-input {
 .tk-text {
   color: var(--text-header);
   line-height: 1.65;
-  font-size: 14px;
+  font-size: $font-size-label;
 }
 
 .att-list {
@@ -1669,7 +1694,7 @@ textarea.form-input {
 }
 
 .att__sub {
-  font-size: 12px;
+  font-size: $font-size-hint;
   color: var(--text-table-head);
   margin-top: 2px;
 }
@@ -1681,6 +1706,18 @@ textarea.form-input {
 
 .att__actions button {
   border-radius: 12px;
+}
+
+.tk-card__footer {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 10px;
+
+  margin-top: 12px;
+  padding: 4px 6px;
+
+  border-top: 1px solid #edf2f7;
 }
 
 /* notes */
@@ -1782,21 +1819,53 @@ textarea.form-input {
   line-height: 1.6;
 
   .refer_tag {
-    background-color: var(--tag-bg-green);
-    border: 1px solid var(--tag-color-green);
-    color: var(--tag-color-green) !important;
     border-radius: 4px;
     padding: 3px 5px;
     font-size: $font-size-label;
     font-weight: 600;
     margin-right: 5px;
 
-    &.last {
+    &.referred {
+      background: color-mix(in srgb, var(--warning) 14%, transparent);
+      border: 1px solid var(--warning);
+      color: var(--warning) !important;
+    }
+
+    &.rejected {
       background-color: var(--tag-bg-red);
       border: 1px solid var(--tag-color-red);
       color: var(--tag-color-red) !important;
     }
   }
+}
+
+.image-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.chat-image {
+  width: 100%;
+  aspect-ratio: 1;
+  object-fit: cover;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: 0.2s;
+  object-position: center;
+}
+
+.chat-image:hover {
+  transform: scale(1.02);
+}
+
+.attachment-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+
+  margin-top: 12px;
 }
 
 .floating-chat {
@@ -1817,7 +1886,7 @@ textarea.form-input {
 }
 
 .floating-chat__panel {
-  width: min(420px, calc(100vw - 32px));
+  width: min(440px, calc(100vw - 32px));
   height: min(620px, calc(100vh - 124px));
   background: var(--bg-card);
   border: 1px solid var(--border-color);
@@ -1853,14 +1922,53 @@ textarea.form-input {
   font-weight: 800;
 }
 
+.floating-chat__label {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  line-height: 1.1;
+}
+
 .floating-chat__ticket-no {
-  font-size: 0.78rem;
-  font-weight: 600;
-  opacity: 0.75;
-  background: rgba(255, 255, 255, 0.15);
+  font-size: 10px;
+  opacity: 0.7;
+}
+
+// .floating-chat__ticket-no {
+//   font-size: 0.78rem;
+//   font-weight: 600;
+//   opacity: 0.75;
+//   background: rgba(255, 255, 255, 0.15);
+//   border-radius: 999px;
+//   padding: 2px 9px;
+//   letter-spacing: 0.02em;
+// }
+
+.floating-chat__summary {
+  border: 1px solid rgba(255, 255, 255, 0.26);
   border-radius: 999px;
-  padding: 2px 9px;
-  letter-spacing: 0.02em;
+  background: rgba(255, 255, 255, 0.14);
+  color: #ffffff;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 9px;
+  height: 30px;
+  cursor: pointer;
+  font-size: 0.78rem;
+  font-weight: 700;
+  transition:
+    background 0.18s,
+    border-color 0.18s;
+
+  i {
+    font-size: 0.72rem;
+  }
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.24);
+    border-color: rgba(255, 255, 255, 0.4);
+  }
 }
 
 .floating-chat__close {
@@ -2010,10 +2118,18 @@ textarea.form-input {
 }
 
 .floating-chat__service-hours {
-  margin-top: 6px;
-  margin-bottom: 12px;
-  padding: 9px 12px;
-  border: 1px solid var(--border-color);
+  // margin-top: 6px;
+  // margin-bottom: 12px;
+  // padding: 9px 12px;
+  // border: 1px solid var(--border-color);
+  // border-radius: 12px;
+  // background: var(--bg-card);
+  // color: var(--text-muted);
+  // font-size: $font-size-hint;
+  // line-height: 1.45;
+  // text-align: center;
+  padding: 6px 2px;
+  margin: 2px;
   border-radius: 12px;
   background: var(--bg-card);
   color: var(--text-muted);
@@ -2413,15 +2529,18 @@ textarea.form-input {
 .floating-chat__files {
   padding: 10px;
   background: var(--bg-card);
-  display: flex;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  justify-items: stretch;
   gap: 8px;
-  flex-wrap: wrap;
   border-top: 1px solid var(--border-color);
 }
 
 .floating-chat__file {
-  max-width: 100%;
+  width: 100%;
   min-width: 0;
+  max-width: none;
+  box-sizing: border-box;
   border: 1px solid var(--border-color);
   border-radius: 999px;
   background: var(--bg-page);
@@ -2438,7 +2557,7 @@ textarea.form-input {
 
   span {
     min-width: 0;
-    max-width: 190px;
+    flex: 1;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -2475,7 +2594,7 @@ textarea.form-input {
   position: relative;
   width: 64px;
   height: 64px;
-  border: 6px solid var(--bg-card);
+  border: 6px solid var(--border-table-head);
   border-radius: 999px;
   background: var(--primary);
   color: #ffffff;
@@ -2911,6 +3030,97 @@ textarea.form-input {
   // border-bottom: 1px solid var(--border-color);
 }
 
+.requester-profile {
+  gap: 7px;
+
+  .side-avatar {
+    width: 72px;
+    height: 72px;
+    border: 3px solid var(--bg-card);
+    outline: 2px solid color-mix(in srgb, var(--primary), transparent 65%);
+    box-shadow: 0 6px 16px rgba(17, 24, 39, 0.14);
+  }
+
+  .requester-detail {
+    gap: 3px;
+  }
+
+  .requester-name {
+    color: var(--text-header);
+    font-weight: 700;
+    line-height: 1.35;
+  }
+
+  .requester-meta {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    color: var(--text-muted);
+    line-height: 1.4;
+    overflow-wrap: anywhere;
+
+    i {
+      width: 13px;
+      color: var(--text-table-head);
+      flex-shrink: 0;
+    }
+  }
+
+  .contact-toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    width: auto;
+    height: 30px;
+    margin-top: 3px;
+    padding: 0 10px;
+    border: 1px solid var(--border-color);
+    border-radius: 999px;
+    background: var(--bg-card);
+    color: var(--primary);
+    font-family: inherit;
+    font-size: $font-size-hint;
+    font-weight: 600;
+    box-shadow: 0 2px 6px rgba(17, 24, 39, 0.08);
+    transition: all 0.2s ease;
+
+    &:hover {
+      border-color: var(--primary);
+      background: color-mix(in srgb, var(--primary), transparent 92%);
+      text-decoration: none;
+    }
+  }
+}
+
+.requester-contact {
+  display: grid;
+  gap: 7px;
+  margin-top: 12px !important;
+  padding: 10px 12px;
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  background: var(--bg-slate);
+}
+
+.requester-contact-item {
+  display: grid;
+  grid-template-columns: 18px minmax(0, 1fr);
+  align-items: center;
+  gap: 7px;
+  color: var(--text-table-head);
+
+  i {
+    color: var(--primary);
+    text-align: center;
+  }
+
+  span {
+    overflow-wrap: anywhere;
+  }
+}
+
 .side-name {
   font-weight: 900;
   color: var(--text-header);
@@ -3008,7 +3218,7 @@ textarea.form-input {
   }
 
   .tk-card {
-    min-height: 150px;
+    min-height: 250px;
   }
 
   .tk-card.note {
@@ -3128,24 +3338,60 @@ textarea.form-input {
   display: flex;
   flex-direction: column;
   gap: 12px;
+  min-height: 0;
+  overscroll-behavior: contain;
   scrollbar-width: thin;
 }
 
-.btn-expand-detail {
-  display: flex;
-  justify-content: flex-end;
+.action-btn {
+  display: inline-flex;
   align-items: center;
-  gap: 6px;
-  cursor: pointer;
-  font-size: 12px;
-  color: var(--primary) !important;
-  position: absolute;
-  right: 20px;
-  bottom: 8px;
+  gap: 8px;
 
-  &:hover {
-    opacity: 0.8;
+  height: 28px;
+  padding: 0 12px;
+
+  border: 1px solid color-mix(in srgb, var(--text) 20%, transparent);
+  border-radius: 10px;
+
+  background: var(--bg-card);
+  color: var(--text-header);
+
+  font-size: $font-size-hint;
+  font-weight: 500;
+
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  i {
+    font-size: $font-size-hint;
   }
+}
+
+.action-btn:hover {
+  background: var(--bg-page);
+  border-color: var(--primary);
+  color: color-mix(in srgb, var(--primary) 80%, transparent);
+}
+
+.action-btn:active {
+  transform: scale(0.98);
+}
+
+.action-btn-primary {
+  background: color-mix(in srgb, var(--primary) 10%, transparent);
+  color: var(--primary);
+  border-color: color-mix(in srgb, var(--primary) 20%, transparent);
+}
+
+.action-btn-primary:hover {
+  background: color-mix(in srgb, var(--primary) 20%, transparent);
+  border-color: var(--primary);
+}
+
+app-expand-icon {
+  width: clamp(15px, 2vw, 18px);
+  height: clamp(15px, 2vw, 18px);
 }
 
 @keyframes fadeIn {
@@ -3157,4 +3403,15 @@ textarea.form-input {
     opacity: 1;
     transform: translateY(0);
   }
+}
+
+.html-detail ::ng-deep th {
+  text-align: start;
+  padding-right: 16px;
+}
+
+.html-detail ::ng-deep img {
+  max-width: 100%;
+  height: auto;
+  display: block;
 }

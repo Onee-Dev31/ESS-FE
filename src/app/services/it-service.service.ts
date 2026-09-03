@@ -308,6 +308,26 @@ export class ItServiceService {
     });
   }
 
+  getApprovalItRequestsByDateRange(params: {
+    empno: string;
+    dateFrom?: string;
+    dateTo?: string;
+  }): Observable<any> {
+    let httpParams = new HttpParams().set('empno', params.empno);
+
+    if (params.dateFrom) {
+      httpParams = httpParams.set('dateFrom', params.dateFrom);
+    }
+
+    if (params.dateTo) {
+      httpParams = httpParams.set('dateTo', params.dateTo);
+    }
+
+    return this._http.get<any>(`${this.baseUrl}/it/ticket-all-request-dateRange`, {
+      params: httpParams,
+    });
+  }
+
   approveTicket(ticketId: number, payload: any) {
     const formData = new FormData();
 
@@ -355,7 +375,7 @@ export class ItServiceService {
     dateTo?: string;
     isReal?: boolean;
   }) {
-    console.log(params);
+    console.log('getTicketByStatus()', params);
     let httpParams = new HttpParams();
     if (params.status) httpParams = httpParams.set('status', params.status);
     if (params.page) httpParams = httpParams.set('page', String(params.page));
@@ -420,6 +440,13 @@ export class ItServiceService {
     return this._http.post(`${this.baseUrl}/tickets/${id}/replies`, formData);
   }
 
+  replyTicketEmail(
+    id: string | number,
+    payload: { message: string; replyAll: boolean; executedBy: string },
+  ): Observable<any> {
+    return this._http.post(`${this.baseUrl}/tickets/${id}/reply-email`, payload);
+  }
+
   getDetailFromJobsByApplicant(id: string): Observable<any> {
     // return of({ success: true }).pipe(delay(1500));
     const token = this.authservice.allData().accessToken;
@@ -438,7 +465,11 @@ export class ItServiceService {
     return this._http.post(`${this.baseUrl}/tickets/${ticketId}/read`, { readerCodeempid });
   }
 
-  markReplyRead(ticketId: string | number, userCodeempid: string, lastReadReplyId: number): Observable<any> {
+  markReplyRead(
+    ticketId: string | number,
+    userCodeempid: string,
+    lastReadReplyId: number,
+  ): Observable<any> {
     return this._http.post(`${this.baseUrl}/tickets/${ticketId}/replies/read`, {
       userCodeempid,
       lastReadReplyId,

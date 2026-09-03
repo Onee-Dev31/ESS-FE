@@ -7,11 +7,11 @@
   </header>
 
   @if (isLoading()) {
-    <main class="content-card">
+    <main class="content-card" cdkScrollable>
       <app-skeleton type="form" [rows]="4" />
     </main>
   } @else {
-    <main class="content-card">
+    <main class="content-card" cdkScrollable>
       <div class="item-info-bar">
         <div class="badge-item">
           <i class="far fa-calendar-alt"></i>
@@ -384,9 +384,9 @@
                       class="desc-control"
                       [(ngModel)]="file.description"
                       [disabled]="isSaving()"
-                      [class.is-invalid]="!file.description"
                       placeholder="ระบุรายละเอียด (ถ้ามี)"
                     />
+                    <!--   [class.is-invalid]="!file.description" -->
                   </div>
                 </td>
               </tr>

@@ -1,17 +1,17 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { SettingHoliday } from './setting-holiday';
+import { LoginVersion4 } from './login-version4';
 
-describe('SettingHoliday', () => {
-  let component: SettingHoliday;
-  let fixture: ComponentFixture<SettingHoliday>;
+describe('LoginVersion4', () => {
+  let component: LoginVersion4;
+  let fixture: ComponentFixture<LoginVersion4>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [SettingHoliday],
+      imports: [LoginVersion4],
     }).compileComponents();
 
-    fixture = TestBed.createComponent(SettingHoliday);
+    fixture = TestBed.createComponent(LoginVersion4);
     component = fixture.componentInstance;
     await fixture.whenStable();
   });

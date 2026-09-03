@@ -1,0 +1,5 @@
+# กำหนดว่าใครต้อง approve ก่อน merge PR เข้า master
+
+# ดู: https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
+
+* @MamaPraew

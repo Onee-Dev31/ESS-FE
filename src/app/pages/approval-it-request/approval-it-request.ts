@@ -1,45 +1,41 @@
+import { CommonModule, Location } from '@angular/common';
 import {
-  Component,
-  signal,
-  computed,
-  inject,
-  OnInit,
-  DestroyRef,
   ChangeDetectionStrategy,
   ChangeDetectorRef,
+  Component,
+  computed,
+  DestroyRef,
+  inject,
+  OnInit,
+  signal,
 } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute } from '@angular/router';
-import { SignalrService } from '../../services/signalr.service';
-import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
-import { createAngularTable, getCoreRowModel, SortingState } from '@tanstack/angular-table';
+import { createAngularTable, getCoreRowModel } from '@tanstack/angular-table';
+import { NzInputModule } from 'ng-zorro-antd/input';
+import { NzDatePickerModule } from 'ng-zorro-antd/date-picker';
+import { NzSelectModule } from 'ng-zorro-antd/select';
+import * as XLSX from 'xlsx-js-style';
+import { saveAs } from 'file-saver';
+import { listAnimation } from '../../animations/animations';
 import { ItRequestDetailModal } from '../../components/modals/it-request-detail-modal/it-request-detail-modal';
+import { EmptyStateComponent } from '../../components/shared/empty-state/empty-state';
+import { PageHeaderComponent } from '../../components/shared/page-header/page-header';
+import { PageLoaderComponent } from '../../components/shared/page-loader/page-loader';
+import { PaginationComponent } from '../../components/shared/pagination/pagination';
+import { APPROVAL_STATUS_TABS } from '../../config/approval.config';
 import { ApprovalItem } from '../../interfaces/approval.interface';
 import { ApprovalsHelperService } from '../../services/approvals-helper.service';
+import { AuthService } from '../../services/auth.service';
 import { DateUtilityService } from '../../services/date-utility.service';
-import { ExportService } from '../../services/export';
-import { ToastService } from '../../services/toast';
-import { DialogService } from '../../services/dialog';
-import { LoadingService } from '../../services/loading';
 import { ErrorService } from '../../services/error';
 import { ItServiceService } from '../../services/it-service.service';
-import { APPROVAL_STATUS_TABS } from '../../config/approval.config';
-import { PageHeaderComponent } from '../../components/shared/page-header/page-header';
-import { PaginationComponent } from '../../components/shared/pagination/pagination';
-// import { SkeletonComponent } from '../../components/shared/skeleton/skeleton';
-import {
-  createListingState,
-  createListingComputeds,
-  TableSortHelper,
-} from '../../utils/listing.util';
-import { EmptyStateComponent } from '../../components/shared/empty-state/empty-state';
-import { listAnimation } from '../../animations/animations';
-import { SkeletonComponent } from '../../components/shared/skeleton/skeleton';
-import { AuthService } from '../../services/auth.service';
-import { NzInputModule } from 'ng-zorro-antd/input';
+import { LoadingService } from '../../services/loading';
+import { SignalrService } from '../../services/signalr.service';
+import { ToastService } from '../../services/toast';
+import { createListingComputeds, createListingState } from '../../utils/listing.util';
 
-/** หน้าจัดการรายการอนุมัติ (Approval IT Request) แสดงข้อมูลในรูปแบบตารางพร้อมระบบกรองและค้นหา */
 @Component({
   selector: 'app-approval-it-request',
   standalone: true,
@@ -48,10 +44,12 @@ import { NzInputModule } from 'ng-zorro-antd/input';
     FormsModule,
     ItRequestDetailModal,
     PageHeaderComponent,
+    PageLoaderComponent,
     PaginationComponent,
     EmptyStateComponent,
-    SkeletonComponent,
     NzInputModule,
+    NzDatePickerModule,
+    NzSelectModule,
   ],
   animations: [listAnimation],
   templateUrl: './approval-it-request.html',
@@ -60,324 +58,107 @@ import { NzInputModule } from 'ng-zorro-antd/input';
 })
 export class ApprovalItRequestComponent implements OnInit {
   private approvalsHelper = inject(ApprovalsHelperService);
-  dateUtil = inject(DateUtilityService);
-  private exportService = inject(ExportService);
-  private toastService = inject(ToastService);
-  private loadingService = inject(LoadingService);
+  private authService = inject(AuthService);
+  private cdr = inject(ChangeDetectorRef);
+  private destroyRef = inject(DestroyRef);
   private errorService = inject(ErrorService);
   private itService = inject(ItServiceService);
+  private loadingService = inject(LoadingService);
+  private location = inject(Location);
   private route = inject(ActivatedRoute);
   private signalrService = inject(SignalrService);
-  private destroyRef = inject(DestroyRef);
+  private toastService = inject(ToastService);
 
+  dateUtil = inject(DateUtilityService);
   isLoading = this.loadingService.loading('approvals-it-list');
   isExporting = this.loadingService.loading('export');
-
   listing = createListingState();
   tabs = APPROVAL_STATUS_TABS;
 
-  isModalOpen = signal<boolean>(false);
-  selectedItem = signal<ApprovalItem | null>(null);
-  initialAction = signal<'Approved' | 'Rejected' | 'Referred Back' | null>(null);
-  totalItems = signal<number>(0);
+  readonly currentYear = new Date().getFullYear();
+  readonly showDateRangeFilter = true;
+  dateRange = signal<Date[]>([
+    new Date(this.currentYear, 0, 1),
+    new Date(this.currentYear, 11, 31),
+  ]);
+  appliedDateFrom = signal(`${this.currentYear}-01-01`);
+  appliedDateTo = signal(`${this.currentYear}-12-31`);
+  approvalStageFilter = signal<'all' | 'approver' | 'director'>('all');
 
   approvals = signal<ApprovalItem[]>([]);
-  sorting = signal<SortingState>([{ id: 'requestNo', desc: true }]);
   highlightedTicketId = signal<number | null>(null);
+  isModalOpen = signal(false);
+  selectedItem = signal<ApprovalItem | null>(null);
+  initialAction = signal<'Approved' | 'Rejected' | 'Referred Back' | null>(null);
+  expandedWaitingApprovers = signal<Set<string>>(new Set());
+  pageTitle = signal('IT Request Approvals');
+  canFilterApprovalStage = computed(() =>
+    (this.authService.userRole() ?? '')
+      .split(',')
+      .map((role) => role.trim().toLowerCase())
+      .includes('it-director'),
+  );
+  canSeeWaitingApprover = computed(() =>
+    (this.authService.userRole() ?? '')
+      .split(',')
+      .map((role) => role.trim().toLowerCase())
+      .includes('system-admin'),
+  );
 
-  statusCounts = signal<any>({
-    Pending: 0,
-    Approved: 0,
-    Rejected: 0,
-    ReferredBack: 0,
-  });
-
-  STATUS_API_MAP: Record<string, string> = {
-    Pending: 'New',
-    Approved: 'Approved',
-    Rejected: 'Rejected',
-    'Referred Back': 'Referred_Back',
-  };
-
-  pageTitle = signal<string>('IT Request Approvals');
-  showExportMenu = signal<boolean>(false);
-  constructor(
-    private itServiceService: ItServiceService,
-    private cdr: ChangeDetectorRef,
-    private authService: AuthService,
-  ) {
-    this.listing.filterStatus.set('Pending');
+  getWaitingApprovers(value: unknown): string[] {
+    if (typeof value !== 'string') return [];
+    return value
+      .split(',')
+      .map((approver) => approver.trim())
+      .filter(Boolean);
   }
 
-  ngOnInit() {
-    this.route.queryParams.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((params) => {
-      const ticketId = Number(params['ticketId']);
-      const ticketNumber = params['ticketNumber'] ?? '';
+  isWaitingApproverExpanded(requestNo: string): boolean {
+    return this.expandedWaitingApprovers().has(requestNo);
+  }
 
-      this.refreshAndFocus(ticketId || null, ticketNumber || null);
+  toggleWaitingApprovers(requestNo: string, event: Event): void {
+    event.stopPropagation();
+    this.expandedWaitingApprovers.update((current) => {
+      const next = new Set(current);
+      if (next.has(requestNo)) {
+        next.delete(requestNo);
+      } else {
+        next.add(requestNo);
+      }
+      return next;
     });
-
-    this.signalrService.ticketFocusTrigger
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe((val) => {
-        const num = Number(val);
-        if (!isNaN(num) && num > 0) {
-          this.refreshAndFocus(num, null);
-        } else {
-          this.refreshAndFocus(null, String(val));
-        }
-      });
-
-    this.signalrService
-      .on('NewTicketForApproval')
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe(() => this.refresh());
-  }
-
-  private refreshAndFocus(ticketId: number | null, ticketNumber: string | null = null) {
-    if (ticketId) {
-      // เรียก getTicketById ก่อน เพื่อรู้ status (Pending/Approved/Rejected/Referred Back)
-      this.itServiceService.getTicketById(ticketId.toString()).subscribe({
-        next: (res: any) => {
-          const ticket = res?.ticket ?? res;
-          const approvalStatus = ticket?.approval_status;
-
-          // map approval_status → tab name
-          const statusTabMap: Record<string, string> = {
-            New: 'Pending',
-            Approved: 'Approved',
-            Rejected: 'Rejected',
-            Referred_Back: 'Referred Back',
-          };
-
-          const targetTab = statusTabMap[approvalStatus] ?? 'Pending';
-
-          // set tab ถ้าต่างจากปัจจุบัน
-          if (this.listing.filterStatus() !== targetTab) {
-            this.listing.filterStatus.set(targetTab);
-            this.listing.currentPage.set(0);
-          }
-
-          // โหลดข้อมูลแล้ว focus
-          this._doRefreshAndFocus(ticketId, ticketNumber);
-        },
-        error: () => {
-          // ถ้า error ก็ refresh ตามปกติ
-          this._doRefreshAndFocus(ticketId, ticketNumber);
-        },
-      });
-    } else {
-      this._doRefreshAndFocus(ticketId, ticketNumber);
-    }
-  }
-
-  private _doRefreshAndFocus(ticketId: number | null, ticketNumber: string | null) {
-    if (ticketNumber) {
-      // ✅ หา focusPage ก่อน
-      const pageSize = this.listing.pageSize();
-      const status = this.listing.filterStatus();
-      const apiStatus = this.STATUS_API_MAP[status] || status;
-      const empNo = this.authService.userData().CODEMPID;
-
-      this.itService
-        .getApprovalItRequests({
-          page: 1,
-          pageSize,
-          status: apiStatus,
-          empno: empNo,
-          focusTicketNumber: ticketNumber,
-        })
-        .subscribe({
-          next: (res) => {
-            // console.log(res, ticketNumber);
-            const focusPage = res.focusPage ?? 1;
-            this.listing.currentPage.set(focusPage - 1);
-            this._loadPage(ticketId, ticketNumber);
-          },
-        });
-    } else {
-      this._loadPage(ticketId, ticketNumber);
-    }
-  }
-
-  private _loadPage(ticketId: number | null, ticketNumber: string | null) {
-    this.loadingService.start('approvals-it-list');
-
-    const page = this.listing.currentPage() + 1;
-    const pageSize = this.listing.pageSize();
-    const status = this.listing.filterStatus();
-    const apiStatus = this.STATUS_API_MAP[status] || status;
-    const empNo = this.authService.userData().CODEMPID;
-
-    this.itService
-      .getApprovalItRequests({ page, pageSize, status: apiStatus, empno: empNo })
-      .subscribe({
-        next: (res) => this._applyResults(res, ticketId, ticketNumber),
-      });
-  }
-
-  private _applyResults(res: any, ticketId: number | null, ticketNumber: string | null) {
-    const mappedData = (res.data || []).map((item: any) => this.mapToApprovalItem(item));
-    this.approvals.set(mappedData);
-    this.totalItems.set(res.total);
-    if (res.statusSummary) this.statusCounts.set(res.statusSummary);
-    this.loadingService.stop('approvals-it-list');
-    this.cdr.markForCheck();
-
-    this.viewRequestDetail(
-      ticketNumber ? (mappedData.find((r: any) => r.requestNo === ticketNumber) ?? null) : null,
-    );
-
-    const resolvedId =
-      ticketId ??
-      (ticketNumber
-        ? (mappedData.find((r: any) => r.requestNo === ticketNumber)?.requestId ?? null)
-        : null);
-
-    if (resolvedId) {
-      setTimeout(() => {
-        this.highlightedTicketId.set(resolvedId);
-        this.cdr.markForCheck();
-        document
-          .getElementById(`approval-row-${resolvedId}`)
-          ?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        setTimeout(() => {
-          this.highlightedTicketId.set(null);
-          this.cdr.markForCheck();
-        }, 10000);
-      }, 100);
-    }
-  }
-  // private _doRefreshAndFocus(ticketId: number | null, ticketNumber: string | null) {
-  //   this.loadingService.start('approvals-it-list');
-
-  //   const page = this.listing.currentPage() + 1;
-  //   const pageSize = this.listing.pageSize();
-  //   const status = this.listing.filterStatus();
-  //   const apiStatus = this.STATUS_API_MAP[status] || status;
-  //   const empNo = this.authService.userData().CODEMPID;
-
-  //   this.itService
-  //     .getApprovalItRequests({ page, pageSize, status: apiStatus, empno: empNo })
-  //     .subscribe({
-  //       next: (res) => {
-  //         const mappedData = (res.data || []).map((item: any) => this.mapToApprovalItem(item));
-  //         this.approvals.set(mappedData);
-  //         this.totalItems.set(res.total);
-  //         if (res.statusSummary) this.statusCounts.set(res.statusSummary);
-  //         this.loadingService.stop('approvals-it-list');
-  //         this.cdr.markForCheck();
-
-  //         this.viewRequestDetail(
-  //           ticketNumber
-  //             ? (mappedData.find((r: any) => r.requestNo === ticketNumber) ?? null)
-  //             : null,
-  //         );
-
-  //         const resolvedId =
-  //           ticketId ??
-  //           (ticketNumber
-  //             ? (mappedData.find((r: any) => r.requestNo === ticketNumber)?.requestId ?? null)
-  //             : null);
-
-  //         if (resolvedId) {
-  //           setTimeout(() => {
-  //             this.highlightedTicketId.set(resolvedId);
-  //             this.cdr.markForCheck();
-  //             document
-  //               .getElementById(`approval-row-${resolvedId}`)
-  //               ?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-  //             setTimeout(() => {
-  //               this.highlightedTicketId.set(null);
-  //               this.cdr.markForCheck();
-  //             }, 10000);
-  //           }, 100);
-  //         }
-  //       },
-  //     });
-  // }
-
-  refresh() {
-    this.loadingService.start('approvals-it-list');
-
-    const page = this.listing.currentPage() + 1;
-    const pageSize = this.listing.pageSize();
-    const status = this.listing.filterStatus();
-    const apiStatus = this.STATUS_API_MAP[status] || status;
-    const empNo = this.authService.userData().CODEMPID;
-
-    this.itService
-      .getApprovalItRequests({
-        page,
-        pageSize,
-        status: apiStatus,
-        empno: empNo,
-      })
-      .subscribe({
-        next: (res) => {
-          const mappedData = (res.data || []).map((item: any) => this.mapToApprovalItem(item));
-
-          this.approvals.set(mappedData);
-
-          this.totalItems.set(res.total);
-
-          if (res.statusSummary) {
-            this.statusCounts.set(res.statusSummary);
-          }
-
-          this.loadingService.stop('approvals-it-list');
-        },
-      });
-  }
-
-  private mapToApprovalItem(item: any): ApprovalItem {
-    return {
-      requestId: item.id,
-      requestNo: item.ticketNumber || item.requestNo || 'IT-XXX',
-      requestDate: item.createDate || null,
-      requestBy: {
-        name: item.requester?.name || item.requestBy?.name || 'Unknown',
-        employeeId: item.requester?.employeeId || item.requestBy?.employeeId || '-',
-        department: item.requester?.department || item.requestBy?.department || '-',
-        company: item.requester?.company || item.requestBy?.company || 'Onee',
-        position: '-',
-        phone: item.requester?.phone || '-',
-        profileImage: 'assets/images/user-placeholder.png',
-      },
-      requestType: 'IT Request',
-      typeId: 99,
-      requestDetail: item.description || item.requestDetail || 'IT Service/Problem Request',
-      amount: item.amount || 0,
-      status: this.approvalsHelper.mapStatus(item.status),
-      rawStatus: item.status || 'Pending',
-      type: 'it-request',
-      originalData: item,
-    };
   }
 
   comps = createListingComputeds(this.approvals, this.listing, (item, search, status) => {
-    // const matchStatus = !status || item.status === status;
-    const matchStatus = true;
-
+    const matchStatus = !status || item.status === status;
+    const stage = this.approvalStageFilter();
+    const matchApprovalStage =
+      stage === 'all' ||
+      (stage === 'director' && !!item.isPendingItDirectorApproval) ||
+      (stage === 'approver' && !item.isPendingItDirectorApproval);
     const matchSearch =
       !search ||
-      item.requestNo.toLowerCase().includes(search.toLowerCase()) ||
-      item.requestBy.name.toLowerCase().includes(search.toLowerCase());
+      item.requestNo.toLowerCase().includes(search) ||
+      item.requestBy.name.toLowerCase().includes(search);
 
-    return matchStatus && matchSearch;
+    return matchStatus && matchApprovalStage && matchSearch;
   });
 
-  sortedData = computed(() => {
-    let list = [...this.comps.filteredData()];
-    const sortState = this.sorting()[0];
-    if (sortState) {
-      return this.approvalsHelper.sortData(list, sortState.id, sortState.desc);
+  statusCounts = computed(() => {
+    const counts = { Pending: 0, Approved: 0, Rejected: 0, ReferredBack: 0 };
+    for (const item of this.approvals()) {
+      const key = item.status === 'Referred Back' ? 'ReferredBack' : item.status;
+      counts[key as keyof typeof counts]++;
     }
-    return list;
+    return counts;
   });
+
+  totalItems = computed(() => this.comps.totalItems());
 
   paginatedRows = computed(() => {
-    return this.sortedData();
+    const start = this.listing.currentPage() * this.listing.pageSize();
+    return this.comps.filteredData().slice(start, start + this.listing.pageSize());
   });
 
   table = createAngularTable(() => ({
@@ -390,78 +171,225 @@ export class ApprovalItRequestComponent implements OnInit {
       { id: 'requestCategory', header: 'Request Category' },
       { accessorKey: 'status', header: 'Status' },
     ],
-    state: { sorting: this.sorting() },
-    onSortingChange: (updaterOrValue) => {
-      const next =
-        typeof updaterOrValue === 'function' ? updaterOrValue(this.sorting()) : updaterOrValue;
-      this.sorting.set(next);
-    },
     getCoreRowModel: getCoreRowModel(),
     manualPagination: true,
   }));
 
-  setActiveTab(tab: string) {
-    if (this.listing.filterStatus() === tab) return;
+  constructor() {
+    this.listing.filterStatus.set('Pending');
+  }
 
+  ngOnInit(): void {
+    this.route.queryParams.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((params) => {
+      this.loadApprovals(Number(params['ticketId']) || null, params['ticketNumber'] || null);
+    });
+
+    this.signalrService.ticketFocusTrigger
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((value) => {
+        const id = Number(value);
+        this.loadApprovals(
+          Number.isFinite(id) && id > 0 ? id : null,
+          id > 0 ? null : String(value),
+        );
+      });
+
+    this.signalrService
+      .on('NewTicketForApproval')
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => this.refresh());
+  }
+
+  searchByDateRange(): void {
+    const [from, to] = this.dateRange() ?? [];
+    if (!from || !to) {
+      this.toastService.warning('กรุณาระบุช่วงวันที่ให้ครบถ้วน');
+      return;
+    }
+    if (from > to) {
+      this.toastService.warning('วันที่เริ่มต้นต้องไม่มากกว่าวันที่สิ้นสุด');
+      return;
+    }
+
+    this.appliedDateFrom.set(this.formatDateParam(from));
+    this.appliedDateTo.set(this.formatDateParam(to));
+    this.listing.currentPage.set(0);
+    this.loadApprovals();
+  }
+
+  private formatDateParam(date: Date): string {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  }
+
+  refresh(): void {
+    this.loadApprovals();
+  }
+
+  private loadApprovals(ticketId: number | null = null, ticketNumber: string | null = null): void {
+    this.loadingService.start('approvals-it-list');
+    this.itService
+      .getApprovalItRequestsByDateRange({
+        empno: this.authService.userData().CODEMPID,
+        dateFrom: this.appliedDateFrom(),
+        dateTo: this.appliedDateTo(),
+      })
+      .subscribe({
+        next: (response) => {
+          const data = (response?.data ?? []).map((item: any) =>
+            this.mapToApprovalItem(this.normalizeApiItem(item)),
+          );
+          console.log(response, data);
+          this.approvals.set(data);
+          this.focusTicket(data, ticketId, ticketNumber);
+          this.loadingService.stop('approvals-it-list');
+          this.cdr.markForCheck();
+        },
+        error: (error) => {
+          this.loadingService.stop('approvals-it-list');
+          this.errorService.handle(error, {
+            component: 'ApprovalItRequest',
+            action: 'load-year-range',
+          });
+        },
+      });
+  }
+
+  private normalizeApiItem(item: any): any {
+    const parseArray = (value: unknown): any[] => {
+      if (Array.isArray(value)) return value;
+      if (typeof value !== 'string' || !value.trim()) return [];
+      try {
+        const parsed = JSON.parse(value);
+        return Array.isArray(parsed) ? parsed : [];
+      } catch {
+        return [];
+      }
+    };
+
+    return {
+      ...item,
+      requester: item.requester ?? {
+        name: item['requester.name'],
+        employeeId: item['requester.employeeId'],
+        department: item['requester.department'],
+        phone: item['requester.phone'],
+        company: item['requester.company'],
+      },
+      attachments: parseArray(item.attachments),
+      main: parseArray(item.main),
+      basic: parseArray(item.basic),
+      specific: parseArray(item.specific),
+    };
+  }
+
+  private mapToApprovalItem(item: any): ApprovalItem {
+    return {
+      requestId: item.id,
+      requestNo: item.ticketNumber || item.requestNo || 'IT-XXX',
+      requestDate: item.createDate || null,
+      requestBy: {
+        name: item.requester?.name || 'Unknown',
+        employeeId: item.requester?.employeeId || '-',
+        department: item.requester?.department || '-',
+        company: item.requester?.company || 'Onee',
+        position: '-',
+        phone: item.requester?.phone || '-',
+        profileImage: 'assets/images/user-placeholder.png',
+      },
+      requestType: 'IT Request',
+      typeId: 99,
+      requestDetail: item.description || 'IT Service/Problem Request',
+      amount: item.amount || 0,
+      status: this.approvalsHelper.mapStatus(item.status),
+      rawStatus: item.status || 'Pending',
+      type: 'it-request',
+      originalData: item,
+      isPendingItDirectorApproval: item.isPendingItDirectorApproval,
+    };
+  }
+
+  private focusTicket(
+    data: ApprovalItem[],
+    ticketId: number | null,
+    ticketNumber: string | null,
+  ): void {
+    const item = data.find(
+      (approval) =>
+        (ticketId != null && approval.requestId === ticketId) ||
+        (!!ticketNumber && approval.requestNo === ticketNumber),
+    );
+    if (!item) return;
+
+    this.listing.filterStatus.set(item.status);
+    const sortedIndex = this.comps
+      .filteredData()
+      .findIndex((approval) => approval.requestId === item.requestId);
+    this.listing.currentPage.set(
+      sortedIndex < 0 ? 0 : Math.floor(sortedIndex / this.listing.pageSize()),
+    );
+    this.viewRequestDetail(item);
+
+    if (ticketId != null || ticketNumber) {
+      this.location.replaceState(this.location.path().split('?')[0]);
+    }
+
+    setTimeout(() => {
+      this.highlightedTicketId.set(item.requestId);
+      document
+        .getElementById(`approval-row-${item.requestId}`)
+        ?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      setTimeout(() => this.highlightedTicketId.set(null), 10000);
+    }, 100);
+  }
+
+  setActiveTab(tab: string): void {
+    if (this.listing.filterStatus() === tab) return;
     this.listing.filterStatus.set(tab);
     this.listing.currentPage.set(0);
-    this.refresh();
   }
 
-  getTabCount(tab: string) {
-    if (tab === 'Referred Back') tab = 'ReferredBack';
-    return this.statusCounts()[tab] || 0;
-  }
-
-  onSearch(event: Event) {
-    const input = event.target as HTMLInputElement;
-    this.listing.searchText.set(input.value);
+  setApprovalStageFilter(stage: 'all' | 'approver' | 'director'): void {
+    this.approvalStageFilter.set(stage);
     this.listing.currentPage.set(0);
   }
 
-  setPageSize(size: number) {
+  getTabCount(tab: string): number {
+    const key = tab === 'Referred Back' ? 'ReferredBack' : tab;
+    return this.statusCounts()[key as keyof ReturnType<typeof this.statusCounts>] ?? 0;
+  }
+
+  onSearch(event: Event): void {
+    this.listing.searchText.set((event.target as HTMLInputElement).value);
+    this.listing.currentPage.set(0);
+  }
+
+  setPageSize(size: number): void {
     this.listing.pageSize.set(size);
     this.listing.currentPage.set(0);
-    this.refresh();
   }
 
-  goToPage(page: number) {
+  goToPage(page: number): void {
     this.listing.currentPage.set(page);
-    this.refresh();
   }
 
-  toggleSort(columnId: string) {
-    TableSortHelper.toggleSort(this.table, columnId);
-  }
-
-  getSortIcon(columnId: string) {
-    return TableSortHelper.getSortIcon(this.table, columnId);
-  }
-
-  viewRequestDetail(item: ApprovalItem) {
+  viewRequestDetail(item: ApprovalItem): void {
     this.selectedItem.set(item);
     this.initialAction.set(null);
     this.isModalOpen.set(true);
   }
 
-  openActionModal(item: ApprovalItem, action: 'Approved' | 'Rejected' | 'Referred Back') {
-    this.selectedItem.set(item);
-    this.initialAction.set(action);
-    this.isModalOpen.set(true);
-  }
-
-  closeModal() {
+  closeModal(): void {
     this.isModalOpen.set(false);
     this.selectedItem.set(null);
     this.initialAction.set(null);
   }
 
-  onStatusUpdated() {
+  onStatusUpdated(): void {
+    this.closeModal();
     this.refresh();
-  }
-
-  getTimeAgo(date: string): string {
-    return this.dateUtil.getTimeAgo(date);
   }
 
   getStatusClass(status: string): string {
@@ -476,62 +404,113 @@ export class ApprovalItRequestComponent implements OnInit {
     return `${item.requestNo}-${index}`;
   }
 
-  toggleExportMenu() {
-    this.showExportMenu.set(!this.showExportMenu());
-  }
+  async exportExcel(): Promise<void> {
+    const search = this.listing.searchText().trim().toLowerCase();
+    const stage = this.approvalStageFilter();
+    const items = this.approvals().filter((item) => {
+      const matchesSearch =
+        !search ||
+        item.requestNo.toLowerCase().includes(search) ||
+        item.requestBy.name.toLowerCase().includes(search);
+      const matchesStage =
+        stage === 'all' ||
+        (stage === 'director' && !!item.isPendingItDirectorApproval) ||
+        (stage === 'approver' && !item.isPendingItDirectorApproval);
+      return matchesSearch && matchesStage;
+    });
+    if (!items.length) return;
 
-  async exportPDF() {
-    this.showExportMenu.set(false);
     this.loadingService.start('export');
     try {
-      await this.exportService.exportToPDF('approvals-it-table', 'approvals-it-request');
-      this.toastService.success('Export PDF สำเร็จ');
-    } catch (error) {
-      this.errorService.handle(error, { component: 'ApprovalItRequest', action: 'export-pdf' });
-    } finally {
-      this.loadingService.stop('export');
-    }
-  }
+      await new Promise<void>((resolve) => {
+        requestAnimationFrame(() => requestAnimationFrame(() => resolve()));
+      });
+      const border = {
+        top: { style: 'thin', color: { rgb: 'D1D5DB' } },
+        bottom: { style: 'thin', color: { rgb: 'D1D5DB' } },
+        left: { style: 'thin', color: { rgb: 'D1D5DB' } },
+        right: { style: 'thin', color: { rgb: 'D1D5DB' } },
+      };
+      const workbook = XLSX.utils.book_new();
+      const statuses = ['Pending', 'Approved', 'Rejected', 'Referred Back'];
 
-  async exportExcel() {
-    this.showExportMenu.set(false);
-    this.loadingService.start('export');
-    try {
-      const data = this.table.getRowModel().rows.map((row) => ({
-        requestNo: row.original.requestNo,
-        requestDate: row.original.requestDate,
-        requestBy: row.original.requestBy.name,
-        requestFor: row.original.originalData?.requestFor || '-',
-        requestCategory: row.original.originalData?.requestCategory || '-',
-        status: row.original.status,
-      }));
+      for (const status of statuses) {
+        const rows = items
+          .filter((item) => item.status === status)
+          .map((item) => ({
+            'Request No.': item.requestNo,
+            'Request Date': this.dateUtil.formatDateToBE(item.requestDate, 'DD/MM/YYYY HH:mm'),
+            'Request By': item.requestBy.name,
+            'Employee ID': item.requestBy.employeeId,
+            Department: item.requestBy.department,
+            'Request For': item.originalData?.requestFor || '-',
+            'Request Category': item.originalData?.requestCategory || '-',
+            Status: item.status,
+            'Approval Stage': item.isPendingItDirectorApproval ? 'IT Director' : 'Approver',
+          }));
+        const headers = [
+          'Request No.',
+          'Request Date',
+          'Request By',
+          'Employee ID',
+          'Department',
+          'Request For',
+          'Request Category',
+          'Status',
+          'Approval Stage',
+        ];
+        const worksheet = XLSX.utils.aoa_to_sheet([headers]);
+        if (rows.length) {
+          XLSX.utils.sheet_add_json(worksheet, rows, { origin: 'A2', skipHeader: true });
+        }
+        worksheet['!cols'] = [
+          { wch: 20 },
+          { wch: 22 },
+          { wch: 28 },
+          { wch: 16 },
+          { wch: 24 },
+          { wch: 28 },
+          { wch: 30 },
+          { wch: 18 },
+          { wch: 18 },
+        ];
 
-      const columns = [
-        { header: 'Request No.', key: 'requestNo', width: 20 },
-        { header: 'Request Date', key: 'requestDate', width: 20 },
-        { header: 'Request By', key: 'requestBy', width: 20 },
-        { header: 'Request For', key: 'requestFor', width: 20 },
-        { header: 'Request Category', key: 'requestCategory', width: 30 },
-        { header: 'Status', key: 'status', width: 15 },
-      ];
+        const range = XLSX.utils.decode_range(worksheet['!ref']!);
+        for (let row = range.s.r; row <= range.e.r; row++) {
+          for (let col = range.s.c; col <= range.e.c; col++) {
+            const cell = worksheet[XLSX.utils.encode_cell({ r: row, c: col })];
+            if (!cell) continue;
+            cell.s = { ...(cell.s ?? {}), border, alignment: { vertical: 'center' } };
+          }
+        }
 
-      await this.exportService.exportToExcel(data, columns, 'approvals-it-request');
+        for (let col = range.s.c; col <= range.e.c; col++) {
+          const header = worksheet[XLSX.utils.encode_cell({ r: 0, c: col })];
+          if (!header) continue;
+          header.s = {
+            ...(header.s ?? {}),
+            font: { bold: true, color: { rgb: 'FFFFFF' } },
+            fill: { patternType: 'solid', fgColor: { rgb: '217346' } },
+            alignment: { horizontal: 'center', vertical: 'center' },
+            border,
+          };
+        }
+
+        XLSX.utils.book_append_sheet(workbook, worksheet, status);
+      }
+      const excelBuffer = XLSX.write(workbook, {
+        bookType: 'xlsx',
+        type: 'array',
+        cellStyles: true,
+      });
+      const blob = new Blob([excelBuffer], {
+        type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      });
+      const exportDate = new Date().toISOString().slice(0, 10);
+      saveAs(blob, `it-approval-${exportDate}.xlsx`);
       this.toastService.success('Export Excel สำเร็จ');
     } catch (error) {
       this.errorService.handle(error, { component: 'ApprovalItRequest', action: 'export-excel' });
-    } finally {
-      this.loadingService.stop('export');
-    }
-  }
-
-  print() {
-    this.showExportMenu.set(false);
-    this.loadingService.start('export');
-    try {
-      this.exportService.printElement('approvals-it-table');
-      this.toastService.success('เปิดหน้าพิมพ์แล้ว');
-    } catch (error) {
-      this.errorService.handle(error, { component: 'ApprovalItRequest', action: 'print' });
     } finally {
       this.loadingService.stop('export');
     }

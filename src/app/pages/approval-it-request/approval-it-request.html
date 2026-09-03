@@ -1,23 +1,21 @@
+@if (isLoading() || isExporting()) {
+  <app-page-loader
+    [message]="isExporting() ? 'กำลังสร้างไฟล์ Excel...' : 'กำลังโหลดรายการอนุมัติ IT...'"
+  />
+}
+
 <div class="approvals-wrapper">
   <app-page-header [title]="pageTitle()">
     <div class="utility-btns">
-      <div class="export-dropdown">
-        <button class="btn-outline" (click)="toggleExportMenu()">
-          <i class="fas fa-download mr-1"></i> <span class="btn-text">Export</span>
-          <i class="fas fa-chevron-down ml-1"></i>
-        </button>
-        <div class="dropdown-menu" [class.show]="showExportMenu()">
-          <button class="dropdown-item" (click)="exportPDF()">
-            <i class="fas fa-file-pdf text-danger"></i> Export PDF
-          </button>
-          <button class="dropdown-item" (click)="exportExcel()">
-            <i class="fas fa-file-excel text-success"></i> Export Excel
-          </button>
-          <button class="dropdown-item" (click)="print()">
-            <i class="fas fa-print text-secondary"></i> Print
-          </button>
-        </div>
-      </div>
+      <button
+        type="button"
+        class="export-button"
+        [disabled]="isExporting() || totalItems() === 0"
+        (click)="exportExcel()"
+      >
+        <i class="fas fa-file-excel"></i>
+        Export Excel
+      </button>
       <button class="btn-outline" (click)="refresh()">
         <i class="fas fa-sync-alt mr-1"></i> <span class="btn-text">Refresh</span>
       </button>
@@ -39,6 +37,25 @@
         </nz-input-wrapper>
       </div>
 
+      @if (showDateRangeFilter) {
+        <div class="year-range-filter">
+          <label>
+            <!-- <span>Date range</span> -->
+            <nz-range-picker
+              class="date-range-picker custom-range-picker"
+              nzFormat="dd/MM/yyyy"
+              nzDropdownClassName="custom-range-picker-popup"
+              [ngModel]="dateRange()"
+              (ngModelChange)="dateRange.set($event)"
+            />
+          </label>
+          <button type="button" class="year-search-button" (click)="searchByDateRange()">
+            <i class="fas fa-search"></i>
+            Search
+          </button>
+        </div>
+      }
+
       <div class="tab-navigation">
         @for (tab of tabs; track tab) {
           <button
@@ -53,98 +70,152 @@
     </div>
 
     <div class="table-responsive">
-      @if (isLoading()) {
-        <app-skeleton type="table" [rows]="5"></app-skeleton>
-      } @else {
-        <table class="modern-table">
-          <thead>
-            <tr>
-              <th class="col-requestNo"><i class="fas fa-hashtag mr-1"></i> Request No.</th>
-              <th class="col-requestDate"><i class="far fa-clock mr-1"></i> Request Date</th>
-              <th class="col-requestBy"><i class="fas fa-user-edit mr-1"></i> Request By</th>
-              <th class="col-requestFor"><i class="fas fa-user mr-1"></i> Request For</th>
-              <th class="col-requestCategory">
-                <i class="fas fa-list-alt mr-1"></i> Request Category
-              </th>
-              <th class="col-status"><i class="fas fa-tasks mr-1"></i> Status</th>
-            </tr>
-          </thead>
-          @for (row of table.getRowModel().rows; track trackByRowId($index, row)) {
-            <tbody [@listAnimation]>
-              <tr
-                [id]="'approval-row-' + row.original.requestId"
-                [class.highlighted-row]="highlightedTicketId() === row.original.requestId"
-              >
-                <td class="col-requestNo detail" (click)="viewRequestDetail(row.original)">
-                  {{ row.original.requestNo }}
-                </td>
-                <td class="text-muted">
-                  <div>
-                    {{ dateUtil.formatDateToBE(row.original.requestDate, 'DD MMMM YYYY') }}
-                  </div>
-                  <div>{{ dateUtil.formatDateToBE(row.original.requestDate, 'HH:mm') }} น.</div>
-                </td>
-                <td>
-                  <div class="col-requestBy">
-                    <div class="name">{{ row.original.requestBy.name }}</div>
-                    <div class="details-box">
-                      <div class="detail-item">{{ row.original.requestBy.employeeId }}</div>
-                      <div class="detail-item">{{ row.original.requestBy.department }}</div>
-                    </div>
-                  </div>
-                </td>
-                <td>
-                  <div class="name">{{ row.original.originalData?.requestFor || '-' }}</div>
-                </td>
-                <td>
-                  <span class="highlight">{{
-                    row.original.originalData?.requestCategory || '-'
-                  }}</span>
-                </td>
-
-                <td class="text-center">
-                  <div>
-                    <span class="status-badge" [ngClass]="getStatusClass(row.original.status)">
-                      {{ row.original.status }}
-                    </span>
-                  </div>
-
-                  <div
-                    class="status-time"
-                    *ngIf="
-                      row.original.originalData?.ApprovalDate && row.original.status != 'Pending'
-                    "
+      <table class="modern-table">
+        <thead>
+          <tr>
+            <th class="col-requestNo">
+              <div class="request-number-header">
+                <span><i class="fas fa-hashtag mr-1"></i> Request No.</span>
+                @if (showDateRangeFilter && canFilterApprovalStage()) {
+                  <nz-select
+                    class="approval-stage-filter"
+                    [class.filter-approver]="approvalStageFilter() === 'approver'"
+                    [class.filter-director]="approvalStageFilter() === 'director'"
+                    aria-label="Filter approval stage"
+                    [ngModel]="approvalStageFilter()"
+                    (ngModelChange)="setApprovalStageFilter($event)"
                   >
-                    {{
-                      dateUtil.formatDateToBE(
-                        row.original.originalData?.ApprovalDate,
-                        'DD MMMM YYYY, HH:mm'
-                      )
-                    }}
-                    น.
+                    <nz-option nzValue="all" nzLabel="All" />
+                    <nz-option nzValue="approver" nzLabel="Approver" />
+                    <nz-option nzValue="director" nzLabel="IT Director" />
+                  </nz-select>
+                }
+              </div>
+            </th>
+            <th class="col-requestDate"><i class="far fa-clock mr-1"></i> Request Date</th>
+            <th class="col-requestBy"><i class="fas fa-user-edit mr-1"></i> Request By</th>
+            <th class="col-requestFor"><i class="fas fa-user mr-1"></i> Request For</th>
+            <th class="col-requestCategory">
+              <i class="fas fa-list-alt mr-1"></i> Request Category
+            </th>
+            <th class="col-status"><i class="fas fa-tasks mr-1"></i> Status</th>
+          </tr>
+        </thead>
+        @for (row of table.getRowModel().rows; track trackByRowId($index, row)) {
+          <tbody [@listAnimation]>
+            <tr
+              [id]="'approval-row-' + row.original.requestId"
+              [class.highlighted-row]="highlightedTicketId() === row.original.requestId"
+            >
+              <td class="col-requestNo detail">
+                <div class="request-number-cell">
+                  <span class="request-number-link" (click)="viewRequestDetail(row.original)">
+                    {{ row.original.requestNo }}
+                  </span>
+                  @if (row.original.isPendingItDirectorApproval && canFilterApprovalStage()) {
+                    <span class="director-pending-badge">IT Director</span>
+                  }
+                  @if (!row.original.isPendingItDirectorApproval && canFilterApprovalStage()) {
+                    <span class="director-pending-badge approver">Approver</span>
+                  }
+                </div>
+              </td>
+              <td class="text-muted">
+                <div class="status-badge-stack">
+                  {{ dateUtil.formatDateToBE(row.original.requestDate, 'DD MMMM YYYY') }}
+                </div>
+                <div>{{ dateUtil.formatDateToBE(row.original.requestDate, 'HH:mm') }} น.</div>
+              </td>
+              <td>
+                <div class="col-requestBy">
+                  <div class="name">{{ row.original.requestBy.name }}</div>
+                  <div class="details-box">
+                    <div class="detail-item">{{ row.original.requestBy.employeeId }}</div>
+                    <div class="detail-item">{{ row.original.requestBy.department }}</div>
                   </div>
-                </td>
-              </tr>
-            </tbody>
-          } @empty {
-            <tbody>
-              <tr>
-                <td colspan="10" class="no-data-cell">
-                  <app-empty-state
-                    title="ไม่พบข้อมูล"
-                    description="ไม่พบรายชื่อพนักงานฟรีแลนซ์"
-                    icon="fas fa-users-slash"
-                  ></app-empty-state>
-                </td>
-              </tr>
-            </tbody>
-          }
-        </table>
-      }
+                </div>
+              </td>
+              <td>
+                <div class="name">{{ row.original.originalData?.requestFor || '-' }}</div>
+              </td>
+              <td>
+                <span class="highlight">{{
+                  row.original.originalData?.requestCategory || '-'
+                }}</span>
+              </td>
+
+              <td class="text-center">
+                <div class="status-with-waiting">
+                  <span class="status-badge" [ngClass]="getStatusClass(row.original.status)">
+                    {{ row.original.status }}
+                  </span>
+                  @if (canSeeWaitingApprover() && row.original.originalData?.waitingApprover) {
+                    @let waitingApprovers =
+                      getWaitingApprovers(row.original.originalData?.waitingApprover);
+                    <div class="waiting-approver-list">
+                      @for (approver of waitingApprovers; track approver; let index = $index) {
+                        @if (index === 0 || isWaitingApproverExpanded(row.original.requestNo)) {
+                          <span
+                            class="waiting-approver-badge"
+                            [title]="'รอ ' + approver"
+                            [class.it-director]="approver === 'IT Director'"
+                          >
+                            รอ {{ approver }}
+                          </span>
+                        }
+                      }
+                      @if (waitingApprovers.length > 1) {
+                        <button
+                          type="button"
+                          class="waiting-approver-toggle"
+                          (click)="toggleWaitingApprovers(row.original.requestNo, $event)"
+                        >
+                          {{
+                            isWaitingApproverExpanded(row.original.requestNo)
+                              ? 'ซ่อน'
+                              : 'ดูเพิ่มเติม (+' + (waitingApprovers.length - 1) + ')'
+                          }}
+                        </button>
+                      }
+                    </div>
+                  }
+                </div>
+
+                <div
+                  class="status-time"
+                  *ngIf="
+                    row.original.originalData?.ApprovalDate && row.original.status != 'Pending'
+                  "
+                >
+                  {{
+                    dateUtil.formatDateToBE(
+                      row.original.originalData?.ApprovalDate,
+                      'DD MMMM YYYY, HH:mm'
+                    )
+                  }}
+                  น.
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        } @empty {
+          <tbody>
+            <tr>
+              <td colspan="10" class="no-data-cell">
+                <app-empty-state
+                  title="ไม่พบข้อมูล"
+                  description="ไม่พบรายชื่อพนักงานฟรีแลนซ์"
+                  icon="fas fa-users-slash"
+                ></app-empty-state>
+              </td>
+            </tr>
+          </tbody>
+        }
+      </table>
     </div>
 
     <div class="card-list-view">
-      @for (req of comps.paginatedData(); track trackByRowId($index, req)) {
+      @for (req of paginatedRows(); track trackByRowId($index, req)) {
         <div class="mobile-card">
           <div class="card-header">
             <div class="request-id">

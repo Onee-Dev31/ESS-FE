@@ -1,0 +1,55 @@
+<div class="approval-steps-wrapper">
+  <div
+    class="approval-steps"
+    [class.two-steps]="steps.length === 2"
+    [class.three-steps]="steps.length === 3"
+  >
+    @for (step of steps; track $index) {
+      <div class="approval-step" [ngClass]="step.state">
+        <div class="step-marker">
+          @if (step.state === 'completed') {
+            <i class="fas fa-check"></i>
+          } @else if (step.state === 'rejected' || step.state === 'cancelled') {
+            <i class="fas fa-times"></i>
+          } @else if (step.state === 'sendback') {
+            <i class="fas fa-undo-alt"></i>
+          } @else {
+            <span>{{ $index + 1 }}</span>
+          }
+        </div>
+        <span class="step-label">{{ step.label }}</span>
+        @if (step.approverCode) {
+          <span class="step-approver-code">{{ step.approverCode }}</span>
+        }
+        @if (step.state === 'sendback') {
+          <span class="status-badge status-referred">Sendback</span>
+        } @else if (step.state === 'rejected') {
+          <span class="status-badge status-rejected">Rejected</span>
+        } @else if (step.state === 'cancelled') {
+          <span class="status-badge status-cancelled">ยกเลิกคำขอ</span>
+        }
+      </div>
+    }
+  </div>
+
+  @if (actionReasonSteps.length) {
+    <div class="action-reasons" aria-label="เหตุผลจากผู้อนุมัติ">
+      <div class="action-reasons-title">เหตุผลจากผู้อนุมัติ</div>
+      @for (step of actionReasonSteps; track $index) {
+        <div class="action-reason" [class.sendback-reason]="step.state === 'sendback'">
+          <div class="action-reason-heading">
+            <i [class]="step.state === 'sendback' ? 'fas fa-undo-alt' : 'fas fa-times'"></i>
+            <strong>{{ step.label }}</strong>
+            @if (step.approverCode) {
+              <span>{{ step.approverCode }}</span>
+            }
+            <span class="reason-status">
+              {{ step.state === 'sendback' ? 'Sendback' : 'Rejected' }}
+            </span>
+          </div>
+          <p>{{ step.actionReason }}</p>
+        </div>
+      }
+    </div>
+  }
+</div>

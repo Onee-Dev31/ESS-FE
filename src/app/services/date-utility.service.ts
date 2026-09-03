@@ -3,6 +3,7 @@ import dayjs from 'dayjs';
 import 'dayjs/locale/th';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import buddhistEra from 'dayjs/plugin/buddhistEra';
+import { isValidDateRange as isValidSharedDateRange } from '../utils/form-validation.util';
 
 dayjs.extend(relativeTime);
 dayjs.extend(buddhistEra);
@@ -38,10 +39,8 @@ export class DateUtilityService {
     return dayjs().format('YYYY-MM-DD');
   }
 
-  isValidDateRange(startDate: string, endDate: string): boolean {
-    const start = dayjs(startDate);
-    const end = dayjs(endDate);
-    return start.isBefore(end) || start.isSame(end);
+  isValidDateRange(startDate: string | Date, endDate: string | Date): boolean {
+    return isValidSharedDateRange(startDate, endDate);
   }
 
   /** คำนวณเวลาที่ผ่านไปเป็นภาษาไทย (เช่น "3 วันที่แล้ว") */

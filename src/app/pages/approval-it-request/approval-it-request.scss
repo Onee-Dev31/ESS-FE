@@ -21,6 +21,33 @@ $border: var(--border);
   }
 }
 
+:host ::ng-deep .approval-stage-filter {
+  .ant-select-selector {
+    height: 30px !important;
+    border-radius: 999px !important;
+    border-color: color-mix(in srgb, var(--primary) 24%, var(--border)) !important;
+    background: var(--bg-card) !important;
+    font-size: 0.75rem;
+    font-weight: 600;
+  }
+
+  .ant-select-selection-item {
+    line-height: 28px !important;
+  }
+
+  &.filter-approver .ant-select-selector {
+    border-color: #9b8bc4 !important;
+    background: color-mix(in srgb, #9b8bc4 10%, var(--bg-card)) !important;
+    color: #77669f;
+  }
+
+  &.filter-director .ant-select-selector {
+    border-color: var(--warning) !important;
+    background: color-mix(in srgb, var(--warning) 10%, var(--bg-card)) !important;
+    color: color-mix(in srgb, var(--warning) 80%, #7a4a00);
+  }
+}
+
 @mixin tablet {
   @media (max-width: 1024px) {
     @content;
@@ -201,7 +228,7 @@ $border: var(--border);
     }
 
     td {
-      padding: 16px;
+      padding: 12px;
       font-size: $font-size-label;
       color: $text;
       border-bottom: 1px solid var(--border);
@@ -214,17 +241,58 @@ $border: var(--border);
   }
 
   .col-requestNo {
-    width: 150px;
+    width: 210px;
+
+    .request-number-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .approval-stage-filter {
+      width: 108px;
+      height: 30px;
+      cursor: pointer;
+    }
 
     &.detail {
       color: var(--primary) !important;
       font-weight: 600;
     }
 
-    &.detail:hover {
+    .request-number-link {
       cursor: pointer;
-      transform: translateY(-1px);
+    }
+
+    .request-number-link:hover {
       text-decoration: underline;
+    }
+
+    .request-number-cell {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 5px;
+    }
+
+    .director-pending-badge {
+      padding: 3px 7px;
+      border: 1px solid var(--warning);
+      border-radius: 999px;
+      background: color-mix(in srgb, var(--warning) 14%, transparent);
+      color: var(--warning);
+      font-size: 0.7rem;
+      font-weight: 600;
+      line-height: 1;
+      text-decoration: none;
+      cursor: default;
+
+      &.approver {
+        border-color: #9b8bc4;
+        background: color-mix(in srgb, #9b8bc4 12%, transparent);
+        color: #77669f;
+      }
     }
   }
 
@@ -241,8 +309,72 @@ $border: var(--border);
   }
 
   .status-time {
-    margin-top: 8px;
+    margin-top: 12px;
     font-size: $font-size-hint;
+  }
+
+  .status-badge-stack {
+    display: flex;
+    flex-direction: column;
+    align-items: left;
+    gap: 12px;
+  }
+
+  .waiting-approver-badge {
+    display: inline-flex;
+    align-items: center;
+    max-width: 140px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    padding: 4px 8px;
+    border: 1px solid #9b8bc4;
+    border-radius: 999px;
+    background: color-mix(in srgb, #9b8bc4 12%, transparent);
+    color: #77669f;
+    font-size: 0.7rem;
+    font-weight: 600;
+    line-height: 1;
+    white-space: nowrap;
+    margin-top: 6px;
+
+    &.it-director {
+      border-color: #eab308;
+      background: #fef9c3;
+      color: #854d0e;
+      box-shadow: 0 1px 3px rgba(202, 138, 4, 0.18);
+    }
+  }
+
+  .status-with-waiting {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+
+    .waiting-approver-badge {
+      margin-top: 0;
+    }
+  }
+
+  .waiting-approver-list {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+  }
+
+  .waiting-approver-toggle {
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: var(--primary);
+    font-size: 0.7rem;
+    font-weight: 600;
+    cursor: pointer;
+
+    &:hover {
+      text-decoration: underline;
+    }
   }
 
   @include tablet {
@@ -433,17 +565,56 @@ $border: var(--border);
     margin-top: 24px;
   }
 
+  .export-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    height: 36px;
+    padding: 0 14px;
+    border: 0;
+    border-radius: 8px;
+    color: #fff;
+    background: #217346;
+    font-size: 0.875rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition:
+      opacity 0.2s,
+      transform 0.2s;
+
+    &:hover:not(:disabled) {
+      opacity: 0.9;
+      transform: translateY(-1px);
+    }
+
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+  }
+
   .table-controls {
     padding: 24px;
     display: flex;
     justify-content: space-between;
     align-items: center;
     gap: 20px;
+    flex-wrap: wrap;
+
+    .form-field {
+      flex: 1 1 240px;
+      max-width: 300px;
+    }
 
     @include tablet {
       flex-direction: column;
       align-items: stretch;
       padding: 20px;
+
+      .form-field {
+        flex: 0 0 auto;
+        width: 100%;
+      }
     }
 
     @include mobile {
@@ -451,10 +622,58 @@ $border: var(--border);
     }
   }
 
+  .year-range-filter {
+    display: flex;
+    align-items: flex-end;
+    gap: 8px;
+    white-space: nowrap;
+
+    label {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      color: var(--text-sub);
+      font-size: $font-size-hint;
+    }
+
+    .date-range-picker {
+      width: 270px;
+      height: 44px;
+      border-radius: 8px;
+      background: var(--bg-table-head);
+    }
+
+    .year-search-button {
+      height: 44px;
+      padding: 0 14px;
+      border: 0;
+      border-radius: 8px;
+      background: var(--primary);
+      color: #fff;
+      font-weight: 600;
+      cursor: pointer;
+      transition:
+        transform 0.15s ease,
+        box-shadow 0.15s ease;
+
+      &:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 5px 12px color-mix(in srgb, var(--primary) 24%, transparent);
+      }
+    }
+
+    @include tablet {
+      width: 100%;
+      align-items: flex-end;
+      flex-wrap: wrap;
+    }
+  }
+
   // ==================== TAB NAVIGATION ====================
   .tab-navigation {
     display: flex;
     gap: 8px;
+    margin-left: auto;
 
     @include tablet {
       overflow-x: auto;

@@ -10,6 +10,7 @@ import { CommonModule } from '@angular/common';
 export class ServicesDetailModal {
   @Output() onClose = new EventEmitter<void>();
   @Input() services: any[] = [];
+  keepOrder = () => 0;
 
   groupedServices: Record<string, any[]> = {};
 
@@ -18,7 +19,7 @@ export class ServicesDetailModal {
   }
 
   groupServices() {
-    this.groupedServices = this.services.reduce((acc: any, service: any) => {
+    const grouped = this.services.reduce((acc: any, service: any) => {
       const key = service.group_type || 'อื่นๆ';
 
       if (!acc[key]) {
@@ -28,6 +29,12 @@ export class ServicesDetailModal {
       acc[key].push(service);
       return acc;
     }, {});
+
+    this.groupedServices = {
+      main: grouped.main ?? {},
+
+      ...Object.fromEntries(Object.entries(grouped).filter(([key]) => key !== 'main')),
+    };
   }
 
   close() {

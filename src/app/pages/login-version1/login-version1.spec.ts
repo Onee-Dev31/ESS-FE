@@ -1,17 +1,17 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { TimeOffForm } from './time-off-form';
+import { LoginVersion1 } from './login-version1';
 
-describe('TimeOffForm', () => {
-  let component: TimeOffForm;
-  let fixture: ComponentFixture<TimeOffForm>;
+describe('LoginVersion1', () => {
+  let component: LoginVersion1;
+  let fixture: ComponentFixture<LoginVersion1>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [TimeOffForm],
+      imports: [LoginVersion1],
     }).compileComponents();
 
-    fixture = TestBed.createComponent(TimeOffForm);
+    fixture = TestBed.createComponent(LoginVersion1);
     component = fixture.componentInstance;
     await fixture.whenStable();
   });

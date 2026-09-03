@@ -156,7 +156,7 @@
           <nz-select
             nzShowSearch
             nzAllowClear
-            class="form-input search-select-company"
+            class="search-select-company"
             [(ngModel)]="filter.company"
             (ngModelChange)="onCompanyChange()"
             [nzDisabled]="textClickFilter === 'department'"
@@ -176,7 +176,7 @@
           <nz-select
             nzShowSearch
             nzAllowClear
-            class="form-input search-select"
+            class="search-select"
             [(ngModel)]="filter.department"
             (ngModelChange)="applyFilter()"
             [disabled]="!filter.company"
@@ -197,7 +197,7 @@
           <nz-select
             nzShowSearch
             nzAllowClear
-            class="form-input search-select-service-type"
+            class="search-select-service-type"
             [nzDisabled]="textClickFilter === 'serviceType'"
             [class.disabled]="textClickFilter === 'serviceType'"
             [(ngModel)]="filter.serviceType"
@@ -216,7 +216,7 @@
             [(ngModel)]="filter.dateRange"
             (ngModelChange)="applyFilter()"
             nzDropdownClassName="custom-range-picker-popup"
-            class="form-input custom-range-picker"
+            class="custom-range-picker"
           />
         </div>
 
@@ -246,7 +246,18 @@
 
           <tbody>
             <tr *ngFor="let data of filteredTicketLogs">
-              <td>{{ data.ticket_number }}</td>
+              <td>
+                <div>{{ data.ticket_number }}</div>
+                <div class="assignee-avatar-list" *ngIf="data.assignees_mock?.length">
+                  <img
+                    *ngFor="let emp of data.assignees_json"
+                    class="assignee-avatar"
+                    [src]="getEmployeeImage(emp.codeempid)"
+                    [alt]="emp.codeempid"
+                    [title]="emp.codeempid"
+                  />
+                </div>
+              </td>
               <td>{{ data.subject }}</td>
               <td>{{ data.requester_name || '-' }}</td>
               <td>

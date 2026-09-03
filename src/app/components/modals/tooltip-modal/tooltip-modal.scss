@@ -40,6 +40,7 @@ $shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.08);
 }
 
 .modal-overlay {
+  @include modal-overlay-styles;
   z-index: 1000;
 
   @media (max-width: 767px) {

@@ -27,6 +27,7 @@ import { DateUtilityService } from '../../../services/date-utility.service';
 import { ApprovalAllowanceService } from '../../../services/approval-allowance';
 import { MedicalService } from '../../../services/medical.service';
 import { VehicleService } from '../../../services/vehicle.service';
+import { EmpAdService } from '../../../services/emp-ad-service';
 
 interface PreviewFile {
   fileName: string;
@@ -50,6 +51,7 @@ export class ApprovalDetailModalComponent implements OnInit {
   private medicalService = inject(MedicalService);
   private approvalAllowanceService = inject(ApprovalAllowanceService);
   private vehicleService = inject(VehicleService);
+  private empAdService = inject(EmpAdService);
   private authService = inject(AuthService);
   private swalService = inject(SwalService);
   private fileConverter = inject(FileConverterService);
@@ -230,8 +232,23 @@ export class ApprovalDetailModalComponent implements OnInit {
 
     this.approvalAllowanceService.getClaimById(item.requestId).subscribe((res) => {
       if (!res) return;
-      // console.log(res);
-      this.allowanceDetail.set(res.data);
+      const data = res.data ?? res;
+      this.allowanceDetail.set(data);
+
+      const empCode = data.employeeCode ?? (item.originalData as any)?.employeeCode;
+      if (empCode) {
+        this.empAdService.getEmployeeDetails(empCode).subscribe({
+          next: (emp) => {
+            if (!emp) return;
+            this.allowanceDetail.update((prev) => ({
+              ...prev,
+              departmentName: emp.DEPARTMENT ?? emp.department ?? prev?.departmentName ?? null,
+              companyName: emp.COMPANY_NAME ?? emp.company_name ?? prev?.companyName ?? null,
+            }));
+          },
+          error: () => {},
+        });
+      }
     });
 
     this.detailedStatus.set((item.claimStatus || item.rawStatus).toLowerCase());
@@ -247,8 +264,23 @@ export class ApprovalDetailModalComponent implements OnInit {
 
     this.vehicleService.getClaimById(item.requestId).subscribe((res) => {
       if (!res) return;
-      // console.log(res.data);
-      this.vehicleDetail.set(res.data);
+      const data = res.data ?? res;
+      this.vehicleDetail.set(data);
+
+      const empCode = data.employeeCode ?? (item.originalData as any)?.employeeCode;
+      if (empCode) {
+        this.empAdService.getEmployeeDetails(empCode).subscribe({
+          next: (emp) => {
+            if (!emp) return;
+            this.vehicleDetail.update((prev) => ({
+              ...prev,
+              departmentName: emp.DEPARTMENT ?? emp.department ?? prev?.departmentName ?? null,
+              companyName: emp.COMPANY_NAME ?? emp.company_name ?? prev?.companyName ?? null,
+            }));
+          },
+          error: () => {},
+        });
+      }
     });
 
     this.detailedStatus.set((item.claimStatus || item.rawStatus).toLowerCase());

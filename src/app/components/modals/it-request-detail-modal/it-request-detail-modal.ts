@@ -19,6 +19,7 @@ import { SwalService } from '../../../services/swal.service';
 import { formatText } from '../../../utils/formatText';
 import { SignalrService } from '../../../services/signalr.service';
 import { FileConverterService } from '../../../services/file-converter';
+import { formatFileSize } from '../../../utils/file-size.util';
 
 @Component({
   selector: 'app-it-request-detail-modal',
@@ -37,6 +38,7 @@ export class ItRequestDetailModal {
   private signalrService = inject(SignalrService);
   private fileConverter = inject(FileConverterService);
   formatText = formatText;
+  formatFileSize = formatFileSize;
 
   @Input({ required: true }) approvalItem!: ApprovalItem;
   @Input() initialAction: 'Approved' | 'Rejected' | 'Referred Back' | null = null;
@@ -54,6 +56,14 @@ export class ItRequestDetailModal {
 
   private dialogService = inject(DialogService);
   currentAction = signal<'Rejected' | 'Referred Back' | null>(null);
+
+  get canShowActions(): boolean {
+    return this.approvalItem.status === 'Pending';
+  }
+
+  get canReferBack(): boolean {
+    return this.canShowActions && !this.approvalItem.isPendingItDirectorApproval;
+  }
 
   get showAttachments(): boolean {
     const ticketTypeId = this.approvalItem.originalData?.ticketTypeId;
@@ -77,14 +87,6 @@ export class ItRequestDetailModal {
 
   get attachments(): any[] {
     return this.approvalItem.originalData?.attachments || [];
-  }
-
-  formatFileSize(bytes: number): string {
-    if (!bytes) return '0 B';
-    const k = 1024;
-    const sizes = ['B', 'KB', 'MB', 'GB'];
-    const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
   }
 
   getFileIcon(fileName: string): string {
@@ -261,7 +263,7 @@ export class ItRequestDetailModal {
           const ticketId = this.approvalItem.requestId;
 
           if (command === 'Approved') {
-            this.signalrService.sendNewTicketNotification(this.approvalItem.requestNo);
+            // this.signalrService.sendNewTicketNotification(this.approvalItem.requestNo);
             if (codeEmpId) {
               this.signalrService.ticketStatusNotifyByEmpId(ticketId, codeEmpId, 'Approved');
             }

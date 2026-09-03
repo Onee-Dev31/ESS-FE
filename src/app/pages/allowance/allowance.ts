@@ -18,6 +18,7 @@ import {
   AllowanceRequest,
   AllowanceItem,
   MealAllowanceClaim,
+  MealAllowanceRate,
 } from '../../interfaces/allowance.interface';
 import { LoadingService } from '../../services/loading';
 import { DateUtilityService } from '../../services/date-utility.service';
@@ -30,7 +31,6 @@ import {
 } from '../../utils/listing.util';
 import { PaginationComponent } from '../../components/shared/pagination/pagination';
 import { PageHeaderComponent } from '../../components/shared/page-header/page-header';
-import { MedicalPolicyModalComponent } from '../../components/modals/medical-policy-modal/medical-policy-modal';
 import { EmptyStateComponent } from '../../components/shared/empty-state/empty-state';
 import { SkeletonComponent } from '../../components/shared/skeleton/skeleton';
 import { combineLatest, debounce, timer, switchMap, catchError, of } from 'rxjs';
@@ -63,7 +63,6 @@ interface FlatAllowanceRow extends AllowanceItem {
     StatusLabelPipe,
     PaginationComponent,
     PageHeaderComponent,
-    MedicalPolicyModalComponent,
     EmptyStateComponent,
     SkeletonComponent,
     NzSelectModule,
@@ -91,6 +90,7 @@ export class AllowanceComponent implements OnInit {
 
   isModalOpen = false;
   isPolicyModalOpen = signal<boolean>(false);
+  rates = signal<MealAllowanceRate[]>([]);
   selectedRequestId = '';
   selectedRequest: any = null;
 
@@ -119,6 +119,14 @@ export class AllowanceComponent implements OnInit {
         this.listing.currentPage.set(0);
       }
       this.loadData();
+    });
+    this.getRates();
+  }
+
+  getRates() {
+    this.allowanceService.getRates().subscribe({
+      next: (res) => this.rates.set(res.data),
+      error: () => {},
     });
   }
 
@@ -252,9 +260,7 @@ export class AllowanceComponent implements OnInit {
   trackByRowId(
     _index: number,
     itemOrRow:
-      | AllowanceRequest
-      | FlatAllowanceRow
-      | import('@tanstack/angular-table').Row<FlatAllowanceRow>,
+      AllowanceRequest | FlatAllowanceRow | import('@tanstack/angular-table').Row<FlatAllowanceRow>,
   ): string {
     const item = 'original' in itemOrRow ? itemOrRow.original : itemOrRow;
     const id = (item as FlatAllowanceRow).requestId || (item as AllowanceRequest).id || 'row';

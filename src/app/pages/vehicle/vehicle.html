@@ -1,5 +1,16 @@
 <div class="vehicle-page">
-  <app-page-header title="เบิกค่าพาหนะ (ก่อน 06:00 น. / หลัง 22:00 น.)"></app-page-header>
+  <app-page-header
+    title="เบิกค่าพาหนะ (ก่อน {{ earlyCheckinLabel() }} / หลัง {{ lateCheckoutLabel() }})"
+  >
+    <button
+      type="button"
+      class="btn-icon-sky"
+      (click)="isPolicyModalOpen.set(true)"
+      title="เงื่อนไขการเบิกค่าพาหนะ"
+    >
+      <i class="fas fa-info-circle"></i>
+    </button>
+  </app-page-header>
 
   <div class="content-card">
     <div class="card-header-row">
@@ -301,6 +312,133 @@
     <div class="modal-overlay">
       <div class="modal-container">
         <app-vehicle-form (onClose)="closeModal()" [requests]="selectedRequest"></app-vehicle-form>
+      </div>
+    </div>
+  }
+
+  @if (isPolicyModalOpen()) {
+    <div class="policy-popup-overlay" (click)="isPolicyModalOpen.set(false)">
+      <div class="policy-popup-content" (click)="$event.stopPropagation()">
+        <div class="policy-popup-header">
+          <h3><i class="fas fa-info-circle"></i> เงื่อนไขการเบิกค่าพาหนะ</h3>
+          <button
+            type="button"
+            class="btn-close-popup"
+            (click)="isPolicyModalOpen.set(false)"
+            title="ปิด"
+          >
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+        <div class="policy-popup-body">
+          <ul class="policy-conditions-list">
+            <li class="condition-item">
+              <i class="fas fa-clock"></i>
+              <div>
+                <div class="condition-title">
+                  @for (seg of renderSegments('cond1_title'); track $index) {
+                    @if (seg.bold) {
+                      <strong>{{ seg.text }}</strong>
+                    } @else {
+                      {{ seg.text }}
+                    }
+                  }
+                </div>
+                <div class="condition-desc">
+                  @for (seg of renderSegments('cond1_desc'); track $index) {
+                    @if (seg.bold) {
+                      <strong>{{ seg.text }}</strong>
+                    } @else {
+                      {{ seg.text }}
+                    }
+                  }
+                </div>
+              </div>
+            </li>
+            <li class="condition-item">
+              <i class="fas fa-stopwatch"></i>
+              <div>
+                <div class="condition-title">
+                  @for (seg of renderSegments('cond2_title'); track $index) {
+                    @if (seg.bold) {
+                      <strong>{{ seg.text }}</strong>
+                    } @else {
+                      {{ seg.text }}
+                    }
+                  }
+                </div>
+                <div class="condition-desc">
+                  @for (seg of renderSegments('cond2_desc'); track $index) {
+                    @if (seg.bold) {
+                      <strong>{{ seg.text }}</strong>
+                    } @else {
+                      {{ seg.text }}
+                    }
+                  }
+                </div>
+              </div>
+            </li>
+            <li class="condition-item">
+              <i class="fas fa-id-badge"></i>
+              <div>
+                <div class="condition-title">
+                  @for (seg of renderSegments('cond3_title'); track $index) {
+                    @if (seg.bold) {
+                      <strong>{{ seg.text }}</strong>
+                    } @else {
+                      {{ seg.text }}
+                    }
+                  }
+                </div>
+                <div class="condition-desc">
+                  @for (seg of renderSegments('cond3_desc'); track $index) {
+                    @if (seg.bold) {
+                      <strong>{{ seg.text }}</strong>
+                    } @else {
+                      {{ seg.text }}
+                    }
+                  }
+                </div>
+              </div>
+            </li>
+          </ul>
+          <div class="policy-rates-panel">
+            <div class="policy-rates-list">
+              @for (rate of rates(); track rate.rate_id) {
+                <div class="rate-item">
+                  <span class="rate-hours">{{ rate.description }}</span>
+                  <span class="rate-amount">{{ rate.rate_amount | number }} บาท/วัน</span>
+                </div>
+              } @empty {
+                <p class="rates-loading">
+                  <i class="fas fa-spinner fa-spin"></i> กำลังโหลดข้อมูล...
+                </p>
+              }
+            </div>
+            <p class="policy-rates-note">
+              <i class="fas fa-circle-info"></i>
+              @for (seg of renderSegments('rates_note'); track $index) {
+                @if (seg.bold) {
+                  <strong>{{ seg.text }}</strong>
+                } @else {
+                  {{ seg.text }}
+                }
+              }
+            </p>
+          </div>
+          <div class="policy-example">
+            <div class="policy-example__label"><i class="fas fa-lightbulb"></i> ตัวอย่าง</div>
+            <p>
+              @for (seg of renderSegments('example_text'); track $index) {
+                @if (seg.bold) {
+                  <strong>{{ seg.text }}</strong>
+                } @else {
+                  {{ seg.text }}
+                }
+              }
+            </p>
+          </div>
+        </div>
       </div>
     </div>
   }

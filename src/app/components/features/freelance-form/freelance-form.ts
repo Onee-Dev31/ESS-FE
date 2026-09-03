@@ -24,6 +24,20 @@ import {
   FilePreviewModalComponent,
 } from '../../modals/file-preview-modal/file-preview-modal';
 import dayjs from 'dayjs';
+import { ModalShellComponent } from '../../shared/modal-shell/modal-shell';
+import {
+  FORM_VALIDATION_PATTERNS,
+  formatPhoneNumber,
+  isDateAfter,
+  isDateBefore,
+  isValidDateRange,
+} from '../../../utils/form-validation.util';
+import {
+  EnglishOnlyDirective,
+  NumbersOnlyDirective,
+  PhoneNumberDirective,
+  ThaiOnlyDirective,
+} from '../../../directives/language-only.directive';
 
 interface FreelanceFormData {
   id?: string;
@@ -67,12 +81,18 @@ interface FreelanceFormData {
     MatIconModule,
     MatTooltipModule,
     FilePreviewModalComponent,
+    ModalShellComponent,
+    ThaiOnlyDirective,
+    EnglishOnlyDirective,
+    PhoneNumberDirective,
+    NumbersOnlyDirective,
   ],
   templateUrl: './freelance-form.html',
   styleUrls: ['./freelance-form.scss'],
   encapsulation: ViewEncapsulation.None,
 })
 export class FreelanceFormComponent implements OnInit, OnChanges {
+  readonly validationPatterns = FORM_VALIDATION_PATTERNS;
   @Input() isOpen = false;
   @Input() editData: any = null;
   @Output() onClose = new EventEmitter<void>();
@@ -208,6 +228,7 @@ export class FreelanceFormComponent implements OnInit, OnChanges {
       this.formData = {
         ...this.formData,
         ...data,
+        phone: formatPhoneNumber(data.phone),
         startDate: data.startDate ? new Date(data.startDate) : null,
         endDate: data.endDate ? new Date(data.endDate) : null,
         lastWorkingDate: data.lastWorkingDate ? new Date(data.lastWorkingDate) : null,
@@ -323,9 +344,21 @@ export class FreelanceFormComponent implements OnInit, OnChanges {
   }
 
   handleSave() {
+    if (this.isContractDateInvalid()) return;
+
     this.formData.attachments = this.uploadedFiles;
     this.onSave.emit(this.formData);
   }
+
+  isContractDateInvalid(): boolean {
+    return !isValidDateRange(this.formData.startDate, this.formData.endDate);
+  }
+
+  disabledContractStartDate = (current: Date): boolean =>
+    isDateAfter(current, this.formData.endDate);
+
+  disabledContractEndDate = (current: Date): boolean =>
+    isDateBefore(current, this.formData.startDate);
 
   handleResign() {
     this.showResignModal = true;
@@ -343,7 +376,12 @@ export class FreelanceFormComponent implements OnInit, OnChanges {
   }
 
   confirmResign() {
-    if (!this.formResignData.resignDate || !this.formResignData.lastWorkingDate) return;
+    if (
+      !this.formResignData.resignDate ||
+      !this.formResignData.lastWorkingDate ||
+      this.isResignDateInvalid()
+    )
+      return;
 
     this.onSave.emit({
       ...this.formData,
@@ -403,14 +441,16 @@ export class FreelanceFormComponent implements OnInit, OnChanges {
   }
 
   disabledResignDate = (current: Date): boolean => {
-    if (!this.formResignData.lastWorkingDate) return false;
-    return current < this.formResignData.lastWorkingDate;
+    return isDateBefore(current, this.formResignData.lastWorkingDate);
   };
 
   disabledLastWorkingDate = (current: Date): boolean => {
-    if (!this.formResignData.resignDate) return false;
-    return current > this.formResignData.resignDate;
+    return isDateAfter(current, this.formResignData.resignDate);
   };
+
+  isResignDateInvalid(): boolean {
+    return !isValidDateRange(this.formResignData.lastWorkingDate, this.formResignData.resignDate);
+  }
 
   // MASTER
   getBanks() {

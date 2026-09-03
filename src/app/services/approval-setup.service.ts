@@ -32,6 +32,22 @@ export class ApprovalSetupService {
     return this.http.get<any>(`${this.baseUrl}/setup/${costCent}`);
   }
 
+  // GET /api/approval/getApproverItWithPaid
+  getApproverItWithPaid(): Observable<any> {
+    return this.http.get<any>(`${this.baseUrl}/getApproverItWithPaid`);
+  }
+
+  // POST /api/approval/UpdateApproverItWithPaid
+  updateApproverItWithPaid(request: {
+    itReqApproverPaidID: number;
+    costcent: string;
+    approverCode: string;
+    approverName: string;
+    modifiedBy: string;
+  }): Observable<any> {
+    return this.http.put<any>(`${this.baseUrl}/UpdateApproverItWithPaid`, request);
+  }
+
   // POST /api/approval/setup/save
   saveApprovalSetup(request: any): Observable<any> {
     return this.http.post<any>(`${this.baseUrl}/setup/save`, request);

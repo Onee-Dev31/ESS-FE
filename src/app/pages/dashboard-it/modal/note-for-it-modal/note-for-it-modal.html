@@ -1,29 +1,50 @@
-<div class="modal-overlay noteTicket">
-  <div class="modal-container">
-    <div>
-      <header class="top-header-strip">
-        <h2>Note for IT</h2>
-      </header>
-      <div class="content-card">
-        <textarea
-          class="form-input note"
-          placeholder="อธิบายรายละเอียด..."
-          [(ngModel)]="noteForm.message"
-        ></textarea>
+<app-modal-shell
+  title="Note for IT"
+  size="lg"
+  [padded]="false"
+  [showClose]="false"
+  [mobileFullscreen]="true"
+  (closeModal)="close()"
+>
+  <div class="note-content">
+    @if (isEditing()) {
+      <textarea
+        class="note-input"
+        placeholder="อธิบายรายละเอียด..."
+        [(ngModel)]="noteForm.message"
+        autofocus
+      ></textarea>
+    } @else {
+      <div class="note-preview" [class.is-empty]="!noteForm.message.trim()">
+        {{ noteForm.message.trim() || 'ยังไม่มี Note for IT' }}
       </div>
-      <div class="form-actions-footer">
-        <button class="btn-back-custom" (click)="close()">
-          <i class="fas fa-times"></i> ยกเลิก
-        </button>
-        <button class="btn-save-custom" (click)="save()" [disabled]="!noteForm.message.trim()">
-          <i class="fas fa-paper-plane"></i> ส่ง
-        </button>
-      </div>
-    </div>
+    }
   </div>
-</div>
+
+  <div modalFooter>
+    @if (isEditing()) {
+      <button type="button" class="modal-button" (click)="cancelEdit()">
+        <i class="fas fa-times"></i> ยกเลิก
+      </button>
+      <button
+        type="button"
+        class="modal-button primary"
+        [disabled]="!noteForm.message.trim()"
+        (click)="save()"
+      >
+        <i class="fas fa-save"></i> บันทึก
+      </button>
+    } @else {
+      <button type="button" class="modal-button" (click)="close()">
+        <i class="fas fa-times"></i> ปิด
+      </button>
+      <button type="button" class="modal-button primary" (click)="edit()">
+        <i class="fas fa-pen"></i> แก้ไข
+      </button>
+    }
+  </div>
+</app-modal-shell>
 
 @if (isPreviewModalOpen()) {
-  <app-file-preview-modal [files]="previewFiles()" (onClose)="closePreview()">
-  </app-file-preview-modal>
+  <app-file-preview-modal [files]="previewFiles()" (onClose)="closePreview()" />
 }

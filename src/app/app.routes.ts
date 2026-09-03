@@ -5,9 +5,17 @@ import { authGuard } from './guards/auth-guard';
 import { menuGuard, roleGuard } from './guards/role-guard';
 import { USER_ROLES } from './constants/user-roles.constant';
 import { ValidateLoginSso } from './pages/validate/validate-login-sso/validate-login-sso';
+import { LoginVersion1 } from './pages/login-version1/login-version1';
+import { LoginVersion2 } from './pages/login-version2/login-version2';
+import { LoginVersion3 } from './pages/login-version3/login-version3';
+import { LoginVersion4 } from './pages/login-version4/login-version4';
 
 export const routes: Routes = [
-  { path: 'login', component: LoginComponent },
+  { path: 'login-v0', component: LoginComponent },
+  { path: 'login-v1', component: LoginVersion1 },
+  { path: 'login-v2', component: LoginVersion2 },
+  { path: 'login', component: LoginVersion4 },
+  { path: 'login-v3', component: LoginVersion3 },
   { path: 'validate/loginSSO', component: ValidateLoginSso },
   {
     path: 'qr-confirm',
@@ -95,6 +103,12 @@ export const routes: Routes = [
         data: { category: 'medical', animation: 'ApprovalAllowance' },
       },
       {
+        path: 'approvals-timeoff',
+        loadComponent: () =>
+          import('./pages/approval-timeoff/approval-timeoff').then((m) => m.ApprovalTimeoff),
+        // canActivate: [menuGuard],
+      },
+      {
         path: 'medicalexpenses',
         loadComponent: () =>
           import('./pages/medicalexpenses/medicalexpenses').then((m) => m.MedicalexpensesComponent),
@@ -125,11 +139,29 @@ export const routes: Routes = [
         canActivate: [menuGuard],
         data: { animation: 'ITRequest' },
       },
+      // {
+      //   path: 'it-service-request',
+      //   loadComponent: () =>
+      //     import('./pages/it-service-request/it-service-request').then(
+      //       (m) => m.ITServiceRequestComponent,
+      //     ),
+      //   canActivate: [menuGuard],
+      //   data: { animation: 'ITRequest' },
+      // },
+      {
+        path: 'it-service-request-specific',
+        loadComponent: () =>
+          import('./pages/it-service-request-specific/it-service-request-specific').then(
+            (m) => m.ITServiceRequestSpecificComponent,
+          ),
+        canActivate: [menuGuard],
+        data: { animation: 'ITRequest' },
+      },
       {
         path: 'it-service-request',
         loadComponent: () =>
-          import('./pages/it-service-request/it-service-request').then(
-            (m) => m.ITServiceRequestComponent,
+          import('./pages/it-service-request-combined/it-service-request-combined').then(
+            (m) => m.ITServiceRequestCombinedComponent,
           ),
         canActivate: [menuGuard],
         data: { animation: 'ITRequest' },
@@ -159,6 +191,13 @@ export const routes: Routes = [
         data: { animation: 'ITRequest' },
       },
       {
+        path: 'it-service-list/:ticketNumber',
+        loadComponent: () =>
+          import('./pages/it-service-list/it-service-list').then((m) => m.ItService),
+        canActivate: [menuGuard],
+        data: { animation: 'ITRequest' },
+      },
+      {
         path: 'menu-setting',
         loadComponent: () => import('./pages/setting-menu/setting-menu').then((m) => m.SettingMenu),
         // canActivate: [menuGuard],
@@ -172,9 +211,34 @@ export const routes: Routes = [
         data: { animation: 'Dashboard' },
       },
       {
+        path: 'timeoff-setting',
+        loadComponent: () =>
+          import('./pages/setting-timeoff/setting-timeoff').then((m) => m.SettingTimeoff),
+        // canActivate: [menuGuard],
+        data: { animation: 'Dashboard' },
+      },
+      {
         path: 'holiday-setting',
         loadComponent: () =>
           import('./pages/setting-holiday/setting-holiday').then((m) => m.SettingHoliday),
+        // canActivate: [menuGuard],
+        data: { animation: 'Dashboard' },
+      },
+      {
+        path: 'allowance-setting',
+        loadComponent: () =>
+          import('./pages/setting-allowance-rate/setting-allowance-rate').then(
+            (m) => m.SettingAllowanceRate,
+          ),
+        // canActivate: [menuGuard],
+        data: { animation: 'Dashboard' },
+      },
+      {
+        path: 'medical-setting',
+        loadComponent: () =>
+          import('./pages/setting-medical-benefit-plan/setting-medical-benefit-plan').then(
+            (m) => m.SettingMedicalBenefitPlan,
+          ),
         // canActivate: [menuGuard],
         data: { animation: 'Dashboard' },
       },
@@ -183,6 +247,14 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./pages/setting-notification/setting-notification').then(
             (m) => m.SettingNotification,
+          ),
+        data: { animation: 'Dashboard' },
+      },
+      {
+        path: 'vehicle-policy-setting',
+        loadComponent: () =>
+          import('./pages/setting-vehicle-policy/setting-vehicle-policy').then(
+            (m) => m.SettingVehiclePolicy,
           ),
         data: { animation: 'Dashboard' },
       },

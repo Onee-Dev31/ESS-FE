@@ -1,0 +1,112 @@
+@use '../../../../../styles/variables' as *;
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: rgba(15, 23, 42, 0.48);
+}
+
+.modal-container {
+  width: min(720px, 100%);
+  overflow: hidden;
+  border-radius: 16px;
+  background: var(--bg-card);
+  box-shadow: 0 24px 64px rgba(15, 23, 42, 0.25);
+}
+
+.modal-header,
+.modal-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 24px;
+}
+
+.modal-header {
+  border-bottom: 1px solid var(--border-toolbar);
+
+  h2,
+  p {
+    margin: 0;
+  }
+
+  h2 {
+    color: var(--text-header);
+    font-size: 1.15rem;
+
+    i {
+      margin-right: 8px;
+      color: #2563eb;
+    }
+  }
+
+  p {
+    margin-top: 4px;
+    color: var(--text-muted);
+    font-size: 0.85rem;
+  }
+}
+
+.btn-close {
+  width: 36px;
+  height: 36px;
+  border: 0;
+  border-radius: 50%;
+  color: var(--text-muted);
+  background: transparent;
+  cursor: pointer;
+}
+
+.modal-body {
+  padding: 22px 24px;
+
+  label {
+    display: block;
+    margin-bottom: 10px;
+    color: var(--text-header);
+    font-weight: 600;
+
+    span {
+      color: var(--danger);
+    }
+  }
+}
+
+.modal-footer {
+  justify-content: flex-end;
+  gap: 10px;
+  border-top: 1px solid var(--border-toolbar);
+}
+
+.btn-cancel,
+.btn-submit {
+  height: 40px;
+  padding: 0 18px;
+  border-radius: 10px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.btn-cancel {
+  border: 1px solid var(--border-color);
+  color: var(--text);
+  background: var(--bg-card);
+}
+
+.btn-submit {
+  border: 1px solid #1d4ed8;
+  color: #fff;
+  background: #2563eb;
+
+  &:disabled {
+    border-color: var(--border-color);
+    color: var(--text-muted);
+    background: var(--border-color);
+    cursor: not-allowed;
+  }
+}

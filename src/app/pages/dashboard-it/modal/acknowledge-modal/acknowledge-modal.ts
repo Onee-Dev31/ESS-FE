@@ -1,15 +1,11 @@
-import { Component, EventEmitter, Input, Output, signal, SimpleChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule, NgForm } from '@angular/forms';
-import {
-  FilePreviewItem,
-  FilePreviewModalComponent,
-} from '../../../../components/modals/file-preview-modal/file-preview-modal';
-import dayjs from 'dayjs';
+import { Component, EventEmitter, Input, Output, SimpleChanges } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { ModalShellComponent } from '../../../../components/shared/modal-shell/modal-shell';
 
 @Component({
   selector: 'app-acknowledge-modal',
-  imports: [CommonModule, FormsModule, FilePreviewModalComponent],
+  imports: [CommonModule, FormsModule, ModalShellComponent],
   templateUrl: './acknowledge-modal.html',
   styleUrl: './acknowledge-modal.scss',
 })
@@ -19,97 +15,53 @@ export class AcknowledgeModal {
   @Output() closeModal = new EventEmitter<void>();
 
   selectedTag: number | null = null;
-  originalTag: number | null = null;
-  repairCostType: 'paid' | 'free' | null = null;
+  message = '';
 
-  message: string = '';
-  attachments: any[] = [];
+  get isApproved(): boolean {
+    return (
+      String(this.ticket?.approval_status ?? this.ticket?.approvalStatus ?? '')
+        .trim()
+        .toLowerCase() === 'approved'
+    );
+  }
 
-  isPreviewModalOpen = signal<boolean>(false);
-  previewFiles = signal<FilePreviewItem[]>([]);
+  get ticketTypeLabel(): string {
+    const ticketTypeId = Number(this.ticket?.ticketTypeId ?? this.ticket?.ticket_type_id);
+    const labels: Record<number, string> = {
+      1: 'แจ้งซ่อม',
+      2: 'แจ้งปัญหา',
+      3: 'ขอใช้บริการ',
+    };
+    return labels[ticketTypeId] ?? '-';
+  }
 
-  ngOnChanges(changes: SimpleChanges) {
+  ngOnChanges(changes: SimpleChanges): void {
     if (changes['ticket'] && this.ticket) {
       this.selectedTag = this.ticket.ticketTypeId;
-      this.originalTag = this.ticket.ticketTypeId;
-    }
-  }
-
-  get isTagChanged(): boolean {
-    return this.selectedTag !== this.originalTag;
-  }
-
-  close() {
-    this.closeModal.emit();
-  }
-
-  save() {
-    if (!this.selectedTag) {
-      return;
-    }
-
-    const payload = {
-      ticketTypeId: this.selectedTag,
-      message: this.message,
-      attachments: this.attachments,
-      ...(this.selectedTag === 1 && { repairCostType: this.repairCostType }),
-    };
-    this.submitModal.emit(payload);
-  }
-
-  onTagChange(value: number) {
-    this.message = '';
-    this.attachments = [];
-    this.repairCostType = null;
-  }
-
-  onFileSelected(event: any) {
-    const files: FileList = event.target.files;
-    this.addFiles(files);
-  }
-
-  private addFiles(files: FileList) {
-    const newFiles = Array.from(files).map((f) => ({
-      name: f.name,
-      size: f.size,
-      file: f,
-    }));
-
-    this.attachments = [...this.attachments, ...newFiles];
-  }
-
-  removeAttachment(index: number) {
-    this.attachments.splice(index, 1);
-
-    if (this.attachments.length === 0) {
       this.message = '';
     }
   }
 
-  viewFile(file: any) {
-    let url = '';
-
-    if (file.file) {
-      // ไฟล์ที่ user upload
-      url = URL.createObjectURL(file.file);
-    } else if (file.filePath) {
-      // ไฟล์จาก server
-      url = file.filePath;
-    }
-
-    this.previewFiles.set([
-      {
-        fileName: file.name || file.fileName,
-        date: dayjs().format('DD/MM/YYYY HH:mm'),
-        url: url,
-        type: file.file?.type || file.type || 'application/octet-stream',
-      },
-    ]);
-
-    this.isPreviewModalOpen.set(true);
+  close(): void {
+    this.closeModal.emit();
   }
 
-  closePreview() {
-    this.isPreviewModalOpen.set(false);
+  save(): void {
+    if (!this.selectedTag) return;
+
+    const ticketTypeId = this.isApproved
+      ? Number(this.ticket?.ticketTypeId ?? this.ticket?.ticket_type_id)
+      : Number(this.selectedTag);
+
+    this.submitModal.emit({
+      ticketTypeId,
+      message: this.message,
+      attachments: [],
+      repairCostType: ticketTypeId === 1 ? 'free' : undefined,
+    });
+  }
+
+  onTagChange(_value: number): void {
+    this.message = '';
   }
 }

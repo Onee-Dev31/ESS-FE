@@ -20,7 +20,6 @@ import { ItServiceService } from '../../../services/it-service.service';
 import { NzTableModule } from 'ng-zorro-antd/table';
 import { NzModalModule } from 'ng-zorro-antd/modal';
 import { NzPaginationModule } from 'ng-zorro-antd/pagination';
-import * as XLSX from 'xlsx';
 import { DateUtilityService } from '../../../services/date-utility.service';
 import dayjs, { Dayjs } from 'dayjs';
 import { NzDatePickerModule } from 'ng-zorro-antd/date-picker';
@@ -31,6 +30,7 @@ import { ViewChildren, QueryList } from '@angular/core';
 import { ItDashboardSummary } from '../it-dashboard-summary/it-dashboard-summary';
 import { PaginationComponent } from '../../../components/shared/pagination/pagination';
 import { createListingComputeds_v2, createListingState } from '../../../utils/listing.util';
+import { exportTicketLogsToExcel } from '../../../utils/ticket-log-excel.util';
 
 @Component({
   selector: 'app-report',
@@ -1211,7 +1211,8 @@ export class Report {
   }
 
   filterAll = {
-    dateRange: [dayjs().subtract(3, 'month').toDate(), dayjs().toDate()] as [Date, Date] | null,
+    dateRange: [dayjs().startOf('year').toDate(), dayjs().endOf('year').toDate()] as
+      [Date, Date] | null,
   };
 
   applyFilterAll() {
@@ -1251,6 +1252,59 @@ export class Report {
   }
 
   exportData() {
+    const [dateFrom, dateTo] = this.filter.dateRange ?? [];
+    const params = {
+      status: this.statusLabelApi(this.filter.status),
+      page: 1,
+      pageSize: Math.max(this.listing.totalItems(), 1),
+      ticketNo: this.filter.ticketNo || undefined,
+      subject: this.filter.subject || undefined,
+      requester: this.filter.requester || undefined,
+      company: this.filter.company || undefined,
+      department: this.filter.department || undefined,
+      serviceType: this.filter.serviceType || undefined,
+      dateFrom: dateFrom ? dayjs(dateFrom).format('YYYY-MM-DD') : undefined,
+      dateTo: dateTo ? dayjs(dateTo).format('YYYY-MM-DD') : undefined,
+      isReal: true,
+    };
+
+    this.isExporting = true;
+    this.itServiceService.getTicketByStatus(params).subscribe({
+      next: (response: any) => {
+        const tickets = (Array.isArray(response?.data) ? response.data : []).map((ticket: any) => ({
+          ...ticket,
+          COMPANY_CODE: this.remapCompanyCode(ticket.COMPANY_CODE),
+        }));
+        if (!tickets.length) {
+          this.isExporting = false;
+          this.cdr.detectChanges();
+          return;
+        }
+
+        const headText =
+          this.textClickFilter === 'serviceType'
+            ? tickets[0]?.name_th
+            : this.textClickFilter === 'department'
+              ? `${tickets[0]?.deptName ?? ''} (${tickets[0]?.COMPANY_CODE ?? ''})`
+              : this.textClickFilter === 'status'
+                ? this.filter.status
+                : 'all';
+        const safeHead = String(headText || 'all').replace(/[\\/:*?"<>|]/g, '-');
+        const fromText = dateFrom ? dayjs(dateFrom).format('YYYY-MM-DD') : 'all';
+        const toText = dateTo ? dayjs(dateTo).format('YYYY-MM-DD') : 'all';
+        exportTicketLogsToExcel(tickets, `tickets_${safeHead}_${fromText}_${toText}.xlsx`);
+        this.isExporting = false;
+        this.cdr.detectChanges();
+      },
+      error: (error) => {
+        console.error('Export tickets error:', error);
+        this.isExporting = false;
+        this.cdr.detectChanges();
+      },
+    });
+  }
+
+  exportData_old() {
     const [dateFrom, dateTo] = this.filter.dateRange ?? [];
 
     const params = {

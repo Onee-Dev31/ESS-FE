@@ -101,6 +101,7 @@ export class NotificationService {
           ReOpened: 'เปิดงานอีกครั้ง',
         };
         const [status, detail] = (d?.status ?? '').split('|');
+        if (status === 'ChangeType' && detail) return `IT เปลี่ยนประเภทคำขอเป็น "${detail}"`;
         if (status === 'In Progress' && detail) return `IT รับเรื่องของคุณแล้ว ประเภท "${detail}"`;
         if (status === 'Rejected' && detail) return `คำขอถูกปฏิเสธ เหตุผล: "${detail}"`;
         if (status === 'Referred_Back' && detail)
@@ -121,11 +122,12 @@ export class NotificationService {
           this.zone.run(() => {
             this.realtimeTick.update((tick) => tick + 1);
             this.refreshAll();
-            // แสดง toast เฉพาะเมื่อ NotificationCreated ไม่ได้ส่ง toast ภายใน 800ms ที่ผ่านมา
-            if (Date.now() - this.lastToastTime > 800 && !document.hidden) {
+            // แสดง toast เฉพาะเมื่อ NotificationCreated ไม่ได้ส่ง toast ภายใน 1.5s ที่ผ่านมา
+            // (บาง event เช่น ticket ใหม่ backend ยิงมาทั้ง legacy event นี้ + NotificationCreated ซ้ำกัน)
+            const isDuplicateToast = Date.now() - this.lastToastTime < 1500;
+            if (!document.hidden && !isDuplicateToast) {
               const msg = buildMsg(data);
               if (msg) {
-                this.lastToastTime = Date.now();
                 const routeInfo = this.resolveRoute({
                   notificationType: event,
                   recipientRole: '',
@@ -134,7 +136,13 @@ export class NotificationService {
                   ticketNumber: this.toText(data?.ticketNumber ?? data?.ticket_number) ?? null,
                   title: msg,
                 });
-                this.toastService.info(msg, undefined, routeInfo.route ?? undefined, routeInfo.queryParams ?? undefined);
+                this.toastService.info(
+                  msg,
+                  undefined,
+                  routeInfo.route ?? undefined,
+                  routeInfo.queryParams ?? undefined,
+                );
+                this.lastToastTime = Date.now();
               }
             }
           });
@@ -164,15 +172,9 @@ export class NotificationService {
     this.http.get<any>(`${this.baseUrl}/unread-count`, { params }).subscribe({
       next: (response) => {
         const newCount = Number(response?.unreadCount ?? response?.count ?? response ?? 0);
-        const prevCount = this.unreadCount();
         const safeCount = Number.isFinite(newCount) ? newCount : 0;
         this.unreadCount.set(safeCount);
         this.isCountLoading.set(false);
-
-        // Trigger sound when polling detects a new notification (no toast — SignalR handles that with actual title)
-        if (safeCount > prevCount) {
-          this.realtimeTick.update((t) => t + 1);
-        }
       },
       error: () => {
         this.countError.set('ไม่สามารถโหลดจำนวนแจ้งเตือนใหม่ได้');
@@ -352,31 +354,47 @@ export class NotificationService {
       this.refreshAll();
 
       const record = this.extractRealtimeRecord(payload) as any;
-      const title =
-        this.toText(record?.title ?? record?.notification_title) ?? 'แจ้งเตือนใหม่';
+      const title = this.toText(record?.title ?? record?.notification_title) ?? 'แจ้งเตือนใหม่';
 
       const payloadData = this.parsePayload(record?.payload_json ?? record?.payloadJson);
       const ticketId = this.toNumber(
-        record?.ticket_id ?? record?.ticketId ?? payloadData?.['ticketId'] ?? payloadData?.['ticket_id'],
+        record?.ticket_id ??
+          record?.ticketId ??
+          payloadData?.['ticketId'] ??
+          payloadData?.['ticket_id'],
       );
       const ticketNumber =
         this.toText(
-          record?.ticket_number ?? record?.ticketNumber ??
-          payloadData?.['ticketNumber'] ?? payloadData?.['ticket_number'],
+          record?.ticket_number ??
+            record?.ticketNumber ??
+            payloadData?.['ticketNumber'] ??
+            payloadData?.['ticket_number'],
         ) ?? null;
+      const targetId = this.toNumber(
+        record?.target_id ?? record?.targetId ?? payloadData?.['requestId'],
+      );
 
       const routeInfo = this.resolveRoute({
         notificationType: this.toText(record?.notification_type ?? record?.notificationType) ?? '',
         recipientRole: this.toText(record?.recipient_role ?? record?.recipientRole) ?? '',
         targetType: this.toText(record?.target_type ?? record?.targetType) ?? '',
+        targetId,
         ticketId,
         ticketNumber,
         title,
       });
 
-      this.lastToastTime = Date.now();
-      if (!document.hidden)
-        this.toastService.info(title, undefined, routeInfo.route ?? undefined, routeInfo.queryParams ?? undefined);
+      // แสดง toast เฉพาะเมื่อ legacy event ตัวเดิม (เช่น NewTicket) ไม่ได้ส่ง toast ภายใน 1.5s ที่ผ่านมา
+      const isDuplicateToast = Date.now() - this.lastToastTime < 1500;
+      if (!document.hidden && !isDuplicateToast) {
+        this.toastService.info(
+          title,
+          undefined,
+          routeInfo.route ?? undefined,
+          routeInfo.queryParams ?? undefined,
+        );
+        this.lastToastTime = Date.now();
+      }
     });
   }
 
@@ -411,11 +429,13 @@ export class NotificationService {
       this.toText(item.notification_created_at ?? item.notificationCreatedAt) ??
       this.toText(item.recipient_created_at ?? item.recipientCreatedAt) ??
       null;
+    const targetId = this.toNumber(item['target_id'] ?? item['targetId'] ?? payload?.['requestId']);
 
     const routeInfo = this.resolveRoute({
       notificationType: this.toText(item.notification_type ?? item.notificationType) ?? '',
       recipientRole: this.toText(item.recipient_role ?? item.recipientRole) ?? '',
       targetType: this.toText(item.target_type ?? item.targetType) ?? '',
+      targetId,
       ticketId,
       ticketNumber,
       title: this.toText(item.title) ?? '',
@@ -453,6 +473,7 @@ export class NotificationService {
     notificationType: string;
     recipientRole: string;
     targetType: string;
+    targetId?: number | null;
     ticketId: number | null;
     ticketNumber: string | null;
     title?: string;
@@ -471,6 +492,35 @@ export class NotificationService {
       };
     }
 
+    if (
+      input.notificationType === 'employee_resignation_bulk' ||
+      input.targetType === 'employee_resignation'
+    ) {
+      return {
+        route: '/resign-management/detail',
+        queryParams: { _t: Date.now() },
+      };
+    }
+
+    if (input.notificationType === 'leave_request_submitted') {
+      return {
+        route: '/approvals-timeoff',
+        queryParams: {
+          requestId: input.targetId ?? undefined,
+          _t: Date.now(),
+        },
+      };
+    }
+
+    if (input.targetType === 'leave_request') {
+      // leave_request_approved / leave_request_rejected / leave_request_sendback
+      // ส่งกลับหาผู้ยื่นใบลาเอง ไม่ใช่ผู้อนุมัติ
+      return {
+        route: '/timeoff',
+        queryParams: { _t: Date.now() },
+      };
+    }
+
     if (!input.ticketId && !input.ticketNumber) {
       return { route: null, queryParams: null };
     }
@@ -482,7 +532,15 @@ export class NotificationService {
         typeText.includes(token),
       );
 
-    if (isApprovalRoute || input.notificationType === 'ticket_resubmited') {
+    const isNewTicketForApprover =
+      input.notificationType === 'ticket_created' &&
+      [...this.approverRoles].some((role) => roleText.includes(role));
+
+    if (
+      isApprovalRoute ||
+      isNewTicketForApprover ||
+      input.notificationType === 'ticket_resubmited'
+    ) {
       return {
         route: '/approval-it-request',
         queryParams: {
@@ -633,12 +691,17 @@ export class NotificationService {
   }
 
   private isChatNotifForApprover(item: NotificationApiRecord): boolean {
-    const typeStr = (this.toText(item.notification_type ?? item.notificationType) ?? '').toLowerCase();
+    const typeStr = (
+      this.toText(item.notification_type ?? item.notificationType) ?? ''
+    ).toLowerCase();
     const titleStr = (this.toText(item.title) ?? '').toLowerCase();
     const isChatType =
-      typeStr.includes('note') || typeStr.includes('reply') ||
-      typeStr.includes('message') || typeStr.includes('chat') ||
-      titleStr.includes('ข้อความ') || titleStr.includes('แชท');
+      typeStr.includes('note') ||
+      typeStr.includes('reply') ||
+      typeStr.includes('message') ||
+      typeStr.includes('chat') ||
+      titleStr.includes('ข้อความ') ||
+      titleStr.includes('แชท');
 
     if (!isChatType) return false;
 

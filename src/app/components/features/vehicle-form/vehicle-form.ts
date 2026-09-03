@@ -40,7 +40,7 @@ import { VehicleService } from '../../../services/vehicle.service';
 import { SwalService } from '../../../services/swal.service';
 import dayjs from 'dayjs';
 import { AuthService } from '../../../services/auth.service';
-import { delay } from 'rxjs';
+import { finalize } from 'rxjs';
 
 @Component({
   selector: 'app-vehicle-form',
@@ -75,19 +75,20 @@ export class VehicleFormComponent implements OnInit, OnChanges {
   isLoading = true;
 
   ngOnInit(): void {
-    this.masterDataService
-      .getDateConfig()
-      .pipe(delay(0))
-      .subscribe((config) => {
-        this.thaiMonths = config.months;
-        this.years = config.years;
-        this.isLoading = false;
-        this.cdr.detectChanges();
+    this.masterDataService.getDateConfig().subscribe((config) => {
+      this.thaiMonths = config.months;
+      this.years = config.years;
 
-        if (!this.requests) {
-          this.loadData();
-        }
-      });
+      if (!this.requests) {
+        this.loadData();
+        return;
+      }
+
+      // Edit mode does not fetch eligible dates, so master data is the last
+      // asynchronous dependency needed before rendering the form.
+      this.isLoading = false;
+      this.cdr.detectChanges();
+    });
   }
 
   ngOnChanges(changes: SimpleChanges) {
@@ -154,8 +155,16 @@ export class VehicleFormComponent implements OnInit, OnChanges {
   }
 
   generateCalendar() {
+    this.isLoading = true;
+
     this.vehicleService
       .getVehicleByEmpcode(this.selectedYearBE.toString(), this.selectedMonthIndex.toString())
+      .pipe(
+        finalize(() => {
+          this.isLoading = false;
+          this.cdr.detectChanges();
+        }),
+      )
       .subscribe({
         next: (res) => {
           const rawData = res.data;

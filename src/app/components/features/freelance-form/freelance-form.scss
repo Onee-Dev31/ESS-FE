@@ -22,50 +22,20 @@
   }
 }
 
-// ==================== MODAL OVERLAY ====================
-.modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 9999;
-  padding: 20px;
-}
-
-.modal-container {
-  background: var(--bg-card);
-  border-radius: 16px;
-  width: 100%;
-  max-width: 1080px;
-  max-height: 90vh;
-  overflow: hidden;
-  position: relative;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-  display: grid !important;
-  grid-template-rows: auto minmax(0, 1fr) auto !important;
+.freelance-modal-form {
+  padding: 24px 36px 30px;
 
   @include tablet {
-    max-width: 95%;
-    max-height: 95vh;
+    padding: 20px 18px 24px;
   }
 }
 
-.modal-container .modal-content {
-  padding: 0 36px;
-  display: block !important;
-  min-height: 0;
-  overflow-y: auto !important;
-  overflow-x: hidden;
-  -webkit-overflow-scrolling: touch;
-  padding-bottom: 30px !important;
-  flex: initial !important;
-  scrollbar-width: thin;
-  scrollbar-color: #cbd5e1 transparent;
+.freelance-footer-actions {
+  width: 100%;
+
+  .save-action {
+    margin-left: auto;
+  }
 }
 
 .hidden-input {
@@ -78,7 +48,7 @@
 }
 
 // ==================== FORM HEADER ====================
-.modal-container .form-header {
+.resign-modal-overlay .modal-container .form-header {
   display: flex !important;
   border-bottom: none !important;
   overflow: visible !important;
@@ -257,7 +227,7 @@
 
     &:focus {
       outline: none;
-      border-color: #a78bfa !important;
+      border-color: var(--primary) !important;
       box-shadow: 0 0 0 4px rgba(167, 139, 250, 0.1) !important;
     }
 
@@ -489,7 +459,7 @@
 }
 
 // ==================== ACTION BUTTONS ====================
-.modal-container .form-actions {
+.resign-modal-overlay .modal-container .form-actions {
   display: flex !important;
   overflow: visible !important;
   flex: none !important;
@@ -599,6 +569,12 @@
 
 // ==================== RESIGN MODAL ====================
 .resign-modal-overlay {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
   z-index: 10000;
   background: rgba(33, 33, 33, 0.4);
   backdrop-filter: blur(4px);
@@ -749,23 +725,23 @@
 
 // ==================== RESPONSIVE ====================
 @media (max-width: 767px) {
-  .modal-overlay {
+  .resign-modal-overlay {
     padding: 10px;
-  }
 
-  .modal-container {
-    border-radius: 12px;
-  }
+    .modal-container {
+      border-radius: 12px;
+    }
 
-  .modal-content {
-    padding: 20px 16px;
-  }
+    .modal-content {
+      padding: 20px 16px;
+    }
 
-  .form-header {
-    margin-bottom: 24px;
+    .form-header {
+      margin-bottom: 24px;
 
-    h2 {
-      font-size: 1.2rem;
+      h2 {
+        font-size: 1.2rem;
+      }
     }
   }
 
@@ -777,4 +753,49 @@
     height: 42px;
     font-size: 0.86rem;
   }
+}
+
+// Keep ng-zorro's inner selector from drawing a second input border.
+// This component uses ViewEncapsulation.None, so scope every override to its form.
+.freelance-modal-form nz-select.form-input {
+  padding: 0 !important;
+  overflow: hidden;
+}
+
+.freelance-modal-form
+  nz-select.form-input.ant-select-single.ant-select:not(.ant-select-customize-input)
+  .ant-select-selector {
+  height: 100% !important;
+  padding: 0 20px !important;
+  background-color: transparent !important;
+  border: 0 !important;
+  border-radius: inherit !important;
+  box-shadow: none !important;
+}
+
+.freelance-modal-form nz-select.form-input .ant-select-selection-item,
+.freelance-modal-form nz-select.form-input .ant-select-selection-placeholder {
+  line-height: 46px !important;
+  padding: 0 !important;
+}
+
+.freelance-modal-form nz-select.form-input .ant-select-selection-search {
+  inset-inline-start: 0 !important;
+  inset-inline-end: 36px !important;
+  top: 50% !important;
+  bottom: auto !important;
+  height: 22px !important;
+  transform: translateY(-50%);
+}
+
+.freelance-modal-form nz-select.form-input .ant-select-selection-search-input {
+  height: 22px !important;
+  line-height: 22px !important;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+.freelance-modal-form nz-select.form-input.ant-select-focused {
+  border-color: var(--primary) !important;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary), transparent 85%) !important;
 }

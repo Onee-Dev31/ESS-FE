@@ -1,0 +1,401 @@
+<div class="page">
+  <app-page-header
+    title="กำหนดแผนสวัสดิการรักษาพยาบาล"
+    subtitle="Medical Benefit Plan Setting"
+    icon="fas fa-briefcase-medical"
+  />
+
+  <div class="content-card">
+    <div class="card-header-title">
+      <div class="header-row">
+        <div>แผนสวัสดิการรักษาพยาบาล</div>
+        <div class="card-actions">
+          <button type="button" class="btn-add" (click)="openCreate()">
+            <i class="fa-solid fa-plus"></i> เพิ่มแผน
+          </button>
+        </div>
+      </div>
+      <p>กำหนดวงเงินคุ้มครองแยกตามระดับพนักงาน (Job Class)</p>
+    </div>
+
+    <div class="table-responsive">
+      @if (isLoading()) {
+        <app-skeleton type="table" [rows]="5"></app-skeleton>
+      } @else if (errorMessage()) {
+        <app-empty-state
+          title="เกิดข้อผิดพลาด"
+          [description]="errorMessage()!"
+          icon="fas fa-triangle-exclamation"
+          actionLabel="ลองอีกครั้ง"
+          actionIcon="fas fa-rotate-right"
+          (action)="loadPlans()"
+        ></app-empty-state>
+      } @else if (plans().length === 0) {
+        <app-empty-state
+          title="ยังไม่มีแผนสวัสดิการ"
+          description="เริ่มเพิ่มแผนแรกได้เลย"
+          icon="fas fa-briefcase-medical"
+        ></app-empty-state>
+      } @else {
+        <table class="modern-table">
+          <thead>
+            <tr>
+              <th>ลำดับ</th>
+              <th>Job Class</th>
+              <th>OPD limit</th>
+              <th>IPD limit</th>
+              <th>ทันตกรรม</th>
+              <th>สายตา</th>
+              <th>สถานะ</th>
+              <th class="action-column"></th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (plan of plans(); track plan.plan_id) {
+              <tr [class.inactive-row]="!plan.is_active">
+                <td>{{ plan.plan_no }}</td>
+                <td>{{ plan.job_class_label }}</td>
+                <td>{{ plan.opd_limit | number }} บาท</td>
+                <td>{{ plan.ipd_limit | number }} บาท</td>
+                <td>{{ plan.dental_limit | number }} บาท</td>
+                <td>{{ plan.vision_limit | number }} บาท</td>
+                <td>
+                  <label class="toggle">
+                    <input
+                      type="checkbox"
+                      [checked]="plan.is_active"
+                      [disabled]="togglingPlanId() === plan.plan_id"
+                      (change)="toggleActive(plan)"
+                    />
+                    <span class="toggle__slider"></span>
+                  </label>
+                </td>
+                <td class="action-column">
+                  <div class="row-actions">
+                    <button
+                      type="button"
+                      class="btn-icon-edit"
+                      title="แก้ไขแผน"
+                      (click)="openEdit(plan)"
+                    >
+                      <i class="fa-solid fa-pen"></i>
+                    </button>
+                    <button
+                      type="button"
+                      class="btn-icon-delete"
+                      title="ลบแผน"
+                      [disabled]="deletingPlanId() === plan.plan_id"
+                      (click)="deletePlan(plan)"
+                    >
+                      <i
+                        class="fa-solid"
+                        [class.fa-trash-can]="deletingPlanId() !== plan.plan_id"
+                        [class.fa-spinner]="deletingPlanId() === plan.plan_id"
+                        [class.spin]="deletingPlanId() === plan.plan_id"
+                      ></i>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      }
+    </div>
+
+    <div class="card-list-view">
+      @if (isLoading()) {
+        <app-skeleton type="card" [rows]="3"></app-skeleton>
+      } @else if (errorMessage()) {
+        <app-empty-state
+          title="เกิดข้อผิดพลาด"
+          [description]="errorMessage()!"
+          icon="fas fa-triangle-exclamation"
+          actionLabel="ลองอีกครั้ง"
+          actionIcon="fas fa-rotate-right"
+          (action)="loadPlans()"
+        ></app-empty-state>
+      } @else if (plans().length === 0) {
+        <app-empty-state
+          title="ยังไม่มีแผนสวัสดิการ"
+          description="เริ่มเพิ่มแผนแรกได้เลย"
+          icon="fas fa-briefcase-medical"
+        ></app-empty-state>
+      } @else {
+        @for (plan of plans(); track plan.plan_id) {
+          <div class="mobile-card" [class.inactive-row]="!plan.is_active">
+            <div class="card-header">
+              <div class="header-content">
+                <span class="card-dept-name">{{ plan.job_class_label }}</span>
+                <div class="card-dept-code">แผนที่ {{ plan.plan_no }}</div>
+              </div>
+              <label class="toggle">
+                <input
+                  type="checkbox"
+                  [checked]="plan.is_active"
+                  [disabled]="togglingPlanId() === plan.plan_id"
+                  (change)="toggleActive(plan)"
+                />
+                <span class="toggle__slider"></span>
+              </label>
+            </div>
+            <div class="card-body">
+              <div class="info-row">
+                <span class="label">OPD limit:</span>
+                <span class="value">{{ plan.opd_limit | number }} บาท</span>
+              </div>
+              <div class="info-row">
+                <span class="label">IPD limit:</span>
+                <span class="value">{{ plan.ipd_limit | number }} บาท</span>
+              </div>
+              <div class="info-row">
+                <span class="label">ทันตกรรม:</span>
+                <span class="value">{{ plan.dental_limit | number }} บาท</span>
+              </div>
+              <div class="info-row">
+                <span class="label">สายตา:</span>
+                <span class="value">{{ plan.vision_limit | number }} บาท</span>
+              </div>
+              <div class="card-footer-actions">
+                <button type="button" class="btn-edit-sm" (click)="openEdit(plan)">
+                  <i class="fa-solid fa-pen"></i> แก้ไข
+                </button>
+                <button
+                  type="button"
+                  class="btn-delete-sm"
+                  [disabled]="deletingPlanId() === plan.plan_id"
+                  (click)="deletePlan(plan)"
+                >
+                  <i
+                    class="fa-solid"
+                    [class.fa-trash-can]="deletingPlanId() !== plan.plan_id"
+                    [class.fa-spinner]="deletingPlanId() === plan.plan_id"
+                    [class.spin]="deletingPlanId() === plan.plan_id"
+                  ></i>
+                  ลบ
+                </button>
+              </div>
+            </div>
+          </div>
+        }
+      }
+    </div>
+  </div>
+</div>
+
+@if (isModalOpen()) {
+  <app-modal-shell
+    [title]="editingPlanId() === null ? 'เพิ่มแผน' : 'แก้ไขแผน'"
+    subtitle="แผนสวัสดิการรักษาพยาบาล"
+    size="lg"
+    [closeOnBackdrop]="!isSaving()"
+    [closeOnEscape]="!isSaving() && !isConfirming()"
+    (closeModal)="closeModal()"
+  >
+    <form id="medical-plan-form" (ngSubmit)="savePlan()">
+      <fieldset class="field-group">
+        <legend>ข้อมูลทั่วไป</legend>
+        <div class="field-grid cols-2">
+          <label class="form-field">
+            <span>ลำดับแผน</span>
+            <input
+              type="number"
+              min="1"
+              step="1"
+              name="plan_no"
+              required
+              class="form-input"
+              [class.input-invalid]="getFieldError('plan_no')"
+              [(ngModel)]="form.plan_no"
+            />
+            @if (getFieldError('plan_no'); as error) {
+              <small class="field-error">{{ error }}</small>
+            }
+          </label>
+          <label class="form-field toggle-field">
+            <span>สถานะ</span>
+            <label class="toggle">
+              <input type="checkbox" name="is_active" [(ngModel)]="form.is_active" />
+              <span class="toggle__slider"></span>
+            </label>
+          </label>
+        </div>
+
+        <label class="form-field">
+          <span>ชื่อแผน</span>
+          <input
+            type="text"
+            name="job_class_label"
+            required
+            autocomplete="off"
+            class="form-input"
+            [class.input-invalid]="getFieldError('job_class_label')"
+            [(ngModel)]="form.job_class_label"
+          />
+          @if (getFieldError('job_class_label'); as error) {
+            <small class="field-error">{{ error }}</small>
+          }
+        </label>
+
+        <div class="field-grid cols-2">
+          <label class="form-field">
+            <span>Job Class ตั้งแต่</span>
+            <input
+              type="number"
+              min="0"
+              step="1"
+              name="job_class_min"
+              required
+              class="form-input"
+              [class.input-invalid]="getFieldError('job_class_min')"
+              [(ngModel)]="form.job_class_min"
+            />
+            @if (getFieldError('job_class_min'); as error) {
+              <small class="field-error">{{ error }}</small>
+            }
+          </label>
+          <label class="form-field">
+            <span>Job Class ไม่เกิน</span>
+            <input
+              type="number"
+              min="0"
+              step="1"
+              name="job_class_max"
+              required
+              class="form-input"
+              [class.input-invalid]="getFieldError('job_class_max')"
+              [(ngModel)]="form.job_class_max"
+            />
+            @if (getFieldError('job_class_max'); as error) {
+              <small class="field-error">{{ error }}</small>
+            }
+          </label>
+        </div>
+      </fieldset>
+
+      <fieldset class="field-group">
+        <legend>OPD (ผู้ป่วยนอก)</legend>
+        <div class="field-grid cols-3">
+          <label class="form-field">
+            <span>วงเงินรวม/ปี</span>
+            <input
+              type="number"
+              min="0"
+              step="1"
+              name="opd_limit"
+              class="form-input"
+              [(ngModel)]="form.opd_limit"
+            />
+          </label>
+          <label class="form-field">
+            <span>เพดานต่อครั้ง</span>
+            <input
+              type="number"
+              min="0"
+              step="1"
+              name="opd_per_visit_cap"
+              class="form-input"
+              [(ngModel)]="form.opd_per_visit_cap"
+            />
+          </label>
+          <label class="form-field">
+            <span>ส่วนเกินเพดาน</span>
+            <input
+              type="number"
+              min="0"
+              step="1"
+              name="opd_over_cap"
+              class="form-input"
+              [(ngModel)]="form.opd_over_cap"
+            />
+          </label>
+        </div>
+      </fieldset>
+
+      <fieldset class="field-group">
+        <legend>IPD (ผู้ป่วยใน)</legend>
+        <div class="field-grid cols-3">
+          <label class="form-field">
+            <span>วงเงินรวม/ปี</span>
+            <input
+              type="number"
+              min="0"
+              step="1"
+              name="ipd_limit"
+              class="form-input"
+              [(ngModel)]="form.ipd_limit"
+            />
+          </label>
+          <label class="form-field">
+            <span>เพดานค่าห้อง/วัน</span>
+            <input
+              type="number"
+              min="0"
+              step="1"
+              name="ipd_daily_cap"
+              class="form-input"
+              [(ngModel)]="form.ipd_daily_cap"
+            />
+          </label>
+          <label class="form-field">
+            <span>ส่วนเกินเพดาน/วัน</span>
+            <input
+              type="number"
+              min="0"
+              step="1"
+              name="ipd_daily_over_cap"
+              class="form-input"
+              [(ngModel)]="form.ipd_daily_over_cap"
+            />
+          </label>
+        </div>
+      </fieldset>
+
+      <fieldset class="field-group">
+        <legend>อื่นๆ</legend>
+        <div class="field-grid cols-2">
+          <label class="form-field">
+            <span>ทันตกรรม</span>
+            <input
+              type="number"
+              min="0"
+              step="1"
+              name="dental_limit"
+              class="form-input"
+              [(ngModel)]="form.dental_limit"
+            />
+          </label>
+          <label class="form-field">
+            <span>สายตา</span>
+            <input
+              type="number"
+              min="0"
+              step="1"
+              name="vision_limit"
+              class="form-input"
+              [(ngModel)]="form.vision_limit"
+            />
+          </label>
+        </div>
+      </fieldset>
+    </form>
+
+    <div modalFooter>
+      <button type="button" class="modal-button" (click)="closeModal()" [disabled]="isSaving()">
+        ยกเลิก
+      </button>
+      <button
+        type="submit"
+        form="medical-plan-form"
+        class="modal-button primary"
+        [disabled]="isSaving() || isConfirming()"
+      >
+        @if (isSaving()) {
+          <i class="fa-solid fa-spinner spin"></i> กำลังบันทึก...
+        } @else {
+          <i class="fa-solid fa-check"></i> บันทึก
+        }
+      </button>
+    </div>
+  </app-modal-shell>
+}

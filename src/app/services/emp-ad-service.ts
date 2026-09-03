@@ -8,6 +8,7 @@ import { environment } from '../../environments/environment';
 })
 export class EmpAdService {
   private baseUrl = 'https://oneeuserapi.oneeclick.co/api';
+  private empUrl = environment.api_url;
 
   constructor(private _http: HttpClient) {}
 
@@ -96,10 +97,10 @@ export class EmpAdService {
     });
   }
 
-  resetPassword(token: string, newPassword: string): Observable<any> {
+  resetPassword(SamAccountName: string, NewPassword: string): Observable<any> {
     return this._http.post(
-      `${this.baseUrl}/ActiveDirectory/ResetPassword`,
-      { token, newPassword },
+      `${this.baseUrl}/ActiveDirectory/ResetPasswordBySamAccountName`,
+      { SamAccountName, NewPassword },
       {
         responseType: 'text',
       },
@@ -148,6 +149,12 @@ export class EmpAdService {
     return this._http.put(`${this.baseUrl}/Employee/UpdateEmployeeX1`, null, {
       params: httpParams,
       responseType: 'text',
+    });
+  }
+
+  getfreelanceCode(comcode: string): Observable<any> {
+    return this._http.get(`${this.empUrl}/getfreelanceCode`, {
+      params: new HttpParams().set('companycode', comcode),
     });
   }
 }
