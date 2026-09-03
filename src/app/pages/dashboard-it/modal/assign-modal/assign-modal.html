@@ -21,16 +21,34 @@
         <p>เลือกประเภทงาน<span class="required">*</span></p>
         <div class="tag-group">
           <label class="tag">
-            <input type="radio" name="tag" [value]="2" [(ngModel)]="selectedTag" (ngModelChange)="onTagChange()" />
+            <input
+              type="radio"
+              name="tag"
+              [value]="2"
+              [(ngModel)]="selectedTag"
+              (ngModelChange)="onTagChange()"
+            />
             <span>แจ้งปัญหา</span>
           </label>
           <label class="tag">
-            <input type="radio" name="tag" [value]="1" [(ngModel)]="selectedTag" (ngModelChange)="onTagChange()" />
+            <input
+              type="radio"
+              name="tag"
+              [value]="1"
+              [(ngModel)]="selectedTag"
+              (ngModelChange)="onTagChange()"
+            />
             <span>แจ้งซ่อม</span>
           </label>
           @if (ticket?.viaEmail === true) {
             <label class="tag">
-              <input type="radio" name="tag" [value]="3" [(ngModel)]="selectedTag" (ngModelChange)="onTagChange()" />
+              <input
+                type="radio"
+                name="tag"
+                [value]="3"
+                [(ngModel)]="selectedTag"
+                (ngModelChange)="onTagChange()"
+              />
               <span>ขอใช้บริการ</span>
             </label>
           }
@@ -67,7 +85,9 @@
             <div class="chip">
               <img [src]="getEmployeeImage(emp.id)" (error)="onImgError($event)" />
               <span>{{ emp.id }}</span>
-              <span class="material-symbols-outlined close-ic" (click)="removeAssignee(emp.id)">close</span>
+              <span class="material-symbols-outlined close-ic" (click)="removeAssignee(emp.id)"
+                >close</span
+              >
             </div>
           }
         </div>
@@ -84,9 +104,15 @@
             </div>
 
             @for (emp of group.members; track emp.id) {
-              <div class="assign-item" [class.selected]="isSelected(emp.id)" (click)="toggleAssignee(emp)">
+              <div
+                class="assign-item"
+                [class.selected]="isSelected(emp.id)"
+                (click)="toggleAssignee(emp)"
+              >
                 <div class="assign-chk">
-                  <span class="material-symbols-outlined">{{ isSelected(emp.id) ? 'check_box' : 'check_box_outline_blank' }}</span>
+                  <span class="material-symbols-outlined">{{
+                    isSelected(emp.id) ? 'check_box' : 'check_box_outline_blank'
+                  }}</span>
                 </div>
                 <div class="assign-avatar">
                   <img
@@ -96,7 +122,9 @@
                     (click)="openImage(emp.id); $event.stopPropagation()"
                   />
                 </div>
-                <div class="assign-info"><div class="assign-name">{{ emp.name }}</div></div>
+                <div class="assign-info">
+                  <div class="assign-name">{{ emp.name }}</div>
+                </div>
               </div>
             }
           </div>
@@ -111,7 +139,9 @@
   </div>
 
   <div modalFooter>
-    <button type="button" class="modal-button" (click)="close()"><i class="fas fa-times"></i> ยกเลิก</button>
+    <button type="button" class="modal-button" (click)="close()">
+      <i class="fas fa-times"></i> ยกเลิก
+    </button>
     <button
       type="button"
       class="modal-button primary"
@@ -119,7 +149,11 @@
       (click)="save()"
     >
       <i class="fas fa-paper-plane"></i>
-      {{ selectedAssigneeEmpCodes.length > 0 ? 'Assign ' + selectedAssigneeEmpCodes.length + ' People' : 'Assign Ticket' }}
+      {{
+        selectedAssigneeEmpCodes.length > 0
+          ? 'Assign ' + selectedAssigneeEmpCodes.length + ' People'
+          : 'Assign Ticket'
+      }}
     </button>
   </div>
 </app-modal-shell>

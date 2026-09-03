@@ -18,9 +18,11 @@ export class AcknowledgeModal {
   message = '';
 
   get isApproved(): boolean {
-    return String(this.ticket?.approval_status ?? this.ticket?.approvalStatus ?? '')
-      .trim()
-      .toLowerCase() === 'approved';
+    return (
+      String(this.ticket?.approval_status ?? this.ticket?.approvalStatus ?? '')
+        .trim()
+        .toLowerCase() === 'approved'
+    );
   }
 
   get ticketTypeLabel(): string {
