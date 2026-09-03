@@ -54,26 +54,6 @@ $border-color: var(--border-color);
   @include card-header-title;
 }
 
-// Icon Button Sky Mixin
-@mixin icon-btn-sky {
-  width: 32px;
-  height: 32px;
-  border-radius: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: rgba(14, 165, 233, 0.1);
-  color: #0ea5e9;
-  border: none;
-  cursor: pointer;
-  transition: all 0.2s;
-
-  &:hover {
-    background: rgba(14, 165, 233, 0.2);
-    transform: translateY(-1px);
-  }
-}
-
 // ============================================
 
 .vehicle-taxi-page {
@@ -903,4 +883,121 @@ select.form-control {
   display: flex;
   gap: 6px;
   justify-content: center;
+}
+
+.btn-icon-sky {
+  @include icon-btn-sky;
+}
+
+// ============================================
+// Policy popup
+// ============================================
+.policy-popup-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  -webkit-backdrop-filter: blur(4px);
+  backdrop-filter: blur(4px);
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  animation: fadeIn 0.2s ease;
+}
+
+.policy-popup-content {
+  background: $bg-card;
+  border-radius: 16px;
+  max-width: 500px;
+  width: 100%;
+  max-height: 80vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  box-shadow: $shadow;
+  animation: slideUp 0.3s ease;
+}
+
+.policy-popup-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
+  border-bottom: 1px solid $border-color;
+  background: linear-gradient(135deg, $header-bg 0%, $bg-card 100%);
+
+  h3 {
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: $primary;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    i {
+      font-size: 1.2rem;
+    }
+  }
+
+  .btn-close-popup {
+    @include close-btn-style;
+  }
+}
+
+.policy-popup-body {
+  padding: 20px;
+  overflow-y: auto;
+
+  .policy-conditions-list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+
+    .condition-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 10px 4px;
+
+      &:not(:last-child) {
+        border-bottom: 1px dashed $border-color;
+      }
+
+      i {
+        flex-shrink: 0;
+        width: 28px;
+        height: 28px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        background: rgba($primary, 0.1);
+        color: $primary;
+        font-size: 0.8rem;
+        margin-top: 2px;
+      }
+
+      .condition-title {
+        font-size: 0.9rem;
+        font-weight: 600;
+        color: $text;
+        line-height: 1.4;
+      }
+
+      .condition-desc {
+        font-size: 0.8rem;
+        color: $text-sub;
+        line-height: 1.4;
+        margin-top: 2px;
+      }
+    }
+  }
 }

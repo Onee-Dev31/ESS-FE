@@ -17,7 +17,11 @@ import { PageHeaderComponent } from '../../components/shared/page-header/page-he
 import { EmptyStateComponent } from '../../components/shared/empty-state/empty-state';
 import { SkeletonComponent } from '../../components/shared/skeleton/skeleton';
 import { StatusLabelPipe } from '../../pipes/status-label.pipe';
-import { VehicleService } from '../../services/vehicle.service';
+import {
+  VehicleService,
+  VehicleRate,
+  VehicleConditions,
+} from '../../services/vehicle.service';
 import { SwalService } from '../../services/swal.service';
 import { AuthService } from '../../services/auth.service';
 import { DateUtilityService } from '../../services/date-utility.service';
@@ -27,6 +31,20 @@ import { NzDatePickerModule } from 'ng-zorro-antd/date-picker';
 import { en_US, NzI18nService } from 'ng-zorro-antd/i18n';
 import dayjs from 'dayjs';
 import { NzSelectModule } from 'ng-zorro-antd/select';
+
+/** ข้อความ fallback ของ popup เงื่อนไข (ใช้ก่อน API ตอบกลับ หรือถ้าเรียก API ไม่สำเร็จ) */
+const DEFAULT_POLICY_TEXTS: Record<string, string> = {
+  cond1_title: 'เข้างานก่อน **{earlyCheckin}** หรือ ออกงานหลัง **{lateCheckout}**',
+  cond1_desc: 'เข้าเงื่อนไขข้อใดข้อหนึ่ง หรือทั้งสองข้อในวันเดียวกันก็ได้',
+  cond2_title: 'เข้างานสายได้ไม่เกิน **{lateTolerance}**',
+  cond2_desc: 'เทียบกับเวลาเข้างานตามกะที่กำหนดไว้',
+  cond3_title: 'ต้องสแกนบัตรเข้า-ออกครบทั้งสองครั้ง',
+  cond3_desc: 'วันที่สแกนไม่ครบจะไม่นับเป็นวันมีสิทธิ์เบิก',
+  rates_note:
+    'แต่ละอัตราคิดแยกตามเงื่อนไข หากวันเดียวกันเข้าเงื่อนไขทั้งเข้าก่อน {earlyCheckin} และออกหลัง {lateCheckout} จะได้รับเงินรวมทั้งสองอัตรา',
+  example_text:
+    'เข้างานเวลา **05:30 น.** และเลิกงานเวลา **23:00 น.** ในวันเดียวกัน เข้าเงื่อนไขทั้ง "ก่อน {earlyCheckin}" และ "หลัง {lateCheckout}" พร้อมกัน จึงได้รับเงินของ **ทั้งสองอัตรารวมกัน** ไม่ใช่แค่อัตราเดียว (ตามอัตราปัจจุบันด้านบน รวมเป็น **240 บาท** ในวันนั้น)',
+};
 
 /** หน้าแสดงรายการคำขอเบี้ยเลี้ยงค่ารถ (Vehicle Allowance) */
 @Component({
@@ -62,6 +80,31 @@ export class VehicleComponent implements OnInit {
   dateRange: Date[] | null = null;
 
   isModalOpen = false;
+  isPolicyModalOpen = signal<boolean>(false);
+  rates = signal<VehicleRate[]>([]);
+  conditions = signal<VehicleConditions | null>(null);
+
+  earlyCheckinLabel = computed(() => {
+    const c = this.conditions();
+    return c ? `${c.early_checkin_time.slice(0, 5)} น.` : '06:00 น.';
+  });
+  lateCheckoutLabel = computed(() => {
+    const c = this.conditions();
+    return c ? `${String(c.late_checkout_hour).padStart(2, '0')}:00 น.` : '22:00 น.';
+  });
+  lateToleranceLabel = computed(() => {
+    const c = this.conditions();
+    return c ? `${c.late_tolerance_min} นาที` : '15 นาที';
+  });
+
+  policyTexts = signal<Record<string, string>>({});
+
+  private tokenValues = computed(() => ({
+    earlyCheckin: this.earlyCheckinLabel(),
+    lateCheckout: this.lateCheckoutLabel(),
+    lateTolerance: this.lateToleranceLabel(),
+  }));
+
   selectedRequestId = '';
   selectedRequest: any = null;
 
@@ -89,6 +132,51 @@ export class VehicleComponent implements OnInit {
 
   ngOnInit() {
     this.loadData();
+    this.getRates();
+    this.getConditions();
+    this.getPolicyTexts();
+  }
+
+  getRates() {
+    this.vehicleService.getRates().subscribe({
+      next: (res) => this.rates.set(res.data),
+      error: () => {},
+    });
+  }
+
+  getConditions() {
+    this.vehicleService.getConditions().subscribe({
+      next: (res) => this.conditions.set(res.data),
+      error: () => {},
+    });
+  }
+
+  getPolicyTexts() {
+    this.vehicleService.getPolicyTexts().subscribe({
+      next: (res) => {
+        const map: Record<string, string> = {};
+        for (const t of res.data) map[t.text_key] = t.content;
+        this.policyTexts.set(map);
+      },
+      error: () => {},
+    });
+  }
+
+  renderSegments(key: string): { text: string; bold: boolean }[] {
+    const raw = this.policyTexts()[key] ?? DEFAULT_POLICY_TEXTS[key] ?? '';
+    const tokens = this.tokenValues();
+    const substituted = raw.replace(
+      /\{(\w+)\}/g,
+      (_, name) => (tokens as Record<string, string>)[name] ?? '',
+    );
+    return substituted
+      .split(/(\*\*.+?\*\*)/g)
+      .filter((s) => s.length > 0)
+      .map((s) =>
+        s.startsWith('**') && s.endsWith('**')
+          ? { text: s.slice(2, -2), bold: true }
+          : { text: s, bold: false },
+      );
   }
 
   constructor(private i18n: NzI18nService) {
