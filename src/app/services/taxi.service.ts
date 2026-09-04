@@ -1,7 +1,7 @@
 /** Service สำหรับจัดการข้อมูลคำขอเบี้ยเลี้ยงค่าแท็กซี่ (Taxi) */
 import { Injectable } from '@angular/core';
 import { Observable, of, delay } from 'rxjs';
-import { HttpClient, HttpContext } from '@angular/common/http';
+import { HttpClient, HttpContext, HttpParams } from '@angular/common/http';
 
 import { TaxiItem, TaxiRequest, TaxiLogItem, TaxiLocation } from '../interfaces/taxi.interface';
 import { TaxiMock } from '../mocks/taxi.mock';
@@ -19,6 +19,7 @@ export class TaxiService extends BaseRequestService<TaxiRequest> {
   protected override readonly STORAGE_KEY = STORAGE_KEYS.MOCK_TAXI_DATA;
 
   private baseUrl = environment.api_url;
+  FILE_BASE = environment.file_base_url;
 
   constructor(private _http: HttpClient) {
     super();
@@ -132,5 +133,27 @@ export class TaxiService extends BaseRequestService<TaxiRequest> {
   getMockTaxiLogs(month: number, year: number): Observable<TaxiLogItem[]> {
     const results = TaxiMock.getMockTaxiLogs(month, year);
     return of(results).pipe(delay(100));
+  }
+
+  // ==================== Approvals ====================
+  getFileUrl(path: string): string {
+    if (!path) return '';
+    if (path.startsWith('http')) return path;
+    return `${this.FILE_BASE}${path.startsWith('/') ? '' : '/'}${path}`;
+  }
+
+  getApprovals(approver_aduser: string, voucher_no?: string, status?: string): Observable<any> {
+    let p = new HttpParams().set('approver_aduser', approver_aduser);
+    if (voucher_no?.trim()) p = p.set('voucher_no', voucher_no.trim());
+    if (status?.trim()) p = p.set('status', status.trim());
+    return this._http.get<any>(`${this.baseUrl}/taxi-claim/approvals`, { params: p });
+  }
+
+  getClaimById(claimId: number): Observable<any> {
+    return this._http.get<any>(`${this.baseUrl}/taxi-claim/claims/${claimId}`);
+  }
+
+  updateStatusClaim(claimId: number, body: any): Observable<any> {
+    return this._http.patch<any>(`${this.baseUrl}/taxi-claim/claims/${claimId}/review`, body);
   }
 }

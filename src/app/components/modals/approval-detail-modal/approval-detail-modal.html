@@ -320,6 +320,93 @@
             </div>
           }
         }
+
+        @if (taxiDetail()) {
+          <div class="medical-info-grid">
+            @for (step of groupedSteps(); track step.stepNo) {
+              <div class="med-info-item">
+                <label><i class="fas fa-user-check"></i> Approve Step {{ step.stepNo }}</label>
+                <span>
+                  @if (step.acted) {
+                    <div class="approver-done">
+                      @if (step.acted.status === 'approved') {
+                        <i class="fas fa-check-circle text-success"></i>
+                      } @else {
+                        <i class="fas fa-times-circle text-danger"></i>
+                      }
+                      {{ step.acted.approver_name }}
+                      <span class="text-muted">{{ step.acted.acted_at | date: 'dd/MM/yyyy' }}</span>
+                    </div>
+                  } @else if (step.approvers.length > 1) {
+                    @for (a of step.approvers; track a.approver_emp_no) {
+                      <div class="approver-done">
+                        {{ a.approver_name }}
+                      </div>
+                    }
+                  } @else {
+                    <div class="approver-done">
+                      {{ step.approvers[0].approver_name }}
+                    </div>
+                  }
+                </span>
+              </div>
+            }
+            @if (taxiDetail().remark) {
+              <div class="med-info-item med-info-full">
+                <label><i class="fas fa-comment-alt"></i> หมายเหตุ</label>
+                <span>{{ taxiDetail().remark }}</span>
+              </div>
+            }
+            @if (taxiDetail().rejectionReason) {
+              <div class="med-info-item med-info-full">
+                <label><i class="fas fa-times-circle text-danger"></i> เหตุผลที่ไม่อนุมัติ</label>
+                <span class="text-danger">{{ taxiDetail().rejectionReason }}</span>
+              </div>
+            }
+          </div>
+
+          @if (taxiDetail()?.items?.length) {
+            <div class="content-header">
+              <h3>รายการเบิก ({{ taxiDetail()?.items?.length }} รายการ)</h3>
+            </div>
+            <div class="table-scroll">
+              <table class="modern-table">
+                <thead>
+                  <tr>
+                    <th>วันที่</th>
+                    <th>รายละเอียด</th>
+                    <th>จาก</th>
+                    <th>ไป</th>
+                    <th class="text-right">ยอดเงิน</th>
+                    <th>เอกสาร</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (d of taxiDetail()?.items; track $index) {
+                    <tr>
+                      <td data-label="วันที่">{{ dateUtil.formatDateToBE(d.date, 'DD/MM/YYYY') }}</td>
+                      <td data-label="รายละเอียด">{{ d.description || '-' }}</td>
+                      <td data-label="จาก">{{ d.locationFrom || '-' }}</td>
+                      <td data-label="ไป">{{ d.locationTo || '-' }}</td>
+                      <td data-label="ยอดเงิน" class="text-right">
+                        ฿{{ d.amount | number: '1.2-2' }}
+                      </td>
+                      <td data-label="เอกสาร">
+                        @if (d.attachments?.length) {
+                          <button type="button" class="btn-view-all" (click)="openPreview(d.attachments[0])">
+                            <i class="far fa-eye"></i> {{ d.attachments.length }}
+                          </button>
+                        } @else {
+                          -
+                        }
+                      </td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          }
+        }
       </div>
 
       <div class="side-panel">
@@ -339,6 +426,7 @@
               {{
                 allowanceDetail()?.departmentName ||
                   vehicleDetail()?.departmentName ||
+                  taxiDetail()?.departmentName ||
                   approvalItem.requestBy.department
               }}
             </div>
@@ -349,6 +437,7 @@
               {{
                 allowanceDetail()?.companyName ||
                   vehicleDetail()?.companyName ||
+                  taxiDetail()?.companyName ||
                   approvalItem.requestBy.company
               }}
             </div>

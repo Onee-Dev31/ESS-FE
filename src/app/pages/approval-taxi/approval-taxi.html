@@ -32,7 +32,7 @@
           <nz-icon nzInputPrefix nzType="search" />
           <input
             nz-input
-            placeholder="ค้นหา Request No, ชื่อ-นามสกุล"
+            placeholder="ค้นหา Request No, ชื่อ-นามสกุล, รายละเอียด"
             [value]="listing.searchText()"
             (input)="onSearch($event)"
           />
@@ -40,7 +40,7 @@
       </div>
 
       <div class="tab-navigation">
-        @for (tab of medicalTabs; track tab) {
+        @for (tab of taxiTabs; track tab) {
           <button
             type="button"
             class="tab-item"
@@ -53,19 +53,63 @@
       </div>
     </div>
 
+    <div class="bulk-toolbar">
+      <label class="checkbox-custom">
+        <input
+          type="checkbox"
+          [checked]="isAllSelected()"
+          [indeterminate]="isSomeSelected()"
+          (change)="toggleSelectAll($event)"
+        />
+        <span class="checkmark"></span>
+        <span class="toolbar-label">
+          {{ isSomeSelected() || isAllSelected() ? 'ยกเลิกการเลือก' : 'เลือกทั้งหมด' }}
+        </span>
+      </label>
+
+      @if (selectedItems().size > 0) {
+        <div class="toolbar-divider"></div>
+
+        <button class="toolbar-btn btn-export" (click)="exportExcel()">
+          <i class="fas fa-file-excel"></i> Export Excel
+        </button>
+
+        <span class="selected-count">เลือก {{ selectedItems().size }} รายการ</span>
+      }
+    </div>
+
     <div class="claim-cards-grid">
       @if (isLoading()) {
         <app-skeleton type="card" [rows]="3"></app-skeleton>
       } @else {
         @for (req of comps.paginatedData(); track trackByRowId($index, req)) {
-          @let claim = getAllowanceClaim(req);
+          @let claim = getTaxiClaim(req);
           @if (claim) {
             <div class="claim-card">
               <div class="claim-card__header">
                 <div class="claim-card__type-badge">
-                  <i class="fas fa-notes-medical"></i> {{ claim.expenseTypeName }}
+                  <label class="checkbox-custom">
+                    <input
+                      type="checkbox"
+                      aria-label="เลือกรายการ"
+                      [checked]="isChecked(req.requestId)"
+                      (change)="toggleSelect(req.requestId, $any($event.target).checked)"
+                    />
+                    <span class="checkmark"></span>
+                  </label>
+                  <i class="fa-solid fa-taxi"></i> เบิกค่าแท็กซี่
                 </div>
                 <div class="claim-card__actions">
+                  @if (getAttachmentCount(claim) > 0) {
+                    <button
+                      type="button"
+                      class="btn-attach"
+                      (click)="openPreview(claim)"
+                      title="ดูเอกสาร"
+                    >
+                      <i class="fas fa-file-alt"></i> {{ getAttachmentCount(claim) }}
+                    </button>
+                  }
                   <span class="status-badge" [ngStyle]="getStatusClass(req.status)">
                     {{ req.rawStatus | statusLabel }}
                   </span>
@@ -106,39 +150,37 @@
               </div>
 
               <div class="claim-card__body">
-                <div class="claim-card__main"></div>
+                <div class="claim-card__main">
+                  <div class="claim-card__count">จำนวน {{ claim.items.length }} รายการ</div>
+                  <div class="claim-card__trips">
+                    @for (item of claim.items; track $index) {
+                      <div class="claim-trip">
+                        <div class="claim-trip__number">เที่ยวที่ {{ $index + 1 }}</div>
+                        <div class="claim-trip__field">
+                          <span class="claim-trip__label">รายละเอียด</span>
+                          <span class="claim-trip__value">{{ item.description || '-' }}</span>
+                        </div>
+                        <div class="claim-trip__route">
+                          <div class="claim-trip__field">
+                            <span class="claim-trip__label">จาก</span>
+                            <span class="claim-trip__value">{{ item.locationFrom || '-' }}</span>
+                          </div>
+                          <i class="fas fa-arrow-right" aria-hidden="true"></i>
+                          <div class="claim-trip__field">
+                            <span class="claim-trip__label">ไป</span>
+                            <span class="claim-trip__value">{{ item.locationTo || '-' }}</span>
+                          </div>
+                        </div>
+                      </div>
+                    }
+                  </div>
+                </div>
 
                 <div class="claim-card__amount">
                   <span class="amount-label">ขอเบิก</span>
                   <span class="amount-value">฿{{ claim.totalAmount | number: '1.2-2' }}</span>
-                  @if (claim.approvedAmount > 0) {
-                    <span class="amount-approved"
-                      >อนุมัติ ฿{{ claim.approvedAmount | number: '1.2-2' }}</span
-                    >
-                  }
                 </div>
               </div>
-
-              @if (claim.typeTotalLimit > 0) {
-                <div class="claim-card__budget">
-                  <div class="budget-row">
-                    <span class="budget-label">วงเงิน {{ claim.expenseTypeCode }}</span>
-                    <span class="budget-remaining"
-                      >คงเหลือ ฿{{ claim.typeRemainingAmount | number: '1.0-0' }}</span
-                    >
-                  </div>
-                  <div class="budget-bar">
-                    <div
-                      class="budget-bar__used"
-                      [style.width.%]="(claim.typeUsedAmount / claim.typeTotalLimit) * 100"
-                    ></div>
-                  </div>
-                  <div class="budget-meta">
-                    <span>ใช้ไป ฿{{ claim.typeUsedAmount | number: '1.2-2' }}</span>
-                    <span>วงเงินทั้งหมด ฿{{ claim.typeTotalLimit | number: '1.2-2' }}</span>
-                  </div>
-                </div>
-              }
 
               <div class="claim-card__footer">
                 <span class="claim-id">{{ req.requestNo }}</span>
@@ -191,24 +233,37 @@
           <thead>
             <tr>
               <th>พนักงาน</th>
-              <th>ประเภท</th>
-              <th>วันที่ขอเบิก</th>
-              <th>รายละเอียด</th>
+              <th>จำนวนรายการ</th>
+              <th>รายละเอียดการเบิก</th>
+              <th>จากที่ไหน</th>
+              <th>ไปที่ไหน</th>
               <th class="text-right">ยอดเงิน</th>
               <th>สถานะ</th>
+              <th>เอกสาร</th>
               <th>จัดการ</th>
             </tr>
           </thead>
           <tbody>
             @for (req of comps.paginatedData(); track trackByRowId($index, req)) {
-              @let claim = getAllowanceClaim(req);
+              @let claim = getTaxiClaim(req);
               @if (claim) {
                 <tr>
                   <td>
                     <div class="emp-cell">
+                      <label class="checkbox-custom">
+                        <input
+                          type="checkbox"
+                          aria-label="เลือกรายการ"
+                          [checked]="isChecked(req.requestId)"
+                          (change)="toggleSelect(req.requestId, $any($event.target).checked)"
+                        />
+                        <span class="checkmark"></span>
+                      </label>
                       <img
                         class="emp-avatar"
                         [src]="claim.employeeImageUrl"
+                        [alt]="(claim.employeeName ?? claim.employeeCode) + ' photo'"
+                        title="รูปพนักงาน"
                         (error)="onImgError($event)"
                       />
                       <div>
@@ -218,46 +273,35 @@
                     </div>
                   </td>
                   <td>
-                    <div class="type-badge">
-                      <span class="type-name">{{ claim.expenseTypeName }}</span>
-                    </div>
                     <div class="request-no">
                       <i class="fa-solid fa-tag"></i> {{ req.requestNo }}
                     </div>
+                    <div class="claim-items-count">{{ claim.items.length }} รายการ</div>
                   </td>
-                  <td>
-                    @for (detail of claim.details; track $index) {
-                      <div>{{ dateUtil.formatDateToBE(detail.date, 'DD/MM/YYYY') }}</div>
-                      <!-- <div>{{ dateUtil.formatDateToBE(detail.date, 'D MMM BBBB', 'th') }}</div> -->
+                  <td class="trip-details-cell">
+                    @for (item of claim.items; track $index) {
+                      <div class="trip-field-row" [title]="item.description || '-'">
+                        {{ item.description || '-' }}
+                      </div>
                     }
                   </td>
-                  <td>
-                    @for (detail of claim.details; track $index) {
-                      <div>{{ detail.description }}</div>
+                  <td class="trip-location-cell">
+                    @for (item of claim.items; track $index) {
+                      <div class="trip-field-row" [title]="item.locationFrom || '-'">
+                        {{ item.locationFrom || '-' }}
+                      </div>
+                    }
+                  </td>
+                  <td class="trip-location-cell">
+                    @for (item of claim.items; track $index) {
+                      <div class="trip-field-row" [title]="item.locationTo || '-'">
+                        {{ item.locationTo || '-' }}
+                      </div>
                     }
                   </td>
                   <td class="text-right">
                     <div class="amount-cell">
-                      <div class="amount-main" [class.is-approved]="claim.approvedAmount > 0">
-                        @if (claim.approvedAmount > 0) {
-                          <i class="fas fa-check check-icon"></i>
-                        }
-                        ฿{{ claim.totalAmount | number: '1.2-2' }}
-                      </div>
-                      @if (claim.typeTotalLimit > 0) {
-                        <div class="budget-section">
-                          <div class="budget-bar">
-                            <div
-                              class="budget-bar__used"
-                              [style.width.%]="(claim.typeUsedAmount / claim.typeTotalLimit) * 100"
-                            ></div>
-                          </div>
-                          <div class="budget-text">
-                            {{ claim.typeUsedAmount | number: '1.0-0' }} /
-                            {{ claim.typeTotalLimit | number: '1.0-0' }}
-                          </div>
-                        </div>
-                      }
+                      <div class="amount-main">฿{{ claim.totalAmount | number: '1.2-2' }}</div>
                     </div>
                   </td>
                   <td>
@@ -265,20 +309,38 @@
                       {{ req.rawStatus | statusLabel }}
                     </span>
                   </td>
+                  <td class="text-center">
+                    @if (getAttachmentCount(claim) > 0) {
+                      <button class="btn-attach" (click)="openPreview(claim)">
+                        <i class="fas fa-file-alt"></i> {{ getAttachmentCount(claim) }}
+                      </button>
+                    } @else {
+                      -
+                    }
+                  </td>
                   <td>
                     <div class="table-actions">
-                      <button class="act-btn act-view" (click)="viewDetail(req)">
+                      <button
+                        type="button"
+                        class="act-btn act-view"
+                        title="ดูรายละเอียด"
+                        (click)="viewDetail(req)"
+                      >
                         <i class="fas fa-eye"></i>
                       </button>
                       @if (req.rawStatus === 'pending') {
                         <button
+                          type="button"
                           class="act-btn act-approve"
+                          title="อนุมัติ"
                           (click)="openActionModal(req, 'Approved')"
                         >
                           <i class="fas fa-check"></i>
                         </button>
                         <button
+                          type="button"
                           class="act-btn act-reject"
+                          title="ไม่อนุมัติ"
                           (click)="openActionModal(req, 'Rejected')"
                         >
                           <i class="fas fa-times"></i>
@@ -302,6 +364,17 @@
           </tbody>
         </table>
       }
+    </div>
+
+    <div class="pagination-wrapper">
+      <app-pagination
+        [currentPage]="listing.currentPage()"
+        [pageSize]="listing.pageSize()"
+        [totalItems]="listing.totalItems()"
+        (onPageChange)="goToPage($event)"
+        (onPageSizeChange)="setPageSize($event)"
+      >
+      </app-pagination>
     </div>
   </div>
 </div>
@@ -347,4 +420,3 @@
     <div class="lightbox-name">{{ profileLightbox()?.name || 'Profile image' }}</div>
   </div>
 }
->
