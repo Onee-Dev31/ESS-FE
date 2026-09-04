@@ -27,6 +27,7 @@ import { DateUtilityService } from '../../../services/date-utility.service';
 import { ApprovalAllowanceService } from '../../../services/approval-allowance';
 import { MedicalService } from '../../../services/medical.service';
 import { VehicleService } from '../../../services/vehicle.service';
+import { TaxiService } from '../../../services/taxi.service';
 import { EmpAdService } from '../../../services/emp-ad-service';
 
 interface PreviewFile {
@@ -51,6 +52,7 @@ export class ApprovalDetailModalComponent implements OnInit {
   private medicalService = inject(MedicalService);
   private approvalAllowanceService = inject(ApprovalAllowanceService);
   private vehicleService = inject(VehicleService);
+  private taxiService = inject(TaxiService);
   private empAdService = inject(EmpAdService);
   private authService = inject(AuthService);
   private swalService = inject(SwalService);
@@ -77,6 +79,7 @@ export class ApprovalDetailModalComponent implements OnInit {
   medicalDetail = signal<any>(null);
   allowanceDetail = signal<any>(null);
   vehicleDetail = signal<any>(null);
+  taxiDetail = signal<any>(null);
 
   steps = computed(() => {
     const status = this.detailedStatus() || this.approvalItem.rawStatus;
@@ -166,6 +169,7 @@ export class ApprovalDetailModalComponent implements OnInit {
 
     if (type === 'allowance') return this.buildGroupedSteps(this.allowanceDetail()?.approvalSteps);
     if (type === 'vehicle') return this.buildGroupedSteps(this.vehicleDetail()?.approvalSteps);
+    if (type === 'taxi') return this.buildGroupedSteps(this.taxiDetail()?.approvalSteps);
 
     return [];
   });
@@ -201,9 +205,11 @@ export class ApprovalDetailModalComponent implements OnInit {
       case 'allowance':
         this.loadAllowanceDetail(item);
         break;
-      case 'taxi':
       case 'vehicle':
         this.loadVehicleDetail(item);
+        break;
+      case 'taxi':
+        this.loadTaxiDetail(item);
         break;
       default:
         this.loadFallbackDetail(item);
@@ -286,6 +292,33 @@ export class ApprovalDetailModalComponent implements OnInit {
     this.detailedStatus.set((item.claimStatus || item.rawStatus).toLowerCase());
   }
 
+  private loadTaxiDetail(item: ApprovalItem) {
+    const claim = item.originalData as any;
+    if (claim?.claimId == null) {
+      this.loadFallbackDetail(item);
+      return;
+    }
+
+    this.taxiDetail.set(claim);
+
+    const empCode = claim.employeeCode;
+    if (empCode) {
+      this.empAdService.getEmployeeDetails(empCode).subscribe({
+        next: (emp) => {
+          if (!emp) return;
+          this.taxiDetail.update((prev) => ({
+            ...prev,
+            departmentName: emp.DEPARTMENT ?? emp.department ?? prev?.departmentName ?? null,
+            companyName: emp.COMPANY_NAME ?? emp.company_name ?? prev?.companyName ?? null,
+          }));
+        },
+        error: () => {},
+      });
+    }
+
+    this.detailedStatus.set((item.claimStatus || item.rawStatus || '').toLowerCase());
+  }
+
   private loadFallbackDetail(item: ApprovalItem) {
     console.log(item);
     const service = this.approvalsHelper.getServiceByType(item.type || 'transport');
@@ -330,6 +363,9 @@ export class ApprovalDetailModalComponent implements OnInit {
         break;
       case 'vehicle':
         this.updateVehicleStatus(item, action, reason);
+        break;
+      case 'taxi':
+        this.updateTaxiStatus(item, action, reason);
         break;
       default:
         this.updateStatus(item, action, reason); // fallback เดิม
@@ -404,6 +440,21 @@ export class ApprovalDetailModalComponent implements OnInit {
     console.log('>>', item.requestId, payload);
     // TODO: เปลี่ยนเป็น VehicleService จริง
     this.vehicleService.updateStatusClaim(item.requestId, payload).subscribe({
+      next: (res) => this.handleResponse(res),
+      error: (err) => this.handleError(err),
+    });
+  }
+
+  private updateTaxiStatus(item: ApprovalItem, action: string, reason?: string) {
+    const payload = {
+      action: action.toLowerCase(),
+      approver_aduser: this.authService.userData().CODEMPID,
+      ...(action.toLowerCase() === 'rejected' && {
+        remark: reason?.trim() || '',
+      }),
+    };
+
+    this.taxiService.updateStatusClaim(item.requestId, payload).subscribe({
       next: (res) => this.handleResponse(res),
       error: (err) => this.handleError(err),
     });
