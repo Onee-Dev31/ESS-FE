@@ -148,19 +148,18 @@
                                         (ngModelChange)="setDate(emp,'effectiveDate',$event)"
                                         [nzDisabledDate]="disableEffectiveDate(emp.empCode)" required>
                                     </nz-date-picker> -->
-                        <nz-date-picker
-                          nzFormat="dd/MM/yyyy"
-                          name="effectiveDate"
-                          class="form-input custom-picker"
-                          nzDropdownClassName="custom-picker-popup"
-                          [ngModel]="activeDates[emp.empCode]?.effectiveDate"
-                          (ngModelChange)="setDate(emp, 'effectiveDate', $event)"
-                          [nzDisabledDate]="disableEffectiveDate(emp.empCode)"
-                          [nzDefaultPickerValue]="activeDates[emp.empCode]?.lastDate ?? null"
-                          required
-                        >
-                        </nz-date-picker>
-                      </div>
+                      <nz-date-picker
+                        nzFormat="dd/MM/yyyy"
+                        name="effectiveDate"
+                        class="form-input custom-picker"
+                        nzDropdownClassName="custom-picker-popup"
+                        [ngModel]="activeDates[emp.empCode]?.effectiveDate"
+                        (ngModelChange)="setDate(emp, 'effectiveDate', $event)"
+                        [nzDisabledDate]="disableEffectiveDate(emp.empCode)"
+                        [nzDefaultPickerValue]="activeDates[emp.empCode]?.lastDate ?? null"
+                        required
+                      >
+                      </nz-date-picker>
                     </div>
                   </td>
                   <td class="col-action">
@@ -486,16 +485,30 @@
                   </div>
                 </div>
 
-                <div class="error-text" *ngIf="dateInvalid()">
-                  Last Date ต้องน้อยกว่าหรือเท่ากับ Effective Date
+              <div class="back-content">
+                <div>
+                  <div class="label">Last Date</div>
+                  <nz-date-picker
+                    class="input custom-picker"
+                    [ngModel]="lastDate()"
+                    (ngModelChange)="lastDate.set($event)"
+                    nzFormat="dd/MM/yyyy"
+                    nzDropdownClassName="custom-picker-popup"
+                    [nzDisabledDate]="disableModalLastDate"
+                  >
+                  </nz-date-picker>
                 </div>
 
-                <div class="back-actions">
-                  <button class="btn btn-ghost" (click)="cancel()">cancel</button>
-                  <button
-                    class="btn btn-primary"
-                    [disabled]="!lastDate() || !effectiveDate() || dateInvalid()"
-                    (click)="onConfirmModal()"
+                <div>
+                  <div class="label">Effective Date</div>
+                  <nz-date-picker
+                    class="input custom-picker"
+                    [ngModel]="effectiveDate()"
+                    (ngModelChange)="effectiveDate.set($event)"
+                    nzFormat="dd/MM/yyyy"
+                    nzDropdownClassName="custom-picker-popup"
+                    [nzDisabledDate]="disableModalEffectiveDate"
+                    [nzDefaultPickerValue]="lastDate()"
                   >
                     ยืนยัน
                   </button>
@@ -515,5 +528,6 @@
       (submitModal)="submitConfirm($event)"
     ></app-confirm-modal>
   }
+}
 }
 }
