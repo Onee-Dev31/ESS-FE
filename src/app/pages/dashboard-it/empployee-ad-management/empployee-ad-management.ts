@@ -46,6 +46,8 @@ export class EmpployeeAdManagement {
   isEditSaving = false;
   editEmp: any = null;
   editAdUser = '';
+  editEmail = '';
+  editTel = '';
 
   isResetOpen = false;
   resetEmp: any = null;
@@ -199,15 +201,39 @@ export class EmpployeeAdManagement {
   }
 
   openEdit(emp: any) {
-    this.editEmp = emp;
-    this.editAdUser = emp.adUser ?? '';
-    this.isEditOpen = true;
+    this.empAdService.getEmployeeDetails(emp.employeeId).subscribe({
+      next: (res: any) => {
+        this.editEmp = emp;
+        this.editAdUser = res.AD_USER ?? '';
+        this.editEmail = res.EMAIL ?? '';
+        this.editTel = res.USR_MOBILE ?? '';
+        this.isEditOpen = true;
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        this.swalService.error(
+          err?.error?.message ?? 'เกิดข้อผิดพลาดขณะโหลดข้อมูลพนักงาน กรุณาลองใหม่',
+        );
+      },
+    });
   }
 
   closeEdit() {
     this.isEditOpen = false;
     this.editEmp = null;
     this.editAdUser = '';
+    this.editEmail = '';
+    this.editTel = '';
+  }
+
+  validateEditTel(event?: Event) {
+    if (event) {
+      const input = event.target as HTMLInputElement;
+      this.editTel = input.value.replace(/\D/g, '');
+      input.value = this.editTel;
+    }
+
+    return !!this.editTel && this.editTel.length !== 4 && this.editTel.length !== 10;
   }
 
   private loadAdInfo(employees: any[]) {
@@ -387,7 +413,8 @@ export class EmpployeeAdManagement {
       firstName: emp.nameEng1 ?? emp.firstName ?? '',
       lastName: emp.nameEng2 ?? emp.lastName ?? '',
       displayName: `${emp.nameThai1 ?? ''} ${emp.nameThai2 ?? ''}`.trim(),
-      email: emp.email ?? '',
+      email: this.editEmail,
+      tel: this.editTel,
       jobTitle: emp.position ?? '',
       department: emp.department ?? '',
       company: emp.companyCode ?? '',

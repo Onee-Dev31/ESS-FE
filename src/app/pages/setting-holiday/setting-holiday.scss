@@ -1519,3 +1519,15 @@
     transform: translateY(0);
   }
 }
+
+:host ::ng-deep nz-select.form-control.ant-select .ant-select-selector,
+:host ::ng-deep
+  nz-select.form-control.ant-select:not(.ant-select-disabled).ant-select-focused
+  .ant-select-selector {
+  padding: 0 !important;
+  border: 0 !important;
+  border-color: transparent !important;
+  border-right-width: 0 !important;
+  box-shadow: none !important;
+  outline: 0 !important;
+}

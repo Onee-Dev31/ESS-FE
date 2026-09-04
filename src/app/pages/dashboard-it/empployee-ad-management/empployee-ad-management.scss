@@ -640,9 +640,19 @@
     &:focus {
       border-color: $primary;
     }
+
+    &.invalid {
+      border-color: #e53935;
+    }
+
     &::placeholder {
       color: var(--text-muted);
     }
+  }
+
+  .field-error {
+    color: #e53935;
+    font-size: 0.75rem;
   }
 }
 
@@ -686,6 +696,18 @@
   transition: background 0.2s;
   &:hover {
     background: color-mix(in srgb, $primary, black 12%);
+  }
+
+  &:disabled {
+    background: #cbd5e1;
+    color: #94a3b8;
+    cursor: not-allowed;
+    opacity: 1;
+  }
+
+  &:disabled:hover {
+    background: #cbd5e1;
+    box-shadow: none;
   }
 }
 
