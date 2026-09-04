@@ -17,7 +17,11 @@ import { PageHeaderComponent } from '../../components/shared/page-header/page-he
 import { EmptyStateComponent } from '../../components/shared/empty-state/empty-state';
 import { SkeletonComponent } from '../../components/shared/skeleton/skeleton';
 import { StatusLabelPipe } from '../../pipes/status-label.pipe';
-import { VehicleService, VehicleRate, VehicleConditions } from '../../services/vehicle.service';
+import {
+  VehicleService,
+  VehicleRate,
+  VehicleConditions,
+} from '../../services/vehicle.service';
 import { SwalService } from '../../services/swal.service';
 import { AuthService } from '../../services/auth.service';
 import { DateUtilityService } from '../../services/date-utility.service';

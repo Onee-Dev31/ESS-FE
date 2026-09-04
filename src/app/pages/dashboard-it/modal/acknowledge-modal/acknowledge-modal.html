@@ -15,34 +15,16 @@
       <p>เลือกประเภทงาน<span class="required">*</span></p>
       <div class="tag-group">
         <label class="tag">
-          <input
-            type="radio"
-            name="tag"
-            [value]="2"
-            [(ngModel)]="selectedTag"
-            (ngModelChange)="onTagChange($event)"
-          />
+          <input type="radio" name="tag" [value]="2" [(ngModel)]="selectedTag" (ngModelChange)="onTagChange($event)" />
           <span>แจ้งปัญหา</span>
         </label>
         <label class="tag">
-          <input
-            type="radio"
-            name="tag"
-            [value]="1"
-            [(ngModel)]="selectedTag"
-            (ngModelChange)="onTagChange($event)"
-          />
+          <input type="radio" name="tag" [value]="1" [(ngModel)]="selectedTag" (ngModelChange)="onTagChange($event)" />
           <span>แจ้งซ่อม</span>
         </label>
         @if (ticket?.viaEmail === true) {
           <label class="tag">
-            <input
-              type="radio"
-              name="tag"
-              [value]="3"
-              [(ngModel)]="selectedTag"
-              (ngModelChange)="onTagChange($event)"
-            />
+            <input type="radio" name="tag" [value]="3" [(ngModel)]="selectedTag" (ngModelChange)="onTagChange($event)" />
             <span>ขอใช้บริการ</span>
           </label>
         }
@@ -62,9 +44,7 @@
   </div>
 
   <div modalFooter>
-    <button type="button" class="modal-button" (click)="close()">
-      <i class="fas fa-times"></i> ยกเลิก
-    </button>
+    <button type="button" class="modal-button" (click)="close()"><i class="fas fa-times"></i> ยกเลิก</button>
     <button type="button" class="modal-button primary" [disabled]="!selectedTag" (click)="save()">
       <i class="fas fa-paper-plane"></i> ยืนยัน
     </button>

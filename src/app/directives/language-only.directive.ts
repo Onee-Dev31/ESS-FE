@@ -15,8 +15,7 @@ function applySanitizedValue(
   if (sanitized === input.value) return;
 
   const cursor = input.selectionStart ?? sanitized.length;
-  const removedBeforeCursor =
-    input.value.slice(0, cursor).length - sanitizer(input.value.slice(0, cursor)).length;
+  const removedBeforeCursor = input.value.slice(0, cursor).length - sanitizer(input.value.slice(0, cursor)).length;
 
   input.value = sanitized;
   control?.control?.setValue(sanitized, { emitEvent: false });

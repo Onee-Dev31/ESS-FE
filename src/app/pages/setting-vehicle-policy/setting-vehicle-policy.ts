@@ -196,11 +196,7 @@ export class SettingVehiclePolicy implements OnInit {
   }
 
   saveTaxiLimit() {
-    if (
-      !this.draftTaxiDailyLimit ||
-      this.draftTaxiDailyLimit <= 0 ||
-      !this.draftTaxiEffectiveFrom
-    ) {
+    if (!this.draftTaxiDailyLimit || this.draftTaxiDailyLimit <= 0 || !this.draftTaxiEffectiveFrom) {
       this.toast.error('กรุณาระบุวงเงินและวันที่มีผลให้ครบถ้วน');
       return;
     }

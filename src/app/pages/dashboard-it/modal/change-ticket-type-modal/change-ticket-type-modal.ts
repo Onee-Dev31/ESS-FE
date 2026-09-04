@@ -45,8 +45,8 @@ export class ChangeTicketTypeModal implements OnChanges {
     const isApprovedPaidRepair =
       ticketTypeId === 1 &&
       String(this.ticket?.repair_cost_type ?? this.ticket?.repairCostType ?? '')
-        .trim()
-        .toLowerCase() === 'paid';
+      .trim()
+      .toLowerCase() === 'paid';
 
     return isApproved && (isApprovedServiceRequest || isApprovedPaidRepair);
   }

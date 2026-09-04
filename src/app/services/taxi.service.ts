@@ -106,10 +106,7 @@ export class TaxiService extends BaseRequestService<TaxiRequest> {
   }
 
   /** GET api/taxi-claim/policy-texts */
-  getPolicyTexts(): Observable<{
-    success: boolean;
-    data: { text_key: string; content: string }[];
-  }> {
+  getPolicyTexts(): Observable<{ success: boolean; data: { text_key: string; content: string }[] }> {
     return this._http.get<{ success: boolean; data: { text_key: string; content: string }[] }>(
       `${this.baseUrl}/taxi-claim/policy-texts`,
     );

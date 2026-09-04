@@ -449,7 +449,10 @@ export class FreelanceFormComponent implements OnInit, OnChanges {
   };
 
   isResignDateInvalid(): boolean {
-    return !isValidDateRange(this.formResignData.lastWorkingDate, this.formResignData.resignDate);
+    return !isValidDateRange(
+      this.formResignData.lastWorkingDate,
+      this.formResignData.resignDate,
+    );
   }
 
   // MASTER

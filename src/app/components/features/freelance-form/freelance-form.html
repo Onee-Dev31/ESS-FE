@@ -27,11 +27,7 @@
               [class.input-error]="firstNameTh.invalid && firstNameTh.touched"
             />
             <div class="error" *ngIf="firstNameTh.invalid && firstNameTh.touched">
-              {{
-                firstNameTh.errors?.['required']
-                  ? 'กรุณากรอกชื่อจริง'
-                  : 'ชื่อจริงต้องเป็นภาษาไทยเท่านั้น'
-              }}
+              {{ firstNameTh.errors?.['required'] ? 'กรุณากรอกชื่อจริง' : 'ชื่อจริงต้องเป็นภาษาไทยเท่านั้น' }}
             </div>
           </div>
           <div class="form-field">
@@ -50,11 +46,7 @@
               [class.input-error]="lastNameTh.invalid && lastNameTh.touched"
             />
             <div class="error" *ngIf="lastNameTh.invalid && lastNameTh.touched">
-              {{
-                lastNameTh.errors?.['required']
-                  ? 'กรุณากรอกนามสกุล'
-                  : 'นามสกุลต้องเป็นภาษาไทยเท่านั้น'
-              }}
+              {{ lastNameTh.errors?.['required'] ? 'กรุณากรอกนามสกุล' : 'นามสกุลต้องเป็นภาษาไทยเท่านั้น' }}
             </div>
           </div>
           <div class="form-field">
@@ -73,11 +65,7 @@
               [class.input-error]="nickname.invalid && nickname.touched"
             />
             <div class="error" *ngIf="nickname.invalid && nickname.touched">
-              {{
-                nickname.errors?.['required']
-                  ? 'กรุณากรอกชื่อเล่น'
-                  : 'ชื่อเล่นต้องเป็นภาษาไทยเท่านั้น'
-              }}
+              {{ nickname.errors?.['required'] ? 'กรุณากรอกชื่อเล่น' : 'ชื่อเล่นต้องเป็นภาษาไทยเท่านั้น' }}
             </div>
           </div>
         </div>
@@ -98,11 +86,7 @@
               [class.input-error]="firstNameEn.invalid && firstNameEn.touched"
             />
             <div class="error" *ngIf="firstNameEn.invalid && firstNameEn.touched">
-              {{
-                firstNameEn.errors?.['required']
-                  ? 'กรุณากรอกชื่อภาษาอังกฤษ'
-                  : 'First name ต้องเป็นภาษาอังกฤษเท่านั้น'
-              }}
+              {{ firstNameEn.errors?.['required'] ? 'กรุณากรอกชื่อภาษาอังกฤษ' : 'First name ต้องเป็นภาษาอังกฤษเท่านั้น' }}
             </div>
           </div>
           <div class="form-field">
@@ -121,11 +105,7 @@
               [class.input-error]="lastNameEn.invalid && lastNameEn.touched"
             />
             <div class="error" *ngIf="lastNameEn.invalid && lastNameEn.touched">
-              {{
-                lastNameEn.errors?.['required']
-                  ? 'กรุณากรอกนามสกุลภาษาอังกฤษ'
-                  : 'Last name ต้องเป็นภาษาอังกฤษเท่านั้น'
-              }}
+              {{ lastNameEn.errors?.['required'] ? 'กรุณากรอกนามสกุลภาษาอังกฤษ' : 'Last name ต้องเป็นภาษาอังกฤษเท่านั้น' }}
             </div>
           </div>
           <div class="form-field">
@@ -146,11 +126,7 @@
               [class.input-error]="phone.invalid && phone.touched"
             />
             <div class="error" *ngIf="phone.invalid && phone.touched">
-              {{
-                phone.errors?.['required']
-                  ? 'กรุณากรอกเบอร์โทรศัพท์'
-                  : 'เบอร์โทรศัพท์ต้องเป็นตัวเลข 10 หลัก'
-              }}
+              {{ phone.errors?.['required'] ? 'กรุณากรอกเบอร์โทรศัพท์' : 'เบอร์โทรศัพท์ต้องเป็นตัวเลข 10 หลัก' }}
             </div>
           </div>
         </div>
@@ -578,7 +554,9 @@
           type="button"
           class="btn-confirm-resign"
           [disabled]="
-            !formResignData.lastWorkingDate || !formResignData.resignDate || isResignDateInvalid()
+            !formResignData.lastWorkingDate ||
+            !formResignData.resignDate ||
+            isResignDateInvalid()
           "
           (click)="confirmResign()"
         >
