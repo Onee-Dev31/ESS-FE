@@ -85,6 +85,8 @@ jobs:
         with:
           node-version: '22.x'
           cache: npm
+      - name: Align npm version
+        run: npm install -g npm@11.7.0
       - run: npm install
       - run: npm audit --audit-level=critical
 
