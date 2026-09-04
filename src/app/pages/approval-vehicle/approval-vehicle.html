@@ -227,7 +227,8 @@
                   </td>
                   <td>
                     @for (detail of claim.details; track $index) {
-                      <div>{{ dateUtil.formatDateToBE(detail.date, 'D MMM BBBB', 'th') }}</div>
+                      <div>{{ dateUtil.formatDateToBE(detail.date, 'DD/MM/YYYY') }}</div>
+                      <!-- <div>{{ dateUtil.formatDateToBE(detail.date, 'D MMM BBBB', 'th') }}</div> -->
                     }
                   </td>
                   <td>
