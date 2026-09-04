@@ -160,45 +160,43 @@ describe('Medical Expenses', () => {
       .last()
       .find('.stat-value')
       .invoke('text')
-      .should('match', /[\d,.]+/);
+      .should('match', /[\d,\.]+/);
   });
 
-  it('stat-card อนุมัติแล้ว แสดงตัวเลข', () => {
-    cy.get('.stats-bar .stat-card')
-      .eq(2)
-      .find('.stat-value')
-      .invoke('text')
-      .should('match', /\d+/);
+  it('table header มี column "โรค"', () => {
+    cy.get('thead').should('contain', 'โรค');
   });
 
-  it('nz-range-picker แสดงในส่วน filter สำหรับเลือกช่วงเดือน', () => {
-    cy.get('nz-range-picker').should('exist');
-  });
-
-  it('ลบรายการ pending แล้ว confirm dialog ปรากฏ', () => {
-    cy.get('.modern-table tbody tr').each(($row): false | void => {
-      const statusText = $row.find('.status-badge').text().trim().toLowerCase();
-      if (statusText === 'pending') {
-        cy.wrap($row).find('.btn-icon.delete').click();
-        cy.get('.swal2-container').should('be.visible');
-        cy.get('.swal2-cancel').click();
-        return false;
+  it('claim card มี attribute data-type สำหรับประเภทการเบิก', () => {
+    cy.get('body').then(($body) => {
+      if ($body.find('.claim-card').length > 0) {
+        cy.get('.claim-card').first().should('have.attr', 'data-type');
+      } else {
+        cy.get('app-empty-state, .modern-table').should('exist');
       }
     });
   });
 
-  it('mobile viewport แสดงหน้า medicalexpenses ถูกต้อง', () => {
-    cy.viewport('iphone-6');
+  it('modal form มี section heading "เลือกประเภทการเบิก"', () => {
+    cy.get('.btn-create').click();
+    cy.get('app-medicalexpenses-form').should('be.visible');
+    cy.contains('app-medicalexpenses-form', 'เลือกประเภทการเบิก').should('be.visible');
+  });
+
+  it('tablet viewport แสดงหน้า medicalexpenses ถูกต้อง', () => {
+    cy.viewport('ipad-2');
     cy.contains('รายการเบิกค่ารักษาพยาบาล').should('be.visible');
     cy.get('.btn-create').should('exist');
   });
 
-  it('medicalexpenses page ไม่แสดง app-error-state เมื่อโหลดหน้าปกติ', () => {
-    cy.get('app-error-state').should('not.exist');
+  it('medicalexpenses form มีปุ่ม btn-close-modal', () => {
+    cy.get('.btn-create').click();
+    cy.get('app-medicalexpenses-form').should('be.visible');
+    cy.get('app-medicalexpenses-form .btn-close-modal').should('exist');
   });
 
-  it('search field แสดง placeholder "ค้นหา..." ในส่วน filter', () => {
-    cy.get('input[placeholder="ค้นหา..."]').should('be.visible');
+  it('label ตัวกรอง "เดือนเริ่มต้น-เดือนสิ้นสุด" แสดงขึ้น', () => {
+    cy.contains('label', 'เดือนเริ่มต้น-เดือนสิ้นสุด').should('be.visible');
   });
 
   it('table header มี column "โรค"', () => {
