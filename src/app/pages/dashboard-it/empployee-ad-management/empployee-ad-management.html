@@ -359,12 +359,41 @@
               placeholder="Enter AD User"
             />
           </div>
+          <div class="edit-field">
+            <label>Email</label>
+            <input
+              type="email"
+              class="edit-input"
+              [(ngModel)]="editEmail"
+              placeholder="Enter Email"
+            />
+          </div>
+          <div class="edit-field">
+            <label>Mobile</label>
+            <input
+              type="text"
+              class="edit-input"
+              inputmode="numeric"
+              pattern="[0-9]*"
+              [(ngModel)]="editTel"
+              (input)="validateEditTel($event)"
+              [class.invalid]="validateEditTel()"
+              placeholder="Enter Mobile"
+            />
+            @if (validateEditTel()) {
+              <span class="field-error">กรุณากรอกเบอร์โทร 4 หรือ 10 หลัก</span>
+            }
+          </div>
         </div>
       }
     </ng-container>
     <ng-template #editFooter>
       <button class="btn-edit-cancel" (click)="closeEdit()">ยกเลิก</button>
-      <button class="btn-edit-confirm" (click)="confirmEdit()" [disabled]="isEditSaving">
+      <button
+        class="btn-edit-confirm"
+        (click)="confirmEdit()"
+        [disabled]="isEditSaving || validateEditTel()"
+      >
         <i class="fas fa-save"></i> ยืนยัน
       </button>
     </ng-template>
