@@ -69,6 +69,7 @@ export class ApprovalTaxiComponent implements OnInit {
   private initialized = false;
 
   approvals = signal<ApprovalItem[]>([]);
+  statusCounts = signal<Record<string, number>>({});
   selectedItems = signal<Set<number>>(new Set());
   showExportMenu = signal<boolean>(false);
 
@@ -98,7 +99,10 @@ export class ApprovalTaxiComponent implements OnInit {
 
   /** โหลดรายการคำขออนุมัติค่าแท็กซี่จาก API */
   loadTaxiClaims(autoOpenVoucherNo?: string) {
-    const adUser = this.authService.currentUser() || '';
+    const excuteBy = this.authService.userData()?.CODEMPID ?? '';
+    const selectedStatus = this.listing.filterStatus();
+    const apiStatus = selectedStatus === 'Pending' ? 'New' : selectedStatus;
+    const displayStatus = this.mapClaimStatus(apiStatus);
 
     if (!this.initialized) {
       this.loadingService.start('approvals-list');
@@ -106,17 +110,25 @@ export class ApprovalTaxiComponent implements OnInit {
       this.isRefreshing.set(true);
     }
 
-    this.taxiApiService.getApprovals(adUser, autoOpenVoucherNo).subscribe({
+    this.taxiApiService.getTaxiClaimsForApprover(excuteBy, apiStatus).subscribe({
       next: (res) => {
-        const mapped = (res.data ?? []).map((c: any) => this.mapClaimToApproval(c));
-        this.approvals.set(mapped);
-        this.listing.currentPage.set(0);
-        this.listing.totalItems.set(
-          mapped.filter(
-            (item: ApprovalItem) =>
-              !this.listing.filterStatus() || item.status === this.listing.filterStatus(),
-          ).length,
+        console.log('Taxi claims loaded:', res);
+        const claims = res.data ?? [];
+        const details = Array.isArray(res.details ?? res.detail) ? (res.details ?? res.detail) : [];
+        const mapped = claims.map((c: any) =>
+          this.mapClaimToApproval(c, claims.length === 1 ? details : [], displayStatus),
         );
+        console.log('Mapped approvals:', mapped);
+        this.approvals.set(mapped);
+        this.statusCounts.set(
+          (res.statusCounts ?? []).reduce((counts: Record<string, number>, item: any) => {
+            const status = this.mapClaimStatus(item.StatusName ?? item.statusName ?? '');
+            counts[status] = Number(item.ClaimCount ?? item.claimCount ?? 0);
+            return counts;
+          }, {}),
+        );
+        this.listing.currentPage.set(0);
+        this.listing.totalItems.set(mapped.length);
 
         this.loadingService.stop('approvals-list');
         this.isRefreshing.set(false);
@@ -135,10 +147,29 @@ export class ApprovalTaxiComponent implements OnInit {
     });
   }
 
-  private mapClaimToApproval(claim: any): ApprovalItem {
-    const items: TaxiTripItem[] = (claim.details ?? []).map((d: any) => {
-      const fromName: string = d.other_from?.trim() || d.location_from_name || '';
-      const toName: string = d.other_to?.trim() || d.location_to_name || '';
+  private mapClaimToApproval(
+    claim: any,
+    fallbackDetails: any[] = [],
+    displayStatus?: ApprovalItem['status'],
+  ): ApprovalItem {
+    const claimId = claim.claimId ?? claim.claim_id;
+    const voucherNo = claim.voucherNo ?? claim.voucher_no;
+    const claimDate = claim.claimDate ?? claim.claim_date;
+    const employeeCode = claim.employeeCode ?? claim.employee_code;
+    const employeeName = claim.NAMETHAI ?? claim.employee_name;
+    const departmentName = claim.departmentName ?? claim.department_name;
+    const companyName = claim.companyName ?? claim.company_name;
+    const totalAmount = claim.totalAmount ?? claim.total_amount ?? 0;
+    const backendStatus = this.mapClaimStatus(claim.status);
+    const isWaitingHrApproval = displayStatus === 'Approved' && backendStatus === 'Pending';
+    const employeeImageUrl = employeeCode
+      ? `https://empimg.oneeclick.co:8048/employeeimage/${encodeURIComponent(employeeCode)}.jpg`
+      : '';
+    const items: TaxiTripItem[] = (claim.details ?? fallbackDetails).map((d: any) => {
+      const fromName: string =
+        d.other_from?.trim() || d.location_from_name || (d.location_from_id === 1 ? 'Office' : '');
+      const toName: string =
+        d.other_to?.trim() || d.location_to_name || (d.location_to_id === 1 ? 'Office' : '');
       const rawAttachments: any[] = d.attachments ?? [];
 
       return {
@@ -160,24 +191,39 @@ export class ApprovalTaxiComponent implements OnInit {
     });
 
     return {
-      requestId: claim.claimId,
-      requestNo: claim.voucherNo ?? `#${claim.claimId}`,
-      requestDate: claim.claimDate,
+      requestId: claimId,
+      requestNo: voucherNo ?? `#${claimId}`,
+      requestDate: claimDate,
       requestBy: {
-        name: claim.employeeName ?? claim.employeeCode,
-        employeeId: claim.employeeCode,
-        department: claim.departmentName ?? '-',
-        company: claim.companyName ?? '-',
+        name: employeeName ?? employeeCode,
+        employeeId: employeeCode,
+        department: departmentName ?? '-',
+        company: companyName ?? '-',
       },
       requestType: 'ค่าแท็กซี่',
       typeId: 0,
       requestDetail: `${items.length} รายการ`,
-      remark: claim.remark || '',
-      amount: claim.totalAmount ?? 0,
-      status: this.mapClaimStatus(claim.status),
-      rawStatus: (claim.status || '').toLowerCase(),
+      remark: claim.remark ?? claim.rejection_reason ?? '',
+      amount: totalAmount,
+      status: displayStatus ?? backendStatus,
+      rawStatus: (isWaitingHrApproval ? 'Approved' : backendStatus).toLowerCase(),
+      claimStatus: (isWaitingHrApproval ? 'Pending' : backendStatus).toLowerCase(),
+      isWaitingHrApproval,
       type: 'taxi',
-      originalData: { ...claim, items },
+      employeeImageUrl,
+      originalData: {
+        ...claim,
+        claimId,
+        voucherNo,
+        claimDate,
+        employeeCode,
+        employeeName,
+        departmentName,
+        companyName,
+        totalAmount,
+        employeeImageUrl,
+        items,
+      },
     };
   }
 
@@ -198,8 +244,7 @@ export class ApprovalTaxiComponent implements OnInit {
     this.loadTaxiClaims();
   }
 
-  comps = createListingComputeds(this.approvals, this.listing, (item, search, status) => {
-    const matchStatus = !status || item.status === status;
+  comps = createListingComputeds(this.approvals, this.listing, (item, search, _status) => {
     const claim = this.getTaxiClaim(item);
     const matchSearch =
       !search ||
@@ -211,22 +256,20 @@ export class ApprovalTaxiComponent implements OnInit {
           i.locationFrom.toLowerCase().includes(search) ||
           i.locationTo.toLowerCase().includes(search),
       );
-    return matchStatus && !!matchSearch;
+    return !!matchSearch;
   });
 
   setActiveTab(tab: string) {
     this.listing.filterStatus.set(tab);
     this.listing.currentPage.set(0);
-    this.listing.totalItems.set(
-      this.approvals().filter(
-        (item) => !this.listing.filterStatus() || item.status === this.listing.filterStatus(),
-      ).length,
-    );
     this.selectedItems.set(new Set());
+    this.loadTaxiClaims();
   }
 
   getTabCount(tab: string) {
-    return this.approvals().filter((item) => item.status === tab).length;
+    return (
+      this.statusCounts()[tab] ?? this.approvals().filter((item) => item.status === tab).length
+    );
   }
 
   onSearch(event: Event) {

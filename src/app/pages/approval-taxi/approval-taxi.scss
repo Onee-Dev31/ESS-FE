@@ -175,6 +175,24 @@ $status-danger-text: var(--status-danger-text);
   // ==================== TABLE SECTION ====================
   .table-responsive {
     @include modern-table;
+
+    th,
+    td {
+      text-align: center !important;
+    }
+
+    th:nth-child(1),
+    td:nth-child(1),
+    th:nth-child(2),
+    td:nth-child(2) {
+      text-align: left !important;
+    }
+
+    th:nth-child(6),
+    td:nth-child(6) {
+      text-align: right !important;
+    }
+
     display: block;
     padding: 0 1.5rem 1.5rem 1.5rem;
     overflow-x: auto;
@@ -234,7 +252,7 @@ $status-danger-text: var(--status-danger-text);
     // จำนวนรายการ
     th:nth-child(2),
     td:nth-child(2) {
-      width: 140px;
+      width: 180px;
     }
 
     // รายละเอียดการเบิก
@@ -304,13 +322,18 @@ $status-danger-text: var(--status-danger-text);
     }
 
     .trip-details-cell {
-      min-width: 220px;
-      max-width: 320px;
+      min-width: 200px;
+      max-width: 280px;
     }
 
     .trip-location-cell {
       min-width: 150px;
       max-width: 220px;
+    }
+
+    .trip-route-cell {
+      min-width: 170px;
+      max-width: 210px;
     }
 
     .trip-field-row {
@@ -321,9 +344,6 @@ $status-danger-text: var(--status-danger-text);
       white-space: nowrap;
       color: var(--text);
 
-      & + .trip-field-row {
-        border-top: 1px dashed var(--border);
-      }
     }
 
     .amount-cell {
@@ -336,6 +356,19 @@ $status-danger-text: var(--status-danger-text);
     .amount-main {
       font-weight: 700;
       font-size: 0.95rem;
+    }
+
+    .status-cell {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .waiting-hr-status {
+      color: var(--text-muted);
+      font-size: 0.7rem;
+      white-space: nowrap;
     }
 
     .sub-text {

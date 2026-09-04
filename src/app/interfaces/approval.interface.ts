@@ -37,5 +37,7 @@ export interface ApprovalItem {
   type?: 'allowance' | 'taxi' | 'transport' | 'medical' | 'it-request' | 'vehicle';
   originalData?: AllowanceRequest | MedicalRequest | any;
   remark?: string;
+  employeeImageUrl?: string;
+  isWaitingHrApproval?: boolean;
   isPendingItDirectorApproval?: boolean;
 }

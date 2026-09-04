@@ -149,11 +149,25 @@ export class TaxiService extends BaseRequestService<TaxiRequest> {
     return this._http.get<any>(`${this.baseUrl}/taxi-claim/approvals`, { params: p });
   }
 
+  getTaxiClaimsForApprover(excuteBy: string, status = 'New'): Observable<any> {
+    const params = new HttpParams().set('excuteBy', excuteBy).set('status', status);
+    return this._http.get<any>(`${this.baseUrl}/taxi-claim/GetTaxiClaimsForApprover`, { params });
+  }
+
   getClaimById(claimId: number): Observable<any> {
     return this._http.get<any>(`${this.baseUrl}/taxi-claim/claims/${claimId}`);
   }
 
   updateStatusClaim(claimId: number, body: any): Observable<any> {
     return this._http.patch<any>(`${this.baseUrl}/taxi-claim/claims/${claimId}/review`, body);
+  }
+
+  approveTaxiClaim(body: {
+    claimId: number;
+    excuteBy: string;
+    status: 'Approved' | 'Rejected' | 'Referred Back';
+    reason?: string;
+  }): Observable<any> {
+    return this._http.post<any>(`${this.baseUrl}/taxi-claim/ApprovedTaxiClaim`, body);
   }
 }
