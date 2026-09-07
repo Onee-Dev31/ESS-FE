@@ -1,7 +1,7 @@
 .attachment-manager__body {
   display: grid;
   grid-template-columns: 260px 1fr;
-  min-height: 360px;
+  height: min(560px, 70vh);
 }
 h4 {
   margin: 0;
@@ -38,7 +38,9 @@ nav button.active {
   color: var(--primary);
 }
 main {
+  display: flex;
   min-width: 0;
+  flex-direction: column;
   padding: 18px 22px;
   overflow: auto;
 }
@@ -112,12 +114,15 @@ main {
   cursor: pointer;
 }
 .empty-files {
-  display: grid;
+  display: flex;
+  flex: 1;
   min-height: 220px;
-  place-content: center;
   gap: 8px;
   color: var(--text-muted);
   text-align: center;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
 }
 .empty-files i {
   font-size: 2rem;
