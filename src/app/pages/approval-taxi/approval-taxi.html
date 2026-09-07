@@ -204,6 +204,15 @@
                   </button>
                   <button
                     type="button"
+                    class="act-btn act-refer-back"
+                    title="ส่งกลับแก้ไข"
+                    *ngIf="req.status === 'Pending'"
+                    (click)="openActionModal(req, 'Referred Back')"
+                  >
+                    <i class="fas fa-rotate-left"></i>
+                  </button>
+                  <button
+                    type="button"
                     class="act-btn act-reject"
                     title="ไม่อนุมัติ"
                     *ngIf="req.status === 'Pending'"
@@ -331,6 +340,14 @@
                           (click)="openActionModal(req, 'Approved')"
                         >
                           <i class="fas fa-check"></i>
+                        </button>
+                        <button
+                          type="button"
+                          class="act-btn act-refer-back"
+                          title="ส่งกลับแก้ไข"
+                          (click)="openActionModal(req, 'Referred Back')"
+                        >
+                          <i class="fas fa-rotate-left"></i>
                         </button>
                         <button
                           type="button"

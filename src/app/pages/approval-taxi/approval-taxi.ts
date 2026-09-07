@@ -223,6 +223,8 @@ export class ApprovalTaxiComponent implements OnInit {
         totalAmount,
         employeeImageUrl,
         items,
+        remark: claim.remark ?? '',
+        rejectionReason: claim.rejection_reason ?? '',
       },
     };
   }
