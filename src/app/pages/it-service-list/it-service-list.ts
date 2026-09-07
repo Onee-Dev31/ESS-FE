@@ -1280,7 +1280,7 @@ export class ItService implements OnInit {
               () => this.signalrService.recentlySubmittedTickets.delete(current.ticketNumber),
               10000,
             );
-            this.signalrService.ticketApprovalNotify(codeEmpId, current.ticketNumber);
+            // this.signalrService.ticketApprovalNotify(codeEmpId, current.ticketNumber);
           }
 
           this.swalService.success('สำเร็จ', 'Re-Submit Ticket สำเร็จ');

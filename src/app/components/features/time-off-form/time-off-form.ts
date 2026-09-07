@@ -22,6 +22,7 @@ import {
 } from '../../../interfaces/time-off.interface';
 import { DateUtilityService } from '../../../services/date-utility.service';
 import { DialogService } from '../../../services/dialog';
+import { SwalService } from '../../../services/swal.service';
 import { STORAGE_KEYS } from '../../../constants/storage.constants';
 import { FULL_DAY_ONLY_LEAVE_CODES } from '../../../constants/time-off-duration.constant';
 import {
@@ -72,6 +73,7 @@ export class TimeOffForm implements OnInit {
   private toastService = inject(ToastService);
   private dateUtil = inject(DateUtilityService);
   private dialogService = inject(DialogService);
+  private swalService = inject(SwalService);
 
   @Input() initialLeaveTypeId: string = '';
   @Input() requestStatus: string = 'NEW';
@@ -548,8 +550,7 @@ export class TimeOffForm implements OnInit {
 
     this.timeOffService.saveLeaveRequest(payload).subscribe({
       next: () => {
-        this.toastService.success('บันทึกคำขอลาเรียบร้อยแล้ว');
-        this.close();
+        this.swalService.success('บันทึกคำขอลาเรียบร้อยแล้ว').then(() => this.close());
       },
       error: () => this.toastService.error('เกิดข้อผิดพลาดในการบันทึกข้อมูล'),
     });

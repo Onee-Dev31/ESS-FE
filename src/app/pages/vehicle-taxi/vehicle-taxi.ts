@@ -7,7 +7,6 @@ import { LoadingService } from '../../services/loading';
 import { ToastService } from '../../services/toast';
 import { DialogService } from '../../services/dialog';
 import { ErrorService } from '../../services/error';
-import { VehicleTaxiFormComponent } from '../../components/features/vehicle-taxi-form/vehicle-taxi-form';
 import { FilePreviewModalComponent } from '../../components/modals/file-preview-modal/file-preview-modal';
 import { StatusUtil } from '../../utils/status.util';
 import { PaginationComponent } from '../../components/shared/pagination/pagination';
@@ -30,6 +29,7 @@ import { NzSelectModule } from 'ng-zorro-antd/select';
 import { NzInputModule } from 'ng-zorro-antd/input';
 import dayjs from 'dayjs';
 import { SwalService } from '../../services/swal.service';
+import { VehicleTaxiFormV2Component } from '../../components/features/vehicle-taxi-form-v2/vehicle-taxi-form-v2';
 
 /** ข้อความ fallback ของ popup เงื่อนไข Taxi (ใช้ก่อน API ตอบกลับ หรือถ้าเรียก API ไม่สำเร็จ) */
 const DEFAULT_POLICY_TEXTS: Record<string, string> = {
@@ -53,7 +53,6 @@ const DEFAULT_POLICY_TEXTS: Record<string, string> = {
   imports: [
     CommonModule,
     FormsModule,
-    VehicleTaxiFormComponent,
     FilePreviewModalComponent,
     StatusLabelPipe,
     PaginationComponent,
@@ -64,6 +63,7 @@ const DEFAULT_POLICY_TEXTS: Record<string, string> = {
     NzDatePickerModule,
     NzSelectModule,
     NzInputModule,
+    VehicleTaxiFormV2Component,
   ],
   templateUrl: './vehicle-taxi.html',
   styleUrl: './vehicle-taxi.scss',

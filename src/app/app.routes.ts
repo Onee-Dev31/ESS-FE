@@ -103,6 +103,13 @@ export const routes: Routes = [
         data: { category: 'medical', animation: 'ApprovalAllowance' },
       },
       {
+        path: 'approvals-taxi',
+        loadComponent: () =>
+          import('./pages/approval-taxi/approval-taxi').then((m) => m.ApprovalTaxiComponent),
+        canActivate: [menuGuard],
+        data: { category: 'medical', animation: 'ApprovalTaxi' },
+      },
+      {
         path: 'approvals-timeoff',
         loadComponent: () =>
           import('./pages/approval-timeoff/approval-timeoff').then((m) => m.ApprovalTimeoff),

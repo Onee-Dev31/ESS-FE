@@ -32,14 +32,15 @@ export class StatusUtil {
   }
 
   private static statusMap: Record<string, string> = {
+    new: 'new',
     pending: 'progress',
     approved: 'closed',
     rejected: 'rejected',
-    'referred back': 'reopen',
+    'referred back': 'referred-back',
   };
 
   static getStatusBadgeClaims(status: string) {
-    const key = this.statusMap[status];
+    const key = this.statusMap[status?.trim().toLowerCase()];
 
     if (!key) {
       return {
