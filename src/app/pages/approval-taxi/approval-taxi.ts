@@ -101,7 +101,10 @@ export class ApprovalTaxiComponent implements OnInit {
   loadTaxiClaims(autoOpenVoucherNo?: string) {
     const excuteBy = this.authService.userData()?.CODEMPID ?? '';
     const selectedStatus = this.listing.filterStatus();
-    const apiStatus = selectedStatus === 'Pending' ? 'New' : selectedStatus;
+    const hasHrRole = (this.authService.userRole() ?? '')
+      .split(',')
+      .some((role) => role.trim().toLowerCase() === 'hr');
+    const apiStatus = selectedStatus === 'Pending' && !hasHrRole ? 'New' : selectedStatus;
     const displayStatus = this.mapClaimStatus(apiStatus);
 
     if (!this.initialized) {
