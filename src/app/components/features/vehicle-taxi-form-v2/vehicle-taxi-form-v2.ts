@@ -23,11 +23,13 @@ import { FileConverterService } from '../../../services/file-converter';
 import { SwalService } from '../../../services/swal.service';
 import { finalize, of, switchMap } from 'rxjs';
 import { mapTaxiClaimDetail, TaxiClaimDetailResponse } from '../../../interfaces/taxi.interface';
+import { ApprovalStep, ApprovalStepsComponent } from '../../shared/approval-steps/approval-steps';
+import { FilePreviewItem, FilePreviewModalComponent } from '../../modals/file-preview-modal/file-preview-modal';
 
 @Component({
   selector: 'app-vehicle-taxi-form-v2',
   standalone: true,
-  imports: [CommonModule, FormsModule, NzSelectModule, FileUploadModal],
+  imports: [CommonModule, FormsModule, NzSelectModule, FileUploadModal, ApprovalStepsComponent, FilePreviewModalComponent],
   templateUrl: './vehicle-taxi-form-v2.html',
   styleUrl: './vehicle-taxi-form-v2.scss',
 })
@@ -60,6 +62,8 @@ export class VehicleTaxiFormV2Component implements OnInit, OnChanges {
   isSubmitting = false;
   isShowUploadModal: boolean = false;
   currentUploadItem: TaxiLogItem | null = null;
+  isPreviewModalOpen = false;
+  previewFiles: FilePreviewItem[] = [];
 
   isEditMode = false;
   originalClaimId?: number;
@@ -70,6 +74,7 @@ export class VehicleTaxiFormV2Component implements OnInit, OnChanges {
   private loadSequence = 0;
 
   get pageTitle(): string {
+    if (this.isReadOnlyMode) return 'รายละเอียดการเบิกค่าเดินทาง (Taxi)';
     return this.isEditMode ? 'แก้ไขข้อมูลค่าเดินทาง (Taxi)' : 'บันทึกข้อมูลค่าเดินทาง (Taxi)';
   }
 
@@ -100,6 +105,74 @@ export class VehicleTaxiFormV2Component implements OnInit, OnChanges {
 
   get isReferredBack(): boolean {
     return this.claimStatus.toLowerCase().replaceAll('_', ' ') === 'referred back';
+  }
+
+  get isReadOnlyMode(): boolean {
+    return this.isEditMode && !this.isEditableClaimStatus;
+  }
+
+  get isEditableClaimStatus(): boolean {
+    const status = this.claimStatus.toLowerCase().replace(/[_-]+/g, ' ');
+    return status === 'new' || status === 'referred back';
+  }
+
+  get headApproved(): boolean {
+    return Boolean(this.requests?.headApproveDate ?? this.requests?.head_approve_date);
+  }
+
+  get hrApproved(): boolean {
+    return Boolean(this.requests?.hrApproveDate ?? this.requests?.hr_approve_date);
+  }
+
+  get headApprover(): string {
+    return this.requests?.headApproveBy ?? this.requests?.head_approve_by ?? '';
+  }
+
+  get hrApprover(): string {
+    return this.requests?.hrApproveBy ?? this.requests?.hr_approve_by ?? '';
+  }
+
+  get isRejectedClaim(): boolean {
+    return this.claimStatus.toLowerCase().replace(/[_-]+/g, ' ') === 'rejected';
+  }
+
+  get rejectionReason(): string {
+    return this.requests?.rejectionReason ?? this.requests?.rejection_reason ?? '';
+  }
+
+  get approvalSteps(): ApprovalStep[] {
+    const hrHasAction = Boolean(
+      this.requests?.hrApproveBy ??
+        this.requests?.hr_approve_by ??
+        this.requests?.hrApproveDate ??
+        this.requests?.hr_approve_date,
+    );
+    const rejectedByHead = this.isRejectedClaim && !hrHasAction;
+    const rejectedByHr = this.isRejectedClaim && hrHasAction;
+
+    return [
+      { label: 'คำร้องใหม่', state: this.isRejectedClaim ? 'rejected' : 'completed' },
+      {
+        label: 'หัวหน้าอนุมัติ',
+        state: rejectedByHead ? 'rejected' : this.headApproved ? 'completed' : 'active',
+        approverCode: this.headApprover || undefined,
+        actionReason: rejectedByHead ? this.rejectionReason || undefined : undefined,
+      },
+      {
+        label: 'HR อนุมัติ',
+        state: rejectedByHr
+          ? 'rejected'
+          : rejectedByHead
+            ? 'pending'
+            : this.hrApproved
+              ? 'completed'
+              : this.headApproved
+                ? 'active'
+                : 'pending',
+        approverCode: this.hrApprover || undefined,
+        actionReason: rejectedByHr ? this.rejectionReason || undefined : undefined,
+      },
+    ];
   }
 
   get confirmButtonLabel(): string {
@@ -580,6 +653,20 @@ export class VehicleTaxiFormV2Component implements OnInit, OnChanges {
     this.isShowUploadModal = true;
   }
 
+  openAttachmentPreview(item: TaxiLogItem): void {
+    this.previewFiles = this.fileConvertService.buildPreviewFiles(item.attachedFiles ?? []);
+    if (!this.previewFiles.length) {
+      this.toastService.warning('ไม่พบไฟล์แนบสำหรับรายการนี้');
+      return;
+    }
+    this.isPreviewModalOpen = true;
+  }
+
+  closeAttachmentPreview(): void {
+    this.isPreviewModalOpen = false;
+    this.previewFiles = [];
+  }
+
   closeUploadModal() {
     this.isShowUploadModal = false;
     this.currentUploadItem = null;
@@ -823,6 +910,12 @@ export class VehicleTaxiFormV2Component implements OnInit, OnChanges {
     if (this.getDailyAmountError(item)) return false;
 
     return true;
+  }
+
+  getLocationLabel(locationId: number | undefined, otherLocation?: string): string {
+    const location = this.locations.find((item) => item.location_id === locationId);
+    if (location?.is_office) return 'Office';
+    return otherLocation?.trim() || location?.location_name || '-';
   }
 
   areAllItemsValid(): boolean {

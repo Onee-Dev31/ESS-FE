@@ -21,10 +21,12 @@
         @if (step.approverCode) {
           <span class="step-approver-code">{{ step.approverCode }}</span>
         }
-        @if (step.state === 'sendback') {
+        @if (showActionBadges && step.state === 'sendback') {
           <span class="status-badge status-referred">Sendback</span>
-        } @else if (step.state === 'rejected') {
+        } @else if (showActionBadges && step.state === 'rejected' && (!hideFirstStepActionBadge || $index > 0)) {
           <span class="status-badge status-rejected">Rejected</span>
+        } @else if (showCompletedActionBadges && step.state === 'completed' && $index > 0) {
+          <span class="status-badge status-approved">Approved</span>
         } @else if (step.state === 'cancelled') {
           <span class="status-badge status-cancelled">ยกเลิกคำขอ</span>
         }
@@ -32,7 +34,7 @@
     }
   </div>
 
-  @if (actionReasonSteps.length) {
+  @if (showActionReasons && actionReasonSteps.length) {
     <div class="action-reasons" aria-label="เหตุผลจากผู้อนุมัติ">
       <div class="action-reasons-title">เหตุผลจากผู้อนุมัติ</div>
       @for (step of actionReasonSteps; track $index) {
@@ -43,9 +45,11 @@
             @if (step.approverCode) {
               <span>{{ step.approverCode }}</span>
             }
-            <span class="reason-status">
+            @if (showActionBadges) {
+              <span class="reason-status">
               {{ step.state === 'sendback' ? 'Sendback' : 'Rejected' }}
-            </span>
+              </span>
+            }
           </div>
           <p>{{ step.actionReason }}</p>
         </div>
