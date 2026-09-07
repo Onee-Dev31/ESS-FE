@@ -306,6 +306,17 @@ export class ItService implements OnInit {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((data) => this.applyStatusChange(data.ticketId, data.status));
 
+    // Ticket ใหม่เข้ามา (เช่นจาก Email) ระหว่างที่ค้างอยู่หน้านี้ → refresh ลิสต์ให้เห็นทันที ไม่ต้องกด refresh เอง
+    // แล้ว auto-select/highlight ticket ที่เพิ่งเข้ามาให้ด้วย (reuse logic เดียวกับ ticketFocusTrigger)
+    this.signalrService
+      .on('NotificationCreated')
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((data: any) => {
+        this.getMyTicket();
+        const ticketId = Number(data?.ticketId ?? data?.ticket_id);
+        if (ticketId) this.signalrService.ticketFocusTrigger.next(ticketId);
+      });
+
     // ✅ Listen for New Note (Real-time)
     this.signalrService
       .on('NewNote')

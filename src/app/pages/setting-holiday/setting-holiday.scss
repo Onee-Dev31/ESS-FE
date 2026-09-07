@@ -1521,7 +1521,8 @@
 }
 
 :host ::ng-deep nz-select.form-control.ant-select .ant-select-selector,
-:host ::ng-deep
+:host
+  ::ng-deep
   nz-select.form-control.ant-select:not(.ant-select-disabled).ant-select-focused
   .ant-select-selector {
   padding: 0 !important;

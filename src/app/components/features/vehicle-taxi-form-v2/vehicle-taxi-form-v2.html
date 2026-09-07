@@ -1,16 +1,16 @@
-<div class="vehicle-taxi-form-page" [class.edit-mode]="isEditMode" [class.read-only-mode]="isReadOnlyMode">
+<div
+  class="vehicle-taxi-form-page"
+  [class.edit-mode]="isEditMode"
+  [class.read-only-mode]="isReadOnlyMode"
+>
   <header class="top-header-strip">
     <h2>
       {{ pageTitle }}
       <span class="request-id-badge" *ngIf="requests?.claimNo"
         >เลขที่การเบิก : {{ requests?.claimNo }}</span
       >
-      <span
-      class="claim-status-badge"
-      *ngIf="isEditMode"
-      [class.referred-back]="isReferredBack"
-    >
-      สถานะ: {{ claimStatusLabel }}
+      <span class="claim-status-badge" *ngIf="isEditMode" [class.referred-back]="isReferredBack">
+        สถานะ: {{ claimStatusLabel }}
       </span>
     </h2>
     <button class="btn-close-modal" (click)="cancel()" title="ปิดหน้าต่าง" aria-label="ปิด">
@@ -102,7 +102,11 @@
         [class.referred-back]="isReferredBack"
         *ngIf="(isRejectedClaim || isReferredBack) && rejectionReason"
       >
-        <i class="fas" [class.fa-circle-xmark]="isRejectedClaim" [class.fa-rotate-left]="isReferredBack"></i>
+        <i
+          class="fas"
+          [class.fa-circle-xmark]="isRejectedClaim"
+          [class.fa-rotate-left]="isReferredBack"
+        ></i>
         <div>
           <strong>{{ isReferredBack ? 'เหตุผลที่ส่งกลับแก้ไข' : 'เหตุผลที่ไม่อนุมัติ' }}</strong>
           <p>{{ rejectionReason }}</p>
@@ -268,10 +272,16 @@
       </table> -->
 
           <div class="claim-detail-grid" *ngIf="isReadOnlyMode">
-            <article class="claim-detail-card" *ngFor="let item of items; let i = index; trackBy: trackByClientId">
+            <article
+              class="claim-detail-card"
+              *ngFor="let item of items; let i = index; trackBy: trackByClientId"
+            >
               <header>
                 <div>
-                  <span class="day-dot" [style.background]="item.dayType === 'H' ? 'var(--danger)' : 'var(--primary)'"></span>
+                  <span
+                    class="day-dot"
+                    [style.background]="item.dayType === 'H' ? 'var(--danger)' : 'var(--primary)'"
+                  ></span>
                   <strong>{{ dateUtil.formatDateToBE(item.date, 'ddd. DD/MM/YYYY') }}</strong>
                   <span class="trip-number">เที่ยวที่ {{ getTripNumber(item) }}</span>
                 </div>
@@ -288,9 +298,15 @@
                 <i class="fas fa-paperclip"></i> ดูไฟล์แนบ ({{ item.attachedFiles?.length }})
               </button>
               <div class="detail-route">
-                <div><span>จากที่ไหน</span><strong>{{ getLocationLabel(item.locationFromId, item.otherFrom) }}</strong></div>
+                <div>
+                  <span>จากที่ไหน</span
+                  ><strong>{{ getLocationLabel(item.locationFromId, item.otherFrom) }}</strong>
+                </div>
                 <i class="fas fa-arrow-right"></i>
-                <div><span>ไปที่ไหน</span><strong>{{ getLocationLabel(item.locationToId, item.otherTo) }}</strong></div>
+                <div>
+                  <span>ไปที่ไหน</span
+                  ><strong>{{ getLocationLabel(item.locationToId, item.otherTo) }}</strong>
+                </div>
               </div>
             </article>
           </div>
@@ -361,7 +377,10 @@
                     type="button"
                     class="btn-trip-action remove"
                     (click)="removeTrip(item)"
-                    *ngIf="!isReadOnlyMode && (item.selected || getTripsForDate(item).length > 1 || isEditMode)"
+                    *ngIf="
+                      !isReadOnlyMode &&
+                      (item.selected || getTripsForDate(item).length > 1 || isEditMode)
+                    "
                     title="ลบเที่ยวนี้"
                     aria-label="ลบเที่ยวนี้"
                   >
@@ -371,7 +390,9 @@
                     type="checkbox"
                     id="mob-select-{{ i }}"
                     [(ngModel)]="item.selected"
-                    [disabled]="isReadOnlyMode || item.isEligible === false || getAvailableAmount(item) <= 0"
+                    [disabled]="
+                      isReadOnlyMode || item.isEligible === false || getAvailableAmount(item) <= 0
+                    "
                     class="card-checkbox"
                     title="เลือกรายการ"
                     aria-label="เลือกรายการ"
@@ -428,10 +449,12 @@
                     (ngModelChange)="onFromLocationChange(item, i)"
                     title="เลือกสถานที่ต้นทาง"
                   >
-                    <nz-option nzLabel="-- เลือก --" [nzValue]="undefined">
-                      -- เลือก --
-                    </nz-option>
-                    <nz-option *ngFor="let loc of locations" [nzLabel]="loc.location_name" [nzValue]="loc.location_id">
+                    <nz-option nzLabel="-- เลือก --" [nzValue]="undefined"> -- เลือก -- </nz-option>
+                    <nz-option
+                      *ngFor="let loc of locations"
+                      [nzLabel]="loc.location_name"
+                      [nzValue]="loc.location_id"
+                    >
                       {{ loc.location_name }}
                     </nz-option>
                   </nz-select>
@@ -467,10 +490,12 @@
                     (ngModelChange)="onToLocationChange(item, i)"
                     title="เลือกสถานที่ปลายทาง"
                   >
-                    <nz-option nzLabel="-- เลือก --" [nzValue]="undefined">
-                      -- เลือก --
-                    </nz-option>
-                    <nz-option *ngFor="let loc of locations" [nzLabel]="loc.location_name" [nzValue]="loc.location_id">
+                    <nz-option nzLabel="-- เลือก --" [nzValue]="undefined"> -- เลือก -- </nz-option>
+                    <nz-option
+                      *ngFor="let loc of locations"
+                      [nzLabel]="loc.location_name"
+                      [nzValue]="loc.location_id"
+                    >
                       {{ loc.location_name }}
                     </nz-option>
                   </nz-select>

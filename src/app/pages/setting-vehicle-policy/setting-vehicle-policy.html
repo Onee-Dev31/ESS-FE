@@ -57,8 +57,8 @@
     } @else {
       <div class="taxi-limit-view">
         <span class="taxi-limit-value">
-          เข้าก่อน {{ activeVoucherCondition()?.early_checkin_time?.slice(0, 5) ?? '-' }} น. / ออกหลัง
-          {{ activeVoucherCondition()?.late_checkout_hour ?? '-' }}:00 น. / สายได้ไม่เกิน
+          เข้าก่อน {{ activeVoucherCondition()?.early_checkin_time?.slice(0, 5) ?? '-' }} น. /
+          ออกหลัง {{ activeVoucherCondition()?.late_checkout_hour ?? '-' }}:00 น. / สายได้ไม่เกิน
           {{ activeVoucherCondition()?.late_tolerance_min ?? '-' }} นาที
         </span>
         @if (activeVoucherCondition()?.effective_from) {
@@ -165,7 +165,10 @@
 
                 <td class="col-vars">
                   <div class="var-chips">
-                    @for (v of extractVars(isEditing(row.id) ? draftContent : row.content); track v) {
+                    @for (
+                      v of extractVars(isEditing(row.id) ? draftContent : row.content);
+                      track v
+                    ) {
                       <span class="var-chip">{{ v }}</span>
                     }
                   </div>
