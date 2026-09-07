@@ -414,6 +414,39 @@
         min-height: 10px;
         width: 100%;
       }
+
+      .btn-view-all {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        min-height: 30px;
+        padding: 5px 10px;
+        border: 1px solid rgba(37, 99, 235, 0.24);
+        border-radius: 999px;
+        background: #eff6ff;
+        font-size: $font-size-hint;
+        font-weight: 600;
+        line-height: 1;
+        color: var(--primary);
+        cursor: pointer;
+        transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+
+        i {
+          font-size: 0.8rem;
+        }
+
+        &:hover {
+          border-color: var(--primary);
+          background: #dbeafe;
+          color: var(--primary);
+          transform: translateY(-1px);
+        }
+
+        &:focus-visible {
+          outline: 2px solid var(--primary);
+          outline-offset: 2px;
+        }
+      }
     }
 
     // Summary
@@ -576,21 +609,6 @@
           color: var(--text-muted);
           font-weight: 400;
           font-size: 0.75rem;
-        }
-      }
-
-      .btn-view-all {
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-        background: none;
-        font-size: $font-size-hint;
-        color: var(--primary);
-        cursor: pointer;
-        transition: background 0.2s;
-
-        &:hover {
-          color: var(--primary);
         }
       }
     }

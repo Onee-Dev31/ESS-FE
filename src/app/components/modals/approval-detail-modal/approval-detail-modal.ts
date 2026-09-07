@@ -447,14 +447,15 @@ export class ApprovalDetailModalComponent implements OnInit {
 
   private updateTaxiStatus(item: ApprovalItem, action: string, reason?: string) {
     const payload = {
-      action: action.toLowerCase(),
-      approver_aduser: this.authService.userData().CODEMPID,
-      ...(action.toLowerCase() === 'rejected' && {
-        remark: reason?.trim() || '',
+      claimId: item.requestId,
+      excuteBy: this.authService.userData().CODEMPID,
+      status: action as 'Approved' | 'Rejected' | 'Referred Back',
+      ...((action === 'Rejected' || action === 'Referred Back') && {
+        reason: reason?.trim() || '',
       }),
     };
 
-    this.taxiService.updateStatusClaim(item.requestId, payload).subscribe({
+    this.taxiService.approveTaxiClaim(payload).subscribe({
       next: (res) => this.handleResponse(res),
       error: (err) => this.handleError(err),
     });

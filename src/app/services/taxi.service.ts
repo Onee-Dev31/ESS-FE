@@ -64,7 +64,7 @@ export class TaxiService extends BaseRequestService<TaxiRequest> {
   }
 
   // ==================== Update Claim (สำหรับ Edit) ====================
-  updateTaxiClaim(claimId: number, formData: FormData): Observable<any> {
+  updateTaxiClaim(claimId: string | number, formData: FormData): Observable<any> {
     return this._http.patch(`${this.baseUrl}/taxi-claim/${claimId}`, formData, {
       context: new HttpContext().set(SKIP_ERROR_TOAST, true),
     });
@@ -107,7 +107,10 @@ export class TaxiService extends BaseRequestService<TaxiRequest> {
   }
 
   /** GET api/taxi-claim/policy-texts */
-  getPolicyTexts(): Observable<{ success: boolean; data: { text_key: string; content: string }[] }> {
+  getPolicyTexts(): Observable<{
+    success: boolean;
+    data: { text_key: string; content: string }[];
+  }> {
     return this._http.get<{ success: boolean; data: { text_key: string; content: string }[] }>(
       `${this.baseUrl}/taxi-claim/policy-texts`,
     );
@@ -149,11 +152,29 @@ export class TaxiService extends BaseRequestService<TaxiRequest> {
     return this._http.get<any>(`${this.baseUrl}/taxi-claim/approvals`, { params: p });
   }
 
+  getTaxiClaimsForApprover(excuteBy: string, status = 'New'): Observable<any> {
+    const params = new HttpParams().set('excuteBy', excuteBy).set('status', status);
+    return this._http.get<any>(`${this.baseUrl}/taxi-claim/GetTaxiClaimsForApprover`, { params });
+  }
+
   getClaimById(claimId: number): Observable<any> {
     return this._http.get<any>(`${this.baseUrl}/taxi-claim/claims/${claimId}`);
   }
 
   updateStatusClaim(claimId: number, body: any): Observable<any> {
     return this._http.patch<any>(`${this.baseUrl}/taxi-claim/claims/${claimId}/review`, body);
+  }
+
+  approveTaxiClaim(body: {
+    claimId: number;
+    excuteBy: string;
+    status: 'Approved' | 'Rejected' | 'Referred Back';
+    reason?: string;
+  }): Observable<any> {
+    return this._http.post<any>(`${this.baseUrl}/taxi-claim/ApprovedTaxiClaim`, body);
+  }
+
+  reSubmitTaxiClaim(body: { claimId: number; type: string }): Observable<any> {
+    return this._http.post<any>(`${this.baseUrl}/taxi-claim/ResubmitClaim`, body);
   }
 }

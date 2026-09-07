@@ -30,6 +30,7 @@ import { NzSelectModule } from 'ng-zorro-antd/select';
 import { NzInputModule } from 'ng-zorro-antd/input';
 import dayjs from 'dayjs';
 import { SwalService } from '../../services/swal.service';
+import { VehicleTaxiFormV2Component } from '../../components/features/vehicle-taxi-form-v2/vehicle-taxi-form-v2';
 
 /** ข้อความ fallback ของ popup เงื่อนไข Taxi (ใช้ก่อน API ตอบกลับ หรือถ้าเรียก API ไม่สำเร็จ) */
 const DEFAULT_POLICY_TEXTS: Record<string, string> = {
@@ -64,6 +65,7 @@ const DEFAULT_POLICY_TEXTS: Record<string, string> = {
     NzDatePickerModule,
     NzSelectModule,
     NzInputModule,
+    VehicleTaxiFormV2Component,
   ],
   templateUrl: './vehicle-taxi.html',
   styleUrl: './vehicle-taxi.scss',
