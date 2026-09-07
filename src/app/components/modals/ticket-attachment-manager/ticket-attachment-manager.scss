@@ -1,0 +1,163 @@
+.attachment-manager__body {
+  display: grid;
+  grid-template-columns: 260px 1fr;
+  min-height: 360px;
+}
+h4 {
+  margin: 0;
+}
+nav {
+  padding: 14px;
+  background: var(--bg-table-head);
+  border-right: 1px solid var(--border-toolbar);
+}
+nav button {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin-bottom: 7px;
+  padding: 11px;
+  border: 1px solid transparent;
+  border-radius: 9px;
+  background: transparent;
+  color: var(--text);
+  text-align: left;
+  cursor: pointer;
+}
+nav button span {
+  margin-left: auto;
+  padding: 1px 7px;
+  border-radius: 99px;
+  background: var(--bg-card);
+  font-size: 0.75rem;
+}
+nav button.active {
+  border-color: var(--primary);
+  background: color-mix(in srgb, var(--primary) 8%, var(--bg-card));
+  color: var(--primary);
+}
+main {
+  min-width: 0;
+  padding: 18px 22px;
+  overflow: auto;
+}
+.source-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+.btn-add-file {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 11px;
+  border-radius: 8px;
+  background: var(--primary);
+  color: #fff;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+.file-rows {
+  display: grid;
+  gap: 8px;
+}
+.file-entry {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.file-row {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  gap: 10px;
+  padding: 12px;
+  border: 1px solid var(--border-toolbar);
+  border-radius: 9px;
+  background: var(--bg-card);
+  color: var(--text);
+  text-align: left;
+  cursor: pointer;
+}
+.file-row:hover {
+  border-color: var(--primary);
+  background: color-mix(in srgb, var(--primary) 5%, var(--bg-card));
+}
+.file-row i {
+  color: var(--primary);
+  font-size: 1.1rem;
+}
+.file-row i:last-child {
+  margin-left: auto;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
+.file-row span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.btn-remove-new {
+  align-self: center;
+  width: 34px;
+  height: 34px;
+  border: 1px solid var(--danger);
+  border-radius: 8px;
+  background: transparent;
+  color: var(--danger);
+  cursor: pointer;
+}
+.empty-files {
+  display: grid;
+  min-height: 220px;
+  place-content: center;
+  gap: 8px;
+  color: var(--text-muted);
+  text-align: center;
+}
+.empty-files i {
+  font-size: 2rem;
+}
+.attachment-manager-footer {
+  display: flex;
+  gap: 8px;
+}
+.attachment-manager-footer button {
+  padding: 8px 14px;
+  border-radius: 8px;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+.btn-cancel {
+  border: 1px solid var(--border);
+  background: var(--bg-card);
+  color: var(--text);
+}
+.btn-save {
+  border: 1px solid var(--primary);
+  background: var(--primary);
+  color: #fff;
+}
+.btn-save:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+@media (max-width: 640px) {
+  .attachment-manager__body {
+    grid-template-columns: 1fr;
+  }
+  nav {
+    display: flex;
+    gap: 8px;
+    border-right: 0;
+    border-bottom: 1px solid var(--border-toolbar);
+  }
+  nav button {
+    margin: 0;
+  }
+}

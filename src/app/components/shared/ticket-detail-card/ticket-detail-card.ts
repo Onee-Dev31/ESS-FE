@@ -44,6 +44,10 @@ export class TicketDetailCardComponent implements OnChanges {
   get attachments(): any[] {
     return this.ticket?.attachments ?? [];
   }
+
+  get allAttachments(): any[] {
+    return [...this.attachments, ...(this.ticket?.itAttachments ?? [])];
+  }
   get services(): any[] {
     return this.ticket?.services ?? [];
   }

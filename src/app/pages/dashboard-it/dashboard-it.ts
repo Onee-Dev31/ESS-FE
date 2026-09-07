@@ -40,6 +40,7 @@ import {
   FilePreviewItem,
   FilePreviewModalComponent,
 } from '../../components/modals/file-preview-modal/file-preview-modal';
+import { TicketAttachmentManagerComponent } from '../../components/modals/ticket-attachment-manager/ticket-attachment-manager';
 import dayjs from 'dayjs';
 import { ItProblemReportComponent } from '../it-problem-report/it-problem-report';
 import { ItRepairRequestComponent } from '../it-repair-request/it-repair-request';
@@ -87,6 +88,7 @@ import { PageLoaderComponent } from '../../components/shared/page-loader/page-lo
     NzModalModule,
     ItDashboardSummary,
     FilePreviewModalComponent,
+    TicketAttachmentManagerComponent,
     ItProblemReportComponent,
     ItRepairRequestComponent,
     ITServiceRequestCombinedComponent,
@@ -376,6 +378,7 @@ export class DashboardIT implements OnInit {
   selectedTicket = signal<any | undefined>(undefined);
   isPreviewModalOpen = signal<boolean>(false);
   previewFiles = signal<FilePreviewItem[]>([]);
+  isAttachmentManagerOpen = signal(false);
 
   isVisibleAssignee = signal<boolean>(false);
   selectedAssignee = signal<any | undefined>(undefined);
@@ -623,9 +626,23 @@ export class DashboardIT implements OnInit {
 
     this.getTicketById(ticketId).subscribe(async (res: any) => {
       console.log(res);
-      const ticketAttachments = res.attachments?.filter((f: any) => !f.reply_id) || [];
+      const ticketAttachments =
+        res.attachments?.filter(
+          (f: any) =>
+            !['from it', 'จาก it'].includes(
+              String(f.file_description ?? '').trim().toLowerCase(),
+            ),
+        ) || [];
+      const itAttachments =
+        res.attachments?.filter(
+          (f: any) =>
+            ['from it', 'จาก it'].includes(
+              String(f.file_description ?? '').trim().toLowerCase(),
+            ),
+        ) || [];
       const replyAttachments = res.attachments?.filter((f: any) => f.reply_id) || [];
       const convertedFiles = await this.fileConverter.convertUrlsToFiles(ticketAttachments);
+      const convertedItFiles = await this.fileConverter.convertUrlsToFiles(itAttachments);
 
       const ticket = res.ticket;
       const replies = res.replies;
@@ -685,6 +702,7 @@ export class DashboardIT implements OnInit {
         user_status: ticket.user_status,
         approval_status: ticket.approval_status,
         attachments: attachments,
+        itAttachments: convertedItFiles,
         assignments: assignments,
         itNotes: itNotes,
         assignTimeline: result,
@@ -1247,6 +1265,21 @@ export class DashboardIT implements OnInit {
     this.isPreviewModalOpen.set(true);
   }
 
+  openAttachmentManager(): void {
+    this.isAttachmentManagerOpen.set(true);
+  }
+
+  closeAttachmentManager(): void {
+    this.isAttachmentManagerOpen.set(false);
+  }
+
+  viewManagedAttachment(event: { file: any; source: 'user' | 'it' }): void {
+    const ticket = this.selectedTicket();
+    const sourceFiles = event.source === 'it' ? (ticket?.itAttachments ?? []) : (ticket?.attachments ?? []);
+    const files = [event.file, ...sourceFiles.filter((file: any) => file !== event.file)];
+    this.openAllAttachments(files);
+  }
+
   closePreview() {
     this.isPreviewModalOpen.set(false);
   }
@@ -1517,10 +1550,7 @@ export class DashboardIT implements OnInit {
       const previousTicket = ticketElement.previousElementSibling as HTMLElement | null;
       const secondPositionOffset = previousTicket?.offsetHeight ?? 0;
       const targetTop =
-        container.scrollTop +
-        ticketRect.top -
-        containerRect.top -
-        secondPositionOffset;
+        container.scrollTop + ticketRect.top - containerRect.top - secondPositionOffset;
       container.scrollTo({ top: Math.max(0, targetTop), behavior: 'smooth' });
       return;
     }
@@ -1662,9 +1692,11 @@ export class DashboardIT implements OnInit {
     }
 
     if (attachments) {
-      attachments.forEach((item: any) => {
+      const files = attachments.filter((item: any) => item?.file instanceof File);
+      files.forEach((item: any) => {
         if (item?.file instanceof File) {
           formData.append('Files', item.file);
+          formData.append('Descriptions', item.description ?? '');
         }
       });
     }
@@ -1965,7 +1997,7 @@ export class DashboardIT implements OnInit {
     ticketTypeId: number;
     repairCostType?: 'paid' | 'free';
     reason: string;
-    attachments: { name: string; size: number; file: File }[];
+    attachments: { name: string; size: number; file: File; description?: string }[];
   }) {
     const ticket = this.selectedTicket();
     const ticketId = ticket?.ticketId;
@@ -1994,7 +2026,7 @@ export class DashboardIT implements OnInit {
       String(data.ticketTypeId),
       null,
       null,
-      data.attachments,
+      data.attachments.map((attachment) => ({ ...attachment, description: 'From IT' })),
       data.repairCostType,
       data.reason,
     ).subscribe({

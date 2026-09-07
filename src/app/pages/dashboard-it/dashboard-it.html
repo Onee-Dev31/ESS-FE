@@ -244,11 +244,19 @@
       audience="it"
       [copied]="copiedTicketId === t.id"
       [serviceLimit]="isSmallMobile ? 1 : isMobile ? 2 : 3"
-      (attachmentClick)="openAllAttachments($event)"
+      (attachmentClick)="openAttachmentManager()"
       (servicesClick)="showAll($event)"
       (copyClick)="copyDescription(t.id, t.description)"
       (changeTypeClick)="openChangeTicketTypeModal()"
       (detailClick)="openDetail(t.ticketId, t.description)"
+    />
+
+    <app-ticket-attachment-manager
+      *ngIf="isAttachmentManagerOpen()"
+      [userFiles]="t.attachments"
+      [itFiles]="t.itAttachments ?? []"
+      (onViewFile)="viewManagedAttachment($event)"
+      (onClose)="closeAttachmentManager()"
     />
 
     <!-- REASON [Denied] -->
