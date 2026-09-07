@@ -626,11 +626,11 @@ export class ResignDetail {
       this.loadingService.stop('employee-list');
     });
 
-    this.fetchFreelanceByStatus('Resigned', pageR, sizeR).subscribe((res) => {
-      console.log('Resigned [FREE]>>', res.items);
-      this.dataFreelanceResignFromApi(res);
-      this.loadingService.stop('freelance-list');
-    });
+    // this.fetchFreelanceByStatus('Resigned', pageR, sizeR).subscribe((res) => {
+    //   console.log('Resigned [FREE]>>', res.items);
+    //   this.dataFreelanceResignFromApi(res);
+    //   this.loadingService.stop('freelance-list');
+    // });
   }
 
   viewReportResign(command: 'fulltime' | 'freelance') {
