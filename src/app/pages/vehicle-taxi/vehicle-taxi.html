@@ -88,7 +88,7 @@
                 <span class="status-badge" [ngStyle]="getStatusClass(claim.status)">
                   {{ claim.status | statusLabel }}
                 </span>
-                @if (claim.status === 'New') {
+                @if (isEditableClaim(claim.status)) {
                   <button
                     class="btn-icon edit"
                     (click)="$event.stopPropagation(); openModal(claim.id)"
@@ -250,7 +250,7 @@
                 </td>
 
                 <td class="text-center">
-                  @if (claim.status === 'New') {
+                  @if (isEditableClaim(claim.status)) {
                     <div class="action-btns">
                       <button class="btn-icon edit" (click)="openModal(claim.id)" title="แก้ไข">
                         <i class="far fa-edit"></i>

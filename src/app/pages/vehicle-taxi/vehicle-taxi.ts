@@ -322,4 +322,9 @@ export class VehicleTaxiComponent implements OnInit {
   getStatusClass(status: string) {
     return StatusUtil.getStatusBadgeClaims(status.toLowerCase());
   }
+
+  isEditableClaim(status: string): boolean {
+    const normalizedStatus = status?.trim().toLowerCase().replace(/[_-]+/g, ' ');
+    return normalizedStatus === 'new' || normalizedStatus === 'referred back';
+  }
 }

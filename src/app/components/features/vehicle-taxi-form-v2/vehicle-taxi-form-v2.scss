@@ -135,6 +135,88 @@ $col-file: 50px;
     overflow: hidden;
   }
 
+  .approval-progress {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+    padding: 14px 18px;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    background: var(--bg-table-head);
+
+    .approval-step {
+      display: flex;
+      flex: 1;
+      align-items: center;
+      gap: 10px;
+      color: var(--text-muted);
+
+      .step-icon {
+        display: inline-flex;
+        width: 32px;
+        height: 32px;
+        flex: 0 0 32px;
+        align-items: center;
+        justify-content: center;
+        border: 2px solid var(--border);
+        border-radius: 50%;
+        background: var(--bg-card);
+      }
+
+      strong,
+      small {
+        display: block;
+      }
+
+      strong {
+        font-size: $font-size-label;
+      }
+
+      small {
+        margin-top: 2px;
+        font-size: $font-size-hint;
+      }
+
+      &.completed,
+      &.current {
+        color: var(--primary);
+
+        .step-icon {
+          border-color: var(--primary);
+          background: var(--primary);
+          color: #fff;
+        }
+      }
+
+      &.current .step-icon {
+        background: var(--bg-card);
+        color: var(--primary);
+      }
+    }
+
+    .step-line {
+      width: 44px;
+      height: 2px;
+      background: var(--border);
+
+      &.completed {
+        background: var(--primary);
+      }
+    }
+
+    @include mobile {
+      align-items: flex-start;
+      flex-direction: column;
+
+      .step-line {
+        width: 2px;
+        height: 18px;
+        margin-left: 15px;
+      }
+    }
+  }
+
   .form-actions {
     padding: 10px 40px 10px;
     gap: 16px;
@@ -168,6 +250,44 @@ $col-file: 50px;
 
     .btn-search {
       @include btn-primary;
+    }
+  }
+
+  .rejection-reason-card {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+    margin-bottom: 16px;
+    padding: 12px 14px;
+    border: 1px solid color-mix(in srgb, var(--danger) 32%, transparent);
+    border-radius: 10px;
+    background: color-mix(in srgb, var(--danger) 7%, var(--bg-card));
+    color: var(--danger);
+
+    > i {
+      margin-top: 2px;
+    }
+
+    strong,
+    p {
+      display: block;
+    }
+
+    strong {
+      font-size: $font-size-label;
+    }
+
+    p {
+      margin: 3px 0 0;
+      color: var(--text);
+      font-size: $font-size-label;
+      white-space: pre-wrap;
+    }
+
+    &.referred-back {
+      border-color: color-mix(in srgb, var(--warning) 40%, transparent);
+      background: color-mix(in srgb, var(--warning) 8%, var(--bg-card));
+      color: var(--warning);
     }
   }
 
@@ -618,6 +738,137 @@ $col-file: 50px;
 // ==========================================
 // Mobile Cards (from _mobile-cards.scss)
 // ==========================================
+
+.claim-detail-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  padding: 4px;
+
+  .claim-detail-card {
+    overflow: hidden;
+    border: 1px solid var(--border);
+    border-left: 4px solid var(--primary);
+    border-radius: 12px;
+    background: var(--bg-card);
+
+    header,
+    footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 12px 14px;
+    }
+
+    header {
+      border-bottom: 1px solid var(--border-toolbar);
+
+      > div {
+        display: flex;
+        min-width: 0;
+        align-items: center;
+        gap: 8px;
+      }
+    }
+
+    .day-dot {
+      width: 8px;
+      height: 8px;
+      flex: 0 0 8px;
+      border-radius: 50%;
+    }
+
+    .trip-number {
+      color: var(--primary);
+      font-size: $font-size-hint;
+      font-weight: 600;
+    }
+
+    .detail-amount {
+      color: var(--primary);
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .detail-description {
+      min-height: 56px;
+      padding: 14px;
+      color: var(--text);
+      font-size: $font-size-body;
+      line-height: 1.5;
+    }
+
+    .btn-view-attachments {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin: 0 14px 14px;
+      padding: 6px 9px;
+      border: 0;
+      border-radius: 7px;
+      background: color-mix(in srgb, var(--primary) 9%, var(--bg-card));
+      color: var(--primary);
+      font: inherit;
+      font-size: $font-size-hint;
+      font-weight: 600;
+      cursor: pointer;
+
+      &:hover {
+        background: color-mix(in srgb, var(--primary) 16%, var(--bg-card));
+      }
+    }
+
+    .detail-route {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 14px;
+      border-top: 1px solid var(--border-toolbar);
+      background: var(--bg-table-head);
+
+      > div {
+        min-width: 0;
+
+        span,
+        strong {
+          display: block;
+        }
+
+        span {
+          margin-bottom: 3px;
+          color: var(--text-muted);
+          font-size: $font-size-hint;
+        }
+
+        strong {
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+        }
+      }
+
+      i {
+        color: var(--text-muted);
+        font-size: $font-size-hint;
+      }
+    }
+
+    footer {
+      color: var(--text-muted);
+      font-size: $font-size-hint;
+
+      strong {
+        color: var(--success);
+      }
+    }
+  }
+
+  @include mobile {
+    grid-template-columns: 1fr;
+  }
+}
 
 .mobile-cards-view {
   display: grid !important;
