@@ -1,4 +1,4 @@
-<div class="vehicle-taxi-form-page" [class.edit-mode]="isEditMode">
+<div class="vehicle-taxi-form-page" [class.edit-mode]="isEditMode" [class.read-only-mode]="isReadOnlyMode">
   <header class="top-header-strip">
     <h2>
       {{ pageTitle }}
@@ -89,7 +89,27 @@
         </div>
       </section>
 
-      <section class="filter-controls" *ngIf="isEditMode">
+      <app-approval-steps
+        *ngIf="isReadOnlyMode"
+        [steps]="approvalSteps"
+        [showActionReasons]="false"
+        [hideFirstStepActionBadge]="true"
+        [showCompletedActionBadges]="true"
+      ></app-approval-steps>
+
+      <section
+        class="rejection-reason-card"
+        [class.referred-back]="isReferredBack"
+        *ngIf="(isRejectedClaim || isReferredBack) && rejectionReason"
+      >
+        <i class="fas" [class.fa-circle-xmark]="isRejectedClaim" [class.fa-rotate-left]="isReferredBack"></i>
+        <div>
+          <strong>{{ isReferredBack ? 'เหตุผลที่ส่งกลับแก้ไข' : 'เหตุผลที่ไม่อนุมัติ' }}</strong>
+          <p>{{ rejectionReason }}</p>
+        </div>
+      </section>
+
+      <section class="filter-controls" *ngIf="isEditMode && !isReadOnlyMode">
         <div class="alert-delete" *ngIf="isDelete()">
           <i class="fa-solid fa-triangle-exclamation"></i>
           รายการที่ยกเลิก {{ isDelete() }} รายการ จะถูกลบเมื่อกดยืนยันการแก้ไข
@@ -247,8 +267,36 @@
         </tfoot>
       </table> -->
 
+          <div class="claim-detail-grid" *ngIf="isReadOnlyMode">
+            <article class="claim-detail-card" *ngFor="let item of items; let i = index; trackBy: trackByClientId">
+              <header>
+                <div>
+                  <span class="day-dot" [style.background]="item.dayType === 'H' ? 'var(--danger)' : 'var(--primary)'"></span>
+                  <strong>{{ dateUtil.formatDateToBE(item.date, 'ddd. DD/MM/YYYY') }}</strong>
+                  <span class="trip-number">เที่ยวที่ {{ getTripNumber(item) }}</span>
+                </div>
+                <span class="detail-amount">฿{{ item.amount | number: '1.2-2' }}</span>
+              </header>
+
+              <div class="detail-description">{{ item.description || '-' }}</div>
+              <button
+                *ngIf="item.attachedFiles?.length"
+                type="button"
+                class="btn-view-attachments"
+                (click)="openAttachmentPreview(item)"
+              >
+                <i class="fas fa-paperclip"></i> ดูไฟล์แนบ ({{ item.attachedFiles?.length }})
+              </button>
+              <div class="detail-route">
+                <div><span>จากที่ไหน</span><strong>{{ getLocationLabel(item.locationFromId, item.otherFrom) }}</strong></div>
+                <i class="fas fa-arrow-right"></i>
+                <div><span>ไปที่ไหน</span><strong>{{ getLocationLabel(item.locationToId, item.otherTo) }}</strong></div>
+              </div>
+            </article>
+          </div>
+
           <!-- ====================== MOBILE CARDS ====================== -->
-          <div class="mobile-cards-view mobile-only">
+          <div class="mobile-cards-view mobile-only" *ngIf="!isReadOnlyMode">
             <div
               *ngFor="let item of items; let i = index; trackBy: trackByClientId"
               [id]="'taxi-card-' + i"
@@ -282,6 +330,7 @@
                 {{ item.attachedFile || item.existingFileName ? 'เปลี่ยนไฟล์' : 'แนบไฟล์' }}
               </button> -->
                   <button
+                    *ngIf="!isReadOnlyMode"
                     class="btn-card-upload"
                     (click)="openUploadModal(item)"
                     [class.has-file]="
@@ -298,7 +347,7 @@
                     }}
                   </button>
                   <button
-                    *ngIf="!isEditMode"
+                    *ngIf="!isEditMode && !isReadOnlyMode"
                     type="button"
                     class="btn-trip-action add"
                     (click)="addTrip(item)"
@@ -312,7 +361,7 @@
                     type="button"
                     class="btn-trip-action remove"
                     (click)="removeTrip(item)"
-                    *ngIf="item.selected || getTripsForDate(item).length > 1 || isEditMode"
+                    *ngIf="!isReadOnlyMode && (item.selected || getTripsForDate(item).length > 1 || isEditMode)"
                     title="ลบเที่ยวนี้"
                     aria-label="ลบเที่ยวนี้"
                   >
@@ -322,8 +371,8 @@
                     type="checkbox"
                     id="mob-select-{{ i }}"
                     [(ngModel)]="item.selected"
+                    [disabled]="isReadOnlyMode || item.isEligible === false || getAvailableAmount(item) <= 0"
                     class="card-checkbox"
-                    [disabled]="item.isEligible === false || getAvailableAmount(item) <= 0"
                     title="เลือกรายการ"
                     aria-label="เลือกรายการ"
                   />
@@ -356,6 +405,7 @@
                     id="mob-desc-{{ i }}"
                     class="card-input"
                     [(ngModel)]="item.description"
+                    [readonly]="isReadOnlyMode"
                     placeholder="ระบุรายละเอียดการเบิก..."
                     [class.is-invalid]="item.selected && !item.description.trim()"
                     (ngModelChange)="onInputChange(item)"
@@ -373,6 +423,7 @@
                     nzPlaceHolder="เลือกสถานที่"
                     id="mob-loc-from-{{ i }}"
                     [(ngModel)]="item.locationFromId"
+                    [nzDisabled]="isReadOnlyMode"
                     [class.is-invalid]="item.selected && !item.locationFromId"
                     (ngModelChange)="onFromLocationChange(item, i)"
                     title="เลือกสถานที่ต้นทาง"
@@ -390,6 +441,7 @@
                     class="card-input mt-1"
                     id="mob-other-from-{{ i }}"
                     [(ngModel)]="item.otherFrom"
+                    [readonly]="isReadOnlyMode"
                     [class.is-invalid]="
                       item.selected &&
                       isOtherLocation(item.locationFromId) &&
@@ -410,6 +462,7 @@
                     nzPlaceHolder="เลือกสถานที่"
                     id="mob-loc-to-{{ i }}"
                     [(ngModel)]="item.locationToId"
+                    [nzDisabled]="isReadOnlyMode"
                     [class.is-invalid]="item.selected && !item.locationToId"
                     (ngModelChange)="onToLocationChange(item, i)"
                     title="เลือกสถานที่ปลายทาง"
@@ -427,6 +480,7 @@
                     class="card-input mt-1"
                     id="mob-other-to-{{ i }}"
                     [(ngModel)]="item.otherTo"
+                    [readonly]="isReadOnlyMode"
                     [class.is-invalid]="
                       item.selected && isOtherLocation(item.locationToId) && !item.otherTo?.trim()
                     "
@@ -458,6 +512,7 @@
                       class="card-input text-right"
                       placeholder="0.00"
                       [value]="formatNumber(item.amount || 0)"
+                      [readonly]="isReadOnlyMode"
                       (input)="onAmountInput($event, item)"
                       [class.is-invalid]="item.amountError"
                     />
@@ -478,7 +533,7 @@
     </main>
   }
 
-  @if (!isLoading) {
+  @if (!isLoading && !isReadOnlyMode) {
     <div class="form-actions">
       <button type="button" class="btn-submit" (click)="save()" [disabled]="isSubmitDisabled()">
         <i
@@ -509,4 +564,10 @@
     (onClose)="closeUploadModal()"
   >
   </app-file-upload-modal>
+
+  <app-file-preview-modal
+    *ngIf="isPreviewModalOpen"
+    [files]="previewFiles"
+    (onClose)="closeAttachmentPreview()"
+  ></app-file-preview-modal>
 </div>

@@ -36,7 +36,7 @@ export class StatusUtil {
     pending: 'progress',
     approved: 'closed',
     rejected: 'rejected',
-    'referred back': 'reopen',
+    'referred back': 'referred-back',
   };
 
   static getStatusBadgeClaims(status: string) {

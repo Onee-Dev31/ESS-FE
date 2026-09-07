@@ -21,6 +21,10 @@ export interface ApprovalStep {
 })
 export class ApprovalStepsComponent {
   @Input({ required: true }) steps: ApprovalStep[] = [];
+  @Input() showActionBadges = true;
+  @Input() showActionReasons = true;
+  @Input() hideFirstStepActionBadge = false;
+  @Input() showCompletedActionBadges = false;
 
   get actionReasonSteps(): ApprovalStep[] {
     return this.steps.filter(

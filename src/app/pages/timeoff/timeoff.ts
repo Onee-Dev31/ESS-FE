@@ -19,6 +19,7 @@ import {
 import { LoadingService } from '../../services/loading';
 import { ToastService } from '../../services/toast';
 import { DialogService } from '../../services/dialog';
+import { SwalService } from '../../services/swal.service';
 import { ErrorService } from '../../services/error';
 import { TimeOffForm } from '../../components/features/time-off-form/time-off-form';
 import {
@@ -70,6 +71,7 @@ export class TimeoffComponent implements OnInit {
   private timeoffService = inject(TimeOffService);
   private toastService = inject(ToastService);
   private dialogService = inject(DialogService);
+  private swalService = inject(SwalService);
   private errorService = inject(ErrorService);
   private authService = inject(AuthService);
   private fileConverter = inject(FileConverterService);
@@ -316,8 +318,7 @@ export class TimeoffComponent implements OnInit {
     };
     this.timeoffService.saveLeaveRequest(payload).subscribe({
       next: () => {
-        this.toastService.success('ลบรายการสำเร็จ');
-        this.loadRequests();
+        this.swalService.success('ลบรายการสำเร็จ').then(() => this.loadRequests());
       },
       error: (error) => {
         this.loadingService.stop('timeoff-list');

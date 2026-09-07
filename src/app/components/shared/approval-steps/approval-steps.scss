@@ -76,6 +76,14 @@
     line-height: 1.2;
   }
 
+  .step-action-reason {
+    max-width: 220px;
+    color: var(--danger);
+    font-size: $font-size-hint;
+    line-height: 1.35;
+    overflow-wrap: anywhere;
+  }
+
   &.completed {
     color: var(--success);
 

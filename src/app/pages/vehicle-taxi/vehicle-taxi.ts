@@ -7,7 +7,6 @@ import { LoadingService } from '../../services/loading';
 import { ToastService } from '../../services/toast';
 import { DialogService } from '../../services/dialog';
 import { ErrorService } from '../../services/error';
-import { VehicleTaxiFormComponent } from '../../components/features/vehicle-taxi-form/vehicle-taxi-form';
 import { FilePreviewModalComponent } from '../../components/modals/file-preview-modal/file-preview-modal';
 import { StatusUtil } from '../../utils/status.util';
 import { PaginationComponent } from '../../components/shared/pagination/pagination';
@@ -54,7 +53,6 @@ const DEFAULT_POLICY_TEXTS: Record<string, string> = {
   imports: [
     CommonModule,
     FormsModule,
-    VehicleTaxiFormComponent,
     FilePreviewModalComponent,
     StatusLabelPipe,
     PaginationComponent,
@@ -323,5 +321,10 @@ export class VehicleTaxiComponent implements OnInit {
 
   getStatusClass(status: string) {
     return StatusUtil.getStatusBadgeClaims(status.toLowerCase());
+  }
+
+  isEditableClaim(status: string): boolean {
+    const normalizedStatus = status?.trim().toLowerCase().replace(/[_-]+/g, ' ');
+    return normalizedStatus === 'new' || normalizedStatus === 'referred back';
   }
 }
