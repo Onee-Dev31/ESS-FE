@@ -393,6 +393,14 @@ $border-color: var(--border-color);
   // ==================== MODAL ====================
   .modal-overlay {
     @include modal-overlay-styles;
+
+    .modal-container {
+      height: min(760px, 90vh);
+
+      @include mobile {
+        height: 100dvh;
+      }
+    }
   }
 
   ::ng-deep .select-status.ant-select {
