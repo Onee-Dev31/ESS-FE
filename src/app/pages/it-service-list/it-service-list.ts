@@ -243,11 +243,16 @@ export class ItService implements OnInit {
     this.checkScreen();
     this.checkMobile();
 
+    let isFirstQueryParamsEmit = true;
     (this.route.queryParams ?? EMPTY)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((params) => {
         const ticketId = params['ticketId'];
         const openChat = params['openChat'] === 'true';
+        // เมื่อกด noti ซ้ำขณะอยู่ในหน้านี้อยู่แล้ว (route เดิม แค่ query param เปลี่ยน) ต้อง refresh
+        // รายการ ticket ใหม่ด้วย ไม่งั้น ticket ที่เพิ่งสร้างจะไม่โผล่ในลิสต์จนกว่าจะกด refresh เอง
+        if (!isFirstQueryParamsEmit) this.getMyTicket();
+        isFirstQueryParamsEmit = false;
         if (ticketId) {
           const id = Number(ticketId);
           this.highlightedTicketId.set(id);
