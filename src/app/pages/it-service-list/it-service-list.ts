@@ -52,6 +52,7 @@ import { TicketRequesterCardComponent } from '../../components/shared/ticket-req
 import { TicketOpenForCardComponent } from '../../components/shared/ticket-open-for-card/ticket-open-for-card';
 import { TicketProgressCardComponent } from '../../components/shared/ticket-progress-card/ticket-progress-card';
 import { TicketDetailCardComponent } from '../../components/shared/ticket-detail-card/ticket-detail-card';
+import { TicketAttachmentManagerComponent } from '../../components/modals/ticket-attachment-manager/ticket-attachment-manager';
 import {
   TicketChatComponent,
   TicketChatReader,
@@ -81,6 +82,7 @@ import {
     TicketOpenForCardComponent,
     TicketProgressCardComponent,
     TicketDetailCardComponent,
+    TicketAttachmentManagerComponent,
     TicketChatComponent,
   ],
   templateUrl: './it-service-list.html',
@@ -204,6 +206,7 @@ export class ItService implements OnInit {
   isPreviewModalOpen = signal<boolean>(false);
   isRatingModalOpen = signal<boolean>(false);
   previewFiles = signal<FilePreviewItem[]>([]);
+  isAttachmentManagerOpen = signal(false);
   isVisibleAssignee = signal<boolean>(false);
   selectedAssignee = signal<any | undefined>(undefined);
   IS_NOTE_TICKET = signal(false);
@@ -438,10 +441,27 @@ export class ItService implements OnInit {
 
     this.getTicketById(ticketId).subscribe(async (res: any) => {
       console.log(res);
-      const ticketAttachments = res.attachments?.filter((f: any) => !f.reply_id) || [];
+      const ticketAttachments =
+        res.attachments?.filter(
+          (f: any) =>
+            !['from it'].includes(
+              String(f.file_description ?? '')
+                .trim()
+                .toLowerCase(),
+            ),
+        ) || [];
+      const itAttachments =
+        res.attachments?.filter((f: any) =>
+          ['from it'].includes(
+            String(f.file_description ?? '')
+              .trim()
+              .toLowerCase(),
+          ),
+        ) || [];
       const replyAttachments = res.attachments?.filter((f: any) => f.reply_id) || [];
 
       const convertedFiles = await this.fileConverter.convertUrlsToFiles(ticketAttachments);
+      const convertedItFiles = await this.fileConverter.convertUrlsToFiles(itAttachments);
 
       const ticket = res.ticket;
       const replies = res.replies;
@@ -491,6 +511,7 @@ export class ItService implements OnInit {
         requesterPhone: ticket.contact_phone,
         requesterColor: ticketTypyColor.getColor(ticket.ticket_type_id),
         attachments: attachments,
+        itAttachments: convertedItFiles,
         assignments: assignments,
         itNotes: itNotes,
         assignTimeline: result,
@@ -501,7 +522,7 @@ export class ItService implements OnInit {
         ccList: ccList,
       };
 
-      // console.log(objectData);
+      console.log(objectData);
 
       this.selectedTicket.set(objectData);
       if (previousTicketId !== objectData.ticketId) {
@@ -931,6 +952,35 @@ export class ItService implements OnInit {
     this.isPreviewModalOpen.set(true);
   }
 
+  openAttachmentManager(): void {
+    this.isAttachmentManagerOpen.set(true);
+  }
+
+  closeAttachmentManager(): void {
+    this.isAttachmentManagerOpen.set(false);
+  }
+
+  addAttachmentFiles(changes: { files: File[]; removedFiles: any[] }): void {
+    if (changes.files.length) this.addFiles(changes.files);
+    changes.removedFiles.forEach((file) => this.removeAttachment(file));
+    this.closeAttachmentManager();
+  }
+
+  getNewAttachmentCount(ticket: any): number {
+    return (ticket?.attachments ?? []).filter((file: any) => file.isNew && file.file).length;
+  }
+
+  viewManagedAttachment(event: { file: any; source: 'user' | 'it' }): void {
+    const ticket = this.selectedTicket();
+    const sourceFiles = event.source === 'it' ? (ticket?.itAttachments ?? []) : (ticket?.attachments ?? []);
+    const files = [event.file, ...sourceFiles.filter((file: any) => file !== event.file)];
+    this.openAllAttachments(files);
+  }
+
+  removeNewManagedAttachment(file: any): void {
+    this.removeAttachment(file);
+  }
+
   buildTimeline(timelines: any[], assignees: any[]) {
     return timelines.map((t) => {
       const assigneeList = assignees
@@ -1191,7 +1241,7 @@ export class ItService implements OnInit {
     input.value = '';
   }
 
-  private addFiles(files: FileList) {
+  private addFiles(files: FileList | File[]) {
     const current = this.selectedTicket();
     if (!current) return;
 

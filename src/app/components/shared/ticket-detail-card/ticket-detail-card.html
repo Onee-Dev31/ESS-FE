@@ -24,10 +24,14 @@
   <header class="detail-header">
     <div class="detail-title">
       <span>รายละเอียด</span>
-      @if (attachments.length && !editable) {
-        <button type="button" class="attachment-button" (click)="attachmentClick.emit(attachments)">
+      @if (allAttachments.length && !editable) {
+        <button
+          type="button"
+          class="attachment-button"
+          (click)="attachmentClick.emit(allAttachments)"
+        >
           <i class="fa-solid fa-paperclip"></i>
-          {{ attachments.length }} ไฟล์
+          {{ allAttachments.length }} ไฟล์
         </button>
       }
     </div>

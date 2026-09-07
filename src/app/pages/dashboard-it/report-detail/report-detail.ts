@@ -23,9 +23,15 @@ import { AcknowledgeModal } from '../modal/acknowledge-modal/acknowledge-modal';
 import { AssignModal } from '../modal/assign-modal/assign-modal';
 import { SignalrService } from '../../../services/signalr.service';
 import { environment } from '../../../../environments/environment';
+import { TicketDetailCardComponent } from '../../../components/shared/ticket-detail-card/ticket-detail-card';
+import { TicketRequesterCardComponent } from '../../../components/shared/ticket-requester-card/ticket-requester-card';
+import { TicketProgressCardComponent } from '../../../components/shared/ticket-progress-card/ticket-progress-card';
+import { TicketAttachmentManagerComponent } from '../../../components/modals/ticket-attachment-manager/ticket-attachment-manager';
+import { TicketChatComponent } from '../../../components/shared/ticket-chat/ticket-chat';
 
 @Component({
   selector: 'app-report-detail',
+  standalone: true,
   imports: [
     CommonModule,
     FormsModule,
@@ -38,6 +44,11 @@ import { environment } from '../../../../environments/environment';
     DenyModal,
     AcknowledgeModal,
     AssignModal,
+    TicketDetailCardComponent,
+    TicketRequesterCardComponent,
+    TicketProgressCardComponent,
+    TicketAttachmentManagerComponent,
+    TicketChatComponent,
   ],
   templateUrl: './report-detail.html',
   styleUrl: './report-detail.scss',
@@ -54,6 +65,8 @@ export class ReportDetail {
 
   isPreviewModalOpen = signal<boolean>(false);
   previewFiles = signal<FilePreviewItem[]>([]);
+  isAttachmentManagerOpen = signal(false);
+  IS_CHAT_OPEN = signal(false);
 
   isVisibleAssignee = signal<boolean>(false);
   selectedAssignee = signal<any | undefined>(undefined);
@@ -101,30 +114,32 @@ export class ReportDetail {
 
   selectTicket() {
     this.getTicketById(this.queryId).subscribe(async (res: any) => {
-      let convertedFiles: any[] = [];
-
-      if (res.attachments?.length) {
-        convertedFiles = await Promise.all(
-          res.attachments.map((f: any) =>
+      const rawAttachments = res.attachments ?? [];
+      const isItAttachment = (file: any) =>
+        ['from it', 'จาก it'].includes(String(file.file_description ?? '').trim().toLowerCase());
+      const convertAttachments = (files: any[]) =>
+        Promise.all(
+          files.map((f: any) =>
             this.convertUrlToFile({
-              id: f.id,
+              id: f.file_id ?? f.id,
               fileName: f.file_name,
               filePath: f.file_path,
               fileType: f.file_type,
               fileSize: f.file_size,
               fileDescription: f.file_description,
               uploadedByaAduser: f.uploaded_by_aduser,
-              created_date: f.created_at,
+              created_date: f.effective_created_at ?? f.created_at,
             }),
           ),
         );
-      }
+      const [convertedFiles, convertedItFiles] = await Promise.all([
+        convertAttachments(rawAttachments.filter((file: any) => !isItAttachment(file))),
+        convertAttachments(rawAttachments.filter(isItAttachment)),
+      ]);
 
       const ticket = res.ticket;
       const attachments = convertedFiles ?? [];
       const replies = res.replies ?? [];
-      const services = res.services ?? [];
-      const assignGroups = res.assignGroups ?? [];
       const assignments = res.assignments ?? [];
 
       const result = this.buildTimeline(res.timeline, res.timelineAssignees);
@@ -135,10 +150,13 @@ export class ReportDetail {
         subject: ticket.subject,
         description: ticket.description,
         ticketType: ticket.ticket_type_name_th,
+        ticketTypeId: ticket.ticket_type_id,
         status: ticket.IT_Status,
         priority: ticket.priority,
         source: ticket.source,
         createdDate: new Date(ticket.created_at).toISOString(),
+        elapsed_time: ticket.elapsed_time,
+        viaEmail: ticket.is_from_email,
         requesterCode: ticket.requester_code,
         requesterAduser: ticket.requester_aduser,
         requesterName: ticket.requester_name,
@@ -149,7 +167,13 @@ export class ReportDetail {
         requesterPhone: ticket.contact_phone,
         requesterColor: ticketTypyColor.getColor(ticket.ticket_type_id),
         attachments: attachments ?? [],
-        itNotes: ticket.requester_code === 'OTD01050',
+        itAttachments: convertedItFiles ?? [],
+        services: res.services ?? [],
+        requester: res.requester,
+        rejection_reason: ticket.rejection_reason,
+        user_status: ticket.user_status,
+        repair_cost_type: ticket.repair_cost_type,
+        itNotes: res.replies ?? [],
         assignments: assignments ?? [],
         assignTimeline: result ?? [],
       };
@@ -211,8 +235,8 @@ export class ReportDetail {
   viewFile(file: any) {
     this.previewFiles.set([
       {
-        fileName: file.fileName,
-        date: dayjs().format('DD/MM/YYYY HH:mm'),
+        fileName: file.name ?? file.fileName,
+        date: file.createdDate ?? dayjs().format('DD/MM/YYYY HH:mm'),
         url: file.filePath,
         type: file.type || 'image/png',
       },
@@ -222,6 +246,29 @@ export class ReportDetail {
 
   closePreview() {
     this.isPreviewModalOpen.set(false);
+  }
+
+  openAttachmentManager(): void {
+    this.isAttachmentManagerOpen.set(true);
+  }
+
+  closeAttachmentManager(): void {
+    this.isAttachmentManagerOpen.set(false);
+  }
+
+  viewManagedAttachment(event: { file: any; source: 'user' | 'it' }): void {
+    const ticket = this.selectedTicket();
+    const sourceFiles = event.source === 'it' ? ticket?.itAttachments ?? [] : ticket?.attachments ?? [];
+    const files = [event.file, ...sourceFiles.filter((file: any) => file !== event.file)];
+    this.previewFiles.set(
+      files.map((file: any) => ({
+        fileName: file.name ?? file.fileName,
+        date: file.createdDate ?? dayjs().format('DD/MM/YYYY HH:mm'),
+        url: file.filePath,
+        type: file.type ?? 'application/octet-stream',
+      })),
+    );
+    this.isPreviewModalOpen.set(true);
   }
 
   buildTimeline(timelines: any[], assignees: any[]) {
