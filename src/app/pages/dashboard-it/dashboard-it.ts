@@ -1517,10 +1517,7 @@ export class DashboardIT implements OnInit {
       const previousTicket = ticketElement.previousElementSibling as HTMLElement | null;
       const secondPositionOffset = previousTicket?.offsetHeight ?? 0;
       const targetTop =
-        container.scrollTop +
-        ticketRect.top -
-        containerRect.top -
-        secondPositionOffset;
+        container.scrollTop + ticketRect.top - containerRect.top - secondPositionOffset;
       container.scrollTo({ top: Math.max(0, targetTop), behavior: 'smooth' });
       return;
     }

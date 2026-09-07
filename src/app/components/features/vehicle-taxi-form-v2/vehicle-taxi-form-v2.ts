@@ -24,12 +24,22 @@ import { SwalService } from '../../../services/swal.service';
 import { finalize, of, switchMap } from 'rxjs';
 import { mapTaxiClaimDetail, TaxiClaimDetailResponse } from '../../../interfaces/taxi.interface';
 import { ApprovalStep, ApprovalStepsComponent } from '../../shared/approval-steps/approval-steps';
-import { FilePreviewItem, FilePreviewModalComponent } from '../../modals/file-preview-modal/file-preview-modal';
+import {
+  FilePreviewItem,
+  FilePreviewModalComponent,
+} from '../../modals/file-preview-modal/file-preview-modal';
 
 @Component({
   selector: 'app-vehicle-taxi-form-v2',
   standalone: true,
-  imports: [CommonModule, FormsModule, NzSelectModule, FileUploadModal, ApprovalStepsComponent, FilePreviewModalComponent],
+  imports: [
+    CommonModule,
+    FormsModule,
+    NzSelectModule,
+    FileUploadModal,
+    ApprovalStepsComponent,
+    FilePreviewModalComponent,
+  ],
   templateUrl: './vehicle-taxi-form-v2.html',
   styleUrl: './vehicle-taxi-form-v2.scss',
 })
@@ -143,9 +153,9 @@ export class VehicleTaxiFormV2Component implements OnInit, OnChanges {
   get approvalSteps(): ApprovalStep[] {
     const hrHasAction = Boolean(
       this.requests?.hrApproveBy ??
-        this.requests?.hr_approve_by ??
-        this.requests?.hrApproveDate ??
-        this.requests?.hr_approve_date,
+      this.requests?.hr_approve_by ??
+      this.requests?.hrApproveDate ??
+      this.requests?.hr_approve_date,
     );
     const rejectedByHead = this.isRejectedClaim && !hrHasAction;
     const rejectedByHr = this.isRejectedClaim && hrHasAction;

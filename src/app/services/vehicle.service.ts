@@ -114,7 +114,9 @@ export class VehicleService {
 
   /** GET api/transport-claim/policy-texts */
   getPolicyTexts(): Observable<VehiclePolicyTextsResponse> {
-    return this._http.get<VehiclePolicyTextsResponse>(`${this.baseUrl}/transport-claim/policy-texts`);
+    return this._http.get<VehiclePolicyTextsResponse>(
+      `${this.baseUrl}/transport-claim/policy-texts`,
+    );
   }
 
   getVehicleByEmpcode(year: string, month: string): Observable<any> {

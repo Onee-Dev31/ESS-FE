@@ -23,7 +23,9 @@
         }
         @if (showActionBadges && step.state === 'sendback') {
           <span class="status-badge status-referred">Sendback</span>
-        } @else if (showActionBadges && step.state === 'rejected' && (!hideFirstStepActionBadge || $index > 0)) {
+        } @else if (
+          showActionBadges && step.state === 'rejected' && (!hideFirstStepActionBadge || $index > 0)
+        ) {
           <span class="status-badge status-rejected">Rejected</span>
         } @else if (showCompletedActionBadges && step.state === 'completed' && $index > 0) {
           <span class="status-badge status-approved">Approved</span>
@@ -47,7 +49,7 @@
             }
             @if (showActionBadges) {
               <span class="reason-status">
-              {{ step.state === 'sendback' ? 'Sendback' : 'Rejected' }}
+                {{ step.state === 'sendback' ? 'Sendback' : 'Rejected' }}
               </span>
             }
           </div>
