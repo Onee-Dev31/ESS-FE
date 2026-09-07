@@ -305,7 +305,7 @@ $border-color: var(--border-color);
 
     tbody {
       tr {
-        cursor: pointer;
+        cursor: default;
       }
     }
 
@@ -329,6 +329,11 @@ $border-color: var(--border-color);
     .request-no {
       font-size: $font-size-label;
       color: $primary;
+    }
+
+    th.claim-count-column,
+    tbody td.claim-count-column {
+      text-align: left;
     }
 
     .trip-details-cell {
@@ -741,7 +746,8 @@ $border-color: var(--border-color);
 }
 
 .btn-edit-sm,
-.btn-icon.edit {
+.btn-icon.edit,
+.btn-icon.view {
   @include btn-secondary;
   padding: 8px 12px;
   font-size: 0.875rem;
@@ -834,57 +840,6 @@ select.form-control {
 // Pagination wrapper spacing
 .pagination-wrapper {
   margin-top: 24px;
-}
-
-// ============================================================
-// Status badge
-// ============================================================
-.status-badge {
-  padding: 4px 10px;
-  border-radius: 20px;
-  font-size: 0.75rem;
-  font-weight: 600;
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  white-space: nowrap;
-  border: 1px solid transparent;
-
-  &::before {
-    content: '';
-    display: block;
-    width: 5px;
-    height: 5px;
-    border-radius: 50%;
-    background: currentColor;
-  }
-
-  &.NEW,
-  &.WAITING_CHECK {
-    background: var(--status-new-bg);
-    color: var(--primary);
-    border-color: var(--primary);
-  }
-
-  &.PENDING_APPROVAL {
-    background: var(--status-warning-bg);
-    color: var(--status-warning-text);
-    border-color: var(--status-warning-text);
-  }
-
-  &.APPROVED,
-  &.VERIFIED {
-    background: var(--status-success-bg);
-    color: var(--status-success-text);
-    border-color: var(--status-success-text);
-  }
-
-  &.REJECTED,
-  &.CANCELLED {
-    background: var(--status-danger-bg);
-    color: var(--status-danger-text);
-    border-color: var(--status-danger-text);
-  }
 }
 
 .action-btns {

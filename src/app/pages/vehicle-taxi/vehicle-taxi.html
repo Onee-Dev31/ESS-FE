@@ -163,7 +163,7 @@
           <thead>
             <tr>
               <!-- <th>ประเภท</th> -->
-              <th>จำนวนรายการ</th>
+              <th class="claim-count-column">จำนวนรายการ</th>
               <th>รายละเอียดการเบิก</th>
               <th>จากที่ไหน</th>
               <th>ไปที่ไหน</th>
@@ -176,7 +176,7 @@
 
           <tbody>
             @for (claim of comps.paginatedData(); track trackByRowId($index, claim)) {
-              <tr (click)="openModal(claim.id)" title="คลิกเพื่อดูรายละเอียด">
+              <tr>
                 <!-- ประเภท -->
                 <!-- <td>
               <div class="type-badge">
@@ -190,7 +190,7 @@
             </td> -->
 
                 <!-- จำนวนรายการ -->
-                <td>
+                <td class="claim-count-column">
                   <div class="request-no">
                     <i class="fa-solid fa-tag"></i>
                     {{ claim.claimNo ?? claim.claimId }}
@@ -245,11 +245,11 @@
                 <!-- ข้อมูลเพิ่มเติม -->
                 <td style="text-align: center">
                   <div class="sub-text">
-                    {{ dateUtil.formatDateToBE(claim.createDate, 'DD MMMM YYYY') }}
+                    {{ dateUtil.formatDateToBE(claim.createDate, 'DD/MM/YYYY') }}
                   </div>
                 </td>
 
-                <td class="text-center" (click)="$event.stopPropagation()">
+                <td class="text-center">
                   @if (claim.status === 'New') {
                     <div class="action-btns">
                       <button class="btn-icon edit" (click)="openModal(claim.id)" title="แก้ไข">
@@ -259,6 +259,14 @@
                         <i class="far fa-trash-alt"></i>
                       </button>
                     </div>
+                  } @else {
+                    <button
+                      class="btn-icon view"
+                      (click)="openModal(claim.id)"
+                      title="ดูรายละเอียด"
+                    >
+                      <i class="far fa-eye"></i>
+                    </button>
                   }
                 </td>
               </tr>
