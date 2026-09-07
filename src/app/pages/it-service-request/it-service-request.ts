@@ -697,7 +697,7 @@ export class ITServiceRequestComponent implements OnInit {
                 () => this.signalrService.recentlySubmittedTickets.delete(res.ticketNumber),
                 10000,
               );
-              this.signalrService.ticketApprovalNotify(codeEmpId, res.ticketNumber);
+              // this.signalrService.ticketApprovalNotify(codeEmpId, res.ticketNumber);
             }
             this.swalService.success('ส่งคำขอเรียบร้อยแล้ว', res.ticketNumber).then(() => {
               this.router.navigate(['/it-service-list']);
