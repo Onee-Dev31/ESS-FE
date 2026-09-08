@@ -88,8 +88,9 @@ export class ResignReport {
   filterCompany = signal<any>(null);
   filterDepartment = signal<any>(null);
   filterMonth = signal<string>('');
-  yearFrom = signal<number>(this.currentYear);
-  yearTo = signal<number>(this.currentYear);
+  // API ต้องการช่วงวันที่เต็ม ไม่ใช่เฉพาะเลขปี
+  yearFrom = signal<string>(`${this.currentYear}-01-01`);
+  yearTo = signal<string>(`${this.currentYear}-12-31`);
   yearRange = signal<Date[]>([
     new Date(this.currentYear, 0, 1),
     new Date(this.currentYear, 11, 31),
@@ -618,8 +619,8 @@ export class ResignReport {
     if (!range?.[0] || !range?.[1]) return;
 
     this.yearRange.set(range);
-    this.yearFrom.set(range[0].getFullYear());
-    this.yearTo.set(range[1].getFullYear());
+    this.yearFrom.set(dayjs(range[0]).format('YYYY-MM-DD'));
+    this.yearTo.set(dayjs(range[1]).format('YYYY-MM-DD'));
   }
 
   applyFilter() {
@@ -685,8 +686,8 @@ export class ResignReport {
       costCent: department?.COSTCENT,
       empStatus: status,
       adExpiredDate: this.status === 'true' ? 'true' : 'false',
-      yearFrom: this.yearFrom(),
-      yearTo: this.yearTo(),
+      startDate: this.yearFrom(),
+      endDate: this.yearTo(),
     });
 
     // return this.resignService.getEmployee({

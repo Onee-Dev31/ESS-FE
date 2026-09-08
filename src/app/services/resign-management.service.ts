@@ -75,8 +75,8 @@ export class ResignManagementService {
     costCent?: any;
     empStatus?: string;
     adExpiredDate?: string;
-    yearFrom?: number;
-    yearTo?: number;
+    startDate?: string;
+    endDate?: string;
   }): Observable<any> {
     const queryParams: any = {};
 
@@ -87,8 +87,8 @@ export class ResignManagementService {
     if (params.costCent) queryParams.costCent = params.costCent;
     if (params.empStatus) queryParams.empStatus = params.empStatus;
     if (params.adExpiredDate === 'true') queryParams.adExpiredDate = params.adExpiredDate;
-    if (params.yearFrom) queryParams.yearFrom = params.yearFrom;
-    if (params.yearTo) queryParams.yearTo = params.yearTo;
+    if (params.startDate) queryParams.startDate = params.startDate;
+    if (params.endDate) queryParams.endDate = params.endDate;
 
     // const headers = new HttpHeaders({
     //   'Authorization': `Bearer ${this.authservice.allData().accessToken}`,
