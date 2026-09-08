@@ -1,4 +1,13 @@
-import { Component, Input, Output, EventEmitter, inject, signal } from '@angular/core';
+import {
+  Component,
+  Input,
+  Output,
+  EventEmitter,
+  inject,
+  signal,
+  OnChanges,
+  SimpleChanges,
+} from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { ToastService } from '../../../services/toast';
@@ -29,7 +38,7 @@ import { formatFileSize } from '../../../utils/file-size.util';
   templateUrl: './it-request-detail-modal.html',
   styleUrl: './it-request-detail-modal.scss',
 })
-export class ItRequestDetailModal {
+export class ItRequestDetailModal implements OnChanges {
   private approvalsHelper = inject(ApprovalsHelperService);
   private toastService = inject(ToastService);
   private authService = inject(AuthService);
@@ -56,6 +65,12 @@ export class ItRequestDetailModal {
 
   private dialogService = inject(DialogService);
   currentAction = signal<'Rejected' | 'Referred Back' | null>(null);
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['approvalItem']) {
+      console.log('[ItRequestDetailModal] approvalItem:', this.approvalItem);
+    }
+  }
 
   get canShowActions(): boolean {
     return this.approvalItem.status === 'Pending';
