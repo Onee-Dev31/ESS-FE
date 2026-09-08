@@ -3,8 +3,14 @@
 } @else {
   <div class="page">
     <div class="content-card resign">
-      <div class="card-header-title">
+      <!-- <div class="card-header-title">
         รายงานรายชื่อพนักงาน{{ type === 'fulltime' ? 'ประจำ' : 'ฟรีแลนซ์' }}ลาออก
+        <button class="btn-export" (click)="exportData()">
+          <i class="fa-solid fa-arrow-up-from-bracket"></i>export
+        </button>
+      </div> -->
+      <div class="card-header-title">
+        รายงานรายชื่อพนักงานที่ลาออก
         <button class="btn-export" (click)="exportData()">
           <i class="fa-solid fa-arrow-up-from-bracket"></i>export
         </button>

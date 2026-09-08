@@ -190,10 +190,21 @@
     [editable]="t.status === 'Waiting you'"
     [alertMessage]="t.status === 'Waiting you' ? t.title : ''"
     [serviceLimit]="isSmallMobile ? 1 : isMobile ? 2 : 3"
-    (attachmentClick)="openAllAttachments($event)"
+    (attachmentClick)="openAttachmentManager()"
     (servicesClick)="showAll($event)"
     (descriptionChange)="t.description = $event"
     (detailClick)="openDetail(t.description)"
+  />
+
+  <app-ticket-attachment-manager
+    *ngIf="isAttachmentManagerOpen()"
+    [userFiles]="t.attachments"
+    [itFiles]="t.itAttachments ?? []"
+    [canAddUserFiles]="t.status === 'Waiting you'"
+    (onSaveFiles)="addAttachmentFiles($event)"
+    (onViewFile)="viewManagedAttachment($event)"
+    (onRemoveNewFile)="removeNewManagedAttachment($event)"
+    (onClose)="closeAttachmentManager()"
   />
 
   <!-- REASON [Denied] -->
@@ -216,32 +227,25 @@
   <section class="tk-card waiting-attachments" *ngIf="t.status === 'Waiting you'">
     <div class="tk-card__head">
       <div class="tk-card__title">เอกสารแนบ</div>
-      <div>
-        <input type="file" multiple hidden #fileInput (change)="onFileSelected($event)" />
-        <button type="button" class="btn-attach" (click)="fileInput.click()">
-          <i class="fas fa-paperclip"></i> แนบไฟล์
-        </button>
-      </div>
+      <button type="button" class="btn-view-all" (click)="openAttachmentManager()">
+        ดูทั้งหมด <i class="fas fa-chevron-right"></i>
+      </button>
     </div>
     <div class="tk-card__body">
-      <ul class="attachment-list" *ngIf="t.attachments.length > 0; else noAttachments">
-        <li *ngFor="let file of t.attachments" class="attachment-item" (click)="viewFile(file)">
-          <div class="file-icon-box"><i class="far fa-file-alt"></i></div>
-          <span class="file-name">{{ file.name }}</span>
-          <!-- *ngIf="t.status_user === 'Pending'" -->
-          <button
-            *ngIf="t.status === 'Waiting you'"
-            type="button"
-            class="btn-close"
-            (click)="removeAttachment(file); $event.stopPropagation()"
-          >
-            <i class="fa-solid fa-xmark"></i>
-          </button>
-        </li>
-      </ul>
-      <ng-template #noAttachments>
-        <p class="text-muted">ไม่มีเอกสารแนบ</p>
-      </ng-template>
+      <button type="button" class="attachment-manager-trigger" (click)="openAttachmentManager()">
+        <i class="fas fa-folder-open"></i>
+        <span>
+          <strong>จัดการเอกสารแนบ</strong>
+          <small>
+            ดูเอกสารแนบและเอกสารจาก IT หรือแนบไฟล์เพิ่ม
+            @if (getNewAttachmentCount(t)) {
+              <b class="new-attachment-hint">• มีไฟล์ใหม่ {{ getNewAttachmentCount(t) }} ไฟล์</b>
+            }
+          </small>
+        </span>
+        <em>{{ t.attachments.length + (t.itAttachments?.length ?? 0) }} ไฟล์</em>
+        <i class="fas fa-chevron-right"></i>
+      </button>
     </div>
   </section>
 

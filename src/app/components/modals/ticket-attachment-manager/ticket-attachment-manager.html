@@ -1,0 +1,80 @@
+<app-modal-shell
+  title="รายการไฟล์แนบ"
+  size="xl"
+  width="900px"
+  [padded]="false"
+  [showFooter]="canAddUserFiles"
+  [mobileFullscreen]="true"
+  [closeOnBackdrop]="false"
+  [closeOnEscape]="false"
+  (closeModal)="onClose.emit()"
+>
+  <div class="attachment-manager__body">
+    <nav>
+      <button
+        type="button"
+        [class.active]="activeSource === 'user'"
+        (click)="activeSource = 'user'"
+      >
+        <i class="fas fa-paperclip"></i> เอกสารแนบทั้งหมด
+        <span>{{ userFiles.length }}</span>
+      </button>
+      <button type="button" [class.active]="activeSource === 'it'" (click)="activeSource = 'it'">
+        <i class="fas fa-laptop"></i> เอกสารจาก IT
+        <span>{{ itFiles.length }}</span>
+      </button>
+    </nav>
+
+    <main>
+      <div class="source-title">
+        <h4>{{ activeSource === 'user' ? 'เอกสารแนบของผู้ใช้ทั้งหมด' : 'เอกสารจาก IT' }}</h4>
+        @if (activeSource === 'user' && canAddUserFiles) {
+          <label class="btn-add-file">
+            <i class="fas fa-paperclip"></i> แนบไฟล์เพิ่ม
+            <input type="file" multiple hidden (change)="onFileSelected($event)" />
+          </label>
+        }
+      </div>
+
+      @if (files.length) {
+        <div class="file-rows">
+          @for (file of files; track $index) {
+            <div class="file-entry">
+              <button
+                type="button"
+                class="file-row"
+                (click)="onViewFile.emit({ file, source: activeSource })"
+              >
+                <i class="far fa-file-alt"></i>
+                <span>{{ fileName(file) }}</span>
+                <i class="far fa-eye"></i>
+              </button>
+              @if (activeSource === 'user' && file.isNew) {
+                <button
+                  type="button"
+                  class="btn-remove-new"
+                  (click)="removeNewFile(file)"
+                  title="ลบไฟล์"
+                >
+                  <i class="fas fa-times"></i>
+                </button>
+              }
+            </div>
+          }
+        </div>
+      } @else {
+        <div class="empty-files"><i class="far fa-folder-open"></i> ไม่มีเอกสารในหมวดนี้</div>
+      }
+    </main>
+  </div>
+  <div modalFooter class="attachment-manager-footer">
+    <button
+      type="button"
+      class="btn-save"
+      [disabled]="!pendingFiles.length && !pendingRemovedFiles.length"
+      (click)="saveFiles()"
+    >
+      บันทึกไฟล์แนบ
+    </button>
+  </div>
+</app-modal-shell>

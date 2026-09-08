@@ -114,7 +114,9 @@
               <th>Last Date</th>
               <th>Effective Date</th>
               <th>Aduser</th>
-              <th>Expire Date</th>
+              @if (activeTab !== 'waiting') {
+                <th>Expire Date</th>
+              }
               <th class="text-center actions-col">
                 @if (activeTab === 'waiting') {
                   <button class="btn-approve" (click)="approve('Employee')">
@@ -170,11 +172,13 @@
                   {{ dataUtil.formatDateToBE(emp.effectiveDate, 'DD/MM/YYYY') }}
                 </td>
                 <td class="col-company">{{ emp.adUser }}</td>
-                <td class="col-expire">
-                  <div *ngIf="emp.expireDate" class="detail">
-                    {{ dataUtil.formatDateToBE(emp.expireDate, 'DD/MM/YYYY') }}
-                  </div>
-                </td>
+                @if (activeTab !== 'waiting') {
+                  <td class="col-expire">
+                    <div *ngIf="emp.expireDate" class="detail">
+                      {{ dataUtil.formatDateToBE(emp.expireDate, 'DD/MM/YYYY') }}
+                    </div>
+                  </td>
+                }
                 <td class="col-action">
                   <div class="Info-delete">
                     <button class="btn-ghost" (click)="onView(emp)">
@@ -190,7 +194,7 @@
           } @empty {
             <tbody>
               <tr>
-                <td [attr.colspan]="activeTab === 'waiting' ? 10 : 9" class="no-data-cell">
+                <td [attr.colspan]="9" class="no-data-cell">
                   <app-empty-state
                     title="ไม่พบข้อมูล"
                     description="ไม่พบรายชื่อพนักงานฟรีแลนซ์"
@@ -291,7 +295,9 @@
               <th>Last Date</th>
               <th>Effective Date</th>
               <th>Aduser</th>
-              <th>Expire Date</th>
+              @if (activeTab !== 'waiting') {
+                <th>Expire Date</th>
+              }
               <th class="text-center actions-col">
                 @if (activeTab === 'waiting') {
                   <button class="btn-approve" (click)="approve('Freelance')">
@@ -347,11 +353,13 @@
                   {{ dataUtil.formatDateToBE(emp.effectiveDate, 'DD/MM/YYYY') }}
                 </td>
                 <td class="col-company">{{ emp.adUser }}</td>
-                <td class="col-expire">
-                  <div *ngIf="emp.expireDate" class="detail">
-                    {{ dataUtil.formatDateToBE(emp.expireDate, 'DD/MM/YYYY') }}
-                  </div>
-                </td>
+                @if (activeTab !== 'waiting') {
+                  <td class="col-expire">
+                    <div *ngIf="emp.expireDate" class="detail">
+                      {{ dataUtil.formatDateToBE(emp.expireDate, 'DD/MM/YYYY') }}
+                    </div>
+                  </td>
+                }
                 <td class="col-action">
                   <div class="Info-delete">
                     <button class="btn-ghost" (click)="onView(emp)">
@@ -364,7 +372,7 @@
           } @empty {
             <tbody>
               <tr>
-                <td [attr.colspan]="activeTab === 'waiting' ? 10 : 9" class="no-data-cell">
+                <td [attr.colspan]="9" class="no-data-cell">
                   <app-empty-state
                     title="ไม่พบข้อมูล"
                     description="ไม่พบรายชื่อพนักงานฟรีแลนซ์"
