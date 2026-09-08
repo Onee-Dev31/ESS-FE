@@ -1703,7 +1703,7 @@ export class DashboardIT implements OnInit {
 
     console.log('formData', [...formData.entries()]);
 
-    return this.itServiceService.updateTicket(ticketId, formData);
+    return this.itServiceService.updateTicketV2(ticketId, formData);
   }
 
   get currentActions() {
@@ -2182,15 +2182,8 @@ export class DashboardIT implements OnInit {
 
         this.swalService.success(res.message || 'บันทึกสำเร็จ');
 
-        const adUsers = data.assignees.map((x: any) => x.adUser).filter((ad: any) => !!ad);
-        setTimeout(() => {
-          this.signalrService.assignNotify(ticketId, adUsers).subscribe({
-            error: () => this.msg.error('ไม่สามารถส่ง Notification ให้ผู้รับผิดชอบได้'),
-          });
-        }, 500);
-
-        // ส่ง TicketStatusChanged ให้ employee เพื่อ refresh progress (silent — ไม่มี toast)
-        this.signalrService.ticketStatusNotify(ticketId, ticket?.requesterAduser ?? '', 'Assigned');
+        // backend (approveV2) ส่ง noti ให้ assignee + requester เองแล้ว ไม่ต้องยิง
+        // assignNotify/ticketStatusNotify จาก frontend อีก
 
         this.selectTicket(res.ticketId || ticketId);
         this.getAllTickets();
