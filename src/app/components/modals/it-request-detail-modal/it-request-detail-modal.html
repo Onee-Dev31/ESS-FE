@@ -62,14 +62,22 @@
       </div>
 
       <!-- Section 3: ระบบที่เลือก (Selected Systems) ถ้าเป็น "ขอใช้ระบบ" -->
-      <div class="info-section" *ngIf="approvalItem.originalData?.ticketTypeId === 3">
+      <div
+        class="info-section"
+        *ngIf="
+          approvalItem.originalData?.ticketTypeId === 3 &&
+          (approvalItem.originalData?.main?.length > 0 ||
+            approvalItem.originalData?.basic?.length > 0 ||
+            approvalItem.originalData?.specific?.length > 0)
+        "
+      >
         <div class="section-header">
           <i class="fas fa-desktop"></i> ระบบที่เลือก (Selected Systems)
         </div>
 
         <div class="section-content">
           <!-- Main Systems -->
-          <div class="info-row" *ngIf="approvalItem.originalData?.main?.length">
+          <div class="info-row" *ngIf="approvalItem.originalData?.main?.length > 0">
             <div class="info-label align-top">Main Systems</div>
             <div class="info-value">
               <ul class="system-list">
@@ -81,7 +89,7 @@
           </div>
 
           <!-- Basic Systems -->
-          <div class="info-row" *ngIf="approvalItem.originalData?.basic?.length">
+          <div class="info-row" *ngIf="approvalItem.originalData?.basic?.length > 0">
             <div class="info-label align-top">Basic Systems</div>
             <div class="info-value">
               <ul class="system-list">
@@ -93,7 +101,7 @@
           </div>
 
           <!-- Specific Systems -->
-          <div class="info-row" *ngIf="approvalItem.originalData?.specific?.length">
+          <div class="info-row" *ngIf="approvalItem.originalData?.specific?.length > 0">
             <div class="info-label align-top">Specific Systems</div>
             <div class="info-value">
               <ul class="system-list">
