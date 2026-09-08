@@ -686,8 +686,8 @@ export class ResignReport {
       costCent: department?.COSTCENT,
       empStatus: status,
       adExpiredDate: this.status === 'true' ? 'true' : 'false',
-      startDate: this.yearFrom(),
-      endDate: this.yearTo(),
+      dateFrom: this.yearFrom(),
+      dateTo: this.yearTo(),
     });
 
     // return this.resignService.getEmployee({
