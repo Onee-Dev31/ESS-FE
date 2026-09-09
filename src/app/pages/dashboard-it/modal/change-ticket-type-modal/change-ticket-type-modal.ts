@@ -204,6 +204,10 @@ export class ChangeTicketTypeModal implements OnChanges, OnDestroy {
       this.showAttachmentError = true;
       return;
     }
+    if (!this.reason.trim()) {
+      this.showReasonError = true;
+      return;
+    }
 
     this.submitModal.emit({
       ticketTypeId: this.selectedTypeId,
