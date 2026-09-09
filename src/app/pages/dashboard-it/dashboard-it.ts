@@ -397,6 +397,7 @@ export class DashboardIT implements OnInit {
   }
   private initialized = false;
   IS_DENY_TICKET = signal(false);
+  IS_HOLD_TICKET = signal(false);
   IS_CLOSE_TICKET = signal(false);
   IS_CHANGE_TICKET_TYPE = signal(false);
   IS_ONHOLD_TICKET = signal(false);
@@ -632,15 +633,18 @@ export class DashboardIT implements OnInit {
           (f: any) =>
             !f.reply_id &&
             !['from it', 'จาก it'].includes(
-              String(f.file_description ?? '').trim().toLowerCase(),
+              String(f.file_description ?? '')
+                .trim()
+                .toLowerCase(),
             ),
         ) || [];
       const itAttachments =
-        res.attachments?.filter(
-          (f: any) =>
-            ['from it', 'จาก it'].includes(
-              String(f.file_description ?? '').trim().toLowerCase(),
-            ),
+        res.attachments?.filter((f: any) =>
+          ['from it', 'จาก it'].includes(
+            String(f.file_description ?? '')
+              .trim()
+              .toLowerCase(),
+          ),
         ) || [];
       const replyAttachments = res.attachments?.filter((f: any) => f.reply_id) || [];
       const convertedFiles = await this.fileConverter.convertUrlsToFiles(ticketAttachments);
@@ -1211,9 +1215,7 @@ export class DashboardIT implements OnInit {
       files.map((attachment) => ({
         fileName: attachment.name || attachment.fileName,
         date: dayjs().format('DD/MM/YYYY HH:mm'),
-        url: attachment.file
-          ? URL.createObjectURL(attachment.file)
-          : attachment.filePath || '',
+        url: attachment.file ? URL.createObjectURL(attachment.file) : attachment.filePath || '',
         type: attachment.file?.type || attachment.type || 'application/octet-stream',
       })),
     );
@@ -1271,7 +1273,8 @@ export class DashboardIT implements OnInit {
 
   viewManagedAttachment(event: { file: any; source: 'user' | 'it' }): void {
     const ticket = this.selectedTicket();
-    const sourceFiles = event.source === 'it' ? (ticket?.itAttachments ?? []) : (ticket?.attachments ?? []);
+    const sourceFiles =
+      event.source === 'it' ? (ticket?.itAttachments ?? []) : (ticket?.attachments ?? []);
     this.openAllAttachments(sourceFiles, Math.max(0, sourceFiles.indexOf(event.file)));
   }
 
@@ -1849,56 +1852,49 @@ export class DashboardIT implements OnInit {
 
   // -- onHold --
   onHoldTicket() {
-    this.checkBeforeAction(() => {
-      this.swalService.promptReason('ยืนยันการหยุดชั่วคราว (On Hold)').then((result) => {
-        if (!result.isConfirmed) return;
+    this.checkBeforeAction(() => this.IS_HOLD_TICKET.set(true));
+  }
 
-        const reason = result.value?.trim() || undefined;
+  closeHoldModal() {
+    this.IS_HOLD_TICKET.set(false);
+  }
 
-        const ticket = this.selectedTicket();
-        const ticketId = ticket?.ticketId;
+  submitHold(data: { reason: string }) {
+    const reason = data.reason?.trim() || undefined;
+    this.closeHoldModal();
+    const ticket = this.selectedTicket();
+    const ticketId = ticket?.ticketId;
 
-        if (!ticketId) {
-          this.msg.warning('ไม่พบ Ticket');
+    if (!ticketId) {
+      this.msg.warning('ไม่พบ Ticket');
+      return;
+    }
+
+    this.swalService.loading('กำลังบันทึกข้อมูล...');
+
+    this.updateTicket('onhold', ticketId, '', null, null, undefined, undefined, reason).subscribe({
+      next: (res) => {
+        if (!res?.success) {
+          this.swalService.warning('ไม่สามารถบันทึกข้อมูลได้');
           return;
         }
 
-        this.swalService.loading('กำลังบันทึกข้อมูล...');
+        this.swalService.success(res.message || 'บันทึกสำเร็จ');
 
-        this.updateTicket(
-          'onhold',
-          ticketId,
-          '',
-          null,
-          null,
-          undefined,
-          undefined,
-          reason,
-        ).subscribe({
-          next: (res) => {
-            if (!res?.success) {
-              this.swalService.warning('ไม่สามารถบันทึกข้อมูลได้');
-              return;
-            }
+        this.signalrService.ticketStatusNotify(ticketId, ticket?.requesterAduser ?? '', 'Hold');
 
-            this.swalService.success(res.message || 'บันทึกสำเร็จ');
+        this.selectTicket(ticketId);
+        this.getAllTickets();
+      },
 
-            this.signalrService.ticketStatusNotify(ticketId, ticket?.requesterAduser ?? '', 'Hold');
+      error: (error) => {
+        console.error('Acknowledge Ticket Error:', error);
 
-            this.selectTicket(ticketId);
-            this.getAllTickets();
-          },
-
-          error: (error) => {
-            console.error('Acknowledge Ticket Error:', error);
-
-            this.swalService.warning(
-              'เกิดข้อผิดพลาด',
-              error?.message || 'ไม่สามารถติดต่อเซิร์ฟเวอร์ได้',
-            );
-          },
-        });
-      });
+        this.swalService.warning(
+          'เกิดข้อผิดพลาด',
+          error?.message || 'ไม่สามารถติดต่อเซิร์ฟเวอร์ได้',
+        );
+      },
     });
   }
 

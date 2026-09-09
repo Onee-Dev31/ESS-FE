@@ -73,6 +73,7 @@ export class ReportDetail {
   queryId: string = '';
 
   IS_DENY_TICKET = signal(false);
+  IS_HOLD_TICKET = signal(false);
   IS_ONHOLD_TICKET = signal(false);
   IS_ACKNOWLEDGE_TICKET = signal(false);
   IS_NOTE_TICKET = signal(false);
@@ -116,7 +117,11 @@ export class ReportDetail {
     this.getTicketById(this.queryId).subscribe(async (res: any) => {
       const rawAttachments = res.attachments ?? [];
       const isItAttachment = (file: any) =>
-        ['from it', 'จาก it'].includes(String(file.file_description ?? '').trim().toLowerCase());
+        ['from it', 'จาก it'].includes(
+          String(file.file_description ?? '')
+            .trim()
+            .toLowerCase(),
+        );
       const convertAttachments = (files: any[]) =>
         Promise.all(
           files.map((f: any) =>
@@ -258,7 +263,8 @@ export class ReportDetail {
 
   viewManagedAttachment(event: { file: any; source: 'user' | 'it' }): void {
     const ticket = this.selectedTicket();
-    const sourceFiles = event.source === 'it' ? ticket?.itAttachments ?? [] : ticket?.attachments ?? [];
+    const sourceFiles =
+      event.source === 'it' ? (ticket?.itAttachments ?? []) : (ticket?.attachments ?? []);
     const files = [event.file, ...sourceFiles.filter((file: any) => file !== event.file)];
     this.previewFiles.set(
       files.map((file: any) => ({
@@ -514,44 +520,46 @@ export class ReportDetail {
   // -- deny --
 
   onHoldTicket() {
-    this.swalService.promptReason('ยืนยันการหยุดชั่วคราว (On Hold)').then((result) => {
-      if (!result.isConfirmed) return;
+    this.IS_HOLD_TICKET.set(true);
+  }
 
-      const reason = result.value?.trim() || undefined;
+  closeHoldModal() {
+    this.IS_HOLD_TICKET.set(false);
+  }
 
-      const ticket = this.selectedTicket();
-      const ticketId = ticket?.ticketId;
+  submitHold(data: { reason: string }) {
+    const reason = data.reason?.trim() || undefined;
+    this.closeHoldModal();
+    const ticket = this.selectedTicket();
+    const ticketId = ticket?.ticketId;
 
-      if (!ticketId) {
-        this.swalService.warning('ไม่พบ Ticket');
-        return;
-      }
+    if (!ticketId) {
+      this.swalService.warning('ไม่พบ Ticket');
+      return;
+    }
 
-      this.swalService.loading('กำลังบันทึกข้อมูล...');
+    this.swalService.loading('กำลังบันทึกข้อมูล...');
 
-      this.updateTicket('onhold', ticketId, '', null, null, undefined, undefined, reason).subscribe(
-        {
-          next: (res) => {
-            if (!res?.success) {
-              this.swalService.warning('ไม่สามารถบันทึกข้อมูลได้');
-              return;
-            }
+    this.updateTicket('onhold', ticketId, '', null, null, undefined, undefined, reason).subscribe({
+      next: (res) => {
+        if (!res?.success) {
+          this.swalService.warning('ไม่สามารถบันทึกข้อมูลได้');
+          return;
+        }
 
-            this.swalService.success(res.message || 'บันทึกสำเร็จ');
+        this.swalService.success(res.message || 'บันทึกสำเร็จ');
 
-            this.selectTicket();
-          },
+        this.selectTicket();
+      },
 
-          error: (error) => {
-            console.error('Acknowledge Ticket Error:', error);
+      error: (error) => {
+        console.error('Acknowledge Ticket Error:', error);
 
-            this.swalService.warning(
-              'เกิดข้อผิดพลาด',
-              error?.message || 'ไม่สามารถติดต่อเซิร์ฟเวอร์ได้',
-            );
-          },
-        },
-      );
+        this.swalService.warning(
+          'เกิดข้อผิดพลาด',
+          error?.message || 'ไม่สามารถติดต่อเซิร์ฟเวอร์ได้',
+        );
+      },
     });
   }
   resumeTicket() {
