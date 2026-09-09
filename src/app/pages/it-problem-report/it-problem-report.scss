@@ -1564,6 +1564,17 @@ $table-label-bg: var(--border-toolbar);
   }
 
   .file-item {
+    cursor: pointer;
+    text-align: left;
+    transition:
+      background-color 0.2s ease,
+      border-color 0.2s ease;
+
+    &:hover,
+    &:focus-visible {
+      background: var(--bg-card);
+      border-color: var(--primary);
+    }
     min-width: 0;
     display: flex;
     align-items: center;
@@ -1574,7 +1585,7 @@ $table-label-bg: var(--border-toolbar);
     border-radius: 8px;
 
     .file-icon {
-      color: var(--text-table-head);
+      color: var(--primary);
       font-size: $font-size-body;
     }
 
@@ -1588,12 +1599,18 @@ $table-label-bg: var(--border-toolbar);
     }
 
     .file-remove {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex: 0 0 24px;
+      width: 24px;
+      height: 24px;
       background: none;
       border: none;
       color: var(--text-muted);
       cursor: pointer;
-      padding: 2px 6px;
-      border-radius: 4px;
+      padding: 0;
+      border-radius: 50%;
       font-size: $font-size-label;
       transition:
         color 0.2s,

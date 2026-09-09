@@ -11,11 +11,21 @@
 .kpi-row {
   padding: 20px;
   display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
+  grid-template-columns: repeat(7, minmax(0, 1fr));
   gap: 14px;
 
   @include large-tablet {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    padding: 10px;
+    gap: 8px;
+
+    .kpi-value {
+      font-size: $font-size-title;
+    }
+
+    .kpi-delta {
+      font-size: $font-size-label;
+    }
   }
 
   @include tablet {

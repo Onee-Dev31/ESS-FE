@@ -386,7 +386,8 @@
       (close)="closeChat()"
       (submitMessage)="submitNote($event, { silent: true })"
       (attachmentView)="viewFile($event)"
-      (pendingAttachmentView)="viewFileChat($event)"
+      (imageGalleryView)="viewFile($event.file, $event.files)"
+      (pendingAttachmentView)="viewFileChat($event.file, $event.files)"
       (attachmentsOpen)="openChatAttachments(t)"
       (export)="exportChatHistory(t)"
     />
@@ -478,6 +479,18 @@
     />
   }
 
+  @if (IS_HOLD_TICKET()) {
+    <app-deny-modal
+      [ticket]="selectedTicket()"
+      title="เหตุผลในการหยุดชั่วคราว (On Hold)"
+      [reasonRequired]="false"
+      placeholder="กรอกเหตุผลในการหยุดชั่วคราว..."
+      validationMessage="กรุณากรอกเหตุผลในการหยุดชั่วคราว"
+      (closeModal)="closeHoldModal()"
+      (submitModal)="submitHold($event)"
+    />
+  }
+
   @if (IS_DENY_TICKET()) {
     <app-deny-modal
       [ticket]="selectedTicket()"
@@ -533,6 +546,7 @@
   @if (isPreviewModalOpen()) {
     <app-file-preview-modal
       [files]="previewFiles()"
+      [initialSelectedIndex]="previewSelectedIndex"
       (onClose)="closePreview()"
       (click)="$event.stopPropagation()"
     >

@@ -32,6 +32,7 @@ export class FilePreviewModalComponent implements OnInit {
   private cdr = inject(ChangeDetectorRef);
 
   @Input() files: FilePreviewItem[] = [];
+  @Input() initialSelectedIndex = 0;
   @Output() onClose = new EventEmitter<void>();
 
   selectedFile: FilePreviewItem | null = null;
@@ -45,7 +46,7 @@ export class FilePreviewModalComponent implements OnInit {
 
   ngOnInit() {
     if (this.files.length > 0) {
-      this.selectedFile = this.files[0];
+      this.selectedFile = this.files[this.initialSelectedIndex] ?? this.files[0];
       this.hasError = false;
     }
   }

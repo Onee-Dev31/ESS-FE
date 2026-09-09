@@ -1,18 +1,32 @@
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, inject, Input, OnChanges, Output } from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  inject,
+  Input,
+  OnChanges,
+  OnDestroy,
+  Output,
+  signal,
+} from '@angular/core';
+import dayjs from 'dayjs';
 import { FormsModule } from '@angular/forms';
 import { ModalShellComponent } from '../../../../components/shared/modal-shell/modal-shell';
 import { IT_ATTACHMENT_FILE_CONFIG } from '../../../../constants/it-attachment-file.constant';
 import { SwalService } from '../../../../services/swal.service';
+import {
+  FilePreviewItem,
+  FilePreviewModalComponent,
+} from '../../../../components/modals/file-preview-modal/file-preview-modal';
 
 @Component({
   selector: 'app-change-ticket-type-modal',
   standalone: true,
-  imports: [CommonModule, FormsModule, ModalShellComponent],
+  imports: [CommonModule, FormsModule, ModalShellComponent, FilePreviewModalComponent],
   templateUrl: './change-ticket-type-modal.html',
   styleUrl: './change-ticket-type-modal.scss',
 })
-export class ChangeTicketTypeModal implements OnChanges {
+export class ChangeTicketTypeModal implements OnChanges, OnDestroy {
   @Input() ticket: any;
   @Output() closeModal = new EventEmitter<void>();
   @Output() submitModal = new EventEmitter<{
@@ -63,8 +77,11 @@ export class ChangeTicketTypeModal implements OnChanges {
   attachments: { name: string; size: number; file: File }[] = [];
   showAttachmentError = false;
   showReasonError = false;
+  isPreviewModalOpen = signal(false);
+  previewFiles = signal<FilePreviewItem[]>([]);
 
   ngOnChanges(): void {
+    this.closePreview();
     this.selectedTypeId = Number(this.ticket?.ticketTypeId ?? this.ticket?.ticket_type_id ?? 2);
     this.originalTypeId = this.selectedTypeId;
     this.repairCostType =
@@ -92,6 +109,7 @@ export class ChangeTicketTypeModal implements OnChanges {
     if (this.isTypeChangeLocked) return;
     this.repairCostType = value;
     this.showAttachmentError = false;
+    this.showReasonError = false;
     if (value !== 'paid') this.attachments = [];
   }
 
@@ -103,12 +121,15 @@ export class ChangeTicketTypeModal implements OnChanges {
 
     const validFiles: { name: string; size: number; file: File }[] = [];
     const errors: string[] = [];
+    let hasFileLimitError = false;
 
     for (const file of files) {
-      const extension = file.name.split('.').pop()?.toLowerCase() ?? '';
       if (this.attachments.length + validFiles.length >= this.fileConfig.maxFiles) {
-        errors.push(`${file.name}: แนบได้สูงสุด ${this.fileConfig.maxFiles} ไฟล์`);
-      } else if (file.size > this.fileConfig.maxSizeMB * 1024 * 1024) {
+        hasFileLimitError = true;
+        continue;
+      }
+      const extension = file.name.split('.').pop()?.toLowerCase() ?? '';
+      if (file.size > this.fileConfig.maxSizeMB * 1024 * 1024) {
         errors.push(`${file.name}: ขนาดไฟล์เกิน ${this.fileConfig.maxSizeMB} MB`);
       } else if (
         !this.fileConfig.allowedTypes.includes(file.type) &&
@@ -122,6 +143,7 @@ export class ChangeTicketTypeModal implements OnChanges {
 
     this.attachments = [...this.attachments, ...validFiles];
     if (this.attachments.length) this.showAttachmentError = false;
+    if (hasFileLimitError) errors.unshift(`อัปโหลดได้สูงสุด ${this.fileConfig.maxFiles} ไฟล์`);
     if (errors.length) this.swalService.warning(errors.join('\n'));
   }
 
@@ -140,6 +162,31 @@ export class ChangeTicketTypeModal implements OnChanges {
 
   removeAttachment(index: number): void {
     this.attachments = this.attachments.filter((_, fileIndex) => fileIndex !== index);
+  }
+
+  previewAttachment(file: { name: string; size: number; file: File }): void {
+    this.closePreview();
+    this.previewFiles.set([
+      {
+        fileName: file.name,
+        date: dayjs().format('DD/MM/YYYY HH:mm'),
+        url: URL.createObjectURL(file.file),
+        type: file.file.type,
+      },
+    ]);
+    this.isPreviewModalOpen.set(true);
+  }
+
+  closePreview(): void {
+    this.isPreviewModalOpen.set(false);
+    for (const file of this.previewFiles()) {
+      if (file.url) URL.revokeObjectURL(file.url);
+    }
+    this.previewFiles.set([]);
+  }
+
+  ngOnDestroy(): void {
+    this.closePreview();
   }
 
   get canSubmit(): boolean {

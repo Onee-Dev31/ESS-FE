@@ -256,6 +256,7 @@
   grid-template-columns: 20px minmax(0, 1fr);
   gap: 8px;
   overflow-wrap: anywhere;
+  align-items: center;
 }
 .assignee-contact i {
   color: var(--primary);

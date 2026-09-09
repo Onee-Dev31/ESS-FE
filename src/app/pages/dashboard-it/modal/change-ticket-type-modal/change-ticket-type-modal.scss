@@ -53,6 +53,14 @@
   margin-top: 24px;
   margin-bottom: 8px;
 }
+.reason-label.required small {
+  display: none;
+}
+.reason-label.required::after {
+  content: '*';
+  margin-left: 3px;
+  color: var(--danger);
+}
 .repair-cost-card {
   margin: 20px -20px 0;
   padding: 20px;
@@ -127,33 +135,70 @@
 }
 
 .file-list {
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 8px;
   margin-top: 8px;
 }
 .file-chip {
-  display: inline-flex;
+  display: flex;
   align-items: center;
   gap: 7px;
-  max-width: 100%;
-  padding: 7px 10px;
-  border: 1px solid var(--border);
+  min-width: 0;
+  padding: 10px 12px;
+  cursor: pointer;
+  border: 1px solid var(--border-color);
   border-radius: 10px;
-  background: var(--bg-card);
+  background: var(--bg-slate);
   color: var(--text-sub);
   font-size: $font-size-hint;
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease;
+
+  &:hover {
+    background: var(--bg-card);
+    border-color: var(--primary);
+  }
+
+  > i {
+    color: var(--primary);
+  }
 
   span {
+    flex: 1;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
   }
   button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 24px;
+    height: 24px;
+    margin-left: auto;
+    padding: 0;
     border: 0;
+    border-radius: 50%;
     background: transparent;
     color: var(--text-muted);
     cursor: pointer;
+    transition:
+      color 0.2s,
+      background 0.2s;
+
+    &:hover {
+      color: var(--danger);
+      background: color-mix(in srgb, var(--danger), transparent 80%);
+    }
+  }
+}
+
+@media (max-width: 560px) {
+  .file-list {
+    grid-template-columns: 1fr;
   }
 }
 

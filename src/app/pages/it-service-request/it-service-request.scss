@@ -1578,6 +1578,9 @@ nz-select.form-input.ant-select-focused {
 
 .file-item,
 .summary-file-item {
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease;
   min-width: 0;
   border: 1px solid var(--border-color);
   border-radius: 10px;
@@ -1606,6 +1609,9 @@ nz-select.form-input.ant-select-focused {
   }
 
   .file-remove {
+    transition:
+      color 0.2s ease,
+      background-color 0.2s ease;
     width: 22px;
     height: 22px;
     border-radius: 999px;
@@ -1617,7 +1623,7 @@ nz-select.form-input.ant-select-focused {
 
     &:hover {
       color: var(--danger);
-      background: color-mix(in srgb, var(--danger), transparent 90%);
+      background: color-mix(in srgb, var(--danger), transparent 80%);
     }
   }
 

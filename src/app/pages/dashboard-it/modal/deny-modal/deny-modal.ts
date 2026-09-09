@@ -14,6 +14,7 @@ export class DenyModal {
   @Input() title = 'เหตุผลในการยกเลิก';
   @Input() placeholder = 'อธิบายรายละเอียด...';
   @Input() validationMessage = 'กรุณากรอกเหตุผลในการยกเลิก';
+  @Input() reasonRequired = true;
   @Output() submitModal = new EventEmitter<any>();
   @Output() closeModal = new EventEmitter<void>();
 

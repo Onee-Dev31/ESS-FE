@@ -159,7 +159,7 @@ export class ItService implements OnInit {
   @HostListener('document:click', ['$event'])
   onDocumentClick(event: MouseEvent) {
     if (!this.IS_CHAT_OPEN()) return;
-    if (this.ticketChat && !this.ticketChat.contains(event.target)) {
+    if (this.ticketChat?.isOutsideClick(event)) {
       this.closeChat();
     }
   }
@@ -206,6 +206,7 @@ export class ItService implements OnInit {
   isPreviewModalOpen = signal<boolean>(false);
   isRatingModalOpen = signal<boolean>(false);
   previewFiles = signal<FilePreviewItem[]>([]);
+  previewSelectedIndex = 0;
   isAttachmentManagerOpen = signal(false);
   isVisibleAssignee = signal<boolean>(false);
   selectedAssignee = signal<any | undefined>(undefined);
@@ -444,7 +445,8 @@ export class ItService implements OnInit {
       const ticketAttachments =
         res.attachments?.filter(
           (f: any) =>
-            !['from it'].includes(
+            !f.reply_id &&
+            !['from it', 'จาก it'].includes(
               String(f.file_description ?? '')
                 .trim()
                 .toLowerCase(),
@@ -452,7 +454,7 @@ export class ItService implements OnInit {
         ) || [];
       const itAttachments =
         res.attachments?.filter((f: any) =>
-          ['from it'].includes(
+          ['from it', 'จาก it'].includes(
             String(f.file_description ?? '')
               .trim()
               .toLowerCase(),
@@ -862,32 +864,23 @@ export class ItService implements OnInit {
     return firstName;
   }
 
-  viewFile(file: any) {
-    this.previewFiles.set([this.fileConverter.buildPreviewFile(file)]);
+  viewFile(file: any, files: any[] = [file]) {
+    this.previewSelectedIndex = Math.max(0, files.indexOf(file));
+    this.previewFiles.set(this.fileConverter.buildPreviewFiles(files));
     this.IS_CHAT_OPEN.set(true);
     this.isPreviewModalOpen.set(true);
   }
 
-  viewFileChat(file: any) {
-    console.log(file);
-    let url = '';
-
-    if (file.file) {
-      // ไฟล์ที่ user upload
-      url = URL.createObjectURL(file.file);
-    } else if (file.filePath) {
-      // ไฟล์จาก server
-      url = file.filePath;
-    }
-
-    this.previewFiles.set([
-      {
-        fileName: file.name || file.fileName,
+  viewFileChat(file: any, files: any[] = [file]) {
+    this.previewSelectedIndex = Math.max(0, files.indexOf(file));
+    this.previewFiles.set(
+      files.map((attachment) => ({
+        fileName: attachment.name || attachment.fileName,
         date: dayjs().format('DD/MM/YYYY HH:mm'),
-        url: url,
-        type: file.file?.type || file.type || 'application/octet-stream',
-      },
-    ]);
+        url: attachment.file ? URL.createObjectURL(attachment.file) : attachment.filePath || '',
+        type: attachment.file?.type || attachment.type || 'application/octet-stream',
+      })),
+    );
 
     this.isPreviewModalOpen.set(true);
   }
@@ -944,9 +937,15 @@ export class ItService implements OnInit {
 
   closePreview() {
     this.isPreviewModalOpen.set(false);
+    this.previewSelectedIndex = 0;
+    for (const file of this.previewFiles()) {
+      if (file.url?.startsWith('blob:')) URL.revokeObjectURL(file.url);
+    }
+    this.previewFiles.set([]);
   }
 
-  openAllAttachments(files: any) {
+  openAllAttachments(files: any, selectedIndex = 0) {
+    this.previewSelectedIndex = selectedIndex;
     // console.log(files);
     this.previewFiles.set(this.fileConverter.buildPreviewFiles(files));
     this.isPreviewModalOpen.set(true);
@@ -972,9 +971,9 @@ export class ItService implements OnInit {
 
   viewManagedAttachment(event: { file: any; source: 'user' | 'it' }): void {
     const ticket = this.selectedTicket();
-    const sourceFiles = event.source === 'it' ? (ticket?.itAttachments ?? []) : (ticket?.attachments ?? []);
-    const files = [event.file, ...sourceFiles.filter((file: any) => file !== event.file)];
-    this.openAllAttachments(files);
+    const sourceFiles =
+      event.source === 'it' ? (ticket?.itAttachments ?? []) : (ticket?.attachments ?? []);
+    this.openAllAttachments(sourceFiles, Math.max(0, sourceFiles.indexOf(event.file)));
   }
 
   removeNewManagedAttachment(file: any): void {

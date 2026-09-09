@@ -46,7 +46,7 @@
           <i class="fa-solid fa-share btn-action-icon"></i> ส่งต่อ
         </button>
         <button class="btn btn-done" (click)="closeTicket()">
-          <i class="fa-solid fa-circle-check btn-action-icon"></i> ปิดงาน sdfsdf
+          <i class="fa-solid fa-circle-check btn-action-icon"></i> ปิดงาน
         </button>
       </div>
     </section>
@@ -76,6 +76,18 @@
 @if (IS_NOTE_TICKET()) {
   <app-note-modal [ticket]="selectedTicket()" (closeModal)="closeAddNoteModal()" />
 }
+@if (IS_HOLD_TICKET()) {
+  <app-deny-modal
+    [ticket]="selectedTicket()"
+    title="เหตุผลในการหยุดชั่วคราว (On Hold)"
+    [reasonRequired]="false"
+    placeholder="กรอกเหตุผลในการหยุดชั่วคราว..."
+    validationMessage="กรุณากรอกเหตุผลในการหยุดชั่วคราว"
+    (closeModal)="closeHoldModal()"
+    (submitModal)="submitHold($event)"
+  />
+}
+
 @if (IS_DENY_TICKET()) {
   <app-deny-modal
     [ticket]="selectedTicket()"

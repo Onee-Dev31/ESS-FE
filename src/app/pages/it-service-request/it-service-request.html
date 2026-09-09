@@ -169,33 +169,37 @@
             <i class="fas fa-paperclip field-icon"></i>
             ไฟล์แนบ
           </label>
-          <small class="attachment-limit-note">แนบไฟล์ได้สูงสุด {{ FILE_CONFIG.maxFiles }} ไฟล์</small>
-          <div
-            class="dropzone"
-            (click)="fileInput.click()"
-            (dragover)="onDragOver($event)"
-            (drop)="onDrop($event)"
+          <small class="attachment-limit-note"
+            >แนบไฟล์ได้สูงสุด {{ FILE_CONFIG.maxFiles }} ไฟล์</small
           >
-            <p class="dropzone-text">
-              <i class="fas fa-cloud-upload-alt dropzone-icon"></i>
-              คลิกหรือลากไฟล์มาวางที่นี่
-            </p>
-            <p class="dropzone-hint">
-              @for (ext of FILE_CONFIG.allowedExtensions; track ext) {
-                <span>{{ ext.toUpperCase() }}</span>
-              }
-              <span>สูงสุด {{ FILE_CONFIG.maxFiles }} ไฟล์</span>
-              <span>ไม่เกิน {{ FILE_CONFIG.maxSizeMB }} MB</span>
-            </p>
-            <input
-              type="file"
-              #fileInput
-              style="display: none"
-              multiple
-              [accept]="'.' + FILE_CONFIG.allowedExtensions.join(',.')"
-              (change)="onFileSelected($event)"
-            />
-          </div>
+          @if (attachments().length < FILE_CONFIG.maxFiles) {
+            <div
+              class="dropzone"
+              (click)="fileInput.click()"
+              (dragover)="onDragOver($event)"
+              (drop)="onDrop($event)"
+            >
+              <p class="dropzone-text">
+                <i class="fas fa-cloud-upload-alt dropzone-icon"></i>
+                คลิกหรือลากไฟล์มาวางที่นี่
+              </p>
+              <p class="dropzone-hint">
+                @for (ext of FILE_CONFIG.allowedExtensions; track ext) {
+                  <span>{{ ext.toUpperCase() }}</span>
+                }
+                <span>สูงสุด {{ FILE_CONFIG.maxFiles }} ไฟล์</span>
+                <span>ไม่เกิน {{ FILE_CONFIG.maxSizeMB }} MB</span>
+              </p>
+              <input
+                type="file"
+                #fileInput
+                style="display: none"
+                multiple
+                [accept]="'.' + FILE_CONFIG.allowedExtensions.join(',.')"
+                (change)="onFileSelected($event)"
+              />
+            </div>
+          }
 
           @if (attachments().length > 0) {
             <div class="file-list">
@@ -564,7 +568,11 @@
   }
 
   @if (isPreviewModalOpen()) {
-    <app-file-preview-modal [files]="previewFiles()" (onClose)="closePreview()">
+    <app-file-preview-modal
+      [files]="previewFiles()"
+      [initialSelectedIndex]="previewSelectedIndex"
+      (onClose)="closePreview()"
+    >
     </app-file-preview-modal>
   }
 
