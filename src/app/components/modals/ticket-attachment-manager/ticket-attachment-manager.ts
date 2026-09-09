@@ -36,7 +36,10 @@ export class TicketAttachmentManagerComponent {
   }
 
   get userFileCount(): number {
-    return this.userFiles.filter((file) => !this.pendingRemovedFiles.includes(file)).length + this.pendingFiles.length;
+    return (
+      this.userFiles.filter((file) => !this.pendingRemovedFiles.includes(file)).length +
+      this.pendingFiles.length
+    );
   }
 
   get remainingUserFileSlots(): number {
