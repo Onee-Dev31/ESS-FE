@@ -173,6 +173,7 @@ export class ItProblemReportComponent implements OnInit {
 
   isPreviewModalOpen = signal<boolean>(false);
   previewFiles = signal<FilePreviewItem[]>([]);
+  previewSelectedIndex = 0;
 
   toggleCategory(cat: string) {
     const current = this.problemFormData();
@@ -301,17 +302,19 @@ export class ItProblemReportComponent implements OnInit {
     return false;
   }
 
-  viewFile(fileObj: any) {
+  viewFile(fileObj: any, files: any[] = [fileObj]) {
     if (fileObj.file) {
-      const url = URL.createObjectURL(fileObj.file);
-      this.previewFiles.set([
-        {
-          fileName: fileObj.name,
+      this.closePreview();
+      const previewableFiles = files.filter((file) => file.file);
+      this.previewSelectedIndex = Math.max(0, previewableFiles.indexOf(fileObj));
+      this.previewFiles.set(
+        previewableFiles.map((file) => ({
+          fileName: file.name,
           date: dayjs().format('DD/MM/YYYY HH:mm'),
-          url: url,
-          type: fileObj.file.type,
-        },
-      ]);
+          url: URL.createObjectURL(file.file),
+          type: file.file.type,
+        })),
+      );
       this.isPreviewModalOpen.set(true);
     } else {
       // For dummy data which doesn't have a real File object
@@ -321,6 +324,11 @@ export class ItProblemReportComponent implements OnInit {
 
   closePreview() {
     this.isPreviewModalOpen.set(false);
+    for (const file of this.previewFiles()) {
+      if (file.url?.startsWith('blob:')) URL.revokeObjectURL(file.url);
+    }
+    this.previewFiles.set([]);
+    this.previewSelectedIndex = 0;
   }
 
   removeAttachment(index: number) {
