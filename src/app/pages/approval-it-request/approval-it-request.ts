@@ -194,10 +194,16 @@ export class ApprovalItRequestComponent implements OnInit {
         );
       });
 
+    // มี noti เข้ามาขณะค้างอยู่หน้านี้ → refresh รายการให้แบบเงียบๆ (ไม่โชว์ full-page loader คั่น)
     this.signalrService
       .on('NewTicketForApproval')
       .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe(() => this.refresh());
+      .subscribe(() => this.refresh(true));
+
+    this.signalrService
+      .on('NotificationCreated')
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => this.refresh(true));
   }
 
   searchByDateRange(): void {
@@ -224,12 +230,16 @@ export class ApprovalItRequestComponent implements OnInit {
     return `${year}-${month}-${day}`;
   }
 
-  refresh(): void {
-    this.loadApprovals();
+  refresh(silent = false): void {
+    this.loadApprovals(null, null, silent);
   }
 
-  private loadApprovals(ticketId: number | null = null, ticketNumber: string | null = null): void {
-    this.loadingService.start('approvals-it-list');
+  private loadApprovals(
+    ticketId: number | null = null,
+    ticketNumber: string | null = null,
+    silent = false,
+  ): void {
+    if (!silent) this.loadingService.start('approvals-it-list');
     this.itService
       .getApprovalItRequestsByDateRange({
         empno: this.authService.userData().CODEMPID,
@@ -244,11 +254,11 @@ export class ApprovalItRequestComponent implements OnInit {
           console.log(response, data);
           this.approvals.set(data);
           this.focusTicket(data, ticketId, ticketNumber);
-          this.loadingService.stop('approvals-it-list');
+          if (!silent) this.loadingService.stop('approvals-it-list');
           this.cdr.markForCheck();
         },
         error: (error) => {
-          this.loadingService.stop('approvals-it-list');
+          if (!silent) this.loadingService.stop('approvals-it-list');
           this.errorService.handle(error, {
             component: 'ApprovalItRequest',
             action: 'load-year-range',
