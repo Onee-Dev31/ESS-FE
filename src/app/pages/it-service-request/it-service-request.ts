@@ -78,6 +78,7 @@ export class ITServiceRequestComponent implements OnInit {
   private initialLoadsPending = signal(1);
   isPageLoading = computed(() => this.initialLoadsPending() > 0);
   previewFiles = signal<FilePreviewItem[]>([]);
+  previewSelectedIndex = 0;
 
   readonly FILE_CONFIG = IT_ATTACHMENT_FILE_CONFIG;
 
@@ -338,20 +339,27 @@ export class ITServiceRequestComponent implements OnInit {
   }
 
   viewFile(fileObj: { name: string; file: File }) {
-    const url = URL.createObjectURL(fileObj.file);
-    this.previewFiles.set([
-      {
-        fileName: fileObj.name,
+    this.closePreview();
+    const files = this.attachments();
+    this.previewSelectedIndex = Math.max(0, files.findIndex((file) => file === fileObj));
+    this.previewFiles.set(
+      files.map((file) => ({
+        fileName: file.name,
         date: dayjs().format('DD/MM/YYYY HH:mm'),
-        url,
-        type: fileObj.file.type,
-      },
-    ]);
+        url: URL.createObjectURL(file.file),
+        type: file.file.type,
+      })),
+    );
     this.isPreviewModalOpen.set(true);
   }
 
   closePreview() {
     this.isPreviewModalOpen.set(false);
+    for (const file of this.previewFiles()) {
+      if (file.url?.startsWith('blob:')) URL.revokeObjectURL(file.url);
+    }
+    this.previewFiles.set([]);
+    this.previewSelectedIndex = 0;
   }
 
   removeAttachment(index: number) {

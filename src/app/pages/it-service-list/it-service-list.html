@@ -133,7 +133,11 @@
   </ng-template>
 
   @if (isPreviewModalOpen()) {
-    <app-file-preview-modal [files]="previewFiles()" (onClose)="closePreview()">
+    <app-file-preview-modal
+      [files]="previewFiles()"
+      [initialSelectedIndex]="previewSelectedIndex"
+      (onClose)="closePreview()"
+    >
     </app-file-preview-modal>
   }
 </div>
@@ -369,7 +373,8 @@
     (close)="closeChat()"
     (submitMessage)="submitNote($event, { silent: true })"
     (attachmentView)="viewFile($event)"
-    (pendingAttachmentView)="viewFile($event)"
+    (imageGalleryView)="viewFile($event.file, $event.files)"
+    (pendingAttachmentView)="viewFileChat($event.file, $event.files)"
     (attachmentsOpen)="openChatAttachments(t)"
   />
 }
@@ -423,6 +428,7 @@
 @if (isPreviewModalOpen()) {
   <app-file-preview-modal
     [files]="previewFiles()"
+    [initialSelectedIndex]="previewSelectedIndex"
     (onClose)="closePreview()"
     (click)="$event.stopPropagation()"
   >

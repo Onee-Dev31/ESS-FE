@@ -252,7 +252,11 @@ export class TicketChatComponent {
   @Output() close = new EventEmitter<void>();
   @Output() submitMessage = new EventEmitter<TicketChatSubmit>();
   @Output() attachmentView = new EventEmitter<any>();
-  @Output() pendingAttachmentView = new EventEmitter<any>();
+  @Output() imageGalleryView = new EventEmitter<{ file: any; files: any[] }>();
+  @Output() pendingAttachmentView = new EventEmitter<{
+    file: TicketChatAttachment;
+    files: TicketChatAttachment[];
+  }>();
   @Output() attachmentsOpen = new EventEmitter<void>();
   @Output() export = new EventEmitter<void>();
 
@@ -411,11 +415,13 @@ export class TicketChatComponent {
   private addFiles(files: FileList): void {
     const errors: string[] = [];
     const validFiles: TicketChatAttachment[] = [];
+    let hasFileLimitError = false;
 
     for (const file of Array.from(files)) {
       const reasons: string[] = [];
       if (this.attachments.length + validFiles.length >= TICKET_CHAT_FILE_CONFIG.maxFiles) {
-        reasons.push(`เกินจำนวนสูงสุด ${TICKET_CHAT_FILE_CONFIG.maxFiles} ไฟล์`);
+        hasFileLimitError = true;
+        break;
       }
       if (file.size / (1024 * 1024) > TICKET_CHAT_FILE_CONFIG.maxSizeMB) {
         reasons.push(`ขนาดเกิน ${TICKET_CHAT_FILE_CONFIG.maxSizeMB} MB`);
@@ -431,6 +437,9 @@ export class TicketChatComponent {
       else validFiles.push({ name: file.name, size: file.size, file });
     }
 
+    if (hasFileLimitError) {
+      errors.unshift(`อัปโหลดได้สูงสุด ${TICKET_CHAT_FILE_CONFIG.maxFiles} ไฟล์`);
+    }
     if (errors.length) this.swalService.warning(errors.join('\n'));
     if (validFiles.length) this.attachments = [...this.attachments, ...validFiles];
   }
@@ -596,6 +605,14 @@ export class TicketChatComponent {
 
   contains(target: EventTarget | null): boolean {
     return !!target && !!this.root?.nativeElement.contains(target as Node);
+  }
+
+  isOutsideClick(event: MouseEvent): boolean {
+    // The alert may already be removed when this click reaches the document.
+    const isAlertClick = event
+      .composedPath()
+      .some((target) => target instanceof Element && target.matches('.swal2-container'));
+    return !isAlertClick && !this.contains(event.target);
   }
 
   private isImage(file: any): boolean {

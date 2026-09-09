@@ -3,6 +3,7 @@
   size="sm"
   [padded]="false"
   [showClose]="false"
+  [closeOnBackdrop]="false"
   [mobileFullscreen]="true"
   (closeModal)="closeModal.emit()"
 >
@@ -48,25 +49,30 @@
 
         @if (repairCostType === 'paid') {
           <div class="attachment-label">เอกสารประกอบการขอ Budget<span>*</span></div>
-          <input
-            #fileInput
-            type="file"
-            multiple
-            hidden
-            [accept]="'.' + fileConfig.allowedExtensions.join(',.')"
-            (change)="onFileSelected($event)"
-          />
-          <button
-            type="button"
-            class="upload-box"
-            (click)="fileInput.click()"
-            (dragover)="onDragOver($event)"
-            (drop)="onFileDrop($event)"
-          >
-            <i class="fas fa-cloud-arrow-up"></i>
-            <span class="upload-title">คลิกเพื่อแนบไฟล์ หรือลากไฟล์มาวาง</span>
-            <span class="upload-hint">ใบเสนอราคาหรือเอกสารประกอบ · สูงสุด 5 ไฟล์ ไฟล์ละ 5 MB</span>
-          </button>
+          @if (attachments.length < fileConfig.maxFiles) {
+            <input
+              #fileInput
+              type="file"
+              multiple
+              hidden
+              [accept]="'.' + fileConfig.allowedExtensions.join(',.')"
+              (change)="onFileSelected($event)"
+            />
+            <button
+              type="button"
+              class="upload-box"
+              (click)="fileInput.click()"
+              (dragover)="onDragOver($event)"
+              (drop)="onFileDrop($event)"
+            >
+              <i class="fas fa-cloud-arrow-up"></i>
+              <span class="upload-title">คลิกเพื่อแนบไฟล์ หรือลากไฟล์มาวาง</span>
+              <span class="upload-hint"
+                >ใบเสนอราคาหรือเอกสารประกอบ · สูงสุด {{ fileConfig.maxFiles }} ไฟล์ ไฟล์ละ
+                {{ fileConfig.maxSizeMB }} MB</span
+              >
+            </button>
+          }
 
           @if (showAttachmentError) {
             <div class="attachment-required">
@@ -77,11 +83,15 @@
 
           @if (attachments.length > 0) {
             <div class="file-list">
-              @for (file of attachments; track file.name; let index = $index) {
-                <div class="file-chip">
-                  <i class="far fa-file"></i>
+              @for (file of attachments; track file; let index = $index) {
+                <div class="file-chip" (click)="previewAttachment(file)">
+                  <i class="fas fa-file-alt"></i>
                   <span>{{ file.name }}</span>
-                  <button type="button" aria-label="ลบไฟล์" (click)="removeAttachment(index)">
+                  <button
+                    type="button"
+                    aria-label="ลบไฟล์"
+                    (click)="removeAttachment(index); $event.stopPropagation()"
+                  >
                     <i class="fas fa-times"></i>
                   </button>
                 </div>
@@ -92,20 +102,25 @@
       </div>
     }
 
-    <label class="field-label reason-label" for="change-type-reason"> เหตุผล<span>*</span> </label>
+    <label
+      class="field-label reason-label"
+      [class.required]="repairCostType === 'paid'"
+      for="change-type-reason"
+    >
+      เหตุผล <small>(ไม่บังคับ)</small>
+    </label>
     <textarea
       id="change-type-reason"
       [(ngModel)]="reason"
+      [required]="repairCostType === 'paid'"
       (ngModelChange)="showReasonError = false"
       rows="4"
       maxlength="1000"
       placeholder="กรอกเหตุผลในการเปลี่ยนประเภทคำขอ..."
     ></textarea>
-
     @if (showReasonError) {
       <div class="attachment-required">
-        <i class="fas fa-exclamation-circle"></i>
-        กรุณากรอกเหตุผลในการเปลี่ยนประเภทคำขอ
+        <i class="fas fa-exclamation-circle"></i> กรุณากรอกเหตุผลประกอบการขอ Budget
       </div>
     }
   </div>
@@ -119,3 +134,7 @@
     </button>
   </div>
 </app-modal-shell>
+
+@if (isPreviewModalOpen()) {
+  <app-file-preview-modal [files]="previewFiles()" (onClose)="closePreview()" />
+}
