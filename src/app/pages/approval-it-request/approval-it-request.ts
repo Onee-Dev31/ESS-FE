@@ -195,15 +195,56 @@ export class ApprovalItRequestComponent implements OnInit {
       });
 
     // มี noti เข้ามาขณะค้างอยู่หน้านี้ → refresh รายการให้แบบเงียบๆ (ไม่โชว์ full-page loader คั่น)
+    // แล้วไฮไลท์/เลื่อนไปหา ticket นั้นให้เหมือนกดจาก toast (แต่ไม่เปลี่ยน tab/เปิดโมดัลแทรก)
     this.signalrService
       .on('NewTicketForApproval')
       .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe(() => this.refresh(true));
+      .subscribe((data: any) => this.silentRefreshAndFocus(data));
 
     this.signalrService
       .on('NotificationCreated')
       .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe(() => this.refresh(true));
+      .subscribe((data: any) => this.silentRefreshAndFocus(data));
+  }
+
+  private silentRefreshAndFocus(data: any): void {
+    // payload จริงบางที ticketId ไม่ได้อยู่ระดับบนสุด แต่ซ่อนอยู่ใน payload_json
+    // (เหมือน record ที่ NotificationCreated ส่งมา) เลยต้อง fallback ไล่ครบทุกจุด
+    const record = data?.notification ?? data?.data ?? data;
+    const payloadData = this.parsePayload(record?.payload_json ?? record?.payloadJson);
+
+    const ticketId = this.toNumberOrNull(
+      record?.ticket_id ??
+        record?.ticketId ??
+        record?.target_id ??
+        record?.targetId ??
+        payloadData?.['ticketId'] ??
+        payloadData?.['ticket_id'],
+    );
+    const ticketNumber =
+      record?.ticket_number ??
+      record?.ticketNumber ??
+      payloadData?.['ticketNumber'] ??
+      payloadData?.['ticket_number'] ??
+      null;
+
+    this.loadApprovals(ticketId, ticketNumber, true);
+  }
+
+  private parsePayload(value: unknown): Record<string, unknown> | null {
+    if (!value) return null;
+    if (typeof value === 'object') return value as Record<string, unknown>;
+    try {
+      const parsed = JSON.parse(value as string);
+      return parsed && typeof parsed === 'object' ? parsed : null;
+    } catch {
+      return null;
+    }
+  }
+
+  private toNumberOrNull(value: unknown): number | null {
+    const num = Number(value);
+    return Number.isFinite(num) && value != null && value !== '' ? num : null;
   }
 
   searchByDateRange(): void {
@@ -253,7 +294,7 @@ export class ApprovalItRequestComponent implements OnInit {
           );
           console.log(response, data);
           this.approvals.set(data);
-          this.focusTicket(data, ticketId, ticketNumber);
+          this.focusTicket(data, ticketId, ticketNumber, silent);
           if (!silent) this.loadingService.stop('approvals-it-list');
           this.cdr.markForCheck();
         },
@@ -325,6 +366,7 @@ export class ApprovalItRequestComponent implements OnInit {
     data: ApprovalItem[],
     ticketId: number | null,
     ticketNumber: string | null,
+    silent = false,
   ): void {
     const item = data.find(
       (approval) =>
@@ -333,17 +375,20 @@ export class ApprovalItRequestComponent implements OnInit {
     );
     if (!item) return;
 
-    this.listing.filterStatus.set(item.status);
-    const sortedIndex = this.comps
-      .filteredData()
-      .findIndex((approval) => approval.requestId === item.requestId);
-    this.listing.currentPage.set(
-      sortedIndex < 0 ? 0 : Math.floor(sortedIndex / this.listing.pageSize()),
-    );
-    this.viewRequestDetail(item);
+    // silent (noti เข้ามาขณะค้างอยู่หน้านี้): แค่ไฮไลท์/เลื่อนไปหา ไม่เปลี่ยน tab/เปิดโมดัลแทรก
+    if (!silent) {
+      this.listing.filterStatus.set(item.status);
+      const sortedIndex = this.comps
+        .filteredData()
+        .findIndex((approval) => approval.requestId === item.requestId);
+      this.listing.currentPage.set(
+        sortedIndex < 0 ? 0 : Math.floor(sortedIndex / this.listing.pageSize()),
+      );
+      this.viewRequestDetail(item);
 
-    if (ticketId != null || ticketNumber) {
-      this.location.replaceState(this.location.path().split('?')[0]);
+      if (ticketId != null || ticketNumber) {
+        this.location.replaceState(this.location.path().split('?')[0]);
+      }
     }
 
     setTimeout(() => {
