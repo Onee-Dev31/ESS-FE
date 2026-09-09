@@ -24,7 +24,7 @@
   <header class="detail-header">
     <div class="detail-title">
       <span>รายละเอียด</span>
-      @if (allAttachments.length && !editable) {
+      @if (allAttachments.length) {
         <button
           type="button"
           class="attachment-button"
@@ -32,6 +32,9 @@
         >
           <i class="fa-solid fa-paperclip"></i>
           {{ allAttachments.length }} ไฟล์
+          @if (newAttachmentCount) {
+            <span class="new-attachment-badge">+{{ newAttachmentCount }} ใหม่</span>
+          }
         </button>
       }
     </div>
