@@ -1830,11 +1830,11 @@ export class DashboardIT implements OnInit {
           3: 'ขอใช้บริการ',
         };
         const typeName = typeNameMap[Number(data.ticketTypeId)] ?? '';
-        this.signalrService.ticketStatusNotify(
-          ticketId,
-          ticket?.requesterAduser ?? '',
-          typeName ? `In Progress|${typeName}` : 'In Progress',
-        );
+        // this.signalrService.ticketStatusNotify(
+        //   ticketId,
+        //   ticket?.requesterAduser ?? '',
+        //   typeName ? `In Progress|${typeName}` : 'In Progress',
+        // );
 
         this.selectTicket(ticketId);
         this.getAllTickets();
@@ -1887,7 +1887,7 @@ export class DashboardIT implements OnInit {
 
             this.swalService.success(res.message || 'บันทึกสำเร็จ');
 
-            this.signalrService.ticketStatusNotify(ticketId, ticket?.requesterAduser ?? '', 'Hold');
+            // this.signalrService.ticketStatusNotify(ticketId, ticket?.requesterAduser ?? '', 'Hold');
 
             this.selectTicket(ticketId);
             this.getAllTickets();
@@ -1931,11 +1931,11 @@ export class DashboardIT implements OnInit {
 
             this.swalService.success(res.message || 'บันทึกสำเร็จ');
 
-            this.signalrService.ticketStatusNotify(
-              ticketId,
-              ticket?.requesterAduser ?? '',
-              'In Progress',
-            );
+            // this.signalrService.ticketStatusNotify(
+            //   ticketId,
+            //   ticket?.requesterAduser ?? '',
+            //   'In Progress',
+            // );
 
             this.selectTicket(ticketId);
             this.getAllTickets();
@@ -2049,11 +2049,11 @@ export class DashboardIT implements OnInit {
         };
         const typeName = typeNameMap[Number(data.ticketTypeId)] ?? '';
 
-        this.signalrService.ticketStatusNotify(
-          ticketId,
-          ticket?.requesterAduser ?? '',
-          typeName ? `ChangeType|${typeName}` : 'ChangeType',
-        );
+        // this.signalrService.ticketStatusNotify(
+        //   ticketId,
+        //   ticket?.requesterAduser ?? '',
+        //   typeName ? `ChangeType|${typeName}` : 'ChangeType',
+        // );
 
         this.selectTicket(ticketId);
         this.getAllTickets();
@@ -2089,7 +2089,7 @@ export class DashboardIT implements OnInit {
         this.swalService.success(res.message || 'บันทึกสำเร็จ');
 
         this.signalrService.ticketStatusTrigger.next({ ticketId, status: 'Denied' });
-        this.signalrService.ticketStatusNotify(ticketId, ticket?.requesterAduser ?? '', 'Denied');
+        // this.signalrService.ticketStatusNotify(ticketId, ticket?.requesterAduser ?? '', 'Denied');
         this.filterStatus = 'all';
         this.getAllTickets(false, false, String(ticketId));
       },
@@ -2235,7 +2235,7 @@ export class DashboardIT implements OnInit {
 
         this.swalService.success(res.message || 'บันทึกสำเร็จ');
         this.signalrService.ticketStatusTrigger.next({ ticketId, status: 'Closed' });
-        this.signalrService.ticketStatusNotify(ticketId, ticket?.requesterAduser ?? '', 'Closed');
+        // this.signalrService.ticketStatusNotify(ticketId, ticket?.requesterAduser ?? '', 'Closed');
         this.filterStatus = 'all';
         this.getAllTickets(false, false, String(ticketId));
       },
