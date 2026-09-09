@@ -76,6 +76,9 @@ export class ChangeTicketTypeModal implements OnChanges, OnDestroy {
   reason = '';
   attachments: { name: string; size: number; file: File }[] = [];
   showAttachmentError = false;
+  showReasonError = false;
+  isPreviewModalOpen = signal(false);
+  previewFiles = signal<FilePreviewItem[]>([]);
 
   ngOnChanges(): void {
     this.closePreview();
