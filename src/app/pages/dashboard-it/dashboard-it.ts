@@ -1881,7 +1881,7 @@ export class DashboardIT implements OnInit {
 
         this.swalService.success(res.message || 'บันทึกสำเร็จ');
 
-        this.signalrService.ticketStatusNotify(ticketId, ticket?.requesterAduser ?? '', 'Hold');
+            // this.signalrService.ticketStatusNotify(ticketId, ticket?.requesterAduser ?? '', 'Hold');
 
         this.selectTicket(ticketId);
         this.getAllTickets();

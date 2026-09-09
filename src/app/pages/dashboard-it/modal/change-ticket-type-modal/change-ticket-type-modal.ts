@@ -76,6 +76,7 @@ export class ChangeTicketTypeModal implements OnChanges, OnDestroy {
   reason = '';
   attachments: { name: string; size: number; file: File }[] = [];
   showAttachmentError = false;
+  showReasonError = false;
 
   ngOnChanges(): void {
     this.closePreview();
@@ -199,6 +200,10 @@ export class ChangeTicketTypeModal implements OnChanges, OnDestroy {
     if (!this.canSubmit) return;
     if (this.repairCostType === 'paid' && this.attachments.length === 0) {
       this.showAttachmentError = true;
+      return;
+    }
+    if (!this.reason.trim()) {
+      this.showReasonError = true;
       return;
     }
 
