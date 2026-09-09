@@ -100,6 +100,14 @@
   font: inherit;
   cursor: pointer;
 }
+.new-attachment-badge {
+  padding: 1px 5px;
+  border-radius: 999px;
+  background: var(--primary);
+  color: var(--text-reverse);
+  font-size: 0.68rem;
+  font-weight: 700;
+}
 .services {
   display: flex;
   flex-wrap: wrap;

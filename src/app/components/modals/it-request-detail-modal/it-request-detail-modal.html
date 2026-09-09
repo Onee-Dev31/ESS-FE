@@ -62,14 +62,22 @@
       </div>
 
       <!-- Section 3: ระบบที่เลือก (Selected Systems) ถ้าเป็น "ขอใช้ระบบ" -->
-      <div class="info-section" *ngIf="approvalItem.originalData?.ticketTypeId === 3">
+      <div
+        class="info-section"
+        *ngIf="
+          approvalItem.originalData?.ticketTypeId === 3 &&
+          (approvalItem.originalData?.main?.length > 0 ||
+            approvalItem.originalData?.basic?.length > 0 ||
+            approvalItem.originalData?.specific?.length > 0)
+        "
+      >
         <div class="section-header">
           <i class="fas fa-desktop"></i> ระบบที่เลือก (Selected Systems)
         </div>
 
         <div class="section-content">
           <!-- Main Systems -->
-          <div class="info-row" *ngIf="approvalItem.originalData?.main?.length">
+          <div class="info-row" *ngIf="approvalItem.originalData?.main?.length > 0">
             <div class="info-label align-top">Main Systems</div>
             <div class="info-value">
               <ul class="system-list">
@@ -81,7 +89,7 @@
           </div>
 
           <!-- Basic Systems -->
-          <div class="info-row" *ngIf="approvalItem.originalData?.basic?.length">
+          <div class="info-row" *ngIf="approvalItem.originalData?.basic?.length > 0">
             <div class="info-label align-top">Basic Systems</div>
             <div class="info-value">
               <ul class="system-list">
@@ -93,7 +101,7 @@
           </div>
 
           <!-- Specific Systems -->
-          <div class="info-row" *ngIf="approvalItem.originalData?.specific?.length">
+          <div class="info-row" *ngIf="approvalItem.originalData?.specific?.length > 0">
             <div class="info-label align-top">Specific Systems</div>
             <div class="info-value">
               <ul class="system-list">
@@ -124,29 +132,64 @@
       </div>
 
       <!-- Section 5: ไฟล์แนบ (Attachments) -->
-      <div class="info-section" *ngIf="showAttachments && attachments.length > 0">
+      <div class="info-section" *ngIf="showAttachments && displayedAttachmentCount > 0">
+        <div class="section-header">
+          <i class="fas fa-paperclip"></i>
+          ไฟล์แนบ (Attachments)
+        </div>
+
+        <div class="section-content">
+          <div class="attachment-group-list">
+            @for (group of attachmentGroups; track group.key) {
+              <div class="attachment-group-card" (click)="viewFileGroup(group.files)">
+                <div class="group-left">
+                  <div class="group-icon">
+                    <i class="fas fa-folder-open"></i>
+                  </div>
+
+                  <div class="group-info">
+                    <div class="group-title">
+                      {{ group.label }}
+                    </div>
+
+                    <div class="group-count">{{ group.files.length }} ไฟล์</div>
+                  </div>
+                </div>
+
+                <div class="group-right">
+                  <i class="fas fa-chevron-right"></i>
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+      </div>
+      <!-- <div class="info-section" *ngIf="showAttachments && displayedAttachmentCount > 0">
         <div class="section-header"><i class="fas fa-paperclip"></i> ไฟล์แนบ (Attachments)</div>
 
         <div class="section-content">
           <div class="attachment-list">
-            <div class="attachment-item" *ngFor="let file of attachments" (click)="viewFile(file)">
-              <div class="file-info">
-                <i class="fas" [ngClass]="getFileIcon(file.fileName)"></i>
+            @for (group of attachmentGroups; track group.key) {
+              <div class="attachment-group-title">{{ group.label }}</div>
+              <div
+                class="attachment-item"
+                *ngFor="let file of group.files"
+                (click)="viewFile(file)"
+              >
+                <div class="file-info">
+                  <i class="fas" [ngClass]="getFileIcon(file.fileName)"></i>
 
-                <span class="file-name">
-                  {{ file.fileName }}
-                </span>
+                  <span class="file-name">
+                    {{ file.fileName }}
+                  </span>
 
-                <span class="file-size"> ({{ formatFileSize(file.fileSize) }}) </span>
+                  <span class="file-size"> ({{ formatFileSize(file.fileSize) }}) </span>
+                </div>
               </div>
-
-              <!-- <button class="btn-view-file" (click)="viewFile(file)">
-                                <i class="fas fa-eye"></i>
-                            </button> -->
-            </div>
+            }
           </div>
         </div>
-      </div>
+      </div> -->
     </div>
 
     <div class="reject-reason-panel" *ngIf="isRejectPanelOpen()" @fadeIn>

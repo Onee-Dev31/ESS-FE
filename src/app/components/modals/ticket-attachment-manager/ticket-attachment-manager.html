@@ -17,7 +17,7 @@
         (click)="activeSource = 'user'"
       >
         <i class="fas fa-paperclip"></i> เอกสารแนบทั้งหมด
-        <span>{{ userFiles.length }}</span>
+        <span>{{ userFileCount }}/{{ maxUserFiles }}</span>
       </button>
       <button type="button" [class.active]="activeSource === 'it'" (click)="activeSource = 'it'">
         <i class="fas fa-laptop"></i> เอกสารจาก IT
@@ -29,12 +29,22 @@
       <div class="source-title">
         <h4>{{ activeSource === 'user' ? 'เอกสารแนบของผู้ใช้ทั้งหมด' : 'เอกสารจาก IT' }}</h4>
         @if (activeSource === 'user' && canAddUserFiles) {
-          <label class="btn-add-file">
+          <label class="btn-add-file" [class.disabled]="!canAddMoreUserFiles">
             <i class="fas fa-paperclip"></i> แนบไฟล์เพิ่ม
-            <input type="file" multiple hidden (change)="onFileSelected($event)" />
+            <input
+              type="file"
+              multiple
+              hidden
+              [accept]="'.' + fileConfig.allowedExtensions.join(',.')"
+              [disabled]="!canAddMoreUserFiles"
+              (change)="onFileSelected($event)"
+            />
           </label>
         }
       </div>
+      @if (activeSource === 'user' && canAddUserFiles) {
+        <p class="attachment-limit-note">แนบได้สูงสุด {{ maxUserFiles }} ไฟล์ (รวมไฟล์เดิม)</p>
+      }
 
       @if (files.length) {
         <div class="file-rows">

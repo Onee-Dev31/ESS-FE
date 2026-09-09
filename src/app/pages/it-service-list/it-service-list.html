@@ -189,6 +189,7 @@
     audience="user"
     [editable]="t.status === 'Waiting you'"
     [alertMessage]="t.status === 'Waiting you' ? t.title : ''"
+    [newAttachmentCount]="getNewAttachmentCount(t)"
     [serviceLimit]="isSmallMobile ? 1 : isMobile ? 2 : 3"
     (attachmentClick)="openAttachmentManager()"
     (servicesClick)="showAll($event)"
@@ -224,7 +225,7 @@
   </section>
 
   <!-- ATTACHMENTS -->
-  <section class="tk-card waiting-attachments" *ngIf="t.status === 'Waiting you'">
+  <section class="tk-card waiting-attachments" *ngIf="false">
     <div class="tk-card__head">
       <div class="tk-card__title">เอกสารแนบ</div>
       <button type="button" class="btn-view-all" (click)="openAttachmentManager()">

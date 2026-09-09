@@ -16,15 +16,14 @@
         </button>
       </div>
       <div class="year-range-toolbar">
-        <label for="report-year-range">ปีเริ่มต้น - ปีสิ้นสุด</label>
+        <label for="report-year-range">วันเริ่มต้น - วันสิ้นสุด</label>
         <div class="year-range-controls">
           <nz-range-picker
             id="report-year-range"
             class="year-range-picker"
-            nzMode="year"
-            nzFormat="yyyy"
+            nzFormat="dd/MM/yyyy"
             [nzAllowClear]="false"
-            [nzPlaceHolder]="['Start year', 'End year']"
+            [nzPlaceHolder]="['วันเริ่มต้น', 'วันสิ้นสุด']"
             [ngModel]="yearRange()"
             (ngModelChange)="onYearRangeChange($event)"
           />

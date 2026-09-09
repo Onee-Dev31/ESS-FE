@@ -160,6 +160,13 @@ $table-label-bg: var(--border-toolbar);
       }
     }
 
+    .attachment-limit-note {
+      display: block;
+      margin: -8px 0 8px;
+      color: var(--text-muted);
+      font-size: 0.78rem;
+    }
+
     .form-control {
       padding: 0.85rem 1rem;
       border: 1px solid var(--border);
