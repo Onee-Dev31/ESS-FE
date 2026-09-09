@@ -17,19 +17,37 @@
 
     <section class="tk-card reason" *ngIf="t.status === 'Denied' && t.rejection_reason">
       <div class="tk-card__head"><div class="tk-card__title">เหตุผลในการไม่อนุมัติ</div></div>
-      <div class="tk-card__body"><div class="tk-text html-detail" [innerHTML]="t.rejection_reason"></div></div>
+      <div class="tk-card__body">
+        <div class="tk-text html-detail" [innerHTML]="t.rejection_reason"></div>
+      </div>
     </section>
 
     <section class="tk-actions" *ngIf="t.status !== 'Closed' && t.status !== 'Denied'">
       <div class="btn-group">
-        <button class="btn btn-onhold" (click)="resumeTicket()" *ngIf="t.status === 'Hold'"><i class="fa-solid fa-play btn-action-icon"></i> Resume</button>
-        <button class="btn btn-onhold" (click)="onHoldTicket()" *ngIf="t.status !== 'Hold'"><i class="fa-solid fa-pause btn-action-icon"></i> On Hold</button>
-        <button class="btn btn-deny" (click)="openDenyModal()" *ngIf="t.status !== 'Hold'"><i class="fa-solid fa-ban btn-action-icon"></i> Deny</button>
+        <button class="btn btn-onhold" (click)="resumeTicket()" *ngIf="t.status === 'Hold'">
+          <i class="fa-solid fa-play btn-action-icon"></i> Resume
+        </button>
+        <button class="btn btn-onhold" (click)="onHoldTicket()" *ngIf="t.status !== 'Hold'">
+          <i class="fa-solid fa-pause btn-action-icon"></i> On Hold
+        </button>
+        <button class="btn btn-deny" (click)="openDenyModal()" *ngIf="t.status !== 'Hold'">
+          <i class="fa-solid fa-ban btn-action-icon"></i> Deny
+        </button>
       </div>
       <div class="btn-group" *ngIf="t.status !== 'Hold'">
-        <button class="btn btn-accept" (click)="openAcknowledgeModal()" *ngIf="t.status !== 'In Progress' && t.status !== 'Assigned'"><i class="fa-solid fa-tag btn-action-icon"></i> รับเรื่อง</button>
-        <button class="btn btn-send" (click)="openAssignModal()"><i class="fa-solid fa-share btn-action-icon"></i> ส่งต่อ</button>
-        <button class="btn btn-done" (click)="closeTicket()"><i class="fa-solid fa-circle-check btn-action-icon"></i> ปิดงาน</button>
+        <button
+          class="btn btn-accept"
+          (click)="openAcknowledgeModal()"
+          *ngIf="t.status !== 'In Progress' && t.status !== 'Assigned'"
+        >
+          <i class="fa-solid fa-tag btn-action-icon"></i> รับเรื่อง
+        </button>
+        <button class="btn btn-send" (click)="openAssignModal()">
+          <i class="fa-solid fa-share btn-action-icon"></i> ส่งต่อ
+        </button>
+        <button class="btn btn-done" (click)="closeTicket()">
+          <i class="fa-solid fa-circle-check btn-action-icon"></i> ปิดงาน sdfsdf
+        </button>
       </div>
     </section>
   </main>
@@ -59,11 +77,24 @@
   <app-note-modal [ticket]="selectedTicket()" (closeModal)="closeAddNoteModal()" />
 }
 @if (IS_DENY_TICKET()) {
-  <app-deny-modal [ticket]="selectedTicket()" (closeModal)="closeDenyModal()" (submitModal)="submitDeny($event)" />
+  <app-deny-modal
+    [ticket]="selectedTicket()"
+    (closeModal)="closeDenyModal()"
+    (submitModal)="submitDeny($event)"
+  />
 }
 @if (IS_ACKNOWLEDGE_TICKET()) {
-  <app-acknowledge-modal [ticket]="selectedTicket()" (closeModal)="closeAcknowledgeModal()" (submitModal)="submitAcknowledge($event)" />
+  <app-acknowledge-modal
+    [ticket]="selectedTicket()"
+    (closeModal)="closeAcknowledgeModal()"
+    (submitModal)="submitAcknowledge($event)"
+  />
 }
 @if (IS_ASSIGN_TICKET()) {
-  <app-assign-modal [assigneeGroups]="assigneeGroups" [ticket]="selectedTicket()" (closeModal)="closeAssignModal()" (submitModal)="submitAssign($event)" />
+  <app-assign-modal
+    [assigneeGroups]="assigneeGroups"
+    [ticket]="selectedTicket()"
+    (closeModal)="closeAssignModal()"
+    (submitModal)="submitAssign($event)"
+  />
 }
