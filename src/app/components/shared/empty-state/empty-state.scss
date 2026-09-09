@@ -11,11 +11,17 @@ $border-color: var(--border-color);
 // อื่นๆ (Others)
 $radius: 16px;
 
+:host {
+  display: block;
+  width: 100%;
+}
+
 .empty-state-container {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  width: 100%;
   padding: 3rem 1.5rem;
   text-align: center;
   background-color: transparent;

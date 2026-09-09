@@ -97,8 +97,8 @@ $border: var(--border);
 
   &.approved,
   &.Approved {
-    background: var(--status-progress-bg);
-    color: var(--status-progress-text);
+    background: var(--status-approved-bg);
+    color: var(--status-approved-text);
   }
 
   &.pending,
@@ -114,8 +114,8 @@ $border: var(--border);
   }
 
   &.referred-back {
-    background: var(--status-hold-bg);
-    color: var(--status-hold-text);
+    background: var(--status-progress-bg);
+    color: var(--status-progress-text);
   }
 }
 
