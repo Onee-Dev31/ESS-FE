@@ -630,15 +630,18 @@ export class DashboardIT implements OnInit {
         res.attachments?.filter(
           (f: any) =>
             !['from it', 'จาก it'].includes(
-              String(f.file_description ?? '').trim().toLowerCase(),
+              String(f.file_description ?? '')
+                .trim()
+                .toLowerCase(),
             ),
         ) || [];
       const itAttachments =
-        res.attachments?.filter(
-          (f: any) =>
-            ['from it', 'จาก it'].includes(
-              String(f.file_description ?? '').trim().toLowerCase(),
-            ),
+        res.attachments?.filter((f: any) =>
+          ['from it', 'จาก it'].includes(
+            String(f.file_description ?? '')
+              .trim()
+              .toLowerCase(),
+          ),
         ) || [];
       const replyAttachments = res.attachments?.filter((f: any) => f.reply_id) || [];
       const convertedFiles = await this.fileConverter.convertUrlsToFiles(ticketAttachments);
@@ -1275,7 +1278,8 @@ export class DashboardIT implements OnInit {
 
   viewManagedAttachment(event: { file: any; source: 'user' | 'it' }): void {
     const ticket = this.selectedTicket();
-    const sourceFiles = event.source === 'it' ? (ticket?.itAttachments ?? []) : (ticket?.attachments ?? []);
+    const sourceFiles =
+      event.source === 'it' ? (ticket?.itAttachments ?? []) : (ticket?.attachments ?? []);
     const files = [event.file, ...sourceFiles.filter((file: any) => file !== event.file)];
     this.openAllAttachments(files);
   }

@@ -62,6 +62,7 @@ export class ChangeTicketTypeModal implements OnChanges {
   reason = '';
   attachments: { name: string; size: number; file: File }[] = [];
   showAttachmentError = false;
+  showReasonError = false;
 
   ngOnChanges(): void {
     this.selectedTypeId = Number(this.ticket?.ticketTypeId ?? this.ticket?.ticket_type_id ?? 2);
@@ -74,6 +75,7 @@ export class ChangeTicketTypeModal implements OnChanges {
     this.reason = '';
     this.attachments = [];
     this.showAttachmentError = false;
+    this.showReasonError = false;
   }
 
   selectType(ticketTypeId: number): void {
@@ -153,6 +155,10 @@ export class ChangeTicketTypeModal implements OnChanges {
     if (!this.canSubmit) return;
     if (this.repairCostType === 'paid' && this.attachments.length === 0) {
       this.showAttachmentError = true;
+      return;
+    }
+    if (!this.reason.trim()) {
+      this.showReasonError = true;
       return;
     }
 

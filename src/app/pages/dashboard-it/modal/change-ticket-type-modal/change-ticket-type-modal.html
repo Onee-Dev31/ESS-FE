@@ -92,16 +92,22 @@
       </div>
     }
 
-    <label class="field-label reason-label" for="change-type-reason">
-      เหตุผล <small>(ไม่บังคับ)</small>
-    </label>
+    <label class="field-label reason-label" for="change-type-reason"> เหตุผล<span>*</span> </label>
     <textarea
       id="change-type-reason"
       [(ngModel)]="reason"
+      (ngModelChange)="showReasonError = false"
       rows="4"
       maxlength="1000"
       placeholder="กรอกเหตุผลในการเปลี่ยนประเภทคำขอ..."
     ></textarea>
+
+    @if (showReasonError) {
+      <div class="attachment-required">
+        <i class="fas fa-exclamation-circle"></i>
+        กรุณากรอกเหตุผลในการเปลี่ยนประเภทคำขอ
+      </div>
+    }
   </div>
 
   <div modalFooter class="modal-actions">
