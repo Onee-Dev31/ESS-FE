@@ -22,6 +22,10 @@
     .kpi-value {
       font-size: $font-size-title;
     }
+
+    .kpi-delta {
+      font-size: $font-size-label;
+    }
   }
 
   @include tablet {
