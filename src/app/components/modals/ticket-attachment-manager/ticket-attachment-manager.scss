@@ -63,6 +63,17 @@ main {
   font-weight: 600;
   cursor: pointer;
 }
+
+.btn-add-file.disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.attachment-limit-note {
+  margin: -10px 0 12px;
+  color: var(--text-muted);
+  font-size: 0.78rem;
+}
 .file-rows {
   display: grid;
   gap: 8px;

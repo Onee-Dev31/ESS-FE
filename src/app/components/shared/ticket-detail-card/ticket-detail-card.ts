@@ -28,6 +28,7 @@ export class TicketDetailCardComponent implements OnChanges {
   @Input() copied = false;
   @Input() serviceLimit = 3;
   @Input() alertMessage = '';
+  @Input() newAttachmentCount = 0;
   @Output() attachmentClick = new EventEmitter<any[]>();
   @Output() servicesClick = new EventEmitter<any[]>();
   @Output() descriptionChange = new EventEmitter<string>();

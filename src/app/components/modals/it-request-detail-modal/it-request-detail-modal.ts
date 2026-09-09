@@ -104,6 +104,55 @@ export class ItRequestDetailModal implements OnChanges {
     return this.approvalItem.originalData?.attachments || [];
   }
 
+  get itAttachments(): any[] {
+    return this.attachments.filter(
+      (file) => this.getFileDescription(file).toLowerCase() === 'from it',
+    );
+  }
+
+  get requesterAttachments(): any[] {
+    return this.attachments.filter((file) => !this.getFileDescription(file));
+  }
+
+  get displayedAttachmentCount(): number {
+    return this.itAttachments.length + this.requesterAttachments.length;
+  }
+
+  get attachmentGroups(): {
+    key: 'it' | 'requester';
+    label: string;
+    files: any[];
+  }[] {
+    const groups: {
+      key: 'it' | 'requester';
+      label: string;
+      files: any[];
+    }[] = [
+      {
+        key: 'it',
+        label: 'เอกสารจาก IT',
+        files: this.itAttachments,
+      },
+      {
+        key: 'requester',
+        label: 'เอกสารจากผู้ขอใช้บริการ',
+        files: this.requesterAttachments,
+      },
+    ];
+
+    return groups.filter((group) => group.files.length > 0);
+  }
+
+  private getFileDescription(file: any): string {
+    return String(
+      file?.fileDescription ??
+        file?.file_description ??
+        file?.FileDescription ??
+        file?.description ??
+        '',
+    ).trim();
+  }
+
   getFileIcon(fileName: string): string {
     const ext = fileName.split('.').pop()?.toLowerCase();
     switch (ext) {
@@ -127,6 +176,12 @@ export class ItRequestDetailModal implements OnChanges {
 
   viewFile(file: any) {
     this.previewFiles.set([this.fileConverter.buildPreviewFile(file)]);
+    this.isPreviewModalOpen.set(true);
+  }
+
+  viewFileGroup(files: any[]) {
+    this.previewFiles.set(files.map((file) => this.fileConverter.buildPreviewFile(file)));
+
     this.isPreviewModalOpen.set(true);
   }
 
