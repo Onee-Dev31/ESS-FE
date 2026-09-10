@@ -351,7 +351,7 @@ export class ResignReport {
       'ตำแหน่ง',
       'แผนก',
       'บริษัท',
-      'Last Date',
+      'Last IT Access Date',
       'Effective Date',
     ];
 
@@ -444,7 +444,7 @@ export class ResignReport {
         { wch: 35 },
         { wch: 25 },
         { wch: 45 },
-        { wch: 12 },
+        { wch: 20 },
         { wch: 14 },
         { wch: 18 },
         { wch: 10 },
