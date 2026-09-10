@@ -22,6 +22,21 @@
 .progress-header.has-note-action {
   padding-right: 36px;
 }
+.progress-status-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.ticket-category {
+  min-width: 0;
+  overflow: hidden;
+  color: var(--text-sub);
+  font-size: $font-size-hint;
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
 
 .timeline {
   position: relative;
