@@ -1419,3 +1419,65 @@ nz-select.form-control.ant-select-focused {
 :host .modern-table tbody td {
   text-align: left;
 }
+
+.card-header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.report-btn {
+  height: 34px;
+  padding: 0 12px;
+  margin-right: 24px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+
+  border: 1px solid var(--border-table-head);
+  border-radius: 9px;
+
+  background: var(--bg-card);
+  color: var(--text-sub);
+
+  font-size: 13px;
+  font-weight: 600;
+
+  cursor: pointer;
+  white-space: nowrap;
+
+  transition: all 0.2s ease;
+
+  .report-icon {
+    color: var(--primary);
+    font-size: 13px;
+  }
+
+  .external-icon {
+    margin-left: 2px;
+    font-size: 10px;
+    color: var(--text-muted);
+    transition: transform 0.2s ease;
+  }
+
+  &:hover {
+    color: var(--primary);
+    border-color: var(--primary);
+
+    background: color-mix(in srgb, var(--primary) 5%, var(--bg-card));
+
+    box-shadow: 0 3px 10px color-mix(in srgb, var(--primary), transparent 88%);
+
+    .external-icon {
+      color: var(--primary);
+      transform: translate(1px, -1px);
+    }
+  }
+
+  &:active {
+    transform: translateY(1px);
+    box-shadow: none;
+  }
+}

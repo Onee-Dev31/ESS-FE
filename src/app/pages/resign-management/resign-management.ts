@@ -24,6 +24,7 @@ import { ConfirmModal } from './modal/confirm-modal/confirm-modal';
 import { AuthService } from '../../services/auth.service';
 import { environment } from '../../../environments/environment';
 import { PageLoaderComponent } from '../../components/shared/page-loader/page-loader';
+import { Router } from '@angular/router';
 
 interface EmployeeFormData {
   empCode: string; //CODEMPID
@@ -73,6 +74,7 @@ export class ResignManagement {
   private swalService = inject(SwalService);
   private masterService = inject(MasterDataService);
   private authService = inject(AuthService);
+  private readonly router = inject(Router);
 
   isLoading = this.loadingService.loading(this.loadingKey);
 
@@ -474,6 +476,12 @@ export class ResignManagement {
     const now = new Date();
 
     return new Date(+year, +month - 1, +day, now.getHours(), now.getMinutes(), now.getSeconds());
+  }
+
+  openResignReport(): void {
+    const url = this.router.serializeUrl(this.router.createUrlTree(['/resign-management/report']));
+
+    window.open(url, '_blank', 'noopener,noreferrer');
   }
 
   // Function

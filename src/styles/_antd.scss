@@ -355,6 +355,14 @@ nz-range-picker {
 |--------------------------------------------------------------------------
 */
 
+.ant-picker-input > input {
+  color: var(--text) !important;
+
+  &::placeholder {
+    color: var(--input-text-placeholder) !important;
+  }
+}
+
 /* panel bg */
 .custom-range-picker-popup .ant-picker-panel {
   background: var(--bg-card);

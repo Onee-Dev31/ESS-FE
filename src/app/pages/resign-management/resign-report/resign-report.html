@@ -20,16 +20,34 @@
         <div class="year-range-controls">
           <nz-range-picker
             id="report-year-range"
+            nzDropdownClassName="custom-range-picker-popup"
             class="year-range-picker"
             nzFormat="dd/MM/yyyy"
             [nzAllowClear]="false"
             [nzPlaceHolder]="['วันเริ่มต้น', 'วันสิ้นสุด']"
-            [ngModel]="yearRange()"
+            [ngModel]="dateRange()"
             (ngModelChange)="onYearRangeChange($event)"
           />
-          <button type="button" class="btn-search-year" (click)="applyFilter()">
+          <button
+            nz-button
+            nzType="primary"
+            class="btn-search-year"
+            type="button"
+            (click)="applyFilter()"
+          >
             <i class="fa-solid fa-magnifying-glass"></i>
             ค้นหา
+          </button>
+
+          <button
+            nz-button
+            nzType="default"
+            class="btn-reset-year"
+            type="button"
+            (click)="resetFilter()"
+          >
+            <i class="fa-solid fa-rotate-left"></i>
+            Reset
           </button>
         </div>
       </div>
@@ -53,19 +71,23 @@
                 <th rowspan="2" class="company-col">บริษัท</th>
                 <th rowspan="2" class="date-col">Last Date</th>
                 <th rowspan="2" class="date-col">Effective Date</th>
-                <th colspan="3" class="text-center expireDate-system-col">System AD Info</th>
-                <th colspan="4" class="text-center expireDate-actual-col">Actual AD Info</th>
-                <th rowspan="2" class="">Compare</th>
+                @if (isItReport) {
+                  <th colspan="3" class="text-center expireDate-system-col">System AD Info</th>
+                  <th colspan="4" class="text-center expireDate-actual-col">Actual AD Info</th>
+                  <th rowspan="2" class="">Compare</th>
+                }
               </tr>
-              <tr>
-                <th>AD User</th>
-                <th>Status</th>
-                <th>Expiry Date</th>
-                <th>AD User</th>
-                <th>Status</th>
-                <th>Expiry Date</th>
-                <th>Password Last Set</th>
-              </tr>
+              @if (isItReport) {
+                <tr>
+                  <th>AD User</th>
+                  <th>Status</th>
+                  <th>Expiry Date</th>
+                  <th>AD User</th>
+                  <th>Status</th>
+                  <th>Expiry Date</th>
+                  <th>Password Last Set</th>
+                </tr>
+              }
             </thead>
             @for (emp of resignComps.paginatedData(); track emp.empCode; let i = $index) {
               <tbody>
@@ -86,23 +108,25 @@
                   <td class="date-col">
                     {{ dataUtil.formatDateToBE(emp.effectiveDate, 'DD/MM/YYYY') }}
                   </td>
-                  <td>{{ emp.adUser_syetem }}</td>
-                  <td>{{ emp.status_system }}</td>
-                  <td class="expireDate-system-col">
-                    <div *ngIf="emp.expiryDate_system" class="detail">
-                      {{ emp.expiryDate_system }}
-                    </div>
-                    <div *ngIf="!emp.expiryDate_system" class="detail">-</div>
-                  </td>
-                  <td>{{ emp.adUser_actual }}</td>
-                  <td>{{ emp.status_actual }}</td>
-                  <td class="expireDate-actual-col">
-                    <div *ngIf="emp.expiryDate_actual" class="detail">
-                      {{ emp.expiryDate_actual }}
-                    </div>
-                  </td>
-                  <td>{{ emp.passwordLastSet_actual }}</td>
-                  <td>{{ emp.expiryDate_system === emp.expiryDate_actual }}</td>
+                  @if (isItReport) {
+                    <td>{{ emp.adUser_syetem }}</td>
+                    <td>{{ emp.status_system }}</td>
+                    <td class="expireDate-system-col">
+                      <div *ngIf="emp.expiryDate_system" class="detail">
+                        {{ emp.expiryDate_system }}
+                      </div>
+                      <div *ngIf="!emp.expiryDate_system" class="detail">-</div>
+                    </td>
+                    <td>{{ emp.adUser_actual }}</td>
+                    <td>{{ emp.status_actual }}</td>
+                    <td class="expireDate-actual-col">
+                      <div *ngIf="emp.expiryDate_actual" class="detail">
+                        {{ emp.expiryDate_actual }}
+                      </div>
+                    </td>
+                    <td>{{ emp.passwordLastSet_actual }}</td>
+                    <td>{{ emp.expiryDate_system === emp.expiryDate_actual }}</td>
+                  }
                 </tr>
               </tbody>
             } @empty {

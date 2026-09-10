@@ -635,7 +635,7 @@ export class ResignDetail {
 
   viewReportResign(command: 'fulltime' | 'freelance') {
     const status = this.activeTab === 'approved' ? 'true' : 'false';
-    window.open(`/resign-management/report?type=${command}&status=${status}`, '_blank');
+    window.open(`/resign-management/detail/report?type=${command}&status=${status}`, '_blank');
     //  window.open(`/it-dashboard/report-detail?id=${encodeURIComponent(encryptedId)}`, '_blank');
   }
 
