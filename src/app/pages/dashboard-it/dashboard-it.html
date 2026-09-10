@@ -124,6 +124,7 @@
               <div class="ticket-header">
                 <span class="ticket-number">{{ ticket.ticketNumber }} </span>
                 <div class="ticket-meta-right">
+                  <i class="fa-regular fa-closed-captioning" *ngIf="ticket.has_cc"></i>
                   <i class="fa-solid fa-paperclip" *ngIf="ticket.attachment_count > 0"></i>
                   <i
                     class="fas text-icon"
