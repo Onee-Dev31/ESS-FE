@@ -73,6 +73,7 @@ export class ChangeTicketTypeModal implements OnChanges, OnDestroy {
   originalTypeId = 2;
   repairCostType: 'paid' | 'free' | null = null;
   originalRepairCostType: 'paid' | 'free' | null = null;
+  private lastRepairCostType: 'paid' | 'free' | null = null;
   reason = '';
   attachments: { name: string; size: number; file: File }[] = [];
   showAttachmentError = false;
@@ -89,6 +90,7 @@ export class ChangeTicketTypeModal implements OnChanges, OnDestroy {
         ? this.ticket.repair_cost_type
         : null;
     this.originalRepairCostType = this.repairCostType;
+    this.lastRepairCostType = this.repairCostType;
     this.reason = '';
     this.attachments = [];
     this.showAttachmentError = false;
@@ -97,11 +99,17 @@ export class ChangeTicketTypeModal implements OnChanges, OnDestroy {
 
   selectType(ticketTypeId: number): void {
     if (this.isTypeChangeLocked || (ticketTypeId === 3 && !this.isViaEmail)) return;
+    if (this.selectedTypeId === 1) {
+      this.lastRepairCostType = this.repairCostType;
+    }
     this.selectedTypeId = ticketTypeId;
+    this.showReasonError = false;
     if (ticketTypeId !== 1) {
       this.repairCostType = null;
       this.attachments = [];
       this.showAttachmentError = false;
+    } else {
+      this.repairCostType = this.lastRepairCostType;
     }
   }
 
@@ -189,13 +197,17 @@ export class ChangeTicketTypeModal implements OnChanges, OnDestroy {
     this.closePreview();
   }
 
+  get hasTypeChanged(): boolean {
+    return (
+      this.selectedTypeId !== this.originalTypeId ||
+      (this.selectedTypeId === 1 && this.repairCostType !== this.originalRepairCostType)
+    );
+  }
+
   get canSubmit(): boolean {
     if (this.isTypeChangeLocked || (this.selectedTypeId === 3 && !this.isViaEmail)) return false;
-    const hasChanged =
-      this.selectedTypeId !== this.originalTypeId ||
-      (this.selectedTypeId === 1 && this.repairCostType !== this.originalRepairCostType);
 
-    return hasChanged && (this.selectedTypeId !== 1 || this.repairCostType !== null);
+    return this.hasTypeChanged && (this.selectedTypeId !== 1 || this.repairCostType !== null);
   }
 
   save(): void {
@@ -204,8 +216,7 @@ export class ChangeTicketTypeModal implements OnChanges, OnDestroy {
       this.showAttachmentError = true;
       return;
     }
-    //  if (this.repairCostType === 'paid' && !this.reason.trim()) {
-    if (!this.reason.trim()) {
+    if (this.repairCostType === 'paid' && !this.reason.trim()) {
       this.showReasonError = true;
       return;
     }
