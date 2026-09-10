@@ -41,7 +41,7 @@ import { FileConverterService } from '../../services/file-converter';
 import { SignalrService } from '../../services/signalr.service';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { EMPTY, interval, firstValueFrom } from 'rxjs';
-import { filter } from 'rxjs/operators';
+import { catchError, filter } from 'rxjs/operators';
 import { NzTooltipModule } from 'ng-zorro-antd/tooltip';
 import { NzModalModule } from 'ng-zorro-antd/modal';
 import { CcModal } from '../dashboard-it/modal/cc-modal/cc-modal';
@@ -255,6 +255,7 @@ export class ItService implements OnInit {
         if (!isFirstQueryParamsEmit) this.getMyTicket();
         isFirstQueryParamsEmit = false;
         if (ticketId) {
+          this.location.replaceState('/it-service-list');
           const id = Number(ticketId);
           this.highlightedTicketId.set(id);
           this.newNoteTicketIds.update((s) => {
@@ -440,119 +441,138 @@ export class ItService implements OnInit {
   selectTicket(ticketId: string, options?: { openChat?: boolean }) {
     const previousTicketId = this.selectedTicket()?.ticketId;
 
-    this.getTicketById(ticketId).subscribe(async (res: any) => {
-      console.log(res);
-      const ticketAttachments =
-        res.attachments?.filter(
-          (f: any) =>
-            !f.reply_id &&
-            !['from it', 'จาก it'].includes(
+    this.itServiceService
+      .getTicketById(ticketId, this.userData.CODEMPID, true)
+      .pipe(
+        catchError((error) => {
+          this.clearSelection();
+          this.closeTicketDetail();
+          this.clearChatDraft();
+          this.replyReaders.set([]);
+          this.replyingTo.set(null);
+          this.highlightedTicketId.set(null);
+          this.highlightedNoteTicketId.set(null);
+          if (error.status === 403) {
+            void this.swalService.warning('คุณไม่มีสิทธิ์เข้าถึง Ticket นี้');
+          } else {
+            void this.swalService.error('ไม่สามารถโหลด Ticket ได้', 'กรุณาลองใหม่อีกครั้ง');
+          }
+          return EMPTY;
+        }),
+      )
+      .subscribe(async (res: any) => {
+        console.log(res);
+        const ticketAttachments =
+          res.attachments?.filter(
+            (f: any) =>
+              !f.reply_id &&
+              !['from it', 'จาก it'].includes(
+                String(f.file_description ?? '')
+                  .trim()
+                  .toLowerCase(),
+              ),
+          ) || [];
+        const itAttachments =
+          res.attachments?.filter((f: any) =>
+            ['from it', 'จาก it'].includes(
               String(f.file_description ?? '')
                 .trim()
                 .toLowerCase(),
             ),
-        ) || [];
-      const itAttachments =
-        res.attachments?.filter((f: any) =>
-          ['from it', 'จาก it'].includes(
-            String(f.file_description ?? '')
-              .trim()
-              .toLowerCase(),
-          ),
-        ) || [];
-      const replyAttachments = res.attachments?.filter((f: any) => f.reply_id) || [];
+          ) || [];
+        const replyAttachments = res.attachments?.filter((f: any) => f.reply_id) || [];
 
-      const convertedFiles = await this.fileConverter.convertUrlsToFiles(ticketAttachments);
-      const convertedItFiles = await this.fileConverter.convertUrlsToFiles(itAttachments);
+        const convertedFiles = await this.fileConverter.convertUrlsToFiles(ticketAttachments);
+        const convertedItFiles = await this.fileConverter.convertUrlsToFiles(itAttachments);
 
-      const ticket = res.ticket;
-      const replies = res.replies;
-      const services = res.services;
-      const attachments = convertedFiles;
-      const assignGroups = res.assignGroups;
-      const assignments = res.assignments;
-      const ccList = res.ccList;
-      this.desNew = ticket.description;
+        const ticket = res.ticket;
+        const replies = res.replies;
+        const services = res.services;
+        const attachments = convertedFiles;
+        const assignGroups = res.assignGroups;
+        const assignments = res.assignments;
+        const ccList = res.ccList;
+        this.desNew = ticket.description;
 
-      const itNotes = await this.buildItNotes(replies, replyAttachments, ticket.requester_aduser);
-      const result = this.buildTimeline(res.timeline, res.timelineAssignees);
-      let status = this.getTicketStatus(ticket);
-      const isOpenForSelf =
-        res.requestFor?.emp_code && res.requestFor.emp_code === res.requester?.emp_code;
+        const itNotes = await this.buildItNotes(replies, replyAttachments, ticket.requester_aduser);
+        const result = this.buildTimeline(res.timeline, res.timelineAssignees);
+        let status = this.getTicketStatus(ticket);
+        const isOpenForSelf =
+          res.requestFor?.emp_code && res.requestFor.emp_code === res.requester?.emp_code;
 
-      const hasOpenFor = !!(res.requestFor?.emp_code || res.requestFor?.fullname);
+        const hasOpenFor = !!(res.requestFor?.emp_code || res.requestFor?.fullname);
 
-      const openFor = isOpenForSelf
-        ? { fullname: 'เปิดให้ตนเอง' }
-        : hasOpenFor
-          ? res.requestFor
-          : null;
+        const openFor = isOpenForSelf
+          ? { fullname: 'เปิดให้ตนเอง' }
+          : hasOpenFor
+            ? res.requestFor
+            : null;
 
-      const objectData = {
-        ticketId: ticket.id,
-        ticketNumber: ticket.ticket_number,
-        subject: ticket.subject,
-        description: ticket.description,
-        viaEmail: ticket.is_from_email,
-        ticketType: ticket.ticket_type_name_th,
-        ticketTypeId: ticket.ticket_type_id,
-        status: status,
-        title: ticket.title,
-        status_user: ticket.user_status,
-        priority: ticket.priority,
-        source: ticket.source,
-        createdDate: new Date(ticket.created_at).toISOString(),
-        elapsed_time: ticket.elapsed_time,
-        requesterCode: ticket.requester_code,
-        requesterAduser: ticket.requester_aduser,
-        requesterName: ticket.requester_name,
-        requesterEmail: ticket.requester_email,
-        requesterDept: ticket.requester_dept,
-        requesterCompanyCode: ticket.requester_companyCode,
-        requesterCompanyName: ticket.requester_companyName,
-        requesterPhone: ticket.contact_phone,
-        requesterColor: ticketTypyColor.getColor(ticket.ticket_type_id),
-        attachments: attachments,
-        itAttachments: convertedItFiles,
-        assignments: assignments,
-        itNotes: itNotes,
-        assignTimeline: result,
-        services: services,
-        requester: res.requester,
-        openFor: openFor,
-        rejection_reason: ticket.rejection_reason,
-        ccList: ccList,
-      };
+        const objectData = {
+          ticketId: ticket.id,
+          ticketNumber: ticket.ticket_number,
+          subject: ticket.subject,
+          description: ticket.description,
+          viaEmail: ticket.is_from_email,
+          ticketType: ticket.ticket_type_name_th,
+          ticketTypeId: ticket.ticket_type_id,
+          status: status,
+          title: ticket.title,
+          status_user: ticket.user_status,
+          priority: ticket.priority,
+          source: ticket.source,
+          createdDate: new Date(ticket.created_at).toISOString(),
+          elapsed_time: ticket.elapsed_time,
+          requesterCode: ticket.requester_code,
+          requesterAduser: ticket.requester_aduser,
+          requesterName: ticket.requester_name,
+          requesterEmail: ticket.requester_email,
+          requesterDept: ticket.requester_dept,
+          requesterCompanyCode: ticket.requester_companyCode,
+          requesterCompanyName: ticket.requester_companyName,
+          requesterPhone: ticket.contact_phone,
+          requesterColor: ticketTypyColor.getColor(ticket.ticket_type_id),
+          attachments: attachments,
+          itAttachments: convertedItFiles,
+          assignments: assignments,
+          itNotes: itNotes,
+          assignTimeline: result,
+          services: services,
+          requester: res.requester,
+          openFor: openFor,
+          rejection_reason: ticket.rejection_reason,
+          ccList: ccList,
+        };
 
-      console.log(objectData);
+        console.log(objectData);
 
-      this.selectedTicket.set(objectData);
-      if (previousTicketId !== objectData.ticketId) {
-        this.clearChatDraft();
-        this.replyReaders.set([]);
-      }
-      if (options?.openChat && this.canAccessChat()) {
-        this.IS_CHAT_OPEN.set(true);
-        setTimeout(() => this.ticketChat?.focusComposer(), 100);
-      }
-      if (this.IS_CHAT_OPEN()) {
-        this.markChatAsRead();
-        this.markLatestReplyRead(objectData.ticketId, objectData.itNotes ?? []);
-      }
-      this.scrollToBottom();
+        this.selectedTicket.set(objectData);
+        if (previousTicketId !== objectData.ticketId) {
+          this.clearChatDraft();
+          this.replyReaders.set([]);
+        }
+        if (options?.openChat && this.canAccessChat()) {
+          this.IS_CHAT_OPEN.set(true);
+          setTimeout(() => this.ticketChat?.focusComposer(), 100);
+        }
+        if (this.IS_CHAT_OPEN()) {
+          this.markChatAsRead();
+          this.markLatestReplyRead(objectData.ticketId, objectData.itNotes ?? []);
+        }
+        this.scrollToBottom();
 
-      const codeempid = this.authService.userData()?.CODEMPID;
-      if (ticketId && codeempid) {
-        this.itServiceService.markTicketRead(ticketId, codeempid).subscribe({
-          complete: () => this.signalrService.ticketReadTrigger.next({ ticketId }),
-        });
-        this.loadReplyReadStatus(ticketId);
-      }
+        const codeempid = this.authService.userData()?.CODEMPID;
+        if (ticketId && codeempid) {
+          this.itServiceService.markTicketRead(ticketId, codeempid).subscribe({
+            complete: () => this.signalrService.ticketReadTrigger.next({ ticketId }),
+          });
+          this.loadReplyReadStatus(ticketId);
+        }
 
-      if (this.isMobile) {
-        this.isTicketDetailOpen.set(true);
-      }
-    });
+        if (this.isMobile) {
+          this.isTicketDetailOpen.set(true);
+        }
+      });
   }
 
   closeTicketDetail() {
@@ -1222,10 +1242,6 @@ export class ItService implements OnInit {
           console.error('Error fetching data:', error);
         },
       });
-  }
-
-  getTicketById(ticketId: string) {
-    return this.itServiceService.getTicketById(ticketId);
   }
 
   onFileSelected(event: Event) {

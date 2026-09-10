@@ -22,8 +22,11 @@ export const roleGuard: CanActivateFn = (route, state) => {
     return true;
   }
 
-  router.navigate(['/dashboard']);
-  return false;
+  // router.navigate(['/dashboard']);
+  // return false;
+  const fallback = route.data['fallback'] || '/dashboard';
+
+  return router.createUrlTree([fallback]);
 };
 
 export const menuGuard: CanActivateFn = (route, state) => {

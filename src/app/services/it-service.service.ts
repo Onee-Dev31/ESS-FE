@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { environment } from '../../environments/environment';
-import { HttpClient, HttpParams } from '@angular/common/http';
+import { HttpClient, HttpContext, HttpParams } from '@angular/common/http';
+import { SKIP_ERROR_TOAST } from '../interceptors/error.interceptor';
 import { delay, Observable, of } from 'rxjs';
 import { AuthService } from './auth.service';
 
@@ -261,8 +262,19 @@ export class ItServiceService {
     });
   }
 
-  getTicketById(ticketId: string) {
-    return this._http.get(`${this.baseUrl}/tickets/${ticketId}`);
+  getTicketById(
+    ticketId: string,
+    requesterCodeempid?: string,
+    skipErrorToast = false,
+  ): Observable<any> {
+    const url = `${this.baseUrl}/tickets/${ticketId}`;
+    const context = new HttpContext().set(SKIP_ERROR_TOAST, skipErrorToast);
+
+    if (requesterCodeempid) {
+      return this._http.get(url, { params: { ownerreq: requesterCodeempid }, context });
+    }
+
+    return this._http.get(url, { context });
   }
 
   createTicket(formData: FormData): Observable<any> {

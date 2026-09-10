@@ -26,23 +26,6 @@ import { ActivatedRoute } from '@angular/router';
 import { FreelanceService } from '../../../services/freelance-management.service';
 import { PageLoaderComponent } from '../../../components/shared/page-loader/page-loader';
 
-// interface EmployeeFormData {
-//   empCode: string; //CODEMPID
-//   firstNameTh: string; //NAMFIRSTT
-//   lastNameTh: string; //NAMLASTT
-//   firstNameEn: string; //NAMFIRSTE
-//   lastNameEn: string; //NAMLASTE
-//   nickName: string; //NICKNAME
-//   department: string; //DEPARTMENT
-//   company: string; //COMPANY_NAME [COMPANY_CODE]
-//   type: string; // ?
-//   adUser: string; //AD_USER
-//   position: string; //POST
-//   lastDate: string;
-//   effectiveDate: string;
-//   expireDate: string;
-// }
-
 @Component({
   selector: 'app-resign-report',
   imports: [
@@ -88,13 +71,23 @@ export class ResignReport {
   filterCompany = signal<any>(null);
   filterDepartment = signal<any>(null);
   filterMonth = signal<string>('');
+
+  dateFrom = signal<string>('');
+  dateTo = signal<string>('');
+  dateRange = signal<Date[]>([]);
+
   // API ต้องการช่วงวันที่เต็ม ไม่ใช่เฉพาะเลขปี
-  yearFrom = signal<string>(`${this.currentYear}-01-01`);
-  yearTo = signal<string>(`${this.currentYear}-12-31`);
-  yearRange = signal<Date[]>([
-    new Date(this.currentYear, 0, 1),
-    new Date(this.currentYear, 11, 31),
-  ]);
+  // yearFrom = signal<string>(`${this.currentYear}-01-01`);
+  // yearTo = signal<string>(`${this.currentYear}-12-31`);
+  // yearRange = signal<Date[]>([
+  //   new Date(this.currentYear, 0, 1),
+  //   new Date(this.currentYear, 11, 31),
+  // ]);
+
+  // Hr
+  readonly currentMonth = new Date().getMonth();
+  monthFrom = signal<Date | null>(new Date(this.currentYear, this.currentMonth, 1));
+  monthTo = signal<Date | null>(new Date(this.currentYear, this.currentMonth, 1));
 
   appliedCompany = signal<any>(null);
   appliedDepartment = signal<any>(null);
@@ -115,13 +108,39 @@ export class ResignReport {
   type: any = 'fulltime';
   status: any = 'fulltime';
 
-  constructor(private route: ActivatedRoute) {}
+  readonly isItReport: boolean;
+  readonly isHrReport: boolean;
+
+  constructor(private route: ActivatedRoute) {
+    this.isItReport = this.route.snapshot.data['showAdInfo'] === true;
+    this.isHrReport = !this.isItReport;
+
+    console.log('isItReport:', this.isItReport, 'isHrReport:', this.isHrReport);
+  }
 
   ngOnInit() {
     this.route.queryParams.subscribe((params) => {
-      this.type = params['type'];
+      this.type = params['type'] ?? 'fulltime';
       this.status = params['status'];
       console.log(this.type, this.status); // fulltime / freelance
+
+      if (this.isItReport) {
+        // IT = ปีปัจจุบัน
+        const from = new Date(this.currentYear, 0, 1);
+        const to = new Date(this.currentYear, 11, 31);
+
+        this.dateRange.set([from, to]);
+        this.dateFrom.set(dayjs(from).format('YYYY-MM-DD'));
+        this.dateTo.set(dayjs(to).format('YYYY-MM-DD'));
+      } else {
+        // HR = เดือนปัจจุบัน
+        const from = dayjs().startOf('month').toDate();
+        const to = dayjs().endOf('month').toDate();
+
+        this.dateRange.set([from, to]);
+        this.dateFrom.set(dayjs(from).format('YYYY-MM-DD'));
+        this.dateTo.set(dayjs(to).format('YYYY-MM-DD'));
+      }
     });
 
     this.getCompanies();
@@ -154,172 +173,422 @@ export class ResignReport {
     this.IS_INFO.set(false);
   }
 
+  // exportData() {
+  //   const data = this.resignData();
+
+  //   const header = [
+  //     [
+  //       'ลำดับ',
+  //       'รหัส',
+  //       'ชื่อ-นามสกุล',
+  //       'ชื่อ-นามสกุล (ภาษาอังกฤษ)',
+  //       'ชื่อเล่น',
+  //       'ตำแหน่ง',
+  //       'แผนก',
+  //       'บริษัท',
+  //       'Last Date',
+  //       'Effective Date',
+  //       'System AD Info',
+  //       '',
+  //       '',
+  //       'Actual AD Info',
+  //       '',
+  //       '',
+  //       'Compare',
+  //     ],
+  //     [
+  //       '',
+  //       '',
+  //       '',
+  //       '',
+  //       '',
+  //       '',
+  //       '',
+  //       '',
+  //       '',
+  //       '',
+  //       'AD User',
+  //       'Status',
+  //       'Expiry Date',
+  //       'AD User',
+  //       'Status',
+  //       'Expiry Date',
+  //       '',
+  //     ],
+  //   ];
+
+  //   const rows = data.map((item: any, index: number) => [
+  //     index + 1,
+  //     item.empCode,
+  //     item.firstNameTh + ' ' + item.lastNameTh,
+  //     item.firstNameEn + ' ' + item.lastNameEn,
+  //     item.nickName,
+  //     item.position,
+  //     item.department,
+  //     item.company,
+  //     dayjs(item.lastDate).format('DD/MM/YYYY'),
+  //     dayjs(item.effectiveDate).format('DD/MM/YYYY'),
+  //     item.adUser_syetem,
+  //     item.status_system,
+  //     item.expiryDate_system === '' ? '-' : item.expiryDate_system,
+  //     item.adUser_actual,
+  //     item.status_actual,
+  //     item.expiryDate_actual,
+  //     item.expiryDate_system === item.expiryDate_actual,
+  //   ]);
+
+  //   const worksheet: XLSX.WorkSheet = XLSX.utils.aoa_to_sheet([...header, ...rows]);
+
+  //   // merge header
+  //   worksheet['!merges'] = [
+  //     { s: { r: 0, c: 0 }, e: { r: 1, c: 0 } },
+  //     { s: { r: 0, c: 1 }, e: { r: 1, c: 1 } },
+  //     { s: { r: 0, c: 2 }, e: { r: 1, c: 2 } },
+  //     { s: { r: 0, c: 3 }, e: { r: 1, c: 3 } },
+  //     { s: { r: 0, c: 4 }, e: { r: 1, c: 4 } },
+  //     { s: { r: 0, c: 5 }, e: { r: 1, c: 5 } },
+  //     { s: { r: 0, c: 6 }, e: { r: 1, c: 6 } },
+  //     { s: { r: 0, c: 7 }, e: { r: 1, c: 7 } },
+  //     { s: { r: 0, c: 8 }, e: { r: 1, c: 8 } },
+  //     { s: { r: 0, c: 9 }, e: { r: 1, c: 9 } },
+
+  //     { s: { r: 0, c: 10 }, e: { r: 0, c: 12 } },
+  //     { s: { r: 0, c: 13 }, e: { r: 0, c: 15 } },
+
+  //     { s: { r: 0, c: 16 }, e: { r: 1, c: 16 } },
+  //   ];
+
+  //   // column width
+  //   worksheet['!cols'] = [
+  //     { wch: 6 }, //A
+  //     { wch: 10 }, //B
+  //     { wch: 25 }, //C
+  //     { wch: 25 }, //D
+  //     { wch: 12 }, //E
+  //     { wch: 35 }, //F
+  //     { wch: 25 }, //G
+  //     { wch: 45 }, //H
+  //     { wch: 12 }, //I
+  //     { wch: 12 }, //J
+  //     { wch: 18 }, //K
+  //     { wch: 10 }, //L
+  //     { wch: 14 }, //M
+  //     { wch: 18 }, //N
+  //     { wch: 10 }, //O
+  //     { wch: 14 }, //P
+  //     { wch: 10 }, //Q
+  //   ];
+
+  //   // header (center + bold)
+  //   const range = XLSX.utils.decode_range(worksheet['!ref']!);
+
+  //   for (let C = range.s.c; C <= range.e.c; C++) {
+  //     const header1 = XLSX.utils.encode_cell({ r: 0, c: C });
+  //     const header2 = XLSX.utils.encode_cell({ r: 1, c: C });
+
+  //     if (worksheet[header1]) {
+  //       worksheet[header1].s = {
+  //         alignment: { horizontal: 'center', vertical: 'center' },
+  //         font: { bold: true },
+  //       };
+  //     }
+
+  //     if (worksheet[header2]) {
+  //       worksheet[header2].s = {
+  //         alignment: { horizontal: 'center', vertical: 'center' },
+  //         font: { bold: true },
+  //       };
+  //     }
+  //   }
+
+  //   // body [lastDate, effectiveDate] อยู่ตรงกลาง
+  //   for (let R = 2; R <= range.e.r; R++) {
+  //     const lastDateCell = XLSX.utils.encode_cell({ r: R, c: 8 }); // column I
+  //     const effectiveDateCell = XLSX.utils.encode_cell({ r: R, c: 9 }); // column J
+
+  //     if (worksheet[lastDateCell]) {
+  //       worksheet[lastDateCell].s = {
+  //         alignment: { horizontal: 'center', vertical: 'center' },
+  //       };
+  //     }
+
+  //     if (worksheet[effectiveDateCell]) {
+  //       worksheet[effectiveDateCell].s = {
+  //         alignment: { horizontal: 'center', vertical: 'center' },
+  //       };
+  //     }
+  //   }
+  //   // เปลี่ยน Font
+  //   for (let R = 2; R <= range.e.r; R++) {
+  //     for (let C = range.s.c; C <= range.e.c; C++) {
+  //       const cell = XLSX.utils.encode_cell({ r: R, c: C });
+
+  //       if (worksheet[cell]) {
+  //         worksheet[cell].s = {
+  //           font: { name: 'Tahoma', sz: 10 },
+  //         };
+  //       }
+  //     }
+  //   }
+
+  //   const workbook: XLSX.WorkBook = {
+  //     Sheets: { ResignReport: worksheet },
+  //     SheetNames: ['ResignReport'],
+  //   };
+
+  //   XLSX.writeFile(workbook, 'ResignReport.xlsx');
+  // }
+
   exportData() {
     const data = this.resignData();
 
-    console.log(data);
-
-    const header = [
-      [
-        'ลำดับ',
-        'รหัส',
-        'ชื่อ-นามสกุล',
-        'ชื่อ-นามสกุล (ภาษาอังกฤษ)',
-        'ชื่อเล่น',
-        'ตำแหน่ง',
-        'แผนก',
-        'บริษัท',
-        'Last Date',
-        'Effective Date',
-        'System AD Info',
-        '',
-        '',
-        'Actual AD Info',
-        '',
-        '',
-        'Compare',
-      ],
-      [
-        '',
-        '',
-        '',
-        '',
-        '',
-        '',
-        '',
-        '',
-        '',
-        '',
-        'AD User',
-        'Status',
-        'Expiry Date',
-        'AD User',
-        'Status',
-        'Expiry Date',
-        '',
-      ],
+    const baseHeader = [
+      'ลำดับ',
+      'รหัส',
+      'ชื่อ-นามสกุล',
+      'ชื่อ-นามสกุล (ภาษาอังกฤษ)',
+      'ชื่อเล่น',
+      'ตำแหน่ง',
+      'แผนก',
+      'บริษัท',
+      'Last Date',
+      'Effective Date',
     ];
 
-    const rows = data.map((item: any, index: number) => [
-      index + 1,
-      item.empCode,
-      item.firstNameTh + ' ' + item.lastNameTh,
-      item.firstNameEn + ' ' + item.lastNameEn,
-      item.nickName,
-      item.position,
-      item.department,
-      item.company,
-      dayjs(item.lastDate).format('DD/MM/YYYY'),
-      dayjs(item.effectiveDate).format('DD/MM/YYYY'),
-      item.adUser_syetem,
-      item.status_system,
-      item.expiryDate_system === '' ? '-' : item.expiryDate_system,
-      item.adUser_actual,
-      item.status_actual,
-      item.expiryDate_actual,
-      item.expiryDate_system === item.expiryDate_actual,
-    ]);
+    let header: any[][];
+    let rows: any[][];
+    let merges: any[];
+    let cols: any[];
+
+    if (this.isItReport) {
+      // =========================
+      // IT REPORT
+      // =========================
+      header = [
+        [...baseHeader, 'System AD Info', '', '', 'Actual AD Info', '', '', 'Compare'],
+        [
+          '',
+          '',
+          '',
+          '',
+          '',
+          '',
+          '',
+          '',
+          '',
+          '',
+          'AD User',
+          'Status',
+          'Expiry Date',
+          'AD User',
+          'Status',
+          'Expiry Date',
+          '',
+        ],
+      ];
+
+      rows = data.map((item: any, index: number) => [
+        index + 1,
+        item.empCode,
+        `${item.firstNameTh} ${item.lastNameTh}`,
+        `${item.firstNameEn} ${item.lastNameEn}`,
+        item.nickName,
+        item.position,
+        item.department,
+        item.company,
+        item.lastDate ? dayjs(item.lastDate).format('DD/MM/YYYY') : '-',
+        item.effectiveDate ? dayjs(item.effectiveDate).format('DD/MM/YYYY') : '-',
+
+        // System AD
+        item.adUser_syetem,
+        item.status_system,
+        item.expiryDate_system || '-',
+
+        // Actual AD
+        item.adUser_actual,
+        item.status_actual,
+        item.expiryDate_actual || '-',
+
+        // Compare
+        item.expiryDate_system === item.expiryDate_actual,
+      ]);
+
+      merges = [
+        { s: { r: 0, c: 0 }, e: { r: 1, c: 0 } },
+        { s: { r: 0, c: 1 }, e: { r: 1, c: 1 } },
+        { s: { r: 0, c: 2 }, e: { r: 1, c: 2 } },
+        { s: { r: 0, c: 3 }, e: { r: 1, c: 3 } },
+        { s: { r: 0, c: 4 }, e: { r: 1, c: 4 } },
+        { s: { r: 0, c: 5 }, e: { r: 1, c: 5 } },
+        { s: { r: 0, c: 6 }, e: { r: 1, c: 6 } },
+        { s: { r: 0, c: 7 }, e: { r: 1, c: 7 } },
+        { s: { r: 0, c: 8 }, e: { r: 1, c: 8 } },
+        { s: { r: 0, c: 9 }, e: { r: 1, c: 9 } },
+
+        // System AD
+        { s: { r: 0, c: 10 }, e: { r: 0, c: 12 } },
+
+        // Actual AD
+        { s: { r: 0, c: 13 }, e: { r: 0, c: 15 } },
+
+        // Compare
+        { s: { r: 0, c: 16 }, e: { r: 1, c: 16 } },
+      ];
+
+      cols = [
+        { wch: 6 },
+        { wch: 10 },
+        { wch: 25 },
+        { wch: 25 },
+        { wch: 12 },
+        { wch: 35 },
+        { wch: 25 },
+        { wch: 45 },
+        { wch: 12 },
+        { wch: 14 },
+        { wch: 18 },
+        { wch: 10 },
+        { wch: 14 },
+        { wch: 18 },
+        { wch: 10 },
+        { wch: 14 },
+        { wch: 10 },
+      ];
+    } else {
+      // =========================
+      // HR REPORT
+      // =========================
+      header = [baseHeader];
+
+      rows = data.map((item: any, index: number) => [
+        index + 1,
+        item.empCode,
+        `${item.firstNameTh} ${item.lastNameTh}`,
+        `${item.firstNameEn} ${item.lastNameEn}`,
+        item.nickName,
+        item.position,
+        item.department,
+        item.company,
+        item.lastDate ? dayjs(item.lastDate).format('DD/MM/YYYY') : '-',
+        item.effectiveDate ? dayjs(item.effectiveDate).format('DD/MM/YYYY') : '-',
+      ]);
+
+      // HR มี header แถวเดียว ไม่ต้อง merge
+      merges = [];
+
+      cols = [
+        { wch: 6 },
+        { wch: 10 },
+        { wch: 25 },
+        { wch: 25 },
+        { wch: 12 },
+        { wch: 35 },
+        { wch: 25 },
+        { wch: 45 },
+        { wch: 12 },
+        { wch: 14 },
+      ];
+    }
 
     const worksheet: XLSX.WorkSheet = XLSX.utils.aoa_to_sheet([...header, ...rows]);
 
-    // merge header
-    worksheet['!merges'] = [
-      { s: { r: 0, c: 0 }, e: { r: 1, c: 0 } },
-      { s: { r: 0, c: 1 }, e: { r: 1, c: 1 } },
-      { s: { r: 0, c: 2 }, e: { r: 1, c: 2 } },
-      { s: { r: 0, c: 3 }, e: { r: 1, c: 3 } },
-      { s: { r: 0, c: 4 }, e: { r: 1, c: 4 } },
-      { s: { r: 0, c: 5 }, e: { r: 1, c: 5 } },
-      { s: { r: 0, c: 6 }, e: { r: 1, c: 6 } },
-      { s: { r: 0, c: 7 }, e: { r: 1, c: 7 } },
-      { s: { r: 0, c: 8 }, e: { r: 1, c: 8 } },
-      { s: { r: 0, c: 9 }, e: { r: 1, c: 9 } },
+    worksheet['!merges'] = merges;
+    worksheet['!cols'] = cols;
 
-      { s: { r: 0, c: 10 }, e: { r: 0, c: 12 } },
-      { s: { r: 0, c: 13 }, e: { r: 0, c: 15 } },
-
-      { s: { r: 0, c: 16 }, e: { r: 1, c: 16 } },
-    ];
-
-    // column width
-    worksheet['!cols'] = [
-      { wch: 6 }, //A
-      { wch: 10 }, //B
-      { wch: 25 }, //C
-      { wch: 25 }, //D
-      { wch: 12 }, //E
-      { wch: 35 }, //F
-      { wch: 25 }, //G
-      { wch: 45 }, //H
-      { wch: 12 }, //I
-      { wch: 12 }, //J
-      { wch: 18 }, //K
-      { wch: 10 }, //L
-      { wch: 14 }, //M
-      { wch: 18 }, //N
-      { wch: 10 }, //O
-      { wch: 14 }, //P
-      { wch: 10 }, //Q
-    ];
-
-    // header (center + bold)
     const range = XLSX.utils.decode_range(worksheet['!ref']!);
 
-    for (let C = range.s.c; C <= range.e.c; C++) {
-      const header1 = XLSX.utils.encode_cell({ r: 0, c: C });
-      const header2 = XLSX.utils.encode_cell({ r: 1, c: C });
+    // จำนวนแถว header
+    const headerRowCount = this.isItReport ? 2 : 1;
 
-      if (worksheet[header1]) {
-        worksheet[header1].s = {
-          alignment: { horizontal: 'center', vertical: 'center' },
-          font: { bold: true },
-        };
-      }
-
-      if (worksheet[header2]) {
-        worksheet[header2].s = {
-          alignment: { horizontal: 'center', vertical: 'center' },
-          font: { bold: true },
-        };
-      }
-    }
-
-    // body [lastDate, effectiveDate] อยู่ตรงกลาง
-    for (let R = 2; R <= range.e.r; R++) {
-      const lastDateCell = XLSX.utils.encode_cell({ r: R, c: 8 }); // column I
-      const effectiveDateCell = XLSX.utils.encode_cell({ r: R, c: 9 }); // column J
-
-      if (worksheet[lastDateCell]) {
-        worksheet[lastDateCell].s = {
-          alignment: { horizontal: 'center', vertical: 'center' },
-        };
-      }
-
-      if (worksheet[effectiveDateCell]) {
-        worksheet[effectiveDateCell].s = {
-          alignment: { horizontal: 'center', vertical: 'center' },
-        };
-      }
-    }
-    // เปลี่ยน Font
-    for (let R = 2; R <= range.e.r; R++) {
+    // =========================
+    // HEADER STYLE
+    // =========================
+    for (let R = 0; R < headerRowCount; R++) {
       for (let C = range.s.c; C <= range.e.c; C++) {
-        const cell = XLSX.utils.encode_cell({ r: R, c: C });
+        const cellAddress = XLSX.utils.encode_cell({
+          r: R,
+          c: C,
+        });
 
-        if (worksheet[cell]) {
-          worksheet[cell].s = {
-            font: { name: 'Tahoma', sz: 10 },
+        if (worksheet[cellAddress]) {
+          worksheet[cellAddress].s = {
+            font: {
+              name: 'Tahoma',
+              sz: 10,
+              bold: true,
+            },
+            alignment: {
+              horizontal: 'center',
+              vertical: 'center',
+            },
           };
         }
       }
     }
 
+    // =========================
+    // BODY STYLE
+    // =========================
+    for (let R = headerRowCount; R <= range.e.r; R++) {
+      for (let C = range.s.c; C <= range.e.c; C++) {
+        const cellAddress = XLSX.utils.encode_cell({
+          r: R,
+          c: C,
+        });
+
+        if (worksheet[cellAddress]) {
+          worksheet[cellAddress].s = {
+            font: {
+              name: 'Tahoma',
+              sz: 10,
+            },
+          };
+        }
+      }
+
+      // Last Date
+      const lastDateCell = XLSX.utils.encode_cell({
+        r: R,
+        c: 8,
+      });
+
+      // Effective Date
+      const effectiveDateCell = XLSX.utils.encode_cell({
+        r: R,
+        c: 9,
+      });
+
+      if (worksheet[lastDateCell]) {
+        worksheet[lastDateCell].s = {
+          ...worksheet[lastDateCell].s,
+          alignment: {
+            horizontal: 'center',
+            vertical: 'center',
+          },
+        };
+      }
+
+      if (worksheet[effectiveDateCell]) {
+        worksheet[effectiveDateCell].s = {
+          ...worksheet[effectiveDateCell].s,
+          alignment: {
+            horizontal: 'center',
+            vertical: 'center',
+          },
+        };
+      }
+    }
+
     const workbook: XLSX.WorkBook = {
-      Sheets: { ResignReport: worksheet },
+      Sheets: {
+        ResignReport: worksheet,
+      },
       SheetNames: ['ResignReport'],
     };
 
-    XLSX.writeFile(workbook, 'ResignReport.xlsx');
+    const exportDate = dayjs().format('DD-MM-YYYY_HH-mm');
+
+    XLSX.writeFile(workbook, `ResignReport_${exportDate}.xlsx`);
   }
 
   closeViewModal() {
@@ -510,9 +779,32 @@ export class ResignReport {
     return new Date(+year, +month - 1, +day, now.getHours(), now.getMinutes(), now.getSeconds());
   }
 
+  resetFilter() {
+    this.resignListing.currentPage.set(0);
+
+    if (this.isItReport) {
+      // IT = ปีปัจจุบัน
+      const from = new Date(this.currentYear, 0, 1);
+      const to = new Date(this.currentYear, 11, 31);
+
+      this.dateRange.set([from, to]);
+      this.dateFrom.set(dayjs(from).format('YYYY-MM-DD'));
+      this.dateTo.set(dayjs(to).format('YYYY-MM-DD'));
+    } else {
+      // HR = เดือนปัจจุบัน
+      const from = dayjs().startOf('month').toDate();
+      const to = dayjs().endOf('month').toDate();
+
+      this.dateRange.set([from, to]);
+      this.dateFrom.set(dayjs(from).format('YYYY-MM-DD'));
+      this.dateTo.set(dayjs(to).format('YYYY-MM-DD'));
+    }
+
+    this.loadInitialData();
+  }
+
   // Function
   private mapApiData(items: any[]): any[] {
-    console.log('items >> ', items);
     return items.map((item: any) => ({
       empCode: item.CODEMPID,
       firstNameTh: item.NAMFIRSTT,
@@ -556,7 +848,7 @@ export class ResignReport {
   }
 
   private mapApiData_Freelance(items: any[]): any[] {
-    console.log('[mapApiData_Freelance] items >> ', items);
+    // console.log('[mapApiData_Freelance] items >> ', items);
     return items.map((item: any) => ({
       empCode: item.EMP_NO,
       firstNameTh: item.FIRSTNAME_TH,
@@ -618,9 +910,9 @@ export class ResignReport {
   onYearRangeChange(range: Date[] | null) {
     if (!range?.[0] || !range?.[1]) return;
 
-    this.yearRange.set(range);
-    this.yearFrom.set(dayjs(range[0]).format('YYYY-MM-DD'));
-    this.yearTo.set(dayjs(range[1]).format('YYYY-MM-DD'));
+    this.dateRange.set(range);
+    this.dateFrom.set(dayjs(range[0]).format('YYYY-MM-DD'));
+    this.dateTo.set(dayjs(range[1]).format('YYYY-MM-DD'));
   }
 
   applyFilter() {
@@ -637,7 +929,7 @@ export class ResignReport {
     this.fetchReportByType(pageR, sizeR)
       .pipe(finalize(() => this.loadingService.stop(this.loadingKey)))
       .subscribe((res) => {
-        console.log('Resigned >>', res);
+        // console.log('Resigned >>', res);
         this.dataResignFromApi(res);
       });
   }
@@ -678,17 +970,24 @@ export class ResignReport {
     const company = this.filterCompany();
     const department = this.filterDepartment();
 
-    return this.resignService.getReportResignEmployees({
+    const params: any = {
       page,
       pageSize,
       searchText: searchText || undefined,
       companyCode: company?.COMPANY_CODE,
       costCent: department?.COSTCENT,
       empStatus: status,
-      adExpiredDate: this.status === 'true' ? 'true' : 'false',
-      dateFrom: this.yearFrom(),
-      dateTo: this.yearTo(),
-    });
+      // adExpiredDate: this.status === 'true' ? 'true' : 'false',
+      dateFrom: this.dateFrom(),
+      dateTo: this.dateTo(),
+    };
+
+    // IT เท่านั้น
+    if (this.isItReport) {
+      params.adExpiredDate = this.status === 'true' ? 'true' : 'false';
+    }
+
+    return this.resignService.getReportResignEmployees(params);
 
     // return this.resignService.getEmployee({
     //   page,
