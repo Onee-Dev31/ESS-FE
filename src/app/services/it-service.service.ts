@@ -431,6 +431,7 @@ export class ItServiceService {
     return this._http.patch(`${this.baseUrl}/tickets/${id}/approve`, formData);
   }
   updateTicketV2(id: string, formData: FormData): Observable<any> {
+    // return {} as any;
     return this._http.patch(`${this.baseUrl}/tickets/${id}/approveV2`, formData);
   }
 

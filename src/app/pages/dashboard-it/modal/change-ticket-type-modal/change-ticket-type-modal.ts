@@ -204,7 +204,8 @@ export class ChangeTicketTypeModal implements OnChanges, OnDestroy {
       this.showAttachmentError = true;
       return;
     }
-    if (this.repairCostType === 'paid' && !this.reason.trim()) {
+    //  if (this.repairCostType === 'paid' && !this.reason.trim()) {
+    if (!this.reason.trim()) {
       this.showReasonError = true;
       return;
     }

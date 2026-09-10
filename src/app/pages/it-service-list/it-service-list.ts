@@ -877,9 +877,7 @@ export class ItService implements OnInit {
       files.map((attachment) => ({
         fileName: attachment.name || attachment.fileName,
         date: dayjs().format('DD/MM/YYYY HH:mm'),
-        url: attachment.file
-          ? URL.createObjectURL(attachment.file)
-          : attachment.filePath || '',
+        url: attachment.file ? URL.createObjectURL(attachment.file) : attachment.filePath || '',
         type: attachment.file?.type || attachment.type || 'application/octet-stream',
       })),
     );
@@ -973,7 +971,8 @@ export class ItService implements OnInit {
 
   viewManagedAttachment(event: { file: any; source: 'user' | 'it' }): void {
     const ticket = this.selectedTicket();
-    const sourceFiles = event.source === 'it' ? (ticket?.itAttachments ?? []) : (ticket?.attachments ?? []);
+    const sourceFiles =
+      event.source === 'it' ? (ticket?.itAttachments ?? []) : (ticket?.attachments ?? []);
     this.openAllAttachments(sourceFiles, Math.max(0, sourceFiles.indexOf(event.file)));
   }
 

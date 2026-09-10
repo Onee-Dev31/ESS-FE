@@ -177,7 +177,8 @@ $table-label-bg: var(--border-toolbar);
       }
 
       &::placeholder {
-        color: var(--text-muted);
+        color: var(--text);
+        opacity: 0.6;
         font-weight: 400;
       }
 
@@ -1414,7 +1415,8 @@ $table-label-bg: var(--border-toolbar);
     }
 
     &::placeholder {
-      color: var(--text-muted);
+      color: var(--text);
+      opacity: 0.6;
       font-weight: 400;
     }
   }
@@ -1956,7 +1958,8 @@ $table-label-bg: var(--border-toolbar);
     }
 
     &::placeholder {
-      color: var(--text-muted);
+      color: var(--text);
+      opacity: 0.6;
       font-weight: 400;
     }
 

@@ -79,8 +79,8 @@
 @if (IS_HOLD_TICKET()) {
   <app-deny-modal
     [ticket]="selectedTicket()"
-      title="เหตุผลในการหยุดชั่วคราว (On Hold)"
-      [reasonRequired]="false"
+    title="เหตุผลในการหยุดชั่วคราว (On Hold)"
+    [reasonRequired]="false"
     placeholder="กรอกเหตุผลในการหยุดชั่วคราว..."
     validationMessage="กรุณากรอกเหตุผลในการหยุดชั่วคราว"
     (closeModal)="closeHoldModal()"

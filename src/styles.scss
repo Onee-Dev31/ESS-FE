@@ -398,3 +398,12 @@ label {
 .ql-editor {
   font-family: 'Inter', 'IBM Plex Sans Thai Looped', sans-serif !important;
 }
+
+[data-theme='dark'] .ql-editor {
+  color: var(--text) !important;
+
+  &.ql-blank::before {
+    color: var(--text) !important;
+    opacity: 0.6;
+  }
+}

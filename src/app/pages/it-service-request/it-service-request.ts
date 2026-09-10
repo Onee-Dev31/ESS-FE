@@ -341,7 +341,10 @@ export class ITServiceRequestComponent implements OnInit {
   viewFile(fileObj: { name: string; file: File }) {
     this.closePreview();
     const files = this.attachments();
-    this.previewSelectedIndex = Math.max(0, files.findIndex((file) => file === fileObj));
+    this.previewSelectedIndex = Math.max(
+      0,
+      files.findIndex((file) => file === fileObj),
+    );
     this.previewFiles.set(
       files.map((file) => ({
         fileName: file.name,
