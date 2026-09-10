@@ -12,9 +12,11 @@
       <div class="requester-meta">
         {{ requester.department_name || '-' }}
       </div>
-      <div class="requester-meta">
-        {{ requester.company_name || '-' }}
-      </div>
+      @if (requester.department_name !== 'ไม่พบข้อมูลพนักงานในระบบ Hr') {
+        <div class="requester-meta">
+          {{ requester.company_name || '-' }}
+        </div>
+      }
     </div>
     <button
       type="button"
