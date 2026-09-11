@@ -14,6 +14,7 @@
       <label>ข้อความตอบกลับ <span>*</span></label>
       <app-text-editor
         [value]="message"
+        [focusAtStart]="true"
         (valueChange)="onMessageChange($event)"
         placeholder="พิมพ์ข้อความตอบกลับ..."
       />

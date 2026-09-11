@@ -823,7 +823,7 @@ export class DashboardIT implements OnInit {
       return;
     }
 
-    console.log(data);
+    console.log('submitEmailReply', data);
 
     this.IS_EMAIL_REPLY_MODAL.set(false);
     this.swalService.loading('กำลังส่งอีเมล...');
