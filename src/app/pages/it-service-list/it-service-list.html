@@ -449,7 +449,7 @@
         </button>
       </div>
       <div class="modal-body">
-        <div class="html-detail" [innerHTML]="selectedDetail()"></div>
+        <div class="html-detail" appImageErrorFallback [innerHTML]="selectedDetail() | safeEmailHtml"></div>
         <!-- <div [innerHTML]="formatText.getFormatTextHTML(selectedDetail())"></div> -->
       </div>
     </div>

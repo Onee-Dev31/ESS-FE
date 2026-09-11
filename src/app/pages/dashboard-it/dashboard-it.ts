@@ -647,8 +647,8 @@ export class DashboardIT implements OnInit {
           ),
         ) || [];
       const replyAttachments = res.attachments?.filter((f: any) => f.reply_id) || [];
-      const convertedFiles = await this.fileConverter.convertUrlsToFiles(ticketAttachments);
-      const convertedItFiles = await this.fileConverter.convertUrlsToFiles(itAttachments);
+      const convertedFiles = this.fileConverter.mapAttachmentMetadata(ticketAttachments);
+      const convertedItFiles = this.fileConverter.mapAttachmentMetadata(itAttachments);
 
       const ticket = res.ticket;
       const replies = res.replies;
@@ -1326,7 +1326,7 @@ export class DashboardIT implements OnInit {
     const notes = await Promise.all(
       replies.map(async (r) => {
         const files = attachments.filter((a) => a.reply_id === r.id);
-        const convertedFiles = await this.fileConverter.convertUrlsToFiles(files);
+        const convertedFiles = this.fileConverter.mapAttachmentMetadata(files);
 
         const senderRole =
           requesterAduser && (r.user_aduser || '').toLowerCase() === requesterAduser.toLowerCase()

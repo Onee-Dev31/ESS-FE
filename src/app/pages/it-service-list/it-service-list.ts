@@ -19,6 +19,8 @@ import {
 } from '../../components/modals/file-preview-modal/file-preview-modal';
 import { RatingModalComponent } from '../../components/modals/rating-modal/rating-modal';
 import dayjs from 'dayjs';
+import { SafeEmailHtmlPipe } from '../../pipes/safe-email-html.pipe';
+import { ImageErrorFallbackDirective } from '../../directives/image-error-fallback.directive';
 import { ItServiceMockService, Ticket } from '../../services/it-service-mock.service';
 import { ItServiceService } from '../../services/it-service.service';
 import { AuthService } from '../../services/auth.service';
@@ -63,6 +65,8 @@ import {
   selector: 'app-it-service',
   standalone: true,
   imports: [
+    SafeEmailHtmlPipe,
+    ImageErrorFallbackDirective,
     CommonModule,
     FormsModule,
     FilePreviewModalComponent,
@@ -482,8 +486,8 @@ export class ItService implements OnInit {
           ) || [];
         const replyAttachments = res.attachments?.filter((f: any) => f.reply_id) || [];
 
-        const convertedFiles = await this.fileConverter.convertUrlsToFiles(ticketAttachments);
-        const convertedItFiles = await this.fileConverter.convertUrlsToFiles(itAttachments);
+        const convertedFiles = this.fileConverter.mapAttachmentMetadata(ticketAttachments);
+        const convertedItFiles = this.fileConverter.mapAttachmentMetadata(itAttachments);
 
         const ticket = res.ticket;
         const replies = res.replies;
@@ -1038,7 +1042,7 @@ export class ItService implements OnInit {
     const notes = await Promise.all(
       replies.map(async (r) => {
         const files = attachments.filter((a) => a.reply_id === r.id);
-        const convertedFiles = await this.fileConverter.convertUrlsToFiles(files);
+        const convertedFiles = this.fileConverter.mapAttachmentMetadata(files);
         const senderRole =
           requesterAduser && (r.user_aduser || '').toLowerCase() === requesterAduser.toLowerCase()
             ? 'requester'

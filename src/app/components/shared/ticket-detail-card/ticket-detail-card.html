@@ -60,7 +60,7 @@
         placeholder="กรอกรายละเอียด ticket"
       />
     } @else {
-      <div class="description" [innerHTML]="ticket.description | safeEmailHtml"></div>
+      <div class="description" appImageErrorFallback [innerHTML]="ticket.description | safeEmailHtml"></div>
     }
   </div>
 
