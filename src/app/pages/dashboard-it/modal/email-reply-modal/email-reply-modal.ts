@@ -25,6 +25,7 @@ export class EmailReplyModal implements OnInit {
   @Output() closeModal = new EventEmitter<void>();
 
   message = '';
+  quotedMessage = '';
   isSubmitting = signal(false);
   private readonly swalService = inject(SwalService);
   private readonly replyNotice =
@@ -34,6 +35,7 @@ export class EmailReplyModal implements OnInit {
     const originalDescription = this.ticket?.description ?? '';
     if (!originalDescription) {
       this.message = '';
+      this.quotedMessage = '';
       return;
     }
     const description = this.removePreviousReplyNotices(originalDescription);
@@ -60,20 +62,29 @@ export class EmailReplyModal implements OnInit {
       }).format(sentAt);
       datePrefix = `ในวันที่ ${date} เวลา ${time} `;
     }
-    const originalHeader = `<p>${datePrefix}${senderName}${senderEmail} เขียนว่า:</p>`;
+
+    const originalHeader = `
+    <p>
+      ${datePrefix}${senderName}${senderEmail} เขียนว่า:
+    </p>
+  `;
+
     const replyNoticeHtml = `
-    <p data-reply-notice="true" style="color: #1a73e8; font-weight: 600;">
-      <span style="margin-right: 4px;">*</span>
+    <p
+      data-reply-notice="true"
+      style="color:#1a73e8;font-weight:600;"
+    >
+      <span style="margin-right:4px;">*</span>
       ${this.replyNotice}
     </p>
   `;
 
-    // Start with a reply line and two blank lines before the original email.
-    this.message =
-      '<p><br></p><p><br></p><p><br></p>' +
-      originalHeader +
-      replyNoticeHtml +
-      `<blockquote>${description}</blockquote>`;
+    // Quill รับเฉพาะข้อความตอบใหม่
+    this.message = '<p><br></p>';
+
+    // HTML เดิมไม่ผ่าน Quill
+    this.quotedMessage =
+      originalHeader + replyNoticeHtml + `<blockquote>${description}</blockquote>`;
   }
 
   private removePreviousReplyNotices(html: string): string {
@@ -162,10 +173,12 @@ export class EmailReplyModal implements OnInit {
 
     this.isSubmitting.set(true);
     this.textEditor.confirmImages().subscribe({
-      next: (message) => {
+      next: (replyMessage) => {
+        const fullMessage = replyMessage + this.quotedMessage;
+
         this.submitModal.emit({
           id: this.ticket.ticketId,
-          message,
+          message: fullMessage,
           attachments: [],
         });
       },
