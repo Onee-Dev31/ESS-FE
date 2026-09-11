@@ -62,7 +62,7 @@ export class EmailReplyModal implements OnInit {
     }
     const originalHeader = `<p>${datePrefix}${senderName}${senderEmail} เขียนว่า:</p>`;
     const replyNoticeHtml = `
-    <p data-reply-notice="true" style="color: #dc2626; font-weight: 600;">
+    <p data-reply-notice="true" style="color: #1a73e8; font-weight: 600;">
       <span style="margin-right: 4px;">*</span>
       ${this.replyNotice}
     </p>
