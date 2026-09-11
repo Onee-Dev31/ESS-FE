@@ -17,7 +17,13 @@ import { ImageErrorFallbackDirective } from '../../../directives/image-error-fal
 @Component({
   selector: 'app-ticket-detail-card',
   standalone: true,
-  imports: [CommonModule, ExpandIconComponent, TextEditorComponent, SafeEmailHtmlPipe, ImageErrorFallbackDirective],
+  imports: [
+    CommonModule,
+    ExpandIconComponent,
+    TextEditorComponent,
+    SafeEmailHtmlPipe,
+    ImageErrorFallbackDirective,
+  ],
   templateUrl: './ticket-detail-card.html',
   styleUrl: './ticket-detail-card.scss',
 })
@@ -26,6 +32,7 @@ export class TicketDetailCardComponent implements OnChanges {
   @Input({ required: true }) ticket!: any;
   @Input({ required: true }) audience!: TicketStatusAudience;
   @Input() editable = false;
+  @Input() reportDetailPage = false;
   @Input() copied = false;
   @Input() serviceLimit = 3;
   @Input() alertMessage = '';

@@ -60,11 +60,15 @@
         placeholder="กรอกรายละเอียด ticket"
       />
     } @else {
-      <div class="description" appImageErrorFallback [innerHTML]="ticket.description | safeEmailHtml"></div>
+      <div
+        class="description"
+        appImageErrorFallback
+        [innerHTML]="ticket.description | safeEmailHtml"
+      ></div>
     }
   </div>
 
-  @if (!editable) {
+  @if (!editable && !reportDetailPage) {
     <footer class="detail-footer">
       @if (audience === 'it') {
         <div class="ticket-type">
