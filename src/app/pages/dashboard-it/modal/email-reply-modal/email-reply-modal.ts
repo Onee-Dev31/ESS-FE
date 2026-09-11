@@ -1,4 +1,13 @@
-import { Component, EventEmitter, inject, Input, OnInit, Output, signal, ViewChild } from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  inject,
+  Input,
+  OnInit,
+  Output,
+  signal,
+  ViewChild,
+} from '@angular/core';
 import { TextEditorComponent } from '../../../../components/shared/text-editor/text-editor';
 import { SwalService } from '../../../../services/swal.service';
 
@@ -18,13 +27,16 @@ export class EmailReplyModal implements OnInit {
   message = '';
   isSubmitting = signal(false);
   private readonly swalService = inject(SwalService);
+  private readonly replyNotice =
+    'หากท่านมีคำถามหรือข้อมูลเพิ่มเติมเกี่ยวกับปัญหาดังกล่าว สามารถตอบกลับอีเมลนี้ได้ทันที';
 
   ngOnInit(): void {
-    const description = this.ticket?.description ?? '';
-    if (!description) {
+    const originalDescription = this.ticket?.description ?? '';
+    if (!originalDescription) {
       this.message = '';
       return;
     }
+    const description = this.removePreviousReplyNotices(originalDescription);
 
     const senderName = this.escapeHtml(String(this.ticket?.requesterName || 'ผู้ส่ง'));
     const senderEmail = this.ticket?.requesterEmail
@@ -49,12 +61,70 @@ export class EmailReplyModal implements OnInit {
       datePrefix = `ในวันที่ ${date} เวลา ${time} `;
     }
     const originalHeader = `<p>${datePrefix}${senderName}${senderEmail} เขียนว่า:</p>`;
+    const replyNoticeHtml = `
+    <p data-reply-notice="true" style="color: #dc2626; font-weight: 600;">
+      <span style="margin-right: 4px;">*</span>
+      ${this.replyNotice}
+    </p>
+  `;
 
     // Start with a reply line and two blank lines before the original email.
     this.message =
       '<p><br></p><p><br></p><p><br></p>' +
       originalHeader +
+      replyNoticeHtml +
       `<blockquote>${description}</blockquote>`;
+  }
+
+  private removePreviousReplyNotices(html: string): string {
+    const template = document.createElement('template');
+    template.innerHTML = html;
+
+    // เวอร์ชันใหม่: ลบ notice ทั้งก้อน รวม *
+    template.content.querySelectorAll('[data-reply-notice="true"]').forEach((el) => el.remove());
+
+    const walker = document.createTreeWalker(template.content, NodeFilter.SHOW_TEXT);
+
+    const nodes: { node: Text; start: number; end: number }[] = [];
+    let text = '';
+    let node: Node | null;
+
+    while ((node = walker.nextNode())) {
+      const start = text.length;
+      text += node.textContent ?? '';
+
+      nodes.push({
+        node: node as Text,
+        start,
+        end: text.length,
+      });
+    }
+
+    // รองรับข้อความเก่าที่ไม่มี data-reply-notice
+    const pattern = new RegExp(
+      `\\*?\\s*${Array.from(this.replyNotice.replace(/\s/g, ''))
+        .map((character) => character.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'))
+        .join('\\s*')}`,
+      'g',
+    );
+
+    const matches = Array.from(text.matchAll(pattern));
+
+    for (const match of matches.reverse()) {
+      const start = match.index!;
+      const end = start + match[0].length;
+
+      for (const entry of nodes) {
+        const from = Math.max(start, entry.start);
+        const to = Math.min(end, entry.end);
+
+        if (from < to) {
+          entry.node.deleteData(from - entry.start, to - from);
+        }
+      }
+    }
+
+    return template.innerHTML;
   }
 
   private escapeHtml(value: string): string {
