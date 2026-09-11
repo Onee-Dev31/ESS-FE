@@ -29,6 +29,22 @@ export class FileConverterService {
 
   constructor() {}
 
+  // Existing attachments only need metadata until the user chooses to preview one.
+  mapAttachmentMetadata(files: any[]): any[] {
+    return (files ?? []).filter(Boolean).map((file) => ({
+      ...file,
+      fieldId: file.FileID ?? file.attachment_id,
+      name: file.FILE_NAME ?? file.file_name ?? file.name ?? 'ไฟล์แนบ',
+      description: file.DESCRIPTION ?? file.file_description ?? '',
+      createdDate: file.created_at,
+      filePath:
+        [file.FILE_DIR, file.file_url, file.fileUrl, file.file_path, file.filePath, file.url]
+          .find((value) => typeof value === 'string' && value.trim().length > 0)?.trim() ?? '',
+      size: file.file_size ?? file.size,
+      type: file.FILE_TYPE ?? file.file_type ?? file.type,
+    }));
+  }
+
   // แปลงไฟล์เดียว
   async convertUrlToFile(fileData: any): Promise<ConvertedFile> {
     const response = await fetch(fileData.FILE_DIR || fileData.file_url);
