@@ -31,6 +31,11 @@
               {
                 "glob": "**/*",
                 "input": "public"
+              },
+              {
+                "glob": "web.config",
+                "input": "config/prod",
+                "output": "/"
               }
             ],
             "styles": [
@@ -82,6 +87,17 @@
               ]
             },
             "dev": {
+              "assets": [
+                {
+                  "glob": "**/*",
+                  "input": "public"
+                },
+                {
+                  "glob": "web.config",
+                  "input": "config/dev",
+                  "output": "/"
+                }
+              ],
               "fileReplacements": [
                 {
                   "replace": "src/environments/environment.ts",
@@ -118,7 +134,7 @@
           "configurations": {
             "production": {
               "buildTarget": "my-angular-app:build:production",
-              "proxyConfig": "proxy.conf.json"
+              "proxyConfig": "proxy.prod.conf.cjs"
             },
             "uat": {
               "buildTarget": "my-angular-app:build:uat",
@@ -126,7 +142,7 @@
             },
             "dev": {
               "buildTarget": "my-angular-app:build:dev",
-              "proxyConfig": "proxy.conf.json"
+              "proxyConfig": "proxy.dev.conf.cjs"
             },
             "development": {
               "buildTarget": "my-angular-app:build:development",
