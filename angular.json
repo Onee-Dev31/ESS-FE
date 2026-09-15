@@ -121,6 +121,14 @@
                 }
               ]
             },
+            "local": {
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.local.ts"
+                }
+              ]
+            },
             "development": {
               "optimization": false,
               "extractLicenses": false,
@@ -141,8 +149,8 @@
               "proxyConfig": "proxy.conf.json"
             },
             "dev": {
-              "buildTarget": "my-angular-app:build:dev",
-              "proxyConfig": "proxy.dev.conf.cjs"
+              "buildTarget": "my-angular-app:build:dev,local",
+              "proxyConfig": "proxy.local.conf.cjs"
             },
             "development": {
               "buildTarget": "my-angular-app:build:development",
