@@ -1,0 +1,155 @@
+<div class="page">
+  <app-page-header title="ตั้งค่าการส่งอีเมล" icon="fas fa-envelope"></app-page-header>
+  @if (loading()) {
+    <div class="card" role="status">กำลังโหลดการตั้งค่า...</div>
+  } @else if (error()) {
+    <div class="card" role="alert">
+      <p>{{ error() }}</p>
+      <button type="button" (click)="load()" [disabled]="busy()">ลองใหม่</button>
+    </div>
+  } @else {
+    <section class="card mode-card" [class.test-mode]="mode()">
+      <div>
+        <span class="eyebrow">โหมดการส่งปัจจุบัน</span>
+        <h2>{{ mode() ? 'โหมดทดสอบ' : 'โหมดส่งจริง' }}</h2>
+        <p>
+          {{
+            mode()
+              ? 'ส่งอีเมลไปยังผู้รับทดสอบใน TestRecipientOverride'
+              : 'ส่งอีเมลถึงผู้รับจริงตามรายการงาน'
+          }}
+        </p>
+      </div>
+      <div class="mode-toggle-control">
+        <span id="test-mode-label">โหมดทดสอบ</span>
+        <button
+          class="mode-toggle"
+          [class.is-on]="mode()"
+          type="button"
+          role="switch"
+          [attr.aria-checked]="mode()"
+          aria-label="โหมดทดสอบ"
+          [attr.aria-busy]="busy()"
+          [disabled]="busy() || formOpen()"
+          (click)="changeMode()"
+        >
+          <span class="toggle-thumb" aria-hidden="true"></span>
+        </button>
+        <span class="toggle-status" aria-live="polite">{{
+          busy() ? 'กำลังดำเนินการ...' : mode() ? 'เปิด' : 'ปิด'
+        }}</span>
+      </div>
+    </section>
+    <section class="card recipients-card">
+      <div class="section-heading">
+        <div>
+          <h2>
+            ผู้รับอีเมลทดสอบ <span class="count">{{ recipients().length }}</span>
+          </h2>
+          <p>TestRecipientOverride · ใช้เมื่อเปิดโหมดทดสอบ</p>
+        </div>
+        <button
+          class="primary"
+          type="button"
+          (click)="openForm()"
+          [disabled]="busy() || formOpen()"
+        >
+          <i class="fas fa-plus" aria-hidden="true"></i> เพิ่มผู้รับ
+        </button>
+      </div>
+      @if (formOpen()) {
+        <form #recipientForm="ngForm" (ngSubmit)="save(recipientForm)" class="recipient-form">
+          <h3>{{ editing ? 'แก้ไขผู้รับทดสอบ' : 'เพิ่มผู้รับทดสอบ' }}</h3>
+          <div class="fields">
+            <label for="recipient-name"
+              >ชื่อ<input
+                id="recipient-name"
+                name="name"
+                [(ngModel)]="draft.name"
+                required
+                [disabled]="busy()"
+            /></label>
+            <label for="recipient-email"
+              >อีเมล<input
+                id="recipient-email"
+                name="email"
+                type="email"
+                email
+                required
+                [(ngModel)]="draft.email"
+                #emailField="ngModel"
+                [disabled]="busy()"
+              />
+              @if (emailField.invalid && emailField.touched) {
+                <span class="validation">กรุณากรอกอีเมลให้ถูกต้อง</span>
+              }
+            </label>
+          </div>
+          <div class="actions">
+            <button type="button" (click)="formOpen.set(false)" [disabled]="busy()">ยกเลิก</button>
+            <button
+              type="submit"
+              class="primary"
+              [disabled]="busy() || recipientForm.invalid || !draft.name.trim()"
+            >
+              {{ busy() ? 'กำลังบันทึก...' : 'บันทึก' }}
+            </button>
+          </div>
+        </form>
+      }
+      @if (!recipients().length) {
+        <p class="empty">ยังไม่มีผู้รับทดสอบ เพิ่มผู้รับก่อนใช้งานโหมดทดสอบ</p>
+      } @else {
+        <div class="table-wrap">
+          <table aria-label="รายชื่อผู้รับอีเมลทดสอบ">
+            <thead>
+              <tr>
+                <th>ชื่อ</th>
+                <th>อีเมล</th>
+                <th>ผู้สร้าง</th>
+                <th class="actions-column">จัดการ</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (recipient of recipients(); track recipient.id) {
+                <tr>
+                  <td>
+                    <div class="recipient-name">
+                      <span class="recipient-avatar" aria-hidden="true">{{
+                        recipient.name.slice(0, 1)
+                      }}</span
+                      ><span>{{ recipient.name }}</span>
+                    </div>
+                  </td>
+                  <td class="email-cell">{{ recipient.email }}</td>
+                  <td>
+                    <span class="creator">{{ recipient.createBy || '-' }}</span>
+                  </td>
+                  <td class="actions-column">
+                    <button
+                      type="button"
+                      (click)="openForm(recipient)"
+                      [disabled]="busy() || formOpen()"
+                      [attr.aria-label]="'แก้ไข ' + recipient.name"
+                    >
+                      <i class="far fa-pen-to-square" aria-hidden="true"></i>
+                    </button>
+                    <button
+                      type="button"
+                      class="danger"
+                      (click)="remove(recipient)"
+                      [disabled]="busy() || formOpen()"
+                      [attr.aria-label]="'ลบ ' + recipient.name"
+                    >
+                      <i class="fas fa-trash-can" aria-hidden="true"></i>
+                    </button>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+    </section>
+  }
+</div>
