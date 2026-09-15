@@ -17,7 +17,7 @@
         (click)="activeSource = 'user'"
       >
         <i class="fas fa-paperclip"></i> เอกสารแนบทั้งหมด
-        <span>{{ userFileCount }}/{{ maxUserFiles }}</span>
+        <span>{{ userFileCount }}</span>
       </button>
       <button type="button" [class.active]="activeSource === 'it'" (click)="activeSource = 'it'">
         <i class="fas fa-laptop"></i> เอกสารจาก IT
@@ -43,7 +43,7 @@
         }
       </div>
       @if (activeSource === 'user' && canAddUserFiles) {
-        <p class="attachment-limit-note">แนบได้สูงสุด {{ maxUserFiles }} ไฟล์ (รวมไฟล์เดิม)</p>
+        <p class="attachment-limit-note">แนบไฟล์ใหม่ได้ครั้งละไม่เกิน 5 ไฟล์ (ไม่รวมไฟล์เดิม)</p>
       }
 
       @if (files.length) {

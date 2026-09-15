@@ -13,7 +13,7 @@ import { IT_ATTACHMENT_FILE_CONFIG } from '../../../constants/it-attachment-file
 })
 export class TicketAttachmentManagerComponent {
   readonly fileConfig = IT_ATTACHMENT_FILE_CONFIG;
-  readonly maxUserFiles = this.fileConfig.maxFiles;
+  readonly maxNewFiles = this.fileConfig.maxFiles;
   private swalService = inject(SwalService);
   @Input() userFiles: any[] = [];
   @Input() itFiles: any[] = [];
@@ -43,7 +43,10 @@ export class TicketAttachmentManagerComponent {
   }
 
   get remainingUserFileSlots(): number {
-    return Math.max(0, this.maxUserFiles - this.userFileCount);
+    const newFileCount =
+      this.userFiles.filter((file) => file.isNew && !this.pendingRemovedFiles.includes(file))
+        .length + this.pendingFiles.length;
+    return Math.max(0, this.maxNewFiles - newFileCount);
   }
 
   get canAddMoreUserFiles(): boolean {
@@ -83,7 +86,7 @@ export class TicketAttachmentManagerComponent {
     }
 
     if (!this.canAddMoreUserFiles) {
-      this.swalService.warning(`แนบไฟล์ได้สูงสุด ${this.maxUserFiles} ไฟล์ (รวมไฟล์เดิม)`);
+      this.swalService.warning(`แนบไฟล์ใหม่ได้สูงสุด ${this.maxNewFiles} ไฟล์ต่อครั้ง (ไม่รวมไฟล์เดิม)`);
       input.value = '';
       return;
     }
@@ -91,7 +94,7 @@ export class TicketAttachmentManagerComponent {
     const allowedFiles = validFiles.slice(0, this.remainingUserFileSlots);
     if (validFiles.length > allowedFiles.length) {
       this.swalService.warning(
-        `แนบไฟล์ได้สูงสุด ${this.maxUserFiles} ไฟล์ (รวมไฟล์เดิม)`,
+        `แนบไฟล์ใหม่ได้สูงสุด ${this.maxNewFiles} ไฟล์ต่อครั้ง (ไม่รวมไฟล์เดิม)`,
         `เพิ่มได้อีก ${this.remainingUserFileSlots} ไฟล์`,
       );
     }
