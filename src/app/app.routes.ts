@@ -258,6 +258,12 @@ export const routes: Routes = [
         data: { animation: 'Dashboard' },
       },
       {
+        path: 'email-setting',
+        loadComponent: () =>
+          import('./pages/setting-email/setting-email').then((m) => m.SettingEmail),
+        data: { animation: 'Dashboard' },
+      },
+      {
         path: 'vehicle-policy-setting',
         loadComponent: () =>
           import('./pages/setting-vehicle-policy/setting-vehicle-policy').then(
