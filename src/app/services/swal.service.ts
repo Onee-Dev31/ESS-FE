@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import Swal, { SweetAlertIcon } from 'sweetalert2';
+import Swal, { SweetAlertIcon, SweetAlertOptions } from 'sweetalert2';
 
 @Injectable({
   providedIn: 'root',
@@ -25,7 +25,12 @@ export class SwalService {
     });
   }
 
-  warning(title: string, text?: string, html?: string) {
+  warning(
+    title: string,
+    text?: string,
+    html?: string,
+    options?: Pick<SweetAlertOptions, 'confirmButtonText' | 'allowOutsideClick' | 'allowEscapeKey'>,
+  ) {
     Swal.close();
     return Swal.fire({
       icon: 'warning',
@@ -33,6 +38,7 @@ export class SwalService {
       text,
       html,
       confirmButtonColor: '#f59e0b',
+      ...options,
     });
   }
 

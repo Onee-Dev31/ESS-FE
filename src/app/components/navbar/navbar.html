@@ -8,7 +8,7 @@
   <div class="nav-center">
     <img src="ESS.png" alt="ESS Logo" class="nav-logo" />
     <h1 class="nav-title" routerLink="/dashboard">
-      {{ isMobile ? 'ESS' : 'Employee Self-Service System' }} TEST
+      {{ isMobile ? 'ESS' : 'Employee Self-Service System' }}
     </h1>
   </div>
 
@@ -347,9 +347,9 @@
             <div class="role">{{ userRole() }}</div>
           </div>
           <ul class="dropdown-menu-list">
-            <li (click)="isProfileOpen = false">Settings</li>
+            <!-- <li (click)="isProfileOpen = false">Settings</li>
             <li (click)="isProfileOpen = false">Activity log</li>
-            <li class="divider"></li>
+            <li class="divider"></li> -->
             <li class="logout" (click)="logout()">Logout</li>
           </ul>
         </div>

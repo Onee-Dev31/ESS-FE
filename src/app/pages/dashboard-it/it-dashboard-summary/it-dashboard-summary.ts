@@ -530,13 +530,33 @@ export class ItDashboardSummary {
     };
   }
   getAllTotal(): number {
-    return this.kpis.find((x) => x.status === 'all')?.value ?? 0;
+    return this.kpis.find((x) => x.status.toLowerCase() === 'all')?.value ?? 0;
   }
 
   getPercent(k: KpiCard): number {
     const total = this.getAllTotal();
-    if (!total || k.status === 'all') return 100;
-    return Math.round((k.value / total) * 100);
+    if (k.status.toLowerCase() === 'all') return 100;
+    if (!total) return 0;
+
+    const statuses = this.kpis.filter((card) => card.status.toLowerCase() !== 'all');
+    // Only balance rounding when the statuses account for all tickets.
+    if (statuses.reduce((sum, card) => sum + card.value, 0) !== total) {
+      return Math.round((k.value / total) * 100);
+    }
+
+    const percentages = statuses.map((card, index) => {
+      const percent = (card.value / total) * 100;
+      return { status: card.status, index, value: Math.floor(percent), remainder: percent % 1 };
+    });
+    const remaining = 100 - percentages.reduce((sum, card) => sum + card.value, 0);
+
+    // Largest remainder method; ties follow the original card order.
+    percentages.sort((a, b) => b.remainder - a.remainder || a.index - b.index);
+    for (let i = 0; i < remaining; i++) {
+      percentages[i].value++;
+    }
+
+    return percentages.find((card) => card.status === k.status)?.value ?? 0;
   }
   onStatusChartInit(ec: any) {
     this.statusChart = ec;

@@ -392,6 +392,36 @@ label {
   font-weight: 700;
 }
 
+// Placeholder for an image that failed to load in ticket descriptions.
+[appImageErrorFallback] .image-error-placeholder {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  max-width: 100%;
+  box-sizing: border-box;
+  margin: 6px 0;
+  padding: 10px 14px;
+  border: 1px dashed var(--border-color, #cbd5e1);
+  border-radius: 8px;
+  background: var(--bg-card, #f8fafc);
+  color: var(--text-muted, #64748b);
+  font-size: 0.85rem;
+  font-weight: 400;
+  line-height: 1.5;
+  text-decoration: none;
+
+  i {
+    flex-shrink: 0;
+    font-size: 1rem;
+    opacity: 0.7;
+  }
+
+  span {
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+}
+
 // Editor
 .ql-toolbar,
 .ql-container,

@@ -17,6 +17,7 @@ import { map, Observable, of } from 'rxjs';
 })
 export class TextEditorComponent {
   @Input() value = '';
+  @Input() focusAtStart = false;
 
   @Input() placeholder = 'กรอกรายละเอียด...';
 
@@ -43,6 +44,12 @@ export class TextEditorComponent {
     this.imageManager = new TextEditorImageManager(quill, (file) => this.uploadEditorImage(file));
 
     this.imageManager.attach();
+
+    if (this.focusAtStart) {
+      quill.focus({ preventScroll: true });
+      quill.setSelection(0, 0, 'silent');
+      quill.root.scrollTop = 0;
+    }
   }
 
   private uploadEditorImage(file: File) {

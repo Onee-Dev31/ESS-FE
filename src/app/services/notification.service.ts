@@ -59,6 +59,7 @@ export class NotificationService {
 
   private page = 1;
   private lastToastTime = 0;
+  private lastServerUnreadCount: number | null = null;
   private activeUserKey: string | null = null;
 
   constructor() {
@@ -153,7 +154,9 @@ export class NotificationService {
     interval(10000)
       .pipe(takeUntilDestroyed())
       .subscribe(() => {
-        if (this.activeUserKey) this.refreshAll();
+        if (this.activeUserKey) {
+          this.refreshUnreadCount(true);
+        }
       });
   }
 
@@ -162,21 +165,31 @@ export class NotificationService {
     this.loadFirstPage();
   }
 
-  refreshUnreadCount() {
+  refreshUnreadCount(refreshListOnIncrease = false) {
     if (!this.activeUserKey) return;
 
     this.isCountLoading.set(true);
     this.countError.set(null);
 
-    const params = new HttpParams().set('recipientAduser', this.activeUserKey);
+    const userKey = this.activeUserKey;
+    const params = new HttpParams().set('recipientAduser', userKey);
     this.http.get<any>(`${this.baseUrl}/unread-count`, { params }).subscribe({
       next: (response) => {
+        if (this.activeUserKey !== userKey) return;
         const newCount = Number(response?.unreadCount ?? response?.count ?? response ?? 0);
         const safeCount = Number.isFinite(newCount) ? newCount : 0;
+        // Compare server counts, since the displayed badge may exclude hidden notifications.
+        const hasNewNotifications =
+          this.lastServerUnreadCount !== null && safeCount > this.lastServerUnreadCount;
+        this.lastServerUnreadCount = safeCount;
         this.unreadCount.set(safeCount);
         this.isCountLoading.set(false);
+        if (refreshListOnIncrease && hasNewNotifications) {
+          this.loadFirstPage();
+        }
       },
       error: () => {
+        if (this.activeUserKey !== userKey) return;
         this.countError.set('ไม่สามารถโหลดจำนวนแจ้งเตือนใหม่ได้');
         this.isCountLoading.set(false);
       },
@@ -328,6 +341,7 @@ export class NotificationService {
   }
 
   retryList() {
+    this.refreshUnreadCount();
     this.loadFirstPage();
   }
 
@@ -712,6 +726,7 @@ export class NotificationService {
   }
 
   private reset() {
+    this.lastServerUnreadCount = null;
     this.page = 1;
     this.items.set([]);
     this.unreadCount.set(0);

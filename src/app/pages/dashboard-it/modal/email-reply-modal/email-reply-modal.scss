@@ -12,7 +12,12 @@
 }
 
 .modal-container {
+  display: flex;
+  flex-direction: column;
   width: min(720px, 100%);
+  max-height: calc(100vh - 40px);
+  max-height: calc(100dvh - 40px);
+  min-width: 0;
   overflow: hidden;
   border-radius: 16px;
   background: var(--bg-card);
@@ -22,6 +27,7 @@
 .modal-header,
 .modal-footer {
   display: flex;
+  flex-shrink: 0;
   align-items: center;
   justify-content: space-between;
   padding: 18px 24px;
@@ -63,6 +69,10 @@
 }
 
 .modal-body {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: auto;
+  overscroll-behavior: contain;
   padding: 22px 24px;
 
   label {
@@ -75,6 +85,12 @@
       color: var(--danger);
     }
   }
+}
+
+:host ::ng-deep .ql-editor blockquote {
+  margin: 0 0 0 5px;
+  padding: 0 0 0 12px;
+  border-left: 1px solid #ccc;
 }
 
 .modal-footer {

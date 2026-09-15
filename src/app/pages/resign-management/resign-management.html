@@ -123,7 +123,7 @@
                   <td class="col-date">
                     <div class="input-date">
                       <div class="form-field">
-                        <label>lastDate</label>
+                        <label>Last IT Access Date</label>
                         <!-- <nz-date-picker nzFormat="dd/MM/yyyy" name="lastDate" class="form-input"
                                         [ngModel]="activeDates[emp.empCode]?.lastDate"
                                         (ngModelChange)="setDate(emp,'lastDate',$event)"
@@ -142,7 +142,7 @@
                         </nz-date-picker>
                       </div>
                       <div class="form-field">
-                        <label>effectiveDate</label>
+                        <label>Effective Date</label>
                         <!-- <nz-date-picker nzFormat="dd/MM/yyyy" name="effectiveDate" class="form-input"
                                         [ngModel]="activeDates[emp.empCode]?.effectiveDate"
                                         (ngModelChange)="setDate(emp,'effectiveDate',$event)"
@@ -239,7 +239,23 @@
     </div>
 
     <div class="content-card resign">
-      <div class="card-header-title">รายชื่อพนักงานที่ลาออก</div>
+      <div class="card-header-row">
+        <div class="card-header-title">รายชื่อพนักงานที่ลาออก</div>
+
+        <button
+          nz-button
+          type="button"
+          class="report-btn"
+          (click)="openResignReport()"
+          title="เปิด Report ในแท็บใหม่"
+        >
+          <i class="fas fa-chart-column report-icon"></i>
+
+          <span>ดู Report</span>
+
+          <i class="fa-solid fa-arrow-up-right-from-square external-icon"></i>
+        </button>
+      </div>
       <div class="table-responsive">
         @if (isLoading()) {
           <app-skeleton type="table" [rows]="5"></app-skeleton>
@@ -436,7 +452,7 @@
                   <hr />
                   <div class="card-middle">
                     <div>
-                      <div class="label">Last Date</div>
+                      <div class="label">Last IT Access Date</div>
                       <div class="value">{{ emp.lastDate | date: 'dd/MM/yyyy' }}</div>
                     </div>
 
@@ -459,7 +475,7 @@
 
                 <div class="back-content">
                   <div>
-                    <div class="label">Last Date</div>
+                    <div class="label">Last IT Access Date</div>
                     <nz-date-picker
                       class="input custom-picker"
                       [ngModel]="lastDate()"
@@ -487,7 +503,7 @@
                 </div>
 
                 <div class="error-text" *ngIf="dateInvalid()">
-                  Last Date ต้องน้อยกว่าหรือเท่ากับ Effective Date
+                  Last IT Access Date ต้องน้อยกว่าหรือเท่ากับ Effective Date
                 </div>
 
                 <div class="back-actions">

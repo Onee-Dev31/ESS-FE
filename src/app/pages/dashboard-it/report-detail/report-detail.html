@@ -2,6 +2,7 @@
   <main class="tk-center">
     <app-ticket-detail-card
       [ticket]="t"
+      [reportDetailPage]="true"
       audience="it"
       [serviceLimit]="3"
       (attachmentClick)="openAttachmentManager()"
@@ -22,7 +23,7 @@
       </div>
     </section>
 
-    <section class="tk-actions" *ngIf="t.status !== 'Closed' && t.status !== 'Denied'">
+    <!-- <section class="tk-actions" *ngIf="t.status !== 'Closed' && t.status !== 'Denied'">
       <div class="btn-group">
         <button class="btn btn-onhold" (click)="resumeTicket()" *ngIf="t.status === 'Hold'">
           <i class="fa-solid fa-play btn-action-icon"></i> Resume
@@ -49,7 +50,7 @@
           <i class="fa-solid fa-circle-check btn-action-icon"></i> ปิดงาน
         </button>
       </div>
-    </section>
+    </section> -->
   </main>
 
   <aside class="tk-right">

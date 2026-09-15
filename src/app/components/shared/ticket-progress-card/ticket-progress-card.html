@@ -1,6 +1,11 @@
 <section class="progress-card">
   <div class="progress-header" [class.has-note-action]="showNoteButton">
-    <app-ticket-status-pill [ticket]="ticket" [audience]="audience" />
+    <div class="progress-status-row">
+      <app-ticket-status-pill [ticket]="ticket" [audience]="audience" />
+      @if (ticket.ticketCategory && ticket.ticketTypeId === 2) {
+        <span class="ticket-category">{{ ticket.ticketCategory }}</span>
+      }
+    </div>
     @if (showNoteButton) {
       <button
         type="button"

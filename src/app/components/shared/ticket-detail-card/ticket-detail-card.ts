@@ -12,11 +12,18 @@ import { ExpandIconComponent } from '../icon/expand-icon';
 import { TicketStatusAudience } from '../ticket-status-pill/ticket-status.model';
 import { TextEditorComponent } from '../text-editor/text-editor';
 import { SafeEmailHtmlPipe } from '../../../pipes/safe-email-html.pipe';
+import { ImageErrorFallbackDirective } from '../../../directives/image-error-fallback.directive';
 
 @Component({
   selector: 'app-ticket-detail-card',
   standalone: true,
-  imports: [CommonModule, ExpandIconComponent, TextEditorComponent, SafeEmailHtmlPipe],
+  imports: [
+    CommonModule,
+    ExpandIconComponent,
+    TextEditorComponent,
+    SafeEmailHtmlPipe,
+    ImageErrorFallbackDirective,
+  ],
   templateUrl: './ticket-detail-card.html',
   styleUrl: './ticket-detail-card.scss',
 })
@@ -25,6 +32,7 @@ export class TicketDetailCardComponent implements OnChanges {
   @Input({ required: true }) ticket!: any;
   @Input({ required: true }) audience!: TicketStatusAudience;
   @Input() editable = false;
+  @Input() reportDetailPage = false;
   @Input() copied = false;
   @Input() serviceLimit = 3;
   @Input() alertMessage = '';

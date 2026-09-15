@@ -5,6 +5,7 @@ import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { LoadingService } from '../../services/loading';
 import { take, finalize } from 'rxjs/operators';
+import { SwalService } from '../../services/swal.service';
 
 @Component({
   selector: 'app-login-version4',
@@ -14,6 +15,7 @@ import { take, finalize } from 'rxjs/operators';
 })
 export class LoginVersion4 {
   private authService = inject(AuthService);
+  private swalService = inject(SwalService);
   private loadingService = inject(LoadingService);
   private router = inject(Router);
 
@@ -57,19 +59,36 @@ export class LoginVersion4 {
       .login(username || '', password || '')
       .pipe(take(1))
       .subscribe({
-        next: () => {
+        next: async () => {
           const returnUrl = localStorage.getItem('returnUrl');
           localStorage.removeItem('returnUrl');
-          if (returnUrl) {
-            this.router.navigateByUrl(returnUrl);
-          } else {
-            this.router.navigate(['/welcome']);
+          const navigated = returnUrl
+            ? await this.router.navigateByUrl(returnUrl)
+            : await this.router.navigate(['/welcome']);
+          if (navigated) {
+            await this.warnIfEmployeeEmailMissing();
           }
         },
         error: (err) => {
           console.log('Login error:', err);
         },
       });
+  }
+
+  private async warnIfEmployeeEmailMissing(): Promise<void> {
+    const email = this.authService.userData()?.EMAIL;
+    if (typeof email === 'string' && email.trim()) return;
+
+    await this.swalService.warning(
+      'ยังไม่ได้ลงทะเบียนอีเมล',
+      'ไม่พบข้อมูลอีเมลของท่านในระบบ ซึ่งอาจทำให้ท่านไม่ได้รับข้อความแจ้งเตือนทางอีเมล กรุณาติดต่อฝ่ายทรัพยากรบุคคล (HR) เพื่อลงทะเบียนอีเมลให้ครบถ้วน',
+      undefined,
+      {
+        confirmButtonText: 'รับทราบ',
+        allowOutsideClick: false,
+        allowEscapeKey: false,
+      },
+    );
   }
 
   switchToQr() {
@@ -118,11 +137,14 @@ export class LoginVersion4 {
         .getQrStatus(this.qrToken)
         .pipe(take(1))
         .subscribe({
-          next: (res) => {
+          next: async (res) => {
             if (res['success'] === true) {
               this.stopPolling();
               this.authService.storeLoginResponse(res);
-              this.router.navigate(['/welcome']);
+              const navigated = await this.router.navigate(['/welcome']);
+              if (navigated) {
+                await this.warnIfEmployeeEmailMissing();
+              }
             } else if (res.status === 'expired') {
               this.stopPolling();
               this.qrExpired = true;
