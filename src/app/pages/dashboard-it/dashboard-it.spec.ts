@@ -3,7 +3,7 @@ import { EMPTY, of, Subject, throwError } from 'rxjs';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { ActivatedRoute } from '@angular/router';
 
-import { DashboardIT } from './dashboard-it';
+import { TicketWorkspaceComponent as DashboardIT } from './ticket-workspace/ticket-workspace';
 import { SignalrService } from '../../services/signalr.service';
 import { ItServiceService } from '../../services/it-service.service';
 import { AuthService } from '../../services/auth.service';

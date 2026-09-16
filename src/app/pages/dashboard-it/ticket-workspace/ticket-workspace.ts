@@ -1,0 +1,2646 @@
+import { CommonModule } from '@angular/common';
+import {
+  Component,
+  inject,
+  OnInit,
+  Input,
+  OnChanges,
+  SimpleChanges,
+  signal,
+  computed,
+  effect,
+  untracked,
+  HostListener,
+  DestroyRef,
+  ViewChild,
+  ElementRef,
+  ChangeDetectorRef,
+} from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { EMPTY, interval, firstValueFrom, concatMap, map, of } from 'rxjs';
+import { filter, finalize } from 'rxjs/operators';
+import { ActivatedRoute, Router } from '@angular/router';
+import { FormsModule } from '@angular/forms';
+import { Attachment, StatusKey, TicketItem } from '../../../interfaces/it-dashboard.interface';
+import { NzMessageService } from 'ng-zorro-antd/message';
+import { AuthService } from '../../../services/auth.service';
+import { NzSelectModule } from 'ng-zorro-antd/select';
+import { NzButtonModule } from 'ng-zorro-antd/button';
+import { NzIconModule } from 'ng-zorro-antd/icon';
+import { NzModalModule } from 'ng-zorro-antd/modal';
+import { ItServiceService } from '../../../services/it-service.service';
+import {
+  StatusColor,
+  ticketTypyColor,
+  StatusColor_Reverse,
+  StatusColor_text,
+  getStatusLabel,
+  getStatusForIt,
+} from '../../../utils/status.util';
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
+import {
+  FilePreviewItem,
+  FilePreviewModalComponent,
+} from '../../../components/modals/file-preview-modal/file-preview-modal';
+import { TicketAttachmentManagerComponent } from '../../../components/modals/ticket-attachment-manager/ticket-attachment-manager';
+import dayjs from 'dayjs';
+import { ItProblemReportComponent } from '../../it-problem-report/it-problem-report';
+import { ItRepairRequestComponent } from '../../it-repair-request/it-repair-request';
+import { ITServiceRequestCombinedComponent } from '../../it-service-request-combined/it-service-request-combined';
+import { SwalService } from '../../../services/swal.service';
+import { tickets } from '../../../utils/it-dashboard-mock';
+import { AcknowledgeModal } from '../modal/acknowledge-modal/acknowledge-modal';
+import { EmailReplyModal } from '../modal/email-reply-modal/email-reply-modal';
+import { DenyModal } from '../modal/deny-modal/deny-modal';
+import { ChangeTicketTypeModal } from '../modal/change-ticket-type-modal/change-ticket-type-modal';
+import { AssignModal } from '../modal/assign-modal/assign-modal';
+import { NoteModal } from '../modal/note-modal/note-modal';
+import { DateUtilityService } from '../../../services/date-utility.service';
+import { formatText } from '../../../utils/formatText';
+import { ServicesDetailModal } from '../../../components/modals/services-detail-modal/services-detail-modal';
+import { FileConverterService } from '../../../services/file-converter';
+import { NzCheckboxModule } from 'ng-zorro-antd/checkbox';
+import { SignalrService } from '../../../services/signalr.service';
+import { CcModal } from '../modal/cc-modal/cc-modal';
+import { NoteForItModal } from '../modal/note-for-it-modal/note-for-it-modal';
+import { NzDatePickerModule } from 'ng-zorro-antd/date-picker';
+import { en_US, NzI18nService } from 'ng-zorro-antd/i18n';
+import { TicketService } from '../../../services/ticket.service';
+import { TicketRequesterCardComponent } from '../../../components/shared/ticket-requester-card/ticket-requester-card';
+import { TicketOpenForCardComponent } from '../../../components/shared/ticket-open-for-card/ticket-open-for-card';
+import { TicketProgressCardComponent } from '../../../components/shared/ticket-progress-card/ticket-progress-card';
+import { TicketDetailCardComponent } from '../../../components/shared/ticket-detail-card/ticket-detail-card';
+import {
+  TicketChatComponent,
+  TicketChatReader,
+  isSameTicketId,
+} from '../../../components/shared/ticket-chat/ticket-chat';
+import { formatElapsedTime } from '../../../utils/time.util';
+import { PageLoaderComponent } from '../../../components/shared/page-loader/page-loader';
+
+@Component({
+  selector: 'app-it-ticket-workspace',
+  standalone: true,
+  imports: [
+    CommonModule,
+    FormsModule,
+    NzSelectModule,
+    NzButtonModule,
+    NzIconModule,
+    NzModalModule,
+    FilePreviewModalComponent,
+    TicketAttachmentManagerComponent,
+    ItProblemReportComponent,
+    ItRepairRequestComponent,
+    ITServiceRequestCombinedComponent,
+    AcknowledgeModal,
+    EmailReplyModal,
+    DenyModal,
+    ChangeTicketTypeModal,
+    AssignModal,
+    NoteModal,
+    ServicesDetailModal,
+    NzCheckboxModule,
+    CcModal,
+    NoteForItModal,
+    NzDatePickerModule,
+    TicketRequesterCardComponent,
+    TicketOpenForCardComponent,
+    TicketProgressCardComponent,
+    TicketDetailCardComponent,
+    TicketChatComponent,
+    PageLoaderComponent,
+  ],
+  templateUrl: './ticket-workspace.html',
+  styleUrl: './ticket-workspace.scss',
+})
+export class TicketWorkspaceComponent implements OnInit, OnChanges {
+  @Input() showTicketList = true;
+  @Input() ticketId: string | null = null;
+  readonly ticketLoadError = signal(false);
+  private detailRequestVersion = 0;
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (this.initialized && changes['ticketId'] && !this.showTicketList && this.ticketId) {
+      this.selectedTicket.set(undefined);
+      this.isPageLoading.set(true);
+      this.selectTicket(this.ticketId);
+    }
+  }
+
+  allDataUserLogin: any = JSON.parse(localStorage.getItem('allData') ?? '{}');
+
+  actionConfig: Record<
+    string,
+    {
+      left: any[];
+      right: any[];
+    }
+  > = {
+    Hold: {
+      left: [
+        {
+          label: 'Resume',
+          icon: 'fa-play',
+          class: 'btn-onhold',
+          action: () => this.resumeTicket(),
+        },
+      ],
+      right: [],
+    },
+
+    Open: {
+      left: [
+        {
+          label: 'On Hold',
+          icon: 'fa-pause',
+          class: 'btn-onhold',
+          action: () => this.onHoldTicket(),
+        },
+        {
+          label: 'Deny',
+          icon: 'fa-ban',
+          class: 'btn-deny',
+          action: () => this.openDenyModal(),
+        },
+      ],
+
+      right: [
+        {
+          label: 'รับเรื่อง',
+          icon: 'fa-tag',
+          class: 'btn-accept',
+          action: () => this.openAcknowledgeModal(),
+        },
+        {
+          label: 'ส่งต่อ',
+          icon: 'fa-share',
+          class: 'btn-send',
+          action: () => this.openAssignModal(),
+        },
+        {
+          label: 'ปิดงาน',
+          icon: 'fa-circle-check',
+          class: 'btn-done',
+          action: () => this.closeTicket(),
+        },
+      ],
+    },
+
+    'In Progress': {
+      left: [
+        {
+          label: 'On Hold',
+          icon: 'fa-pause',
+          class: 'btn-onhold',
+          action: () => this.onHoldTicket(),
+        },
+        {
+          label: 'Deny',
+          icon: 'fa-ban',
+          class: 'btn-deny',
+          action: () => this.openDenyModal(),
+        },
+      ],
+
+      right: [
+        {
+          label: 'ส่งต่อ',
+          icon: 'fa-share',
+          class: 'btn-send',
+          action: () => this.openAssignModal(),
+        },
+        {
+          label: 'ปิดงาน',
+          icon: 'fa-circle-check',
+          class: 'btn-done',
+          action: () => this.closeTicket(),
+        },
+      ],
+    },
+
+    Assigned: {
+      left: [
+        {
+          label: 'On Hold',
+          icon: 'fa-pause',
+          class: 'btn-onhold',
+          action: () => this.onHoldTicket(),
+        },
+        {
+          label: 'Deny',
+          icon: 'fa-ban',
+          class: 'btn-deny',
+          action: () => this.openDenyModal(),
+        },
+      ],
+
+      right: [
+        {
+          label: 'ส่งต่อ',
+          icon: 'fa-share',
+          class: 'btn-send',
+          action: () => this.openAssignModal(),
+        },
+        {
+          label: 'ปิดงาน',
+          icon: 'fa-circle-check',
+          class: 'btn-done',
+          action: () => this.closeTicket(),
+        },
+      ],
+    },
+
+    ReOpened: {
+      left: [
+        {
+          label: 'On Hold',
+          icon: 'fa-pause',
+          class: 'btn-onhold',
+          action: () => this.onHoldTicket(),
+        },
+        {
+          label: 'Deny',
+          icon: 'fa-ban',
+          class: 'btn-deny',
+          action: () => this.openDenyModal(),
+        },
+      ],
+
+      right: [
+        {
+          label: 'ส่งต่อ',
+          icon: 'fa-share',
+          class: 'btn-send',
+          action: () => this.openAssignModal(),
+        },
+        {
+          label: 'ปิดงาน',
+          icon: 'fa-circle-check',
+          class: 'btn-done',
+          action: () => this.closeTicket(),
+        },
+      ],
+    },
+
+    'waiting-user-resubmit': {
+      left: [],
+
+      right: [
+        {
+          label: 'ปิดงาน',
+          icon: 'fa-circle-check',
+          class: 'btn-done',
+          action: () => this.closeTicket(),
+        },
+      ],
+    },
+  };
+
+  private router = inject(Router);
+
+  isTablet = false;
+  isMobile = false;
+  isSmallMobile = false;
+  isTicketDetailOpen = signal(false);
+  IS_CHAT_OPEN = signal(false);
+  private cdr = inject(ChangeDetectorRef);
+
+  private readonly CHAT_READ_KEY = 'ess_it_chat_read';
+
+  private loadChatReadCounts(): Map<number, number> {
+    try {
+      const raw = localStorage.getItem(this.CHAT_READ_KEY);
+      const obj = raw ? JSON.parse(raw) : {};
+      return new Map(Object.entries(obj).map(([k, v]) => [Number(k), v as number]));
+    } catch {
+      return new Map();
+    }
+  }
+
+  private saveChatReadCounts(m: Map<number, number>) {
+    localStorage.setItem(this.CHAT_READ_KEY, JSON.stringify(Object.fromEntries(m)));
+  }
+
+  private chatReadCounts = signal<Map<number, number>>(new Map());
+
+  replyReaders = signal<TicketChatReader[]>([]);
+  replyingTo = signal<any>(null);
+
+  unreadChatCount = computed(() => {
+    const ticket = this.selectedTicket();
+    if (!ticket) return 0;
+    const total = (ticket.itNotes ?? []).length;
+    const read = this.chatReadCounts().get(ticket.ticketId) ?? 0;
+    return Math.max(0, total - read);
+  });
+
+  @ViewChild(TicketChatComponent) ticketChat?: TicketChatComponent;
+
+  filter = {
+    dateRange: [dayjs().startOf('year').toDate(), dayjs().toDate()] as [Date, Date] | null,
+  };
+
+  @ViewChild('ticketList') ticketList!: ElementRef;
+
+  @HostListener('window:resize')
+  onResize() {
+    this.checkScreen();
+  }
+
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent) {
+    // ถ้ามี Preview เปิดอยู่ ไม่ต้องปิด Chat
+    if (this.isPreviewModalOpen()) return;
+
+    if (!this.IS_CHAT_OPEN()) return;
+
+    if (this.ticketChat?.isOutsideClick(event)) {
+      this.closeChat();
+    }
+  }
+
+  checkScreen() {
+    const width = window.innerWidth;
+    this.isMobile = width <= 860;
+    this.isTablet = width > 860 && width <= 1200;
+    this.isSmallMobile = window.innerWidth <= 460;
+  }
+
+  private itServiceService = inject(ItServiceService);
+  private authService = inject(AuthService);
+  private swalService = inject(SwalService);
+  private fileConverter = inject(FileConverterService);
+  private signalrService = inject(SignalrService);
+  private ticketService = inject(TicketService);
+  private destroyRef = inject(DestroyRef);
+  private route = inject(ActivatedRoute);
+  dateUtil = inject(DateUtilityService);
+
+  myTicket: boolean = false;
+
+  formatText = formatText;
+  StatusColor = StatusColor;
+  StatusColor_Reverse = StatusColor_Reverse;
+  StatusColor_text = StatusColor_text;
+
+  currentUserEmpCode = this.authService.userData().CODEMPID;
+
+  Tickets = signal<any[]>([]);
+  isPageLoading = signal(true);
+  summaryRes = signal<any>(null);
+  selectedTicket = signal<any | undefined>(undefined);
+  isPreviewModalOpen = signal<boolean>(false);
+  previewFiles = signal<FilePreviewItem[]>([]);
+  previewSelectedIndex = 0;
+  isAttachmentManagerOpen = signal(false);
+
+  isVisibleAssignee = signal<boolean>(false);
+  selectedAssignee = signal<any | undefined>(undefined);
+
+  assigneeGroups: any[] = [];
+
+  IS_OPEN_IT_SERVICE = signal(0);
+  newTicketIds = signal<Set<number>>(new Set());
+  unreadTicketIds = signal<Set<number>>(new Set());
+  newNoteTicketIds = signal<Set<number>>(new Set());
+  private prevTicketIds = new Set<number>();
+
+  get newTicketCount() {
+    return this.signalrService.pendingNewTickets;
+  }
+  private initialized = false;
+  IS_DENY_TICKET = signal(false);
+  IS_HOLD_TICKET = signal(false);
+  IS_CLOSE_TICKET = signal(false);
+  IS_CHANGE_TICKET_TYPE = signal(false);
+  IS_ONHOLD_TICKET = signal(false);
+  IS_ACKNOWLEDGE_TICKET = signal(false);
+  IS_NOTE_TICKET = signal(false);
+  IS_EMAIL_REPLY_MODAL = signal(false);
+  IS_ASSIGN_TICKET = signal(false);
+  IS_NOTEFORIT_TICKET = signal(false);
+  isCcModalVisible = false;
+
+  keyword = '';
+  TicketStatus: any;
+
+  filterStatus: string | null = 'all';
+
+  selectedId = 1;
+  // isAssignModalVisible = false;
+  assignSearchKeyword = '';
+  selectedAssigneeEmpCodes: any[] = [];
+  private keywordSearchTimer: ReturnType<typeof setTimeout> | null = null;
+
+  constructor(
+    private msg: NzMessageService,
+    private sanitizer: DomSanitizer,
+    private i18n: NzI18nService,
+  ) {
+    effect(() => {
+      const trigger = this.signalrService.refreshTrigger();
+      if (trigger > 0 && this.initialized) {
+        untracked(() => this.refreshTickets());
+      }
+    });
+    this.i18n.setLocale(en_US);
+  }
+
+  ngOnInit() {
+    this.chatReadCounts.set(this.loadChatReadCounts());
+    this.checkScreen();
+    this.destroyRef.onDestroy(() => {
+      if (this.keywordSearchTimer) clearTimeout(this.keywordSearchTimer);
+    });
+    if (this.showTicketList) {
+      const hasTrigger = this.signalrService.refreshTrigger() > 0;
+      this.signalrService.refreshTrigger.set(0);
+      const navigatingToTicket = !!this.route.snapshot.queryParamMap.get('ticketId');
+      if (!navigatingToTicket && (hasTrigger || this.signalrService.pendingNewTickets() > 0)) {
+        this.refreshTickets();
+      } else {
+        this.getAllTickets();
+      }
+    } else if (this.ticketId) {
+      this.selectTicket(this.ticketId);
+    } else {
+      this.isPageLoading.set(false);
+    }
+    this.initialized = true;
+    this.getAssignItDropdown();
+    (this.route.queryParams ?? EMPTY)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((params) => {
+        if (!this.showTicketList) return;
+        if (params['focusZone'] === 'tickets') {
+          this.focusTicketsZone();
+        }
+
+        if (params['ticketId']) {
+          // ✅ Ensure the ticket is visible by resetting filters
+          this.filterStatus = 'all';
+          this.myTicket = false;
+          this.getAllTickets();
+
+          this.selectTicket(params['ticketId'], {
+            openChat: params['openChat'] === 'true',
+          });
+        }
+      });
+
+    this.signalrService.on('NewTicket', '/it-dashboard');
+    this.signalrService.on('TicketAssigned', '/it-dashboard');
+
+    this.signalrService.ticketFocusTrigger
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((ticketId) => {
+        if (!this.showTicketList && !isSameTicketId(ticketId, this.ticketId)) return;
+        this.newNoteTicketIds.update((s) => {
+          s.delete(ticketId);
+          return new Set(s);
+        });
+        this.selectTicket(String(ticketId));
+      });
+
+    // ✅ Listen for New Note (Real-time)
+    this.signalrService
+      .on('NewNote')
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((data: any) => {
+        if (data.ticketId) {
+          // 1. Mark as unread (envelope icon + ข้อความใหม่ badge)
+          this.unreadTicketIds.update((s) => new Set([...s, data.ticketId]));
+          this.newNoteTicketIds.update((s) => new Set([...s, Number(data.ticketId)]));
+
+          // 2. Re-Open note → update status in list immediately
+          if ((data.note ?? data.message ?? '').startsWith('Re-Open')) {
+            this.Tickets.update((list) =>
+              list.map((t: any) =>
+                isSameTicketId(t.ticketId, data.ticketId)
+                  ? { ...t, IT_Status: getStatusLabel('ReOpened'), status: 'Re-Opened' }
+                  : t,
+              ),
+            );
+          }
+
+          // 3. If viewing this ticket, refresh details to show new note instantly
+          if (isSameTicketId(this.selectedTicket()?.ticketId, data.ticketId)) {
+            this.selectTicket(String(data.ticketId));
+          }
+        }
+      });
+
+    this.signalrService
+      .on('ChatRead')
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((data: any) => {
+        if (!isSameTicketId(data.ticketId, this.selectedTicket()?.ticketId)) return;
+        this.replyReaders.update((readers) => {
+          const others = readers.filter((r) => r.userCodeempid !== data.userCodeempid);
+          return [
+            ...others,
+            {
+              userCodeempid: data.userCodeempid,
+              aduser: data.aduser ?? '',
+              nickName: data.nickName ?? '',
+              lastReadReplyId: data.lastReadReplyId,
+              readAt: data.readAt ?? new Date().toISOString(),
+            },
+          ];
+        });
+      });
+
+    // Poll for new notes every 5s while chat panel is open (fallback when SignalR doesn't reach all parties)
+    interval(2000)
+      .pipe(
+        takeUntilDestroyed(this.destroyRef),
+        filter(() => this.IS_CHAT_OPEN() && !!this.selectedTicket()),
+      )
+      .subscribe(() => this.refreshChatNotes());
+
+    this.signalrService.ticketStatusTrigger
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(({ ticketId, status }) => {
+        this.Tickets.update((list) =>
+          list.map((t: any) =>
+            t.ticketId == ticketId ? { ...t, IT_Status: getStatusLabel(status), status } : t,
+          ),
+        );
+        if (this.selectedTicket()?.ticketId == ticketId) {
+          this.selectTicket(String(ticketId), { scrollToList: false });
+        }
+      });
+  }
+
+  close() {
+    this.IS_OPEN_IT_SERVICE.set(0);
+  }
+
+  refreshTickets() {
+    if (!this.showTicketList) {
+      if (this.ticketId) this.selectTicket(this.ticketId);
+      return;
+    }
+    this.prevTicketIds = new Set(this.Tickets().map((t: any) => t.ticketId));
+    // console.log(this.prevTicketIds);
+    this.getAllTickets(true);
+    const zone = document.getElementById('tickets-zone');
+    if (zone) {
+      zone.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }
+
+  onStatusChange(status: string | null) {
+    this.filterStatus = status ?? 'all'; // ✅ ถ้า null → all
+    this.filteredTickets();
+    // หรือเรียก filterStatus(status) ของคุณ
+  }
+
+  onFilterStatusChange(status: string) {
+    this.filterStatus = status;
+    this.filteredTickets();
+  }
+
+  onKeywordChange(value: string) {
+    this.keyword = value;
+
+    if (this.keywordSearchTimer) {
+      clearTimeout(this.keywordSearchTimer);
+    }
+
+    this.keywordSearchTimer = setTimeout(() => {
+      this.getAllTickets();
+    }, 300);
+  }
+
+  trackById = (_: number, item: TicketItem) => item.id;
+
+  private focusTicketsZone(retries = 10) {
+    if (!this.showTicketList) return;
+    const zone = document.getElementById('tickets-zone');
+    if (zone) {
+      zone.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      // blur first so :focus state changes even if element was already focused,
+      // ensuring the glow animation replays every time
+      zone.blur();
+      requestAnimationFrame(() => zone.focus({ preventScroll: true }));
+      return;
+    }
+
+    if (retries > 0) {
+      setTimeout(() => this.focusTicketsZone(retries - 1), 200);
+    }
+  }
+
+  onTicketClick(ticketId: any) {
+    const hasNewNote = this.newNoteTicketIds().has(Number(ticketId));
+    this.newNoteTicketIds.update((s) => {
+      s.delete(Number(ticketId));
+      return new Set(s);
+    });
+    this.focusTicketsZone();
+    requestAnimationFrame(() => this.scrollTicketInList(String(ticketId)));
+    this.selectTicket(String(ticketId), {
+      openChat: hasNewNote,
+      scrollToList: false,
+    });
+  }
+
+  selectTicket(
+    ticketId: string,
+    options?: {
+      openChat?: boolean;
+      scrollToList?: boolean;
+    },
+  ) {
+    if (!this.showTicketList && !isSameTicketId(ticketId, this.ticketId)) return;
+    const requestVersion = ++this.detailRequestVersion;
+    this.ticketLoadError.set(false);
+    const previousTicketId = this.selectedTicket()?.ticketId;
+
+    this.getTicketById(ticketId)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: async (res: any) => {
+          try {
+            if (!res?.ticket) throw new Error('ไม่พบข้อมูล Ticket');
+            // console.log(res);
+            const ticketAttachments =
+              res.attachments?.filter(
+                (f: any) =>
+                  !f.reply_id &&
+                  !['from it', 'จาก it'].includes(
+                    String(f.file_description ?? '')
+                      .trim()
+                      .toLowerCase(),
+                  ),
+              ) || [];
+            const itAttachments =
+              res.attachments?.filter((f: any) =>
+                ['from it', 'จาก it'].includes(
+                  String(f.file_description ?? '')
+                    .trim()
+                    .toLowerCase(),
+                ),
+              ) || [];
+            const replyAttachments = res.attachments?.filter((f: any) => f.reply_id) || [];
+            const convertedFiles = this.fileConverter.mapAttachmentMetadata(ticketAttachments);
+            const convertedItFiles = this.fileConverter.mapAttachmentMetadata(itAttachments);
+
+            const ticket = res.ticket;
+            const replies = res.replies;
+            const services = res.services;
+            const attachments = convertedFiles;
+            const assignGroups = res.assignGroups;
+            const assignments = res.assignments;
+            const ccList = res.ccList;
+
+            const itNotes = await this.buildItNotes(
+              replies,
+              replyAttachments,
+              ticket.requester_aduser,
+            );
+            if (requestVersion !== this.detailRequestVersion || this.destroyRef.destroyed) return;
+            const result = this.buildTimeline(res.timeline, res.timelineAssignees);
+
+            const statusForIt = getStatusForIt(
+              assignments,
+              this.authService.userData().CODEMPID,
+              ticket.IT_Status,
+            );
+
+            const isOpenForSelf =
+              res.requestFor?.emp_code && res.requestFor.emp_code === res.requester?.emp_code;
+
+            const hasOpenFor = !!res.requestFor?.emp_code;
+
+            const openFor = isOpenForSelf
+              ? { fullname: 'เปิดให้ตนเอง' }
+              : hasOpenFor
+                ? res.requestFor
+                : null;
+
+            const objectData = {
+              ticketId: ticket.id,
+              ticketNumber: ticket.ticket_number,
+              subject: ticket.subject,
+              description: ticket.description,
+              viaEmail: ticket.is_from_email,
+              noteForIt: ticket.noteForIt,
+              ticketType: ticket.ticket_type_name_th,
+              ticketTypeId: ticket.ticket_type_id,
+              ticketCategory: ticket.sub_category_name,
+              subCategoryId: ticket.sub_category_id,
+              problemBy: ticket.problemBy,
+              priority: ticket.priority,
+              source: ticket.source,
+              createdDate: new Date(ticket.created_at).toISOString(),
+              elapsed_time: ticket.elapsed_time,
+              // updatedDate: new Date(ticket.updated_at).toISOString(),
+              requesterCode: ticket.requester_code,
+              requesterAduser: ticket.requester_aduser,
+              requesterName: ticket.requester_name,
+              requesterEmail: ticket.requester_email,
+              requesterDept: ticket.requester_dept,
+              requesterCompanyCode: ticket.requester_companyCode,
+              requesterCompanyName: ticket.requester_companyName,
+              requesterPhone: ticket.contact_phone,
+              requesterColor: ticketTypyColor.getColor(ticket.ticket_type_id),
+              status: ticket.IT_Status,
+              repair_cost_type: ticket.repair_cost_type,
+              it_satus: getStatusLabel(statusForIt), //ticket.IT_Status
+              user_status: ticket.user_status,
+              approval_status: ticket.approval_status,
+              attachments: attachments,
+              itAttachments: convertedItFiles,
+              assignments: assignments,
+              itNotes: itNotes,
+              assignTimeline: result,
+              services: services,
+              requester: res.requester,
+              openFor: openFor,
+              // openFor: res.requestFor.emp_code ? res.requestFor : null,
+              rejection_reason: ticket.rejection_reason,
+              ccList: ccList || [],
+            };
+            this.selectedTicket.set(objectData);
+            if (previousTicketId !== objectData.ticketId) {
+              this.clearChatDraft();
+              this.replyReaders.set([]);
+            }
+            if (options?.openChat) {
+              this.IS_CHAT_OPEN.set(true);
+              setTimeout(() => this.ticketChat?.focusComposer(), 100);
+            }
+            if (this.IS_CHAT_OPEN()) {
+              this.markChatAsRead();
+              this.markLatestReplyRead(objectData.ticketId, objectData.itNotes ?? []);
+            }
+            this.scrollToBottom();
+
+            // console.log(objectData);
+
+            const codeempid = this.authService.userData()?.CODEMPID;
+            if (ticketId && codeempid) {
+              this.itServiceService.markTicketRead(ticketId, codeempid).subscribe({
+                complete: () => this.signalrService.ticketReadTrigger.next({ ticketId }),
+              });
+
+              this.loadReplyReadStatus(ticketId);
+              this.unreadTicketIds.update((s) => {
+                const next = new Set(s);
+                next.delete(Number(ticketId));
+                return next;
+              });
+            }
+
+            if (this.showTicketList && this.isMobile) {
+              this.isTicketDetailOpen.set(true);
+            }
+
+            if (options?.scrollToList !== false) {
+              this.scrollTicketInList(ticketId);
+            }
+          } catch (error) {
+            this.handleTicketLoadFailure(requestVersion, error);
+          } finally {
+            if (
+              !this.showTicketList &&
+              requestVersion === this.detailRequestVersion &&
+              !this.destroyRef.destroyed
+            ) {
+              this.isPageLoading.set(false);
+            }
+          }
+        },
+        error: (error) => this.handleTicketLoadFailure(requestVersion, error),
+      });
+  }
+
+  private handleTicketLoadFailure(requestVersion: number, error: unknown): void {
+    if (requestVersion !== this.detailRequestVersion || this.destroyRef.destroyed) return;
+    this.ticketLoadError.set(true);
+    if (!this.showTicketList) this.isPageLoading.set(false);
+    this.msg.warning('ไม่สามารถโหลดข้อมูล Ticket ได้');
+    console.error('Ticket detail load failed:', error);
+  }
+
+  closeTicketDetail() {
+    this.isTicketDetailOpen.set(false);
+    this.closeChat();
+  }
+
+  private markChatAsRead() {
+    const ticket = this.selectedTicket();
+    if (!ticket) return;
+    this.newNoteTicketIds.update((s) => {
+      s.delete(ticket.ticketId);
+      return new Set(s);
+    });
+    const total = (ticket.itNotes ?? []).length;
+    this.chatReadCounts.update((m) => {
+      const next = new Map(m);
+      next.set(ticket.ticketId, total);
+      this.saveChatReadCounts(next);
+      return next;
+    });
+  }
+
+  toggleChat() {
+    this.IS_CHAT_OPEN.update((isOpen) => {
+      const next = !isOpen;
+      if (next) {
+        this.scrollToBottom();
+        this.markChatAsRead();
+        const ticket = this.selectedTicket();
+        if (ticket) {
+          this.markLatestReplyRead(ticket.ticketId, ticket.itNotes ?? []);
+        }
+      }
+      return next;
+    });
+  }
+
+  canReplyToEmailTicket(ticket: any): boolean {
+    const viaEmail =
+      ticket?.viaEmail === true ||
+      ticket?.viaEmail === 1 ||
+      ticket?.viaEmail === '1' ||
+      ticket?.viaEmail === 'true';
+    const acknowledgedStatuses = ['In Progress', 'Assigned', 'ReOpened', 'Hold'];
+
+    return viaEmail && acknowledgedStatuses.includes(ticket?.status);
+  }
+
+  openEmailReply(): void {
+    this.IS_EMAIL_REPLY_MODAL.set(true);
+  }
+
+  closeEmailReplyModal(): void {
+    this.IS_EMAIL_REPLY_MODAL.set(false);
+  }
+
+  submitEmailReply(data: any): void {
+    const executedBy = this.authService.currentUser() ?? this.authService.userData()?.AD_USER ?? '';
+
+    if (!data?.id || !data?.message || !executedBy) {
+      this.swalService.warning('ข้อมูลสำหรับตอบกลับอีเมลไม่ครบถ้วน');
+      return;
+    }
+
+    // console.log('submitEmailReply', data);
+
+    this.IS_EMAIL_REPLY_MODAL.set(false);
+    this.swalService.loading('กำลังส่งอีเมล...');
+    this.itServiceService
+      .replyTicketEmail(data.id, {
+        message: data.message,
+        replyAll: true,
+        executedBy,
+      })
+      .subscribe({
+        next: (res) => {
+          if (res?.success === false) {
+            this.swalService.warning(res.message || 'ไม่สามารถส่งอีเมลได้');
+            return;
+          }
+
+          this.swalService.success(res?.message || 'ส่งอีเมลเรียบร้อยแล้ว');
+          this.selectTicket(String(data.id));
+          this.getAllTickets();
+        },
+        error: (error) => {
+          this.swalService.warning(
+            'เกิดข้อผิดพลาด',
+            error?.error?.message || error?.message || 'ไม่สามารถส่งอีเมลได้',
+          );
+        },
+      });
+  }
+
+  closeChat() {
+    this.IS_CHAT_OPEN.set(false);
+  }
+
+  private clearChatDraft() {
+    this.ticketChat?.clearDraft();
+  }
+
+  private focusChatComposer() {
+    requestAnimationFrame(() => {
+      setTimeout(() => this.ticketChat?.focusComposer(), 0);
+    });
+  }
+
+  exportChatHistory(ticket: any) {
+    const ticketId = ticket?.ticketId;
+
+    if (!ticketId || !(ticket?.itNotes?.length > 0)) {
+      return;
+    }
+
+    this.ticketService.exportChatHistory(ticketId).subscribe({
+      next: (response) => {
+        const blob = response.body;
+
+        if (!blob) {
+          return;
+        }
+
+        const contentType = response.headers.get('content-type') || blob.type;
+        if (contentType.toLowerCase().includes('application/json')) {
+          return;
+        }
+
+        this.downloadChatHistoryBlob(
+          blob,
+          this.getExportFileName(response.headers.get('content-disposition'), ticketId),
+        );
+      },
+      error: () => this.msg.warning('ไม่สามารถ export ประวัติการแชทได้'),
+    });
+  }
+
+  private downloadChatHistoryBlob(blob: Blob, fileName: string) {
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+
+    link.href = url;
+    link.download = fileName;
+    link.style.display = 'none';
+
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  }
+
+  private getExportFileName(contentDisposition: string | null, ticketId: string | number): string {
+    if (!contentDisposition) {
+      return `chat-history-${ticketId}.xlsx`;
+    }
+
+    const utf8FileName = contentDisposition.match(/filename\*=UTF-8''([^;]+)/i)?.[1];
+    if (utf8FileName) {
+      return decodeURIComponent(utf8FileName.replace(/"/g, ''));
+    }
+
+    return (
+      contentDisposition.match(/filename="?([^";]+)"?/i)?.[1] || `chat-history-${ticketId}.xlsx`
+    );
+  }
+
+  showAllServices: boolean = false;
+  selectedServices: any[] = [];
+  showAll(services: any) {
+    this.showAllServices = true;
+    this.selectedServices = services;
+  }
+
+  closeModal_showAll() {
+    this.showAllServices = false;
+  }
+
+  selectAssignee(item: any) {
+    this.isVisibleAssignee.set(true);
+    this.selectedAssignee.set(item);
+  }
+
+  closeAssignee() {
+    this.isVisibleAssignee.set(false);
+  }
+
+  filteredTickets(): any[] {
+    const statusMap: Record<string, string> = {
+      open: 'New',
+      reopen: 'Re-Opened',
+      assigned: 'In Progress',
+      done: 'Closed',
+      hold: 'Hold',
+      denied: 'Denied',
+    };
+
+    const mappedStatus = statusMap[this.filterStatus ?? ''];
+
+    return this.Tickets().filter((t: any) => {
+      const matchStatus = this.filterStatus === 'all' ? true : t.IT_Status === mappedStatus;
+      return matchStatus;
+    });
+  }
+
+  statusLabel(s: string) {
+    switch (s) {
+      case 'inprogress':
+        return 'In Progress Tickets';
+      case 'assigned':
+        return 'Assigned Tickets';
+      case 'done':
+        return 'Done';
+      case 'open':
+        return 'Open';
+      default:
+        return s;
+    }
+  }
+
+  copy(text: string) {
+    if (!text) return;
+    navigator.clipboard.writeText(text);
+    this.msg.success('คัดลอกแล้ว');
+  }
+
+  safeUrl!: SafeResourceUrl;
+
+  previewFile(f: any) {
+    this.msg.info(`ดูไฟล์: ${f.name}`);
+    this.safeUrl = this.sanitizer.bypassSecurityTrustResourceUrl(f.file_path);
+  }
+
+  onImgError(event: Event) {
+    const img = event.target as HTMLImageElement;
+    if (!img.src.includes('user.png')) {
+      img.src = 'user.png';
+    }
+  }
+
+  isDetailModalOpen = signal(false);
+  selectedTicketId = signal('');
+  selectedDetail = signal('');
+
+  openDetail(id: any, description: string) {
+    // console.log('id', id);
+    this.selectedTicketId.set(id);
+    this.selectedDetail.set(description);
+    this.isDetailModalOpen.set(true);
+  }
+
+  copiedTicketId: string | null = null;
+
+  copyDescription(ticketId: string, html: string) {
+    const text = this.toPlainText(html);
+
+    const textarea = document.createElement('textarea');
+    textarea.value = text;
+
+    document.body.appendChild(textarea);
+    textarea.select();
+
+    document.execCommand('copy');
+
+    document.body.removeChild(textarea);
+
+    this.copiedTicketId = ticketId;
+
+    setTimeout(() => {
+      this.copiedTicketId = '';
+      this.cdr.detectChanges();
+    }, 2000);
+  }
+
+  private toPlainText(html: string): string {
+    const doc = new DOMParser().parseFromString(html, 'text/html');
+
+    const lines: string[] = [];
+
+    const walk = (node: Node) => {
+      if (node.nodeType === Node.TEXT_NODE) {
+        const text = node.textContent?.replace(/\s+/g, ' ').trim();
+        if (text) {
+          lines.push(text);
+        }
+        return;
+      }
+
+      if (!(node instanceof HTMLElement)) return;
+
+      switch (node.tagName) {
+        case 'IMG': {
+          const src = node.getAttribute('src');
+          if (src) {
+            lines.push(src);
+            lines.push('');
+          }
+          break;
+        }
+
+        case 'LI': {
+          lines.push(`• ${node.textContent?.trim()}`);
+          break;
+        }
+
+        case 'P': {
+          node.childNodes.forEach(walk);
+          lines.push('');
+          break;
+        }
+
+        case 'BR': {
+          lines.push('');
+          break;
+        }
+
+        case 'A': {
+          const text = node.textContent?.trim() ?? '';
+          const href = node.getAttribute('href');
+
+          lines.push(href ? `${text} (${href})` : text);
+          break;
+        }
+
+        case 'TABLE':
+        case 'TBODY': {
+          node.childNodes.forEach(walk);
+          lines.push('');
+          break;
+        }
+
+        case 'TR': {
+          const th = node.querySelector('th')?.textContent?.trim();
+          const td = node.querySelector('td')?.textContent?.trim();
+
+          if (th || td) {
+            lines.push(`${th}: ${td}`);
+          }
+
+          break;
+        }
+
+        case 'H3': {
+          lines.push('');
+          lines.push(node.textContent?.trim() ?? '');
+          lines.push('--------------------');
+          break;
+        }
+
+        case 'H4': {
+          lines.push('');
+          lines.push(`[ ${node.textContent?.trim()} ]`);
+          break;
+        }
+
+        case 'DIV': {
+          node.childNodes.forEach(walk);
+          lines.push('');
+          break;
+        }
+
+        default:
+          node.childNodes.forEach(walk);
+      }
+    };
+
+    doc.body.childNodes.forEach(walk);
+
+    return lines
+      .join('\n')
+      .replace(/\n{3,}/g, '\n\n')
+      .trim();
+  }
+
+  openCcModal(): void {
+    this.isCcModalVisible = true;
+  }
+
+  handleCancel(): void {
+    this.isCcModalVisible = false;
+  }
+
+  ReOpen() {
+    // console.log('reOpen mock', this.selectedTicket());
+
+    this.swalService.confirm('ยืนยันการเปิดงานอีกครั้ง (Re-open)').then((result) => {
+      if (!result.isConfirmed) return;
+
+      const formData = new FormData();
+
+      formData.append('TicketId', this.selectedTicket().ticketId);
+      formData.append('Requester', this.authService.userData().CODEMPID ?? '');
+      // console.log('formData', [...formData.entries()]);
+
+      this.swalService.loading('กำลังบันทึกข้อมูล...');
+      this.itServiceService.re_open(formData).subscribe({
+        next: (res) => {
+          // console.log(res);
+          setTimeout(() => {
+            this.swalService.success(res.message || 'บันทึกสำเร็จ');
+          }, 100);
+
+          const ticket = this.selectedTicket();
+          this.signalrService.ticketStatusNotify(
+            ticket?.ticketId,
+            ticket?.requesterAduser ?? '',
+            'ReOpened',
+          );
+
+          this.selectTicket(ticket.ticketId);
+          this.getAllTickets();
+        },
+        error: (error) => {
+          console.error('Error Re-open:', error.error);
+          this.swalService.close();
+        },
+      });
+    });
+  }
+
+  // FUNCTION
+
+  isToday(dateValue: string | Date): boolean {
+    const date = new Date(dateValue);
+    const now = new Date();
+
+    return (
+      date.getDate() === now.getDate() &&
+      date.getMonth() === now.getMonth() &&
+      date.getFullYear() === now.getFullYear()
+    );
+  }
+
+  private extractNickName(name: string) {
+    const nickMatch = name.match(/\((.*?)\)/);
+    const firstName = name.split(' ')[0];
+
+    if (nickMatch) {
+      return `${firstName} (${nickMatch[1]})`;
+    }
+
+    return firstName;
+  }
+
+  viewFile(file: any, files: any[] = [file]) {
+    this.previewSelectedIndex = Math.max(0, files.indexOf(file));
+    this.previewFiles.set(this.fileConverter.buildPreviewFiles(files));
+    this.IS_CHAT_OPEN.set(true);
+    this.isPreviewModalOpen.set(true);
+  }
+
+  viewFileChat(file: any, files: any[] = [file]) {
+    this.previewSelectedIndex = Math.max(0, files.indexOf(file));
+    this.previewFiles.set(
+      files.map((attachment) => ({
+        fileName: attachment.name || attachment.fileName,
+        date: dayjs().format('DD/MM/YYYY HH:mm'),
+        url: attachment.file ? URL.createObjectURL(attachment.file) : attachment.filePath || '',
+        type: attachment.file?.type || attachment.type || 'application/octet-stream',
+      })),
+    );
+
+    this.isPreviewModalOpen.set(true);
+  }
+
+  isImage(file: any): boolean {
+    const type = file.type || '';
+
+    if (type.startsWith('image/')) {
+      return true;
+    }
+
+    const ext = (file.name || '').split('.').pop()?.toLowerCase();
+
+    return ['png', 'jpg', 'jpeg', 'gif', 'webp', 'bmp'].includes(ext ?? '');
+  }
+
+  getImages(files: any[] = []) {
+    return files.filter((f) => this.isImage(f));
+  }
+
+  getFiles(files: any[] = []) {
+    return files.filter((f) => !this.isImage(f));
+  }
+
+  getChatAttachments(ticket: any): any[] {
+    return (ticket?.itNotes ?? []).flatMap((note: any) => note.attachments ?? []);
+  }
+
+  getChatAttachmentCount(ticket: any): number {
+    return this.getChatAttachments(ticket).length;
+  }
+
+  openChatAttachments(ticket: any) {
+    const files = this.getChatAttachments(ticket);
+    if (files.length === 0) return;
+    this.openAllAttachments(files);
+  }
+
+  openAllAttachments(files: any, selectedIndex = 0) {
+    this.previewSelectedIndex = selectedIndex;
+    this.previewFiles.set(this.fileConverter.buildPreviewFiles(files));
+    this.isPreviewModalOpen.set(true);
+  }
+
+  openAttachmentManager(): void {
+    this.isAttachmentManagerOpen.set(true);
+  }
+
+  closeAttachmentManager(): void {
+    this.isAttachmentManagerOpen.set(false);
+  }
+
+  viewManagedAttachment(event: { file: any; source: 'user' | 'it' }): void {
+    const ticket = this.selectedTicket();
+    const sourceFiles =
+      event.source === 'it' ? (ticket?.itAttachments ?? []) : (ticket?.attachments ?? []);
+    this.openAllAttachments(sourceFiles, Math.max(0, sourceFiles.indexOf(event.file)));
+  }
+
+  closePreview() {
+    this.isPreviewModalOpen.set(false);
+    this.previewSelectedIndex = 0;
+    for (const file of this.previewFiles()) {
+      if (file.url?.startsWith('blob:')) URL.revokeObjectURL(file.url);
+    }
+    this.previewFiles.set([]);
+  }
+
+  buildTimeline(timelines: any[], assignees: any[]) {
+    return timelines.map((t) => {
+      const assigneeList = assignees
+        .filter((a) => a.timeline_id === t.timeline_id)
+        .map((a) => ({
+          id: a.id,
+          fullName: a.full_name,
+          nickName: a.nickname,
+          empCode: a.codeempid,
+          adUser: a.aduser,
+          email: a.email,
+          phone: a.phone,
+        }));
+
+      return {
+        step: t.step,
+        title: t.title,
+        description: t.description,
+        reason: t.reason,
+        status: t.status,
+        Assignee: assigneeList,
+
+        createBy: {
+          fullName: t.created_by_name,
+          nickName: t.created_by_nickname,
+          empCode: t.created_by_codeempid,
+          adUser: t.created_by_aduser,
+          department: t.created_by_department,
+        },
+
+        createdDate: new Date(t.created_at).toISOString(),
+      };
+    });
+  }
+
+  async buildItNotes(replies: any[], attachments: any[], requesterAduser?: string) {
+    const notes = await Promise.all(
+      replies.map(async (r) => {
+        const files = attachments.filter((a) => a.reply_id === r.id);
+        const convertedFiles = this.fileConverter.mapAttachmentMetadata(files);
+
+        const senderRole =
+          requesterAduser && (r.user_aduser || '').toLowerCase() === requesterAduser.toLowerCase()
+            ? 'requester'
+            : 'it-staff';
+
+        return {
+          id: r.id,
+          message: r.message,
+          attachments: convertedFiles,
+          createdDate: r.created_at,
+          createBy: {
+            fullName: r.sender_name,
+            nickName: this.extractNickName(r.sender_name),
+            empCode: r.user_code,
+            adUser: r.user_aduser,
+            role: 'user',
+            senderRole,
+          },
+        };
+      }),
+    );
+
+    return notes;
+  }
+
+  private async refreshChatNotes() {
+    const ticket = this.selectedTicket();
+    if (!ticket?.ticketId) return;
+    try {
+      const res: any = await firstValueFrom(this.getTicketById(String(ticket.ticketId)));
+      const replyAttachments = (res.attachments ?? []).filter((f: any) => f.reply_id);
+      const itNotes = await this.buildItNotes(
+        res.replies ?? [],
+        replyAttachments,
+        ticket.requesterAduser,
+      );
+      this.loadReplyReadStatus(ticket.ticketId);
+      const currentIds = new Set((ticket.itNotes ?? []).map((n: any) => n.id));
+      const hasNew = itNotes.some((n: any) => !currentIds.has(n.id));
+      if (!hasNew) return;
+      this.selectedTicket.update((t) => (t ? { ...t, itNotes } : t));
+      this.scrollToBottom();
+      if (this.IS_CHAT_OPEN()) {
+        this.markChatAsRead();
+        this.markLatestReplyRead(ticket.ticketId, itNotes);
+      }
+    } catch {
+      // silent fail — chat still works, just won't show new messages until next poll
+    }
+  }
+
+  scrollToBottom() {
+    setTimeout(() => {
+      this.ticketChat?.scrollToBottom();
+    }, 0);
+  }
+
+  loadReplyReadStatus(ticketId: string | number) {
+    this.itServiceService.getReplyReadStatus(ticketId).subscribe({
+      next: (res) => {
+        if (res?.readers) this.replyReaders.set(res.readers);
+      },
+      error: () => {},
+    });
+  }
+
+  private markLatestReplyRead(ticketId: string | number, notes: any[]): void {
+    const codeempid = this.authService.userData()?.CODEMPID;
+    const latestReply = notes.at(-1);
+    if (!codeempid || !latestReply) return;
+    this.itServiceService.markReplyRead(ticketId, codeempid, latestReply.id).subscribe({
+      complete: () => this.loadReplyReadStatus(ticketId),
+      error: () => {},
+    });
+  }
+
+  readersForNote(replyId: number): TicketChatReader[] {
+    const myCode = this.authService.userData()?.CODEMPID;
+    return this.replyReaders().filter(
+      (r) => r.lastReadReplyId >= replyId && r.userCodeempid !== myCode,
+    );
+  }
+
+  isPreviewable(fileName: string): boolean {
+    const ext = fileName?.split('.').pop()?.toLowerCase();
+    return ['jpg', 'jpeg', 'png', 'pdf'].includes(ext ?? '');
+  }
+
+  getFileIcon(fileName: string): string {
+    const ext = fileName?.split('.').pop()?.toLowerCase();
+    const iconMap: Record<string, string> = {
+      pdf: 'fas fa-file-pdf',
+      jpg: 'fas fa-file-image',
+      jpeg: 'fas fa-file-image',
+      png: 'fas fa-file-image',
+      doc: 'fas fa-file-word',
+      docx: 'fas fa-file-word',
+      xls: 'fas fa-file-excel',
+      xlsx: 'fas fa-file-excel',
+      ppt: 'fas fa-file-powerpoint',
+      pptx: 'fas fa-file-powerpoint',
+      txt: 'fas fa-file-alt',
+    };
+    return iconMap[ext ?? ''] ?? 'fas fa-file';
+  }
+
+  downloadFile(file: any) {
+    const url = file.fileUrl || file.filePath;
+    if (!url) return;
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = file.name;
+    a.click();
+  }
+
+  onMyTicketChange() {
+    this.getAllTickets();
+  }
+
+  // GET MASTER
+  getAllTickets(trackNew = false, preserveScroll = false, focusTicketId?: string) {
+    if (!this.showTicketList) {
+      if (focusTicketId) this.selectTicket(focusTicketId);
+      return;
+    }
+    const preservedScrollTop = preserveScroll
+      ? (this.ticketList?.nativeElement?.scrollTop ?? 0)
+      : 0;
+    const showPageLoader = !this.initialized && this.Tickets().length === 0;
+    if (showPageLoader) this.isPageLoading.set(true);
+
+    const searchText = this.keyword.trim();
+    const [from, to] = this.filter.dateRange ?? [];
+    const dateFrom = dayjs(from).format('YYYY-MM-DD');
+    const dateTo = dayjs(to).format('YYYY-MM-DD');
+
+    this.itServiceService
+      .getAllTickets({
+        searchText: searchText || undefined,
+        myTicket: this.myTicket ? this.authService.userData().AD_USER : null,
+        dateFrom,
+        dateTo,
+      })
+      .pipe(
+        finalize(() => {
+          if (showPageLoader) this.isPageLoading.set(false);
+        }),
+      )
+      .subscribe({
+        next: (res) => {
+          // console.log('res', res);
+          this.summaryRes.set(res);
+
+          const mapped = res.data.map((ticket: any) => {
+            const assignments = ticket.assignments ?? [];
+            const statusForIt = getStatusForIt(
+              assignments,
+              this.authService.userData().CODEMPID,
+              ticket.IT_Status,
+            );
+
+            return {
+              ...ticket,
+              ticketId: ticket.id,
+              ticketNumber: ticket.ticket_number,
+              ticketType: ticket.ticket_type_name_th,
+              status: ticket.status,
+              IT_Status: getStatusLabel(statusForIt),
+              requesterEmpId: ticket.requester_code,
+              subject: ticket.subject,
+              createdDate: new Date(ticket.created_at).toISOString(),
+              updatedDate: new Date(ticket.updated_at).toISOString(),
+              elapsed_hours: ticket.elapsed_time,
+              // elapsed_hours: formatElapsedTime(ticket.hours_elapsed),
+            };
+          });
+          this.Tickets.set(mapped);
+          this.fetchUnreadIds();
+
+          setTimeout(() => {
+            const el = this.ticketList?.nativeElement;
+
+            if (!el) return;
+
+            if (focusTicketId) {
+              this.scrollTicketInList(focusTicketId);
+            } else if (preserveScroll) {
+              el.scrollTop = preservedScrollTop;
+            } else if (typeof el.scrollTo === 'function') {
+              el.scrollTo({ top: 0, behavior: 'smooth' });
+            } else {
+              el.scrollTop = 0;
+            }
+          });
+
+          if (trackNew) {
+            const pendingNumbers = this.signalrService.pendingTicketNumbers();
+            const ids = new Set<number>(
+              mapped
+                .filter((t: any) =>
+                  pendingNumbers.size > 0
+                    ? pendingNumbers.has(t.ticketNumber)
+                    : !this.prevTicketIds.has(t.ticketId),
+                )
+                .map((t: any) => t.ticketId),
+            );
+
+            // console.log(ids);
+            this.newTicketIds.set(ids);
+            this.signalrService.pendingTicketNumbers.set(new Set());
+            this.signalrService.pendingNewTickets.set(0);
+            setTimeout(() => this.newTicketIds.set(new Set()), 60000);
+          }
+        },
+        error: (error) => {
+          console.error('Error fetching data:', error);
+        },
+      });
+  }
+
+  private scrollTicketInList(ticketId: string, retries = 10): void {
+    if (!this.showTicketList) return;
+    const container = this.ticketList?.nativeElement;
+    const ticketElement = document.getElementById(`ticket-${ticketId}`);
+    if (container && ticketElement) {
+      const containerRect = container.getBoundingClientRect();
+      const ticketRect = ticketElement.getBoundingClientRect();
+      const previousTicket = ticketElement.previousElementSibling as HTMLElement | null;
+      const secondPositionOffset = previousTicket?.offsetHeight ?? 0;
+      const targetTop =
+        container.scrollTop + ticketRect.top - containerRect.top - secondPositionOffset;
+      container.scrollTo({ top: Math.max(0, targetTop), behavior: 'smooth' });
+      return;
+    }
+
+    if (retries > 0) {
+      setTimeout(() => this.scrollTicketInList(ticketId, retries - 1), 200);
+    }
+  }
+
+  fetchUnreadIds() {
+    const codeempid = this.authService.userData()?.CODEMPID;
+    if (!codeempid) return;
+    this.itServiceService
+      .getUnreadTickets(codeempid, this.authService.userRole() ?? undefined)
+      .subscribe({
+        next: (res: any) => {
+          const list: any[] = Array.isArray(res) ? res : (res?.data ?? []);
+          this.unreadTicketIds.set(new Set(list.map((t: any) => t.id ?? t.ticketId)));
+        },
+        error: () => {},
+      });
+  }
+
+  getTicketById(ticketId: string) {
+    return this.itServiceService.getTicketById(ticketId);
+  }
+
+  getAssignItDropdown() {
+    this.itServiceService.getAssignItDropdown().subscribe({
+      next: (res) => {
+        const rows = res.data;
+        const groupMap: Record<any, any> = {};
+        const assigneeGroup: any = [];
+
+        // สร้าง group
+        rows.forEach((r: any) => {
+          if (r.type === 'GROUP') {
+            groupMap[r.id] = {
+              name: r.display_name,
+              members: [],
+            };
+          }
+        });
+
+        // ใส่ employee
+        rows.forEach((r: any) => {
+          if (r.type === 'EMPLOYEE' && groupMap[r.group_id]) {
+            groupMap[r.group_id].members.push({
+              id: r.id,
+              name: r.display_name,
+              adUser: r.AD_USER,
+            });
+          }
+        });
+        // แปลงเป็น array
+        Object.values(groupMap).forEach((g) => assigneeGroup.push(g));
+
+        this.assigneeGroups = assigneeGroup;
+      },
+      error: (error) => {
+        console.error('Error fetching data:', error);
+      },
+    });
+  }
+
+  viewApproveResign() {
+    window.open(`/resign-management/detail`, '_blank');
+
+    //  window.open(`/it-dashboard/report-detail?id=${encodeURIComponent(encryptedId)}`, '_blank');
+  }
+
+  viewEmployeeInfo() {
+    window.open(`/employee-Info`, '_blank');
+  }
+
+  // MODAL
+  //>>> function
+  updateTicket(
+    command: string,
+    ticketId: string,
+    ticketTypeId?: string,
+    assignees?: any,
+    comment?: any,
+    attachments?: any[],
+    repairCostType?: string,
+    reason?: string,
+    subCategoryId?: number | null,
+  ) {
+    // console.log(command, ticketId, ticketTypeId, comment, attachments);
+
+    const formData = new FormData();
+
+    if (command === 'acknowledge') {
+      formData.append(
+        'subCategoryId',
+        Number(ticketTypeId) === 2 && subCategoryId != null ? String(subCategoryId) : '',
+      );
+    }
+
+    formData.append('decision', 'ITAnalyze');
+    formData.append('executedBy', this.authService.userData().CODEMPID);
+
+    if (command === 'resume') {
+      formData.append('itResult', 'In Progress');
+    }
+
+    if (command === 'onhold') {
+      formData.append('itResult', 'Hold');
+    }
+
+    if ((command === 'onhold' || command === 'assign') && reason) {
+      formData.append('reason', reason);
+    }
+
+    if (command === 'changeType') {
+      formData.append('ITResult', 'ChangeType');
+      formData.append('newTicketTypeId', ticketTypeId || '2');
+      if (repairCostType) formData.append('repairCostType', repairCostType);
+      if (reason) formData.append('reason', reason);
+    }
+
+    if (command === 'close') {
+      formData.append('itResult', 'Closed');
+      if (comment) formData.append('reason', comment);
+    }
+
+    if (command === 'deny') {
+      formData.append('itResult', 'Denied');
+      formData.append('comment', comment);
+    }
+
+    if (command === 'assign') {
+      formData.append('assignJson', JSON.stringify(assignees));
+    }
+
+    if (command === 'acknowledge' || (command === 'assign' && comment)) {
+      formData.append('comment', comment);
+    }
+
+    if ((command === 'acknowledge' || command === 'assign') && repairCostType) {
+      formData.append('repairCostType', repairCostType);
+    }
+
+    if (command === 'acknowledge' || command === 'assign') {
+      formData.append('itResult', 'In Progress');
+      formData.append('newTicketTypeId', ticketTypeId || '2');
+    }
+
+    if (attachments) {
+      const files = attachments.filter((item: any) => item?.file instanceof File);
+      files.forEach((item: any) => {
+        if (item?.file instanceof File) {
+          formData.append('Files', item.file);
+          formData.append('Descriptions', item.description ?? '');
+        }
+      });
+    }
+
+    // console.log('formData', [...formData.entries()]);
+
+    return this.itServiceService.updateTicketV2(ticketId, formData);
+  }
+
+  get currentActions() {
+    const ticket = this.selectedTicket();
+    const condition1 =
+      ticket?.repair_cost_type === 'paid' && ticket?.approval_status !== 'Approved'; //แจ้งซ่อมแบบเสียตัง ยังไม่ได้ approve/resubmit มา
+    const condition2 = ticket?.user_status === 'Pending' && ticket?.repair_cost_type !== 'free'; //รอ user resubmit > approval > it
+    const configuredActions = (condition1 || condition2
+      ? this.actionConfig['waiting-user-resubmit']
+      : this.actionConfig[ticket?.status]) ?? { left: [], right: [] };
+    const actions = {
+      left: [...configuredActions.left],
+      right: [...configuredActions.right],
+    };
+
+    if (this.canReplyToEmailTicket(ticket)) {
+      actions.right.unshift({
+        label: 'ตอบกลับ',
+        icon: 'fa-reply-all',
+        class: 'btn-reply',
+        action: () => this.openEmailReply(),
+      });
+    }
+
+    return actions;
+  }
+
+  private checkBeforeAction(callback: () => void) {
+    const ticketId = this.selectedTicket()?.ticketId;
+
+    if (!ticketId) {
+      this.msg.warning('ไม่พบ Ticket');
+      return;
+    }
+
+    this.itServiceService.checkItAvalible(ticketId).subscribe({
+      next: (res) => {
+        // console.log(res);
+        if (!res?.success) {
+          this.swalService.warning(res.message);
+
+          this.getAllTickets();
+          if (this.showTicketList && res.message.includes('พิจารณา')) {
+            this.selectedTicket.set(undefined);
+          } else {
+            this.selectTicket(this.selectedTicket().ticketId);
+          }
+
+          return;
+        }
+
+        callback();
+      },
+
+      error: (error) => {
+        console.error('Check Ticket Error:', error);
+
+        this.swalService.warning(
+          'เกิดข้อผิดพลาด',
+          error?.message || 'ไม่สามารถติดต่อเซิร์ฟเวอร์ได้',
+        );
+      },
+    });
+  }
+
+  // -- acknowledge --
+  openAcknowledgeModal() {
+    this.checkBeforeAction(() => {
+      this.IS_ACKNOWLEDGE_TICKET.set(true);
+    });
+  }
+
+  closeAcknowledgeModal() {
+    this.IS_ACKNOWLEDGE_TICKET.set(false);
+  }
+
+  submitAcknowledge(data: any) {
+    const ticket = this.selectedTicket();
+    const ticketId = ticket?.ticketId;
+
+    if (!ticketId) {
+      this.swalService.warning('ไม่พบ Ticket');
+      return;
+    }
+
+    if (!data?.ticketTypeId) {
+      this.swalService.warning('กรุณาเลือกประเภท Ticket');
+      return;
+    }
+
+    const tag = data.ticketTypeId;
+    const repairCostType =
+      Number(data.ticketTypeId) === 1 ? (data.repairCostType ?? 'free') : undefined;
+
+    // console.log('acknowledge', ticketId, tag, null, data.message, data.attachments, repairCostType);
+
+    let acknowledged = false;
+
+    this.swalService.loading('กำลังบันทึกข้อมูล...');
+    this.IS_ACKNOWLEDGE_TICKET.set(false);
+
+    this.updateTicket(
+      'acknowledge',
+      ticketId,
+      tag,
+      null,
+      data.message,
+      data.attachments,
+      repairCostType,
+      undefined,
+      data.subCategoryId,
+    )
+      .pipe(
+        concatMap((res) => {
+          if (!res?.success) return of(res);
+          acknowledged = true;
+          return this.itServiceService
+            .updateSubcatProblemby({
+              ticketID: Number(ticketId),
+              subCategoryID: Number(tag) === 2 ? data.subCategoryId : null,
+              problemBy: Number(tag) === 2 ? data.problemSource : null,
+            })
+            .pipe(
+              map((result) => {
+                if (result?.success === false) {
+                  throw new Error(result.message || 'บันทึกหมวดหมู่และปัญหาไม่สำเร็จ');
+                }
+                return res;
+              }),
+            );
+        }),
+      )
+      .subscribe({
+        next: (res) => {
+          if (!res?.success) {
+            this.swalService.warning('ไม่สามารถบันทึกข้อมูลได้');
+            return;
+          }
+
+          this.swalService.success(res.message || 'บันทึกสำเร็จ');
+
+          const typeNameMap: Record<number, string> = {
+            1: 'แจ้งซ่อม',
+            2: 'แจ้งปัญหา',
+            3: 'ขอใช้บริการ',
+          };
+          const typeName = typeNameMap[Number(data.ticketTypeId)] ?? '';
+          // this.signalrService.ticketStatusNotify(
+          //   ticketId,
+          //   ticket?.requesterAduser ?? '',
+          //   typeName ? `In Progress|${typeName}` : 'In Progress',
+          // );
+
+          this.selectTicket(ticketId);
+          this.getAllTickets();
+        },
+
+        error: (error) => {
+          console.error('Acknowledge Ticket Error:', error);
+
+          if (acknowledged) {
+            this.swalService.warning(
+              'รับเรื่องสำเร็จ แต่บันทึกหมวดหมู่และปัญหาไม่สำเร็จ',
+              error?.error?.message || error?.message || 'กรุณาตรวจสอบข้อมูลอีกครั้ง',
+            );
+            this.selectTicket(ticketId);
+            this.getAllTickets();
+            return;
+          }
+
+          this.swalService.warning(
+            'เกิดข้อผิดพลาด',
+            error?.message || 'ไม่สามารถติดต่อเซิร์ฟเวอร์ได้',
+          );
+        },
+      });
+  }
+
+  // -- onHold --
+  onHoldTicket() {
+    this.checkBeforeAction(() => this.IS_HOLD_TICKET.set(true));
+  }
+
+  closeHoldModal() {
+    this.IS_HOLD_TICKET.set(false);
+  }
+
+  submitHold(data: { reason: string }) {
+    const reason = data.reason?.trim() || undefined;
+    this.closeHoldModal();
+    const ticket = this.selectedTicket();
+    const ticketId = ticket?.ticketId;
+
+    if (!ticketId) {
+      this.msg.warning('ไม่พบ Ticket');
+      return;
+    }
+
+    this.swalService.loading('กำลังบันทึกข้อมูล...');
+
+    this.updateTicket('onhold', ticketId, '', null, null, undefined, undefined, reason).subscribe({
+      next: (res) => {
+        if (!res?.success) {
+          this.swalService.warning('ไม่สามารถบันทึกข้อมูลได้');
+          return;
+        }
+
+        this.swalService.success(res.message || 'บันทึกสำเร็จ');
+
+        // this.signalrService.ticketStatusNotify(ticketId, ticket?.requesterAduser ?? '', 'Hold');
+
+        this.selectTicket(ticketId);
+        this.getAllTickets();
+      },
+
+      error: (error) => {
+        console.error('Acknowledge Ticket Error:', error);
+
+        this.swalService.warning(
+          'เกิดข้อผิดพลาด',
+          error?.message || 'ไม่สามารถติดต่อเซิร์ฟเวอร์ได้',
+        );
+      },
+    });
+  }
+
+  // -- resume --
+  resumeTicket() {
+    this.checkBeforeAction(() => {
+      this.swalService.confirm('ยืนยันการกลับมาดำเนินการต่อ (Resume)').then((result) => {
+        if (!result.isConfirmed) return;
+
+        const ticket = this.selectedTicket();
+        const ticketId = ticket?.ticketId;
+
+        if (!ticketId) {
+          this.msg.warning('ไม่พบ Ticket');
+          return;
+        }
+
+        this.swalService.loading('กำลังบันทึกข้อมูล...');
+
+        this.updateTicket('resume', ticketId, '', null, null).subscribe({
+          next: (res) => {
+            if (!res?.success) {
+              this.swalService.warning('ไม่สามารถบันทึกข้อมูลได้');
+              return;
+            }
+
+            this.swalService.success(res.message || 'บันทึกสำเร็จ');
+
+            // this.signalrService.ticketStatusNotify(
+            //   ticketId,
+            //   ticket?.requesterAduser ?? '',
+            //   'In Progress',
+            // );
+
+            this.selectTicket(ticketId);
+            this.getAllTickets();
+          },
+
+          error: (error) => {
+            console.error('Acknowledge Ticket Error:', error);
+
+            this.swalService.warning(
+              'เกิดข้อผิดพลาด',
+              error?.message || 'ไม่สามารถติดต่อเซิร์ฟเวอร์ได้',
+            );
+          },
+        });
+      });
+    });
+  }
+
+  // -- deny --
+  openDenyModal() {
+    this.checkBeforeAction(() => {
+      this.IS_DENY_TICKET.set(true);
+    });
+  }
+
+  closeDenyModal() {
+    this.IS_DENY_TICKET.set(false);
+  }
+
+  private isTicketTypeChangeLocked(ticket: any): boolean {
+    const isApproved =
+      String(ticket?.approval_status ?? ticket?.approvalStatus ?? '')
+        .trim()
+        .toLowerCase() === 'approved';
+    const ticketTypeId = Number(ticket?.ticketTypeId ?? ticket?.ticket_type_id);
+    const isServiceRequest = ticketTypeId === 3;
+    const isPaidRepair =
+      ticketTypeId === 1 &&
+      String(ticket?.repair_cost_type ?? ticket?.repairCostType ?? '')
+        .trim()
+        .toLowerCase() === 'paid';
+
+    return isApproved && (isServiceRequest || isPaidRepair);
+  }
+
+  openChangeTicketTypeModal() {
+    if (this.isTicketTypeChangeLocked(this.selectedTicket())) {
+      this.swalService.warning(
+        'ขอใช้บริการหรือแจ้งซ่อมแบบเสียเงินที่อนุมัติแล้ว ไม่สามารถเปลี่ยนประเภทคำขอได้',
+      );
+      return;
+    }
+    this.checkBeforeAction(() => {
+      this.IS_CHANGE_TICKET_TYPE.set(true);
+    });
+  }
+
+  closeChangeTicketTypeModal() {
+    this.IS_CHANGE_TICKET_TYPE.set(false);
+  }
+
+  submitChangeTicketType(data: {
+    ticketTypeId: number;
+    subCategoryId: number | null;
+    problemSource: 'user' | 'system' | null;
+    repairCostType?: 'paid' | 'free';
+    reason: string;
+    attachments: { name: string; size: number; file: File; description?: string }[];
+  }) {
+    const ticket = this.selectedTicket();
+    const ticketId = ticket?.ticketId;
+    if (!ticketId) {
+      this.swalService.warning('ไม่พบ Ticket');
+      return;
+    }
+
+    if (this.isTicketTypeChangeLocked(ticket)) {
+      this.swalService.warning(
+        'ขอใช้บริการหรือแจ้งซ่อมแบบเสียเงินที่อนุมัติแล้ว ไม่สามารถเปลี่ยนประเภทคำขอได้',
+      );
+      return;
+    }
+    if (data.ticketTypeId === 3 && ticket?.viaEmail !== true) {
+      this.swalService.warning('ขอใช้บริการสามารถเลือกได้เฉพาะ Ticket ที่มาจาก Email');
+      return;
+    }
+
+    const hasTypeChanged =
+      Number(data.ticketTypeId) !== Number(ticket.ticketTypeId ?? ticket.ticket_type_id);
+    const hasRepairCostChanged =
+      Number(data.ticketTypeId) === 1 && data.repairCostType !== ticket.repair_cost_type;
+    const needsTicketUpdate = hasTypeChanged || hasRepairCostChanged;
+    this.swalService.loading(
+      needsTicketUpdate ? 'กำลังเปลี่ยนประเภทคำขอ...' : 'กำลังบันทึกข้อมูล...',
+    );
+    this.closeChangeTicketTypeModal();
+
+    let typeChanged = false;
+
+    const update$ = needsTicketUpdate
+      ? this.updateTicket(
+          'changeType',
+          ticketId,
+          String(data.ticketTypeId),
+          null,
+          null,
+          data.attachments.map((attachment) => ({ ...attachment, description: 'From IT' })),
+          data.repairCostType,
+          data.reason,
+        )
+      : of({ success: true, message: 'บันทึกหมวดหมู่และปัญหาสำเร็จ' });
+
+    update$
+      .pipe(
+        concatMap((res) => {
+          if (!res?.success) return of(res);
+          typeChanged = needsTicketUpdate;
+          return this.itServiceService
+            .updateSubcatProblemby({
+              ticketID: Number(ticketId),
+              subCategoryID: data.ticketTypeId === 2 ? data.subCategoryId : null,
+              problemBy: data.ticketTypeId === 2 ? data.problemSource : null,
+            })
+            .pipe(
+              map((result) => {
+                if (result?.success === false) {
+                  throw new Error(result.message || 'บันทึกหมวดหมู่และปัญหาไม่สำเร็จ');
+                }
+                return res;
+              }),
+            );
+        }),
+      )
+      .subscribe({
+        next: (res) => {
+          if (!res?.success) {
+            this.swalService.warning(res?.message || 'ไม่สามารถเปลี่ยนประเภทคำขอได้');
+            return;
+          }
+
+          this.swalService.success(res.message || 'เปลี่ยนประเภทคำขอสำเร็จ');
+
+          const typeNameMap: Record<number, string> = {
+            1: 'แจ้งซ่อม',
+            2: 'แจ้งปัญหา',
+            3: 'ขอใช้บริการ',
+          };
+          const typeName = typeNameMap[Number(data.ticketTypeId)] ?? '';
+
+          // this.signalrService.ticketStatusNotify(
+          //   ticketId,
+          //   ticket?.requesterAduser ?? '',
+          //   typeName ? `ChangeType|${typeName}` : 'ChangeType',
+          // );
+
+          this.selectTicket(ticketId);
+          this.getAllTickets();
+        },
+        error: (error) => {
+          console.error('Change Ticket Type Error:', error);
+          if (typeChanged) {
+            this.swalService.warning(
+              'เปลี่ยนประเภทสำเร็จ แต่บันทึกหมวดหมู่และปัญหาไม่สำเร็จ',
+              error?.error?.message || error?.message || 'กรุณาตรวจสอบข้อมูลอีกครั้ง',
+            );
+            this.selectTicket(ticketId);
+            this.getAllTickets();
+            return;
+          }
+          this.swalService.warning(
+            'เกิดข้อผิดพลาด',
+            error?.error?.message ||
+              error?.message ||
+              (needsTicketUpdate
+                ? 'ไม่สามารถเปลี่ยนประเภทคำขอได้'
+                : 'บันทึกหมวดหมู่และปัญหาไม่สำเร็จ'),
+          );
+        },
+      });
+  }
+
+  submitDeny(data: any) {
+    const ticket = this.selectedTicket();
+    const ticketId = ticket?.ticketId;
+
+    if (!ticketId) {
+      this.swalService.warning('ไม่พบ Ticket');
+      return;
+    }
+    this.swalService.loading('กำลังบันทึกข้อมูล...');
+    this.IS_DENY_TICKET.set(false);
+
+    this.updateTicket('deny', ticketId, '', null, data.reason).subscribe({
+      next: (res) => {
+        if (!res?.success) {
+          this.swalService.warning('ไม่สามารถบันทึกข้อมูลได้');
+          return;
+        }
+
+        this.swalService.success(res.message || 'บันทึกสำเร็จ');
+
+        this.signalrService.ticketStatusTrigger.next({ ticketId, status: 'Denied' });
+        // this.signalrService.ticketStatusNotify(ticketId, ticket?.requesterAduser ?? '', 'Denied');
+        this.filterStatus = 'all';
+        this.getAllTickets(false, false, String(ticketId));
+      },
+
+      error: (error) => {
+        console.error('Acknowledge Ticket Error:', error);
+
+        this.swalService.warning(
+          'เกิดข้อผิดพลาด',
+          error?.message || 'ไม่สามารถติดต่อเซิร์ฟเวอร์ได้',
+        );
+      },
+    });
+  }
+
+  // -- assign --
+  openAssignModal() {
+    this.checkBeforeAction(() => {
+      this.IS_ASSIGN_TICKET.set(true);
+      this.selectedAssigneeEmpCodes = [];
+      this.assignSearchKeyword = '';
+    });
+    // this.itServiceService.checkItAvalible(this.selectedTicket().ticketId).subscribe({
+    //   next: (res) => {
+    //     if (!res?.success) {
+    //       this.swalService.warning(res.message);
+    //       this.getAllTickets();
+    //       if (res.message.includes('พิจารณา')) {
+    //         this.selectedTicket.set(undefined);
+    //       } else {
+    //         this.selectTicket(this.selectedTicket().ticketId);
+    //       }
+    //       return;
+    //     }
+
+    //     this.IS_ASSIGN_TICKET.set(true);
+    //     this.selectedAssigneeEmpCodes = [];
+    //     this.assignSearchKeyword = '';
+    //   },
+
+    //   error: (error) => {
+    //     console.error('Assign Ticket Error:', error);
+
+    //     this.swalService.warning(
+    //       'เกิดข้อผิดพลาด',
+    //       error?.message || 'ไม่สามารถติดต่อเซิร์ฟเวอร์ได้',
+    //     );
+    //   },
+    // });
+  }
+
+  closeAssignModal() {
+    this.IS_ASSIGN_TICKET.set(false);
+  }
+
+  submitAssign(data: any) {
+    const ticket = this.selectedTicket();
+    const ticketId = ticket?.ticketId;
+
+    if (!ticketId) {
+      this.msg.warning('ไม่พบ Ticket');
+      return;
+    }
+
+    if (!data?.assignees || data.assignees.length === 0) {
+      this.msg.warning('กรุณาเลือกผู้รับผิดชอบ');
+      return;
+    }
+
+    const assignees = data.assignees.map((x: any) => ({
+      codeempid: x?.id,
+    }));
+
+    const typeTicket = data?.ticketTypeId;
+
+    let assigned = false;
+
+    this.swalService.loading('กำลังบันทึกข้อมูล...');
+    this.IS_ASSIGN_TICKET.set(false);
+
+    this.updateTicket(
+      'assign',
+      ticketId,
+      typeTicket,
+      assignees,
+      data.message,
+      data.attachments,
+      data.repairCostType,
+      data.reason,
+    )
+      .pipe(
+        concatMap((res) => {
+          if (!res?.success) return of(res);
+          assigned = true;
+          return this.itServiceService
+            .updateSubcatProblemby({
+              ticketID: Number(ticketId),
+              subCategoryID: Number(typeTicket) === 2 ? data.subCategoryId : null,
+              problemBy: Number(typeTicket) === 2 ? data.problemSource : null,
+            })
+            .pipe(
+              map((result) => {
+                if (result?.success === false) {
+                  throw new Error(result.message || 'บันทึกหมวดหมู่และปัญหาไม่สำเร็จ');
+                }
+                return res;
+              }),
+            );
+        }),
+      )
+      .subscribe({
+        next: (res) => {
+          if (!res?.success) {
+            this.swalService.warning('ไม่สามารถบันทึกข้อมูลได้');
+            return;
+          }
+
+          this.swalService.success(res.message || 'บันทึกสำเร็จ');
+
+          // backend (approveV2) ส่ง noti ให้ assignee + requester เองแล้ว ไม่ต้องยิง
+          // assignNotify/ticketStatusNotify จาก frontend อีก
+
+          this.selectTicket(res.ticketId || ticketId);
+          this.getAllTickets();
+        },
+
+        error: (error) => {
+          console.error('Assign Ticket Error:', error);
+
+          if (assigned) {
+            this.swalService.warning(
+              'ส่งต่อสำเร็จ แต่บันทึกหมวดหมู่และปัญหาไม่สำเร็จ',
+              error?.error?.message || error?.message || 'กรุณาตรวจสอบข้อมูลอีกครั้ง',
+            );
+            this.selectTicket(ticketId);
+            this.getAllTickets();
+            return;
+          }
+
+          this.swalService.warning(
+            'เกิดข้อผิดพลาด',
+            error?.message || 'ไม่สามารถติดต่อเซิร์ฟเวอร์ได้',
+          );
+        },
+      });
+  }
+
+  // -- close --
+
+  closeTicket() {
+    this.checkBeforeAction(() => {
+      this.IS_CLOSE_TICKET.set(true);
+    });
+  }
+
+  closeCloseTicketModal(): void {
+    this.IS_CLOSE_TICKET.set(false);
+  }
+
+  submitCloseTicket(data: { reason: string }): void {
+    const ticket = this.selectedTicket();
+    const ticketId = ticket?.ticketId;
+    if (!ticketId) {
+      this.msg.warning('ไม่พบ Ticket');
+      return;
+    }
+
+    this.IS_CLOSE_TICKET.set(false);
+    this.swalService.loading('กำลังบันทึกข้อมูล...');
+    this.updateTicket('close', ticketId, '', null, data.reason).subscribe({
+      next: (res) => {
+        if (!res?.success) {
+          this.swalService.warning('ไม่สามารถบันทึกข้อมูลได้');
+          return;
+        }
+
+        this.swalService.success(res.message || 'บันทึกสำเร็จ');
+        this.signalrService.ticketStatusTrigger.next({ ticketId, status: 'Closed' });
+        // this.signalrService.ticketStatusNotify(ticketId, ticket?.requesterAduser ?? '', 'Closed');
+        this.filterStatus = 'all';
+        this.getAllTickets(false, false, String(ticketId));
+      },
+      error: (error) => {
+        console.error('Closed Ticket Error:', error);
+        this.swalService.warning(
+          'เกิดข้อผิดพลาด',
+          error?.message || 'ไม่สามารถติดต่อเซิร์ฟเวอร์ได้',
+        );
+      },
+    });
+  }
+
+  // -- note --
+  openAddNote() {
+    this.IS_NOTE_TICKET.set(true);
+  }
+
+  closeAddNoteModal() {
+    this.IS_NOTE_TICKET.set(false);
+  }
+
+  submitNote(data: any, options?: { silent?: boolean }) {
+    const silent = options?.silent ?? false;
+    const formData = new FormData();
+    formData.append('Message', data.message);
+    formData.append('ExecutedBy', this.authService.userData().CODEMPID);
+
+    (data.attachments ?? []).forEach((item: any) => {
+      if (item?.file instanceof File) {
+        formData.append('Files', item.file);
+      }
+    });
+
+    if (!silent) this.swalService.loading('กำลังบันทึกข้อมูล...');
+    this.IS_NOTE_TICKET.set(false);
+    this.itServiceService.replyTicket(data.id, formData).subscribe({
+      next: (res) => {
+        if (!res?.success) {
+          if (!silent) this.swalService.warning('ไม่สามารถบันทึกข้อมูลได้');
+          return;
+        }
+        if (!silent) this.swalService.close();
+
+        const ticket = this.selectedTicket();
+        const requesterAdUser = ticket?.requesterAduser;
+        const userData = this.authService.userData();
+        const senderAdUser = this.authService.currentUser() ?? '';
+        const senderName = `${userData?.NAMFIRSTT ?? ''} ${userData?.NAMLASTT ?? ''}`.trim();
+
+        if (requesterAdUser && senderAdUser) {
+          // Type 3 (ขอใช้บริการ) ที่ยังไม่ Approve: step ล่าสุดใน timeline คือ "รออนุมัติ"
+          // ซึ่ง Assignee คือกลุ่มผู้อนุมัติ ไม่ใช่คนที่ควรได้รับ noti แชท จึงข้ามการดึง assignee ตอนนี้
+          const isPendingApprovalType3 =
+            ticket?.ticketTypeId === 3 &&
+            (ticket?.approval_status === 'New' || !ticket?.approval_status);
+          const timeline: any[] = ticket?.assignTimeline ?? [];
+          const latestStep = timeline[timeline.length - 1];
+          const assigneeAdUsers = isPendingApprovalType3
+            ? []
+            : ((latestStep?.Assignee ?? []) as any[])
+                .map((a: any) => (a.adUser || a.aduser || '').toLowerCase())
+                .filter((u: string) => !!u && u !== senderAdUser.toLowerCase());
+          const allRecipients = [
+            ...new Set([...assigneeAdUsers, ...(data.mentionedAdUsers ?? [])]),
+          ];
+          // requester พิมพ์แชทเอง (เช่น type 3 ก่อน approve ที่ยังไม่มี assignee) และไม่มีคนอื่นให้แจ้ง
+          // → ไม่ต้องยิง noti เพราะจะกลายเป็นแจ้งเตือนตัวเอง
+          const isSelfChat = senderAdUser.toLowerCase() === requesterAdUser.toLowerCase();
+          if (!(isSelfChat && allRecipients.length === 0)) {
+            this.signalrService.noteNotify(
+              data.id,
+              requesterAdUser,
+              senderAdUser,
+              senderName,
+              data.message,
+              allRecipients,
+            );
+          }
+        }
+
+        if (!silent) {
+          setTimeout(() => {
+            this.swalService.success(res.message || 'บันทึกสำเร็จ');
+          }, 100);
+        }
+
+        this.selectTicket(data.id);
+        this.getAllTickets();
+
+        // mark self as having read up to the latest reply after sending
+        const codeempid = this.authService.userData()?.CODEMPID;
+        const latestNote = (this.selectedTicket()?.itNotes ?? []).slice(-1)[0];
+        if (codeempid && latestNote) {
+          this.itServiceService
+            .markReplyRead(data.id, codeempid, latestNote.id)
+            .subscribe({ error: () => {} });
+        }
+      },
+      error: (error) => {
+        console.error('Assign Ticket Error:', error);
+        if (!silent) {
+          this.swalService.warning(
+            'เกิดข้อผิดพลาด',
+            error?.message || 'ไม่สามารถติดต่อเซิร์ฟเวอร์ได้',
+          );
+        }
+      },
+    });
+  }
+
+  isAssigned(): boolean {
+    const assignments = this.selectedTicket()?.assignments ?? [];
+    return assignments.some(
+      (a: any) =>
+        a.aduser === this.authService.userData().AD_USER ||
+        a.codeempid === this.authService.userData().CODEMPID,
+    );
+  }
+
+  // -- note for IT --
+  openNoteForItModal() {
+    // console.log(this.IS_NOTEFORIT_TICKET());
+
+    this.selectTicket(this.selectedTicket().ticketId);
+    this.IS_NOTEFORIT_TICKET.set(true);
+  }
+
+  closeNoteForItModal() {
+    this.IS_NOTEFORIT_TICKET.set(false);
+  }
+
+  submitNoteForIt(data: any) {
+    const payload = {
+      note: data.message,
+      updatedBy: this.authService.userData()?.CODEMPID ?? '',
+      role: 'it-staff',
+    };
+
+    this.itServiceService.updateNoteForIt(data.id, payload).subscribe({
+      next: (res) => {
+        if (!res?.success) {
+          this.swalService.warning('ไม่สามารถบันทึกข้อมูลได้');
+          return;
+        }
+        this.swalService.close();
+        this.IS_NOTEFORIT_TICKET.set(false);
+        setTimeout(() => {
+          this.swalService.success(res.message || 'บันทึกสำเร็จ');
+        }, 100);
+
+        this.selectTicket(data.id);
+        this.getAllTickets();
+      },
+
+      error: (error) => {
+        console.error('Assign Ticket Error:', error);
+
+        this.swalService.warning(
+          'เกิดข้อผิดพลาด',
+          error?.message || 'ไม่สามารถติดต่อเซิร์ฟเวอร์ได้',
+        );
+      },
+    });
+  }
+
+  viewExport() {
+    window.open('/it-dashboard/report', '_blank');
+    // this.router.navigate(['/it-dashboard/report']);
+  }
+
+  /**
+   *
+   * EXPORT
+   *
+   */
+  // applyFilter() {
+  //   console.log(this.filter.dateRange);
+  //   this.getAllTickets();
+  // }
+
+  // resetFilter() {
+  //   this.filter = {
+  //     dateRange: null,
+  //   };
+  // }
+
+  // export() {
+  //   const [from, to] = this.filter.dateRange ?? [];
+  //   const dateFrom = dayjs(from).format('YYYY-MM-DD');
+  //   const dateTo = dayjs(to).format('YYYY-MM-DD');
+
+  //   this.itServiceService.exportTicket({ dateFrom, dateTo }).subscribe({
+  //     next: (blob: Blob) => {
+  //       const url = URL.createObjectURL(blob);
+  //       const a = document.createElement('a');
+  //       a.href = url;
+  //       a.download = `tickets_${dateFrom}_${dateTo}.xlsx`;
+  //       a.click();
+  //       URL.revokeObjectURL(url);
+  //     },
+  //     error: (error) => {
+  //       console.error('Export failed:', error);
+  //     },
+  //   });
+  // }
+
+  // clearFilter() {
+  //   this.filter = {
+  //     dateRange: [dayjs().subtract(3, 'month').toDate(), dayjs().toDate()] as [Date, Date],
+  //   };
+
+  //   this.getAllTickets();
+  // }
+
+  // @ViewChild(ItDashboardSummary) dashboardSummary!: ItDashboardSummary;
+  // exportCharts() {
+  //   this.dashboardSummary.exportCharts();
+  // }
+}
