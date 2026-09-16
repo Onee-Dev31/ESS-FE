@@ -164,7 +164,7 @@ export class ApprovalAllowanceService {
 
   //NEW!!
   updateStatusClaim(claimId: number, body: any): Observable<any> {
-    console.log(claimId, body);
+    // console.log(claimId, body);
     return this._http.patch<any>(`${this.baseUrl}/meal-allowance/claims/${claimId}/review`, body);
   }
 

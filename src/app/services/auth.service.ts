@@ -207,7 +207,7 @@ export class AuthService {
     return this.getMagicUser().pipe(
       tap((res) => {
         if (!res?.success) return;
-        console.log('res : ', JSON.stringify(res));
+        // console.log('res : ', JSON.stringify(res));
 
         localStorage.setItem(STORAGE_KEYS.ALL_DATA, JSON.stringify(res));
         localStorage.setItem(STORAGE_KEYS.IS_LOGGED_IN, 'true');
