@@ -789,4 +789,15 @@ export class DashboardComponent implements OnInit {
     this.selectedDate.set('');
     this.selectedLeaveTypeId.set('');
   }
+
+  hasServiceYear(): boolean {
+    const serviceYears = this.performanceData()?.service_info?.service_years;
+
+    if (!serviceYears) return false;
+
+    const match = serviceYears.match(/(\d+)\s*ปี/);
+    const years = match ? Number(match[1]) : 0;
+
+    return years > 0;
+  }
 }

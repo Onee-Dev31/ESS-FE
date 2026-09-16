@@ -71,20 +71,13 @@
               </div>
               <div class="meta-row">
                 <span class="meta-label">อายุงาน</span>
-                <span class="meta-value"
-                  >{{ performanceData()?.service_info?.service_years }} ปี</span
-                >
+                <span class="meta-value">{{ performanceData()?.service_info?.service_years }}</span>
               </div>
             </div>
 
-            <h6 class="perf-subtitle" *ngIf="performanceData()?.service_info?.service_years !== 0">
-              ประวัติผลการประเมินการทำงาน
-            </h6>
+            <h6 class="perf-subtitle" *ngIf="hasServiceYear()">ประวัติผลการประเมินการทำงาน</h6>
 
-            <div
-              class="performance-list"
-              *ngIf="performanceData()?.service_info?.service_years !== 0"
-            >
+            <div class="performance-list" *ngIf="hasServiceYear()">
               @for (p of performanceData()?.evaluations; track p.year) {
                 <div class="perf-item">
                   <span class="perf-year">{{ p.year }}</span>
@@ -98,12 +91,7 @@
             <button type="button" class="action-btn">
               <i class="fas fa-clipboard-check"></i> ประเมินประจำปี
             </button>
-            <button
-              type="button"
-              class="eye-btn"
-              (click)="toggleGrade()"
-              *ngIf="performanceData()?.service_info?.service_years !== 0"
-            >
+            <button type="button" class="eye-btn" (click)="toggleGrade()" *ngIf="hasServiceYear()">
               <i class="fa-solid" [ngClass]="showGrade ? 'fa-eye' : 'fa-eye-slash'"></i>
             </button>
           </div>
