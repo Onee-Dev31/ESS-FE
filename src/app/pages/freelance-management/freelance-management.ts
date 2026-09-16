@@ -541,7 +541,7 @@ export class FreelanceManagementComponent implements OnInit {
 
       if (is_update) {
         const originalFiles = this.original_formData_freelance.attachments || [];
-        console.log(fData.attachments, originalFiles);
+        // console.log(fData.attachments, originalFiles);
 
         // 2️⃣ deleted
         const deletedFiles = originalFiles.filter(
@@ -559,7 +559,7 @@ export class FreelanceManagementComponent implements OnInit {
 
         // 3️⃣ description changed only
         const updatedDescriptions = fData.attachments.filter((item: any) => {
-          console.log(item);
+          // console.log(item);
           if (!item.fieldId) return false;
           // if (!item.fieldId || item.file instanceof File) return false;
 
@@ -568,7 +568,7 @@ export class FreelanceManagementComponent implements OnInit {
           return oldFile && (oldFile.description || '') !== (item.description || '');
         });
 
-        console.log(updatedDescriptions);
+        // console.log(updatedDescriptions);
 
         updatedDescriptions.forEach((file: any) => {
           formData.append('fileIdForDesc', file.fieldId.toString());
@@ -609,11 +609,11 @@ export class FreelanceManagementComponent implements OnInit {
       obj[key] = value;
     });
 
-    console.log(obj);
-    console.log('replaceDescriptions:', formData.getAll('replaceDescriptions'));
-    console.log('replaceFiles:', formData.getAll('replaceFiles'));
-    console.log('newFileDescriptions:', formData.getAll('newFileDescriptions'));
-    console.log('Files:', formData.getAll('newFiles'));
+    // console.log(obj);
+    // console.log('replaceDescriptions:', formData.getAll('replaceDescriptions'));
+    // console.log('replaceFiles:', formData.getAll('replaceFiles'));
+    // console.log('newFileDescriptions:', formData.getAll('newFileDescriptions'));
+    // console.log('Files:', formData.getAll('newFiles'));
 
     this.freelanceService
       .createFreelance(formData)
@@ -642,7 +642,7 @@ export class FreelanceManagementComponent implements OnInit {
         error: (error) => {
           console.error('Error fetching data:', error.error.message);
           const message = error?.error?.message || '';
-          console.log(message);
+          // console.log(message);
           if (message.includes('duplicate')) {
             this.swalService.warning('ชื่อนามสกุลมีอยู่ในระบบแล้ว');
           } else {
@@ -650,7 +650,7 @@ export class FreelanceManagementComponent implements OnInit {
           }
         },
         complete: () => {
-          console.log('COMPLETE');
+          // console.log('COMPLETE');
         },
       });
   }

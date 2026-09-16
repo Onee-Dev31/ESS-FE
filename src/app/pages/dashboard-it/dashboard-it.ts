@@ -627,7 +627,7 @@ export class DashboardIT implements OnInit {
     const previousTicketId = this.selectedTicket()?.ticketId;
 
     this.getTicketById(ticketId).subscribe(async (res: any) => {
-      console.log(res);
+      // console.log(res);
       const ticketAttachments =
         res.attachments?.filter(
           (f: any) =>
@@ -734,7 +734,7 @@ export class DashboardIT implements OnInit {
       }
       this.scrollToBottom();
 
-      console.log(objectData);
+      // console.log(objectData);
 
       const codeempid = this.authService.userData()?.CODEMPID;
       if (ticketId && codeempid) {
@@ -823,7 +823,7 @@ export class DashboardIT implements OnInit {
       return;
     }
 
-    console.log('submitEmailReply', data);
+    // console.log('submitEmailReply', data);
 
     this.IS_EMAIL_REPLY_MODAL.set(false);
     this.swalService.loading('กำลังส่งอีเมล...');
@@ -1150,7 +1150,7 @@ export class DashboardIT implements OnInit {
 
       formData.append('TicketId', this.selectedTicket().ticketId);
       formData.append('Requester', this.authService.userData().CODEMPID ?? '');
-      console.log('formData', [...formData.entries()]);
+      // console.log('formData', [...formData.entries()]);
 
       this.swalService.loading('กำลังบันทึกข้อมูล...');
       this.itServiceService.re_open(formData).subscribe({
@@ -1704,7 +1704,7 @@ export class DashboardIT implements OnInit {
       });
     }
 
-    console.log('formData', [...formData.entries()]);
+    // console.log('formData', [...formData.entries()]);
 
     return this.itServiceService.updateTicketV2(ticketId, formData);
   }
@@ -1744,7 +1744,7 @@ export class DashboardIT implements OnInit {
 
     this.itServiceService.checkItAvalible(ticketId).subscribe({
       next: (res) => {
-        console.log(res);
+        // console.log(res);
         if (!res?.success) {
           this.swalService.warning(res.message);
 

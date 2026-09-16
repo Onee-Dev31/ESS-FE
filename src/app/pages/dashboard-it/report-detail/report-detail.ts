@@ -183,7 +183,7 @@ export class ReportDetail {
         assignTimeline: result ?? [],
       };
 
-      console.log('selectedTicket:', objectData);
+      // console.log('selectedTicket:', objectData);
       this.selectedTicket.set(objectData);
       this.cdr.detectChanges();
 
@@ -453,7 +453,7 @@ export class ReportDetail {
       });
     }
 
-    console.log('formData', [...formData.entries()]);
+    // console.log('formData', [...formData.entries()]);
 
     return this.itServiceService.updateTicket(ticketId, formData);
   }
@@ -687,7 +687,7 @@ export class ReportDetail {
       data.reason,
     ).subscribe({
       next: (res) => {
-        console.log('[submitAssign] next res:', res);
+        // console.log('[submitAssign] next res:', res);
 
         if (!res?.success) {
           this.swalService.warning('ไม่สามารถบันทึกข้อมูลได้');
@@ -697,7 +697,7 @@ export class ReportDetail {
         this.swalService.success(res.message || 'บันทึกสำเร็จ');
 
         const adUsers = data.assignees.map((x: any) => x.adUser).filter((ad: any) => !!ad);
-        console.log('[submitAssign] adUsers:', adUsers);
+        // console.log('[submitAssign] adUsers:', adUsers);
         setTimeout(() => this.signalrService.assignNotify(ticketId, adUsers), 500);
 
         this.selectTicket();

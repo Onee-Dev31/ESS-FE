@@ -465,7 +465,7 @@ export class ItService implements OnInit {
         }),
       )
       .subscribe(async (res: any) => {
-        console.log(res);
+        // console.log(res);
         const ticketAttachments =
           res.attachments?.filter(
             (f: any) =>
@@ -548,7 +548,7 @@ export class ItService implements OnInit {
           ccList: ccList,
         };
 
-        console.log(objectData);
+        // console.log(objectData);
 
         this.selectedTicket.set(objectData);
         if (previousTicketId !== objectData.ticketId) {
@@ -788,7 +788,7 @@ export class ItService implements OnInit {
     if (data.reason) {
       formData.append('Description', data.reason ?? '');
     }
-    console.log('formData', [...formData.entries()]);
+    // console.log('formData', [...formData.entries()]);
     this.swalService.loading('กำลังบันทึกข้อมูล...');
     this.itServiceService.re_open(formData).subscribe({
       next: (res) => {

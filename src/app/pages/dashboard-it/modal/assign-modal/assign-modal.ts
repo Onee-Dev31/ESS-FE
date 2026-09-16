@@ -132,7 +132,7 @@ export class AssignModal {
   }
 
   openImage(empCode: string) {
-    console.log('Open image:', empCode);
+    // console.log('Open image:', empCode);
   }
 
   toggleAssignee(emp: any) {

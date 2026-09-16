@@ -33,8 +33,8 @@ export class CcModal {
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['ticket']) {
-      console.log('ticket:', this.ticket);
-      console.log('ccList:', this.ticket?.ccList);
+      // console.log('ticket:', this.ticket);
+      // console.log('ccList:', this.ticket?.ccList);
     }
   }
 

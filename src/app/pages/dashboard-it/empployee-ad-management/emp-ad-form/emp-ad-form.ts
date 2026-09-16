@@ -295,7 +295,7 @@ export class EmpAdForm implements OnChanges {
     this.empAdService.getEmployeeDetails(this.employeeId).subscribe({
       next: (res: any) => {
         const item = Array.isArray(res) ? res[0] : (res.data ?? res);
-        console.log('Loaded employee details:', item);
+        // console.log('Loaded employee details:', item);
         if (item) this.mapToForm(item);
         this.isLoading = false;
         this.cdr.detectChanges();

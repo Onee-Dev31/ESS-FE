@@ -776,7 +776,7 @@ export class ItDashboardSummary {
 
   loadTickets(): void {
     const [dateFrom, dateTo] = this.filter.dateRange ?? [];
-    console.log('loadTickets()', this.filter);
+    // console.log('loadTickets()', this.filter);
 
     const params = {
       status: this.statusLabelApi(this.currentStatus),
@@ -795,7 +795,7 @@ export class ItDashboardSummary {
     // console.log(params);
     this.itServiceService.getTicketByStatus(params).subscribe({
       next: (res: any) => {
-        console.log(res);
+        // console.log(res);
         this.allRequests.set(res.data);
         this.listing.totalItems.set(res.pagination.total ?? 0);
         this.listing.totalPages.set(res.pagination.totalPages ?? 1);
@@ -811,7 +811,7 @@ export class ItDashboardSummary {
           assignees_mock: ['OTD01050', 'OTD01128', 'OTD01125'],
           assignees_json: t.assignees_json ? JSON.parse(t.assignees_json) : [],
         }));
-        console.log(this.filteredTicketLogs);
+        // console.log(this.filteredTicketLogs);
 
         this.cdr.detectChanges();
       },

@@ -667,7 +667,7 @@ export class ITServiceRequestComponent implements OnInit {
           : 'false',
     ); //it เปิดให้ตัวเอง ?
 
-    console.log('IsSelfRequestByIT >', this.openBy, '>', this.authService.userData().DEPARTMENT);
+    // console.log('IsSelfRequestByIT >', this.openBy, '>', this.authService.userData().DEPARTMENT);
 
     selectedServices.forEach((service) => {
       formData.append('serviceTypeIds', service.id.toString());
@@ -841,7 +841,7 @@ export class ITServiceRequestComponent implements OnInit {
   }
 
   onEmployeeFormSave(data: any) {
-    console.log(data);
+    // console.log(data);
     this.requestUserData = data;
 
     const requestUserDetail = `
@@ -876,7 +876,7 @@ export class ITServiceRequestComponent implements OnInit {
       .pipe(finalize(() => this.completeInitialLoad()))
       .subscribe({
         next: (res) => {
-          console.log(res.data);
+          // console.log(res.data);
           const mappedServices_main = res.data.mainServices
             .filter((item: any) => item.id !== 6)
             .map((item: any) => ({

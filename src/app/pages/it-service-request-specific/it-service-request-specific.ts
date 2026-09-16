@@ -543,7 +543,7 @@ export class ITServiceRequestSpecificComponent implements OnInit {
       onee: person.systems.includes('onee') ? person.onee : null,
       onePortal: person.systems.includes('onePortal') ? person.onePortal : null,
     }));
-    console.log(payload);
+    // console.log(payload);
     const summary = this.buildRequestSummary(payload);
 
     this.summaryText.set(summary);
@@ -686,7 +686,7 @@ export class ITServiceRequestSpecificComponent implements OnInit {
           : 'false',
     ); //it เปิดให้ตัวเอง ?
 
-    console.log('IsSelfRequestByIT >', this.openBy, '>', this.authService.userData().DEPARTMENT);
+    // console.log('IsSelfRequestByIT >', this.openBy, '>', this.authService.userData().DEPARTMENT);
 
     selectedServices.forEach((service) => {
       formData.append('serviceTypeIds', service.id.toString());
@@ -1570,7 +1570,7 @@ export class ITServiceRequestSpecificComponent implements OnInit {
       .pipe(finalize(() => this.completeInitialLoad()))
       .subscribe({
         next: (data) => {
-          console.log(data);
+          // console.log(data);
           this.companyList = data.map((item: any) => ({
             ...item,
             COMPANY_CODE: this.remapCompanyCode(item.COMPANY_CODE),
@@ -1682,7 +1682,7 @@ export class ITServiceRequestSpecificComponent implements OnInit {
       .pipe(finalize(() => this.completeInitialLoad()))
       .subscribe({
         next: (res) => {
-          console.log(res);
+          // console.log(res);
           this.deptHeads = res.data;
           this.refreshOneeSupervisors();
         },
