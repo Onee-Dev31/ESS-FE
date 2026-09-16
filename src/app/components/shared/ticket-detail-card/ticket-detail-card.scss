@@ -171,6 +171,10 @@
   overflow-wrap: anywhere;
 }
 
+:host-context([data-theme='dark']) ::ng-deep .description span {
+  background-color: #000000 !important;
+}
+
 .description ::ng-deep th {
   text-align: start;
   padding-right: 16px;
