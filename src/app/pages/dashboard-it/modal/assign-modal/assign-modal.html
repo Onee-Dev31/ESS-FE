@@ -56,6 +56,44 @@
       }
     </div>
 
+    @if (effectiveTicketTypeId === 2) {
+      <fieldset class="problem-field">
+        <legend>หมวดหมู่ปัญหา <span class="required">*</span></legend>
+        @if (categoriesLoading()) {
+          <p role="status">กำลังโหลดหมวดหมู่...</p>
+        } @else if (categoriesError()) {
+          <p role="alert">โหลดหมวดหมู่ไม่สำเร็จ</p>
+          <button type="button" class="modal-button" (click)="loadCategories()">
+            <i class="fas fa-rotate-right"></i> ลองใหม่
+          </button>
+        } @else {
+          <div class="tag-group">
+            @for (category of categories(); track category.id) {
+              <label class="tag">
+                <input type="radio" name="subCategory" [value]="category.id" [(ngModel)]="selectedCategory" />
+                <span>{{ category.sub_category_name }}</span>
+              </label>
+            } @empty {
+              <p role="status">ไม่พบหมวดหมู่ปัญหา</p>
+            }
+          </div>
+        }
+      </fieldset>
+      <fieldset class="problem-field">
+        <legend>ปัญหา <span class="required">*</span></legend>
+        <div class="tag-group">
+          <label class="tag">
+            <input type="radio" name="problemSource" value="user" [(ngModel)]="problemSource" />
+            <span>user</span>
+          </label>
+          <label class="tag">
+            <input type="radio" name="problemSource" value="system" [(ngModel)]="problemSource" />
+            <span>system</span>
+          </label>
+        </div>
+      </fieldset>
+    }
+
     <div class="assign-reason">
       <label for="assignReason">เหตุผล <span class="optional-label">(ไม่บังคับ)</span></label>
       <textarea
@@ -145,7 +183,7 @@
     <button
       type="button"
       class="modal-button primary"
-      [disabled]="selectedAssigneeEmpCodes.length === 0 || selectedTag === null"
+      [disabled]="!canSubmit"
       (click)="save()"
     >
       <i class="fas fa-paper-plane"></i>

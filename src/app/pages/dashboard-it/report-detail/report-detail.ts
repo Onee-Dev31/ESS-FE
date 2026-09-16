@@ -1,4 +1,5 @@
 import { ChangeDetectorRef, Component, signal } from '@angular/core';
+import { concatMap, map, of } from 'rxjs';
 import { ItServiceService } from '../../../services/it-service.service';
 import { tickets } from '../../../utils/it-dashboard-mock';
 import {
@@ -156,6 +157,9 @@ export class ReportDetail {
         description: ticket.description,
         ticketType: ticket.ticket_type_name_th,
         ticketTypeId: ticket.ticket_type_id,
+        ticketCategory: ticket.sub_category_name,
+        subCategoryId: ticket.sub_category_id,
+        problemBy: ticket.problemBy,
         status: ticket.IT_Status,
         priority: ticket.priority,
         source: ticket.source,
@@ -401,8 +405,16 @@ export class ReportDetail {
     attachments?: any[],
     repairCostType?: string,
     reason?: string,
+    subCategoryId?: number | null,
   ) {
     const formData = new FormData();
+
+    if (command === 'acknowledge') {
+      formData.append(
+        'subCategoryId',
+        Number(ticketTypeId) === 2 && subCategoryId != null ? String(subCategoryId) : '',
+      );
+    }
 
     formData.append('decision', 'ITAnalyze');
     formData.append('executedBy', this.authService.userData().CODEMPID);
@@ -483,6 +495,8 @@ export class ReportDetail {
 
     const tag = data.ticketTypeId;
 
+    let acknowledged = false;
+
     this.swalService.loading('กำลังบันทึกข้อมูล...');
     this.IS_ACKNOWLEDGE_TICKET.set(false);
 
@@ -494,6 +508,23 @@ export class ReportDetail {
       data.message,
       data.attachments,
       data.repairCostType,
+      undefined,
+      data.subCategoryId,
+    ).pipe(
+      concatMap((res) => {
+        if (!res?.success) return of(res);
+        acknowledged = true;
+        return this.itServiceService.updateSubcatProblemby({
+          ticketID: Number(ticketId),
+          subCategoryID: Number(tag) === 2 ? data.subCategoryId : null,
+          problemBy: Number(tag) === 2 ? data.problemSource : null,
+        }).pipe(map((result) => {
+          if (result?.success === false) {
+            throw new Error(result.message || 'บันทึกหมวดหมู่และปัญหาไม่สำเร็จ');
+          }
+          return res;
+        }));
+      }),
     ).subscribe({
       next: (res) => {
         if (!res?.success) {
@@ -508,6 +539,15 @@ export class ReportDetail {
 
       error: (error) => {
         console.error('Acknowledge Ticket Error:', error);
+
+        if (acknowledged) {
+          this.swalService.warning(
+            'รับเรื่องสำเร็จ แต่บันทึกหมวดหมู่และปัญหาไม่สำเร็จ',
+            error?.error?.message || error?.message || 'กรุณาตรวจสอบข้อมูลอีกครั้ง',
+          );
+          this.selectTicket();
+          return;
+        }
 
         this.swalService.warning(
           'เกิดข้อผิดพลาด',
@@ -673,6 +713,8 @@ export class ReportDetail {
 
     const typeTicket = data?.ticketTypeId;
 
+    let assigned = false;
+
     this.swalService.loading('กำลังบันทึกข้อมูล...');
     this.IS_ASSIGN_TICKET.set(false);
 
@@ -685,6 +727,21 @@ export class ReportDetail {
       data.attachments,
       data.repairCostType,
       data.reason,
+    ).pipe(
+      concatMap((res) => {
+        if (!res?.success) return of(res);
+        assigned = true;
+        return this.itServiceService.updateSubcatProblemby({
+          ticketID: Number(ticketId),
+          subCategoryID: Number(typeTicket) === 2 ? data.subCategoryId : null,
+          problemBy: Number(typeTicket) === 2 ? data.problemSource : null,
+        }).pipe(map((result) => {
+          if (result?.success === false) {
+            throw new Error(result.message || 'บันทึกหมวดหมู่และปัญหาไม่สำเร็จ');
+          }
+          return res;
+        }));
+      }),
     ).subscribe({
       next: (res) => {
         // console.log('[submitAssign] next res:', res);
@@ -705,6 +762,15 @@ export class ReportDetail {
 
       error: (error) => {
         console.error('Assign Ticket Error:', error);
+
+        if (assigned) {
+          this.swalService.warning(
+            'ส่งต่อสำเร็จ แต่บันทึกหมวดหมู่และปัญหาไม่สำเร็จ',
+            error?.error?.message || error?.message || 'กรุณาตรวจสอบข้อมูลอีกครั้ง',
+          );
+          this.selectTicket();
+          return;
+        }
 
         this.swalService.warning(
           'เกิดข้อผิดพลาด',

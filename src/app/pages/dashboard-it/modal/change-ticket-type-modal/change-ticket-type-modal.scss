@@ -53,6 +53,36 @@
   margin-top: 24px;
   margin-bottom: 8px;
 }
+
+.problem-field {
+  min-width: 0;
+  margin: 20px 0 0;
+  padding: 0;
+  border: 0;
+
+  legend {
+    float: none;
+    width: auto;
+  }
+
+  .type-option {
+    position: relative;
+    max-width: 100%;
+    overflow-wrap: anywhere;
+  }
+
+  input {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    opacity: 0;
+  }
+
+  .type-option:has(input:focus-visible) {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
+  }
+}
 .reason-label.required small {
   display: none;
 }

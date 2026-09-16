@@ -14,7 +14,7 @@ import {
   ChangeDetectorRef,
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { EMPTY, interval, firstValueFrom } from 'rxjs';
+import { EMPTY, interval, firstValueFrom, concatMap, map, of } from 'rxjs';
 import { filter, finalize } from 'rxjs/operators';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
@@ -688,6 +688,8 @@ export class DashboardIT implements OnInit {
         ticketType: ticket.ticket_type_name_th,
         ticketTypeId: ticket.ticket_type_id,
         ticketCategory: ticket.sub_category_name,
+        subCategoryId: ticket.sub_category_id,
+        problemBy: ticket.problemBy,
         priority: ticket.priority,
         source: ticket.source,
         createdDate: new Date(ticket.created_at).toISOString(),
@@ -1640,10 +1642,18 @@ export class DashboardIT implements OnInit {
     attachments?: any[],
     repairCostType?: string,
     reason?: string,
+    subCategoryId?: number | null,
   ) {
     // console.log(command, ticketId, ticketTypeId, comment, attachments);
 
     const formData = new FormData();
+
+    if (command === 'acknowledge') {
+      formData.append(
+        'subCategoryId',
+        Number(ticketTypeId) === 2 && subCategoryId != null ? String(subCategoryId) : '',
+      );
+    }
 
     formData.append('decision', 'ITAnalyze');
     formData.append('executedBy', this.authService.userData().CODEMPID);
@@ -1803,6 +1813,8 @@ export class DashboardIT implements OnInit {
 
     // console.log('acknowledge', ticketId, tag, null, data.message, data.attachments, repairCostType);
 
+    let acknowledged = false;
+
     this.swalService.loading('กำลังบันทึกข้อมูล...');
     this.IS_ACKNOWLEDGE_TICKET.set(false);
 
@@ -1814,6 +1826,23 @@ export class DashboardIT implements OnInit {
       data.message,
       data.attachments,
       repairCostType,
+      undefined,
+      data.subCategoryId,
+    ).pipe(
+      concatMap((res) => {
+        if (!res?.success) return of(res);
+        acknowledged = true;
+        return this.itServiceService.updateSubcatProblemby({
+          ticketID: Number(ticketId),
+          subCategoryID: Number(tag) === 2 ? data.subCategoryId : null,
+          problemBy: Number(tag) === 2 ? data.problemSource : null,
+        }).pipe(map((result) => {
+          if (result?.success === false) {
+            throw new Error(result.message || 'บันทึกหมวดหมู่และปัญหาไม่สำเร็จ');
+          }
+          return res;
+        }));
+      }),
     ).subscribe({
       next: (res) => {
         if (!res?.success) {
@@ -1841,6 +1870,16 @@ export class DashboardIT implements OnInit {
 
       error: (error) => {
         console.error('Acknowledge Ticket Error:', error);
+
+        if (acknowledged) {
+          this.swalService.warning(
+            'รับเรื่องสำเร็จ แต่บันทึกหมวดหมู่และปัญหาไม่สำเร็จ',
+            error?.error?.message || error?.message || 'กรุณาตรวจสอบข้อมูลอีกครั้ง',
+          );
+          this.selectTicket(ticketId);
+          this.getAllTickets();
+          return;
+        }
 
         this.swalService.warning(
           'เกิดข้อผิดพลาด',
@@ -1991,6 +2030,8 @@ export class DashboardIT implements OnInit {
 
   submitChangeTicketType(data: {
     ticketTypeId: number;
+    subCategoryId: number | null;
+    problemSource: 'user' | 'system' | null;
     repairCostType?: 'paid' | 'free';
     reason: string;
     attachments: { name: string; size: number; file: File; description?: string }[];
@@ -2013,10 +2054,17 @@ export class DashboardIT implements OnInit {
       return;
     }
 
-    this.swalService.loading('กำลังเปลี่ยนประเภทคำขอ...');
+    const hasTypeChanged = Number(data.ticketTypeId) !==
+      Number(ticket.ticketTypeId ?? ticket.ticket_type_id);
+    const hasRepairCostChanged = Number(data.ticketTypeId) === 1 &&
+      data.repairCostType !== ticket.repair_cost_type;
+    const needsTicketUpdate = hasTypeChanged || hasRepairCostChanged;
+    this.swalService.loading(needsTicketUpdate ? 'กำลังเปลี่ยนประเภทคำขอ...' : 'กำลังบันทึกข้อมูล...');
     this.closeChangeTicketTypeModal();
 
-    this.updateTicket(
+    let typeChanged = false;
+
+    const update$ = needsTicketUpdate ? this.updateTicket(
       'changeType',
       ticketId,
       String(data.ticketTypeId),
@@ -2025,6 +2073,23 @@ export class DashboardIT implements OnInit {
       data.attachments.map((attachment) => ({ ...attachment, description: 'From IT' })),
       data.repairCostType,
       data.reason,
+    ) : of({ success: true, message: 'บันทึกหมวดหมู่และปัญหาสำเร็จ' });
+
+    update$.pipe(
+      concatMap((res) => {
+        if (!res?.success) return of(res);
+        typeChanged = needsTicketUpdate;
+        return this.itServiceService.updateSubcatProblemby({
+          ticketID: Number(ticketId),
+          subCategoryID: data.ticketTypeId === 2 ? data.subCategoryId : null,
+          problemBy: data.ticketTypeId === 2 ? data.problemSource : null,
+        }).pipe(map((result) => {
+          if (result?.success === false) {
+            throw new Error(result.message || 'บันทึกหมวดหมู่และปัญหาไม่สำเร็จ');
+          }
+          return res;
+        }));
+      }),
     ).subscribe({
       next: (res) => {
         if (!res?.success) {
@@ -2052,9 +2117,19 @@ export class DashboardIT implements OnInit {
       },
       error: (error) => {
         console.error('Change Ticket Type Error:', error);
+        if (typeChanged) {
+          this.swalService.warning(
+            'เปลี่ยนประเภทสำเร็จ แต่บันทึกหมวดหมู่และปัญหาไม่สำเร็จ',
+            error?.error?.message || error?.message || 'กรุณาตรวจสอบข้อมูลอีกครั้ง',
+          );
+          this.selectTicket(ticketId);
+          this.getAllTickets();
+          return;
+        }
         this.swalService.warning(
           'เกิดข้อผิดพลาด',
-          error?.error?.message || error?.message || 'ไม่สามารถเปลี่ยนประเภทคำขอได้',
+          error?.error?.message || error?.message ||
+            (needsTicketUpdate ? 'ไม่สามารถเปลี่ยนประเภทคำขอได้' : 'บันทึกหมวดหมู่และปัญหาไม่สำเร็จ'),
         );
       },
     });
@@ -2157,6 +2232,8 @@ export class DashboardIT implements OnInit {
 
     const typeTicket = data?.ticketTypeId;
 
+    let assigned = false;
+
     this.swalService.loading('กำลังบันทึกข้อมูล...');
     this.IS_ASSIGN_TICKET.set(false);
 
@@ -2169,6 +2246,21 @@ export class DashboardIT implements OnInit {
       data.attachments,
       data.repairCostType,
       data.reason,
+    ).pipe(
+      concatMap((res) => {
+        if (!res?.success) return of(res);
+        assigned = true;
+        return this.itServiceService.updateSubcatProblemby({
+          ticketID: Number(ticketId),
+          subCategoryID: Number(typeTicket) === 2 ? data.subCategoryId : null,
+          problemBy: Number(typeTicket) === 2 ? data.problemSource : null,
+        }).pipe(map((result) => {
+          if (result?.success === false) {
+            throw new Error(result.message || 'บันทึกหมวดหมู่และปัญหาไม่สำเร็จ');
+          }
+          return res;
+        }));
+      }),
     ).subscribe({
       next: (res) => {
         if (!res?.success) {
@@ -2187,6 +2279,16 @@ export class DashboardIT implements OnInit {
 
       error: (error) => {
         console.error('Assign Ticket Error:', error);
+
+        if (assigned) {
+          this.swalService.warning(
+            'ส่งต่อสำเร็จ แต่บันทึกหมวดหมู่และปัญหาไม่สำเร็จ',
+            error?.error?.message || error?.message || 'กรุณาตรวจสอบข้อมูลอีกครั้ง',
+          );
+          this.selectTicket(ticketId);
+          this.getAllTickets();
+          return;
+        }
 
         this.swalService.warning(
           'เกิดข้อผิดพลาด',

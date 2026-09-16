@@ -447,6 +447,15 @@ export class ItServiceService {
     return this._http.patch(`${this.baseUrl}/tickets/${id}/approveV2`, formData);
   }
 
+  // เปลี่ยนหมวดหมู่ปัญหาและระบุปัญหาเกิดจาก user/system ภายใน IT โดยไม่แจ้ง user
+  updateSubcatProblemby(payload: {
+    ticketID: number;
+    subCategoryID: number | null;
+    problemBy: 'user' | 'system' | null;
+  }): Observable<any> {
+    return this._http.post(`${this.baseUrl}/it/updateSubcatProblemby`, payload);
+  }
+
   re_submit(formData: FormData): Observable<any> {
     return this._http.put<any>(`${this.baseUrl}/tickets/re-submit`, formData);
   }

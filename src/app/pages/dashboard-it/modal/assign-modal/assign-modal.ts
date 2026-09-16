@@ -1,5 +1,6 @@
 import {
   Component,
+  inject,
   computed,
   EventEmitter,
   Input,
@@ -15,6 +16,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { environment } from '../../../../../environments/environment';
 import { ModalShellComponent } from '../../../../components/shared/modal-shell/modal-shell';
+import { ItServiceService } from '../../../../services/it-service.service';
 
 @Component({
   selector: 'app-assign-modal',
@@ -52,6 +54,59 @@ export class AssignModal {
 
   selectedAssigneeEmpCodes: any[] = [];
   selectedTag: number | null = null;
+  selectedCategory: number | null = null;
+  problemSource: 'user' | 'system' | null = null;
+  private readonly itService = inject(ItServiceService);
+  readonly categories = signal<{ id: number; sub_category_name: string; display_order?: number }[]>([]);
+  readonly categoriesLoading = signal(false);
+  readonly categoriesError = signal(false);
+
+  ngOnInit(): void {
+    this.loadCategories();
+  }
+
+  loadCategories(): void {
+    this.categoriesLoading.set(true);
+    this.categoriesError.set(false);
+    this.itService.getSubProblem().subscribe({
+      next: (res) => {
+        this.categories.set([...(res.data ?? [])]
+          .map((category) => ({ ...category, id: Number(category.id) }))
+          .sort((a, b) => Number(a.display_order ?? 0) - Number(b.display_order ?? 0)));
+        this.restoreCategory();
+        this.categoriesLoading.set(false);
+      },
+      error: () => {
+        this.categoriesLoading.set(false);
+        this.categoriesError.set(true);
+      },
+    });
+  }
+
+  get effectiveTicketTypeId(): number {
+    return Number(this.isApproved
+      ? this.ticket?.ticketTypeId ?? this.ticket?.ticket_type_id
+      : this.selectedTag);
+  }
+
+  get canSubmit(): boolean {
+    return this.selectedAssigneeEmpCodes.length > 0 &&
+      [1, 2, 3].includes(this.effectiveTicketTypeId) &&
+      (this.effectiveTicketTypeId !== 2 || (
+        !this.categoriesLoading() && !this.categoriesError() &&
+        this.categories().some((category) => category.id === this.selectedCategory) &&
+        (this.problemSource === 'user' || this.problemSource === 'system')
+      ));
+  }
+
+  private restoreCategory(): void {
+    if (this.effectiveTicketTypeId !== 2 || this.selectedCategory !== null) return;
+    const id = Number(this.ticket?.subCategoryId ?? this.ticket?.sub_category_id);
+    const name = this.ticket?.ticketCategory ?? this.ticket?.sub_category_name;
+    this.selectedCategory = this.categories().find((category) =>
+      id ? category.id === id : category.sub_category_name === name,
+    )?.id ?? null;
+  }
   originalTag: number | null = null;
   reason = '';
   // assignSearchKeyword = '';
@@ -77,8 +132,13 @@ export class AssignModal {
 
   ngOnChanges(changes: SimpleChanges) {
     if (changes['ticket'] && this.ticket) {
-      this.selectedTag = Number(this.ticket.ticketTypeId);
-      this.originalTag = Number(this.ticket.ticketTypeId);
+      this.selectedTag = Number(this.ticket.ticketTypeId ?? this.ticket.ticket_type_id);
+      this.originalTag = this.selectedTag;
+      this.selectedCategory = null;
+      const source = String(this.ticket.problemBy ?? '').trim().toLowerCase();
+      this.problemSource = this.effectiveTicketTypeId === 2 &&
+        (source === 'user' || source === 'system') ? source : null;
+      this.restoreCategory();
       this.reason = '';
       if (this.ticket.assignments) {
         this.ticketId = this.ticket.ticketId;
@@ -181,12 +241,15 @@ export class AssignModal {
   }
 
   save() {
+    if (!this.canSubmit) return;
     const ticketTypeId = this.isApproved
       ? Number(this.ticket?.ticketTypeId ?? this.ticket?.ticket_type_id)
       : this.selectedTag;
     this.submitModal.emit({
       assignees: this.selectedAssigneeEmpCodes,
       ticketTypeId,
+      subCategoryId: ticketTypeId === 2 ? this.selectedCategory : null,
+      problemSource: ticketTypeId === 2 ? this.problemSource : null,
       ticketId: this.ticketId,
       reason: this.reason.trim() || undefined,
       ...(this.isChangedToRepair && { repairCostType: 'free' }),

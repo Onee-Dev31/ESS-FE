@@ -23,6 +23,47 @@
       }
     </div>
 
+    @if (selectedTypeId === 2) {
+      <fieldset class="problem-field">
+        <legend class="field-label">หมวดหมู่ปัญหา<span>*</span></legend>
+        @if (categoriesLoading()) {
+          <p role="status">กำลังโหลดหมวดหมู่...</p>
+        } @else if (categoriesError()) {
+          <p role="alert">โหลดหมวดหมู่ไม่สำเร็จ</p>
+          <button type="button" class="modal-button" (click)="loadCategories()">
+            <i class="fas fa-rotate-right"></i> ลองใหม่
+          </button>
+        } @else {
+          <div class="type-options">
+            @for (category of categories(); track category.id) {
+              <label class="type-option" [class.selected]="selectedCategory === category.id">
+                <input type="radio" name="subCategory" [value]="category.id"
+                  [(ngModel)]="selectedCategory" [disabled]="isTypeChangeLocked" />
+                {{ category.sub_category_name }}
+              </label>
+            } @empty {
+              <p role="status">ไม่พบหมวดหมู่ปัญหา</p>
+            }
+          </div>
+        }
+      </fieldset>
+      <fieldset class="problem-field">
+        <legend class="field-label">ปัญหา<span>*</span></legend>
+        <div class="type-options">
+          <label class="type-option" [class.selected]="problemSource === 'user'">
+            <input type="radio" name="problemSource" value="user"
+              [(ngModel)]="problemSource" [disabled]="isTypeChangeLocked" />
+            user
+          </label>
+          <label class="type-option" [class.selected]="problemSource === 'system'">
+            <input type="radio" name="problemSource" value="system"
+              [(ngModel)]="problemSource" [disabled]="isTypeChangeLocked" />
+            system
+          </label>
+        </div>
+      </fieldset>
+    }
+
     @if (selectedTypeId === 1) {
       <div class="repair-cost-card">
         <div class="field-label">ประเภทค่าใช้จ่าย<span>*</span></div>
@@ -102,7 +143,7 @@
       </div>
     }
 
-    @if (hasTypeChanged) {
+    @if (hasTypeChanged || hasRepairCostChanged) {
       <label class="field-label reason-label" for="change-type-reason">
         เหตุผล
         @if (repairCostType === 'paid') {
