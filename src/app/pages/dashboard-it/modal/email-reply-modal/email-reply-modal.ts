@@ -1,4 +1,5 @@
 import {
+  ChangeDetectorRef,
   Component,
   EventEmitter,
   inject,
@@ -8,13 +9,15 @@ import {
   signal,
   ViewChild,
 } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 import { TextEditorComponent } from '../../../../components/shared/text-editor/text-editor';
 import { SwalService } from '../../../../services/swal.service';
+import { ItServiceService } from '../../../../services/it-service.service';
 
 @Component({
   selector: 'app-email-reply-modal',
   standalone: true,
-  imports: [TextEditorComponent],
+  imports: [TextEditorComponent, FormsModule],
   templateUrl: './email-reply-modal.html',
   styleUrl: './email-reply-modal.scss',
 })
@@ -27,11 +30,19 @@ export class EmailReplyModal implements OnInit {
   message = '';
   quotedMessage = '';
   isSubmitting = signal(false);
+
+  to = '';
+  cc: string[] = [];
+  ccInput = '';
+
   private readonly swalService = inject(SwalService);
+  private readonly itServiceService = inject(ItServiceService);
+  private readonly cdr = inject(ChangeDetectorRef);
   private readonly replyNotice =
     'หากท่านมีคำถามหรือข้อมูลเพิ่มเติมเกี่ยวกับปัญหาดังกล่าว สามารถตอบกลับอีเมลนี้ได้ทันที';
 
   ngOnInit(): void {
+    this.loadRecipients();
     const originalDescription = this.ticket?.description ?? '';
     if (!originalDescription) {
       this.message = '';
@@ -85,6 +96,47 @@ export class EmailReplyModal implements OnInit {
     // HTML เดิมไม่ผ่าน Quill
     this.quotedMessage =
       originalHeader + replyNoticeHtml + `<blockquote>${description}</blockquote>`;
+  }
+
+  private loadRecipients(): void {
+    const ticketId = this.ticket?.ticketId;
+    if (!ticketId) return;
+
+    this.itServiceService.getReplyEmailRecipients(ticketId).subscribe({
+      next: (res) => {
+        this.to = res?.to ?? '';
+        this.cc = Array.isArray(res?.cc) ? res.cc : [];
+        console.log('loadRecipients', { to: this.to, cc: this.cc });
+        // สั่ง render ทันทีตรงนี้ ก่อนที่ zone จะ tick ทับ ป้องกัน NG0100
+        this.cdr.detectChanges();
+      },
+      error: (error) => {
+        this.swalService.warning(
+          'ไม่สามารถโหลดรายชื่อผู้รับได้',
+          error?.error?.message || error?.message || 'กรุณาลองใหม่อีกครั้ง',
+        );
+      },
+    });
+  }
+
+  addCcTag(): void {
+    const value = this.ccInput.trim().replace(/,$/, '');
+    this.ccInput = '';
+    if (!value) return;
+    if (this.cc.includes(value)) return;
+
+    this.cc.push(value);
+  }
+
+  removeCcTag(index: number): void {
+    this.cc.splice(index, 1);
+  }
+
+  onCcInputKeydown(event: KeyboardEvent): void {
+    if (event.key === 'Enter' || event.key === ',') {
+      event.preventDefault();
+      this.addCcTag();
+    }
   }
 
   private removePreviousReplyNotices(html: string): string {
@@ -176,11 +228,18 @@ export class EmailReplyModal implements OnInit {
       next: (replyMessage) => {
         const fullMessage = replyMessage + this.quotedMessage;
 
-        this.submitModal.emit({
+        const payload = {
           id: this.ticket.ticketId,
           message: fullMessage,
+          to: this.to,
+          cc: this.cc,
           attachments: [],
-        });
+        };
+
+        console.log('submit email reply', payload);
+
+        // this.submitModal.emit(payload);
+        this.isSubmitting.set(false);
       },
       error: (error) => {
         this.isSubmitting.set(false);
