@@ -917,3 +917,61 @@ body[data-theme='dark'] {
     }
   }
 }
+
+.sortable-header {
+  cursor: pointer;
+  user-select: none;
+  transition: background 0.15s ease;
+
+  &:hover {
+    background: #f8fafc;
+
+    .sort-indicator.idle {
+      opacity: 1;
+      color: #64748b;
+    }
+  }
+}
+
+.sort-header {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.sort-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+
+  &.idle {
+    color: #cbd5e1;
+    opacity: 0.7;
+    font-size: 11px;
+    transition: 0.15s ease;
+  }
+
+  &.active {
+    color: #2563eb;
+    font-size: 11px;
+  }
+}
+
+.sort-priority {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  min-width: 17px;
+  height: 17px;
+  padding: 0 4px;
+
+  border: 1px solid #bfdbfe;
+  border-radius: 5px;
+
+  background: #eff6ff;
+  color: #2563eb;
+
+  font-size: 9px;
+  font-weight: 700;
+}

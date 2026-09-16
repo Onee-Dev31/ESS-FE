@@ -386,8 +386,12 @@ export class ItServiceService {
     dateFrom?: string;
     dateTo?: string;
     isReal?: boolean;
+    sortBy?: string;
+    sortOrder?: string;
+    thenBy?: string;
+    thenOrder?: string;
   }) {
-    console.log('getTicketByStatus()', params);
+    // console.log('getTicketByStatus()', params);
     let httpParams = new HttpParams();
     if (params.status) httpParams = httpParams.set('status', params.status);
     if (params.page) httpParams = httpParams.set('page', String(params.page));
@@ -401,6 +405,10 @@ export class ItServiceService {
     if (params.dateFrom) httpParams = httpParams.set('dateFrom', params.dateFrom);
     if (params.dateTo) httpParams = httpParams.set('dateTo', params.dateTo);
     if (params.isReal) httpParams = httpParams.set('isReal', params.isReal);
+    if (params.sortBy) httpParams = httpParams.set('sortBy', params.sortBy);
+    if (params.sortOrder) httpParams = httpParams.set('sortOrder', params.sortOrder);
+    if (params.thenBy) httpParams = httpParams.set('thenBy', params.thenBy);
+    if (params.thenOrder) httpParams = httpParams.set('thenOrder', params.thenOrder);
 
     return this._http.get(`${this.baseUrl}/tickets/by-status`, { params: httpParams });
   }

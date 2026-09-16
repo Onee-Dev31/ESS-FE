@@ -24,6 +24,13 @@ import { createListingComputeds_v2, createListingState } from '../../../utils/li
 import { environment } from '../../../../environments/environment';
 import { exportTicketLogsToExcel } from '../../../utils/ticket-log-excel.util';
 
+type SortColumn = 'ticketNo' | 'updated';
+type SortOrder = 'asc' | 'desc';
+
+interface SortItem {
+  column: SortColumn;
+  order: SortOrder;
+}
 @Component({
   selector: 'app-it-dashboard-summary',
   standalone: true,
@@ -60,6 +67,8 @@ export class ItDashboardSummary {
     // this.buildCompanyBar(res.topCompanies);
     this.cdr.detectChanges();
   }
+
+  sorts: SortItem[] = [];
 
   allRequests = signal<any[]>([]);
   listing = createListingState();
@@ -189,6 +198,7 @@ export class ItDashboardSummary {
   companyList: any[] = [];
   filteredTicketLogs: any[] = [];
   filteredDepartmentList: any[] = [];
+
   constructor(
     private itServiceService: ItServiceService,
     private cdr: ChangeDetectorRef,
@@ -204,6 +214,38 @@ export class ItDashboardSummary {
     // this.getAllTickets();
     this.getCompanies();
     this.getDepartments();
+  }
+
+  onSort(column: SortColumn): void {
+    const existing = this.sorts.find((x) => x.column === column);
+
+    // ยังไม่มี → DESC
+    if (!existing) {
+      this.sorts = [{ column, order: 'desc' }, ...this.sorts];
+    }
+
+    // DESC → ASC และย้ายขึ้น Priority 1
+    else if (existing.order === 'desc') {
+      this.sorts = [{ column, order: 'asc' }, ...this.sorts.filter((x) => x.column !== column)];
+    }
+
+    // ASC → ยกเลิก column นี้
+    else {
+      this.sorts = this.sorts.filter((x) => x.column !== column);
+    }
+
+    this.listing.currentPage.set(0);
+    this.loadTickets();
+  }
+
+  getSort(column: SortColumn): SortItem | undefined {
+    return this.sorts.find((x) => x.column === column);
+  }
+
+  getSortPriority(column: SortColumn): number | null {
+    const index = this.sorts.findIndex((x) => x.column === column);
+
+    return index >= 0 ? index + 1 : null;
   }
 
   // ====== 1) Status Donut ======
@@ -778,6 +820,9 @@ export class ItDashboardSummary {
     const [dateFrom, dateTo] = this.filter.dateRange ?? [];
     // console.log('loadTickets()', this.filter);
 
+    const primarySort = this.sorts[0];
+    const secondarySort = this.sorts[1];
+
     const params = {
       status: this.statusLabelApi(this.currentStatus),
       page: this.listing.currentPage() + 1,
@@ -791,6 +836,13 @@ export class ItDashboardSummary {
       dateFrom: dateFrom ? dayjs(dateFrom).format('YYYY-MM-DD') : undefined,
       dateTo: dateTo ? dayjs(dateTo).format('YYYY-MM-DD') : undefined,
       isReal: false,
+
+      // Sort
+      sortBy: primarySort?.column,
+      sortOrder: primarySort?.order,
+
+      thenBy: secondarySort?.column,
+      thenOrder: secondarySort?.order,
     };
     // console.log(params);
     this.itServiceService.getTicketByStatus(params).subscribe({
