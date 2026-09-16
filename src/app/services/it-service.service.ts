@@ -577,4 +577,11 @@ export class ItServiceService {
   checkItAvalible(ticketId: string): Observable<any> {
     return this._http.get(`${this.baseUrl}/tickets/check-it-avalible?ticketId=${ticketId}`);
   }
+
+  syncTicketCC(ticketId: number, usersCC: string[], executedBy: string): Observable<any> {
+    return this._http.post<any>(`${this.baseUrl}/tickets/${ticketId}/sync-ticket-cc`, {
+      usersCC,
+      executedBy,
+    });
+  }
 }

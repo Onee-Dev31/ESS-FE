@@ -2,35 +2,121 @@
   <div class="modal-container">
     <div>
       <header class="top-header-strip">
-        <h2>CC:</h2>
+        <div class="cc-header-title">
+          <h2>ผู้รับสำเนา (CC)</h2>
+
+          <span class="cc-count"> {{ selectedCC.length }} คน </span>
+        </div>
+
         <button type="button" class="btn-close-modal" (click)="close()" title="ปิด">
           <i class="fas fa-times"></i>
         </button>
       </header>
+
       <div class="content-card">
-        <div class="cc-list" *ngIf="ticket?.ccList?.length > 0">
-          <div class="cc-item" *ngFor="let cc of ticket.ccList">
-            <!-- avatar -->
-            <div class="cc-avatar">
-              <img [src]="getEmployeeImage(cc.codeempid)" (error)="onImgError($event)" />
-            </div>
+        <!-- CC ที่เลือกแล้ว -->
+        @if (selectedCC.length > 0) {
+          <div class="cc-list">
+            @for (cc of selectedCC; track cc.codeempid) {
+              <div class="cc-item">
+                <div class="cc-avatar">
+                  <img [src]="getEmployeeImage(cc.codeempid)" (error)="onImgError($event)" />
+                </div>
 
-            <!-- info -->
-            <div class="cc-info">
-              <div class="cc-name">{{ cc.name }}</div>
-              <div class="cc-meta">
-                <span class="cc-email">{{ cc.email }}</span>
+                <div class="cc-info">
+                  <div class="cc-name">
+                    {{ cc.name }}
+                  </div>
 
-                <span *ngIf="cc.department">• {{ cc.department }}</span>
-                <span *ngIf="cc.company">• {{ cc.company }}</span>
+                  <div class="cc-meta">
+                    <span>{{ cc.email || '-' }}</span>
+
+                    <!-- @if (cc.department) {
+                      <span>• {{ cc.department }}</span>
+                    } -->
+                  </div>
+                </div>
+
+                @if (isItDashboard) {
+                  <button type="button" class="btn-remove-cc" (click)="removeCC(cc)" title="ลบ CC">
+                    <i class="fa-solid fa-xmark"></i>
+                  </button>
+                }
               </div>
+            }
+          </div>
+        } @else {
+          <div class="cc-empty">
+            <i class="fa-regular fa-user"></i>
+
+            <div>
+              <strong>ยังไม่มีผู้รับสำเนา</strong>
+              <span>เพิ่มพนักงานที่ต้องการให้รับการแจ้งเตือน Ticket นี้</span>
             </div>
           </div>
-        </div>
-        <button class="btn-add-cc" (click)="addCC()" *ngIf="isItDashboard">
-          <i class="fas fa-plus"></i> เพิ่ม CC
-        </button>
+        }
+
+        @if (isItDashboard) {
+          <div class="employee-picker">
+            <div class="picker-header">
+              <strong>เพิ่มผู้รับสำเนา</strong>
+            </div>
+
+            <div class="employee-search">
+              <i class="fa-solid fa-magnifying-glass"></i>
+
+              <input
+                type="text"
+                [value]="searchText"
+                (input)="onSearch($event)"
+                placeholder="ค้นหาชื่อ, ชื่อเล่น, รหัสพนักงาน..."
+              />
+            </div>
+
+            <div class="employee-list">
+              @if (isLoadingEmployees()) {
+                <div class="picker-message">กำลังโหลดข้อมูล...</div>
+              } @else if (!searchText.trim()) {
+                <div class="picker-message">พิมพ์ชื่อ ชื่อเล่น หรือรหัสพนักงานเพื่อค้นหา</div>
+              } @else if (filteredEmployees.length === 0) {
+                <div class="picker-message">ไม่พบพนักงาน</div>
+              } @else {
+                @for (emp of filteredEmployees; track emp.EmployeeID) {
+                  <button type="button" class="employee-item" (click)="addEmployee(emp)">
+                    <div class="cc-avatar">
+                      <img [src]="getEmployeeImage(emp.EmployeeID)" (error)="onImgError($event)" />
+                    </div>
+
+                    <div class="employee-info">
+                      <strong>{{ getEmployeeName(emp) }}</strong>
+                      <span>{{ emp.ID }}</span>
+                    </div>
+
+                    <div class="employee-add-icon">
+                      <i class="fa-solid fa-plus"></i>
+                    </div>
+                  </button>
+                }
+              }
+            </div>
+          </div>
+        }
       </div>
+
+      @if (isItDashboard) {
+        <footer class="form-actions-footer">
+          <button type="button" class="btn-back-custom" (click)="close()">ยกเลิก</button>
+
+          <button type="button" class="btn-save-custom" [disabled]="isSaving" (click)="save()">
+            @if (isSaving) {
+              กำลังบันทึก...
+            } @else {
+              <i class="fa-solid fa-check"></i>
+              บันทึก
+            }
+          </button>
+        </footer>
+      }
     </div>
   </div>
 </div>

@@ -1206,6 +1206,18 @@ export class TicketWorkspaceComponent implements OnInit, OnChanges {
     this.isCcModalVisible = false;
   }
 
+  onCcUpdated(): void {
+    const ticketId = this.selectedTicket()?.ticketId;
+
+    this.isCcModalVisible = false;
+
+    if (ticketId) {
+      this.selectTicket(String(ticketId), {
+        scrollToList: false,
+      });
+    }
+  }
+
   ReOpen() {
     // console.log('reOpen mock', this.selectedTicket());
 

@@ -42,9 +42,28 @@
     </div>
   }
 
-  @if (ccCount > 0) {
-    <div class="cc-row">
-      CC: <button type="button" (click)="ccClick.emit()">{{ ccCount }} คน</button>
+  <div class="cc-section">
+    <div class="cc-info">
+      <i class="fa-solid fa-user-group cc-icon"></i>
+
+      <span class="cc-title">CC</span>
+
+      <span class="cc-description">
+        @if (ccCount > 0) {
+          {{ ccCount }} คน
+        } @else {
+          ยังไม่มีผู้รับสำเนา
+        }
+      </span>
     </div>
-  }
+
+    <button type="button" class="cc-action" (click)="ccClick.emit()">
+      @if (ccCount > 0) {
+        <span>จัดการ</span>
+      } @else {
+        <i class="fa-solid fa-plus"></i>
+        <span>เพิ่ม</span>
+      }
+    </button>
+  </div>
 </section>

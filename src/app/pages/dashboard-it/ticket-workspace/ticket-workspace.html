@@ -547,7 +547,12 @@
   }
 
   @if (isCcModalVisible) {
-    <app-cc-modal [ticket]="selectedTicket()" [isItDashboard]="true" (closeModal)="handleCancel()">
+    <app-cc-modal
+      [ticket]="selectedTicket()"
+      [isItDashboard]="true"
+      (closeModal)="handleCancel()"
+      (submitModal)="onCcUpdated()"
+    >
     </app-cc-modal>
   }
 
