@@ -42,7 +42,8 @@ export class EmailReplyModal implements OnInit {
   isSubmitting = signal(false);
   isConfirming = signal(false);
 
-  to:string[] = [];
+  to = '';
+  canEditTo = false;
   cc: string[] = [];
   ccInput = '';
   employees = signal<CcRecipient[]>([]);
@@ -128,17 +129,26 @@ export class EmailReplyModal implements OnInit {
       this.ticket?.viaEmail === 'true';
 
     if (!viaEmail) {
-      this.to = [String(this.ticket?.requester?.email ?? '').trim()];
-      if (!this.to[0]) {
-        this.swalService.warning('Requester ไม่มี email', 'ไม่พบอีเมลของผู้ขอใช้บริการ กรุณาเพิ่มอีเมลก่อนส่งข้อความ');
+      this.to = String(this.ticket?.requester?.email ?? '').trim();
+      if (this.to === 'ไม่ระบุอีเมล') this.to = '';
+      this.canEditTo = !this.to;
+      if (!this.to) {
+        this.swalService.warning(
+          'Requester ไม่มี email',
+          'ไม่พบอีเมลของผู้ขอใช้บริการ กรุณากรอกอีเมลในช่อง “ถึง” ก่อนส่งข้อความ',
+        );
       }
       const ccList = Array.isArray(this.ticket?.ccList) ? this.ticket.ccList : [];
       const emails = ccList
-        .map((cc: any) => String(typeof cc === 'string' ? cc : cc?.email ?? cc?.EMAIL ?? '').trim())
+        .map((cc: any) =>
+          String(typeof cc === 'string' ? cc : (cc?.email ?? cc?.EMAIL ?? '')).trim(),
+        )
         .filter((email: string) => this.isValidEmail(email));
-      this.cc = [...new Map<string, string>(
-        emails.map((email: string): [string, string] => [email.toLowerCase(), email]),
-      ).values()];
+      this.cc = [
+        ...new Map<string, string>(
+          emails.map((email: string): [string, string] => [email.toLowerCase(), email]),
+        ).values(),
+      ];
       return;
     }
 
@@ -147,7 +157,9 @@ export class EmailReplyModal implements OnInit {
 
     this.itServiceService.getReplyEmailRecipients(ticketId).subscribe({
       next: (res) => {
-        this.to = res?.to ?? '';
+        this.to = String(res?.to ?? '').trim();
+        if (this.to === 'ไม่ระบุอีเมล') this.to = '';
+        this.canEditTo = !this.to;
         this.cc = Array.isArray(res?.cc) ? res.cc : [];
         console.log('loadRecipients', { to: this.to, cc: this.cc });
         // สั่ง render ทันทีตรงนี้ ก่อนที่ zone จะ tick ทับ ป้องกัน NG0100
@@ -366,7 +378,17 @@ export class EmailReplyModal implements OnInit {
   }
 
   async submit(): Promise<void> {
-    if (!this.hasMessage || !this.ticket?.ticketId || this.isSubmitting() || this.isConfirming()) return;
+    if (!this.hasMessage || !this.ticket?.ticketId || this.isSubmitting() || this.isConfirming())
+      return;
+
+    this.to = this.to.trim();
+    if (!this.isValidEmail(this.to)) {
+      this.swalService.warning(
+        'กรุณาตรวจสอบอีเมลผู้รับ',
+        'กรุณากรอกอีเมลในช่อง “ถึง” ให้ถูกต้องก่อนส่งข้อความ',
+      );
+      return;
+    }
 
     this.addCcTag();
     if (this.ccInput.trim()) {
@@ -384,7 +406,7 @@ export class EmailReplyModal implements OnInit {
           <div class="email-confirm-recipients">
             <div class="email-confirm-group">
               <div class="email-confirm-label"><i class="fa-regular fa-envelope" aria-hidden="true"></i> ถึง <span>ผู้รับหลัก</span></div>
-              <div class="email-confirm-chips"><span class="email-confirm-chip">${this.escapeHtml(this.to[0])}</span></div>
+              <div class="email-confirm-chips"><span class="email-confirm-chip">${this.escapeHtml(this.to)}</span></div>
             </div>
             <div class="email-confirm-group">
               <div class="email-confirm-label"><i class="fa-solid fa-user-group" aria-hidden="true"></i> Cc <span>${this.cc.length} รายการ</span></div>
@@ -414,12 +436,12 @@ export class EmailReplyModal implements OnInit {
         const payload = {
           id: this.ticket.ticketId,
           message: fullMessage,
-          to: this.to,
+          to: this.to ? [this.to] : [],
           cc: this.cc,
           attachments: [],
         };
 
-        console.log('submit email reply', payload);
+        // console.log('submit email reply', payload);
 
         this.submitModal.emit(payload);
         this.isSubmitting.set(false);

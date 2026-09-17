@@ -12,8 +12,17 @@
 
     <div class="modal-body">
       <div class="field-group">
-        <label>ถึง</label>
-        <input type="text" class="input-to" [value]="to" disabled />
+        <label for="reply-to-input">ถึง</label>
+        <input
+          id="reply-to-input"
+          type="email"
+          class="input-to"
+          [(ngModel)]="to"
+          [disabled]="!canEditTo || isSubmitting() || isConfirming()"
+          placeholder="กรอกอีเมลผู้รับ"
+          autocomplete="email"
+          required
+        />
       </div>
 
       <div class="field-group">
