@@ -439,6 +439,52 @@ label {
 }
 
 /* Confirm Button */
+.problem-details-confirm {
+  margin: 8px 0 0;
+  padding: 4px 16px;
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  background: var(--bg-slate);
+  text-align: left;
+
+  .problem-details-confirm-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 8px 16px;
+    padding: 14px 0;
+
+    + .problem-details-confirm-row {
+      border-top: 1px solid var(--border-color);
+    }
+  }
+
+  .problem-details-confirm-label {
+    flex: 0 0 110px;
+    color: var(--text-sub);
+    font-size: 13px;
+  }
+
+  .problem-details-confirm-value {
+    flex: 1 1 180px;
+    color: var(--text);
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 1.6;
+    overflow-wrap: anywhere;
+  }
+
+  .problem-details-confirm-badge {
+    padding: 3px 12px;
+    border: 1px solid color-mix(in srgb, var(--primary) 45%, var(--border-color));
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--primary) 10%, var(--bg-card));
+    color: color-mix(in srgb, var(--primary) 55%, var(--text-header));
+    font-size: 13px;
+    font-weight: 600;
+  }
+}
+
 .swal2-confirm {
   background-color: var(--primary) !important;
   border-radius: 8px !important;
@@ -466,6 +512,69 @@ label {
 /* Remove button focus outline */
 .swal2-styled:focus {
   box-shadow: none !important;
+}
+
+[data-theme='dark'] {
+  .swal2-popup {
+    background-color: var(--bg-card) !important;
+    border: 1px solid var(--input-border-hover);
+    box-shadow: 0 24px 64px rgba(0, 0, 0, 0.55) !important;
+  }
+
+  .swal2-title {
+    color: var(--text-header);
+  }
+
+  .swal2-html-container,
+  .swal2-input-label {
+    color: var(--text);
+  }
+
+  .swal2-icon.swal2-question,
+  .swal2-icon.swal2-info {
+    color: #c7d2fe;
+    border-color: #a5b4fc;
+    background: color-mix(in srgb, var(--primary) 15%, var(--bg-card));
+  }
+
+  .swal2-confirm {
+    color: #ffffff;
+
+    &:hover {
+      background-color: color-mix(in srgb, var(--primary) 85%, white) !important;
+    }
+  }
+
+  .swal2-cancel {
+    border: 1px solid var(--input-border-hover);
+    color: var(--text-header);
+
+    &:hover {
+      background-color: var(--input-border-hover) !important;
+    }
+  }
+
+  .swal2-input,
+  .swal2-textarea,
+  .swal2-select {
+    background: var(--input-bg);
+    border-color: var(--input-border-hover);
+    color: var(--input-text);
+
+    &::placeholder {
+      color: var(--input-text-placeholder);
+    }
+  }
+
+  .swal2-validation-message {
+    background: var(--bg-slate);
+    color: var(--text);
+  }
+
+  .swal2-styled:focus-visible {
+    outline: 2px solid #c7d2fe;
+    outline-offset: 3px;
+  }
 }
 
 // it-service-request-spectfic.ts

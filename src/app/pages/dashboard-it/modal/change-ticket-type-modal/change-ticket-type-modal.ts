@@ -8,6 +8,7 @@ import {
   OnDestroy,
   Output,
   signal,
+  SimpleChanges,
 } from '@angular/core';
 import dayjs from 'dayjs';
 import { FormsModule } from '@angular/forms';
@@ -96,7 +97,9 @@ export class ChangeTicketTypeModal implements OnChanges, OnDestroy {
   isPreviewModalOpen = signal(false);
   previewFiles = signal<FilePreviewItem[]>([]);
 
-  ngOnChanges(): void {
+  ngOnChanges(changes: SimpleChanges): void {
+    if (!changes['ticket']) return;
+
     this.closePreview();
     this.selectedTypeId = Number(this.ticket?.ticketTypeId ?? this.ticket?.ticket_type_id ?? 2);
     this.originalTypeId = this.selectedTypeId;
