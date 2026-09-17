@@ -86,7 +86,7 @@ export class ItProblemReportComponent implements OnInit {
   ccOptions = signal<{ label: string; value: string }[]>([]);
   readonly nzFilterOption = () => true;
   ccSearched = signal<boolean>(false);
-  readonly CC_CATEGORIES = ['BMS', 'Oracle', 'Onee App'];
+  readonly CC_CATEGORIES = ['BMS', 'Oracle', 'ONEE App'];
 
   // Editor
   // editorImagePaths: string[] = [];
