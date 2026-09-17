@@ -81,15 +81,15 @@
               } @else if (filteredEmployees.length === 0) {
                 <div class="picker-message">ไม่พบพนักงาน</div>
               } @else {
-                @for (emp of filteredEmployees; track emp.EmployeeID) {
+                @for (emp of filteredEmployees; track emp.codeempid) {
                   <button type="button" class="employee-item" (click)="addEmployee(emp)">
                     <div class="cc-avatar">
-                      <img [src]="getEmployeeImage(emp.EmployeeID)" (error)="onImgError($event)" />
+                      <img [src]="getEmployeeImage(emp.codeempid)" (error)="onImgError($event)" />
                     </div>
 
                     <div class="employee-info">
                       <strong>{{ getEmployeeName(emp) }}</strong>
-                      <span>{{ emp.ID }}</span>
+                      <span>{{ emp.codeempid }}</span>
                     </div>
 
                     <div class="employee-add-icon">

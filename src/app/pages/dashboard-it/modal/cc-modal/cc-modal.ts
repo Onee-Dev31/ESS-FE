@@ -11,8 +11,17 @@ import {
 import { CommonModule } from '@angular/common';
 import { environment } from '../../../../../environments/environment';
 import { ItServiceService } from '../../../../services/it-service.service';
-import { EmpAdService } from '../../../../services/emp-ad-service';
+import { MasterService } from '../../../../services/master.service';
 import { SwalService } from '../../../../services/swal.service';
+
+interface CcEmployee {
+  codeempid: string;
+  name: string;
+  nickname: string;
+  email: string;
+  department: string;
+  company: string;
+}
 
 @Component({
   selector: 'app-cc-modal',
@@ -31,8 +40,8 @@ export class CcModal implements OnInit, OnChanges {
   @Output() submitModal = new EventEmitter<any>();
   @Output() closeModal = new EventEmitter<void>();
 
-  employees: any[] = [];
-  filteredEmployees: any[] = [];
+  employees: CcEmployee[] = [];
+  filteredEmployees: CcEmployee[] = [];
 
   selectedCC: any[] = [];
 
@@ -41,7 +50,7 @@ export class CcModal implements OnInit, OnChanges {
   isSaving = false;
 
   constructor(
-    private empAdService: EmpAdService,
+    private masterService: MasterService,
     private itServiceService: ItServiceService,
     private swalService: SwalService,
   ) {}
@@ -82,19 +91,23 @@ export class CcModal implements OnInit, OnChanges {
       pageSize: 2000,
     };
 
-    console.log('getEmployees params:', params);
-
-    this.empAdService.getEmployees(params).subscribe({
+    this.masterService.getEmployees(params).subscribe({
       next: (res: any) => {
-        console.log('getEmployees response:', res);
-        console.log('getEmployees data:', res?.data);
+        const items = Array.isArray(res) ? res : Array.isArray(res?.data) ? res.data : [];
+        this.employees = items.map((emp: any): CcEmployee => {
+          const firstName = String(emp.FirstNameT ?? '').trim();
+          const lastName = String(emp.LastNameT ?? '').trim();
 
-        this.employees = Array.isArray(res) ? res : Array.isArray(res?.data) ? res.data : [];
-
-        console.log('employees:', this.employees);
-        console.log('first employee:', this.employees[0]);
-
-        this.filteredEmployees = [];
+          return {
+            codeempid: String(emp.EmployeeID ?? '').trim(),
+            name: String(emp.FullName ?? '').trim() || `${firstName} ${lastName}`.trim(),
+            nickname: String(emp.Nickname ?? '').trim(),
+            email: String(emp.Email ?? '').trim(),
+            department: String(emp.DepartmentName ?? emp.Department ?? '').trim(),
+            company: String(emp.CompanyName ?? '').trim(),
+          };
+        });
+        this.filterEmployees();
         this.isLoadingEmployees.set(false);
       },
       error: (err) => {
@@ -118,40 +131,25 @@ export class CcModal implements OnInit, OnChanges {
     const selectedCodes = new Set(this.selectedCC.map((cc) => String(cc.codeempid ?? '').trim()));
 
     this.filteredEmployees = this.employees.filter((emp) => {
-      const code = String(emp.EmployeeID ?? '').trim();
-
+      const code = this.getEmployeeCode(emp);
       if (!code || selectedCodes.has(code)) {
         return false;
       }
 
-      const firstName = String(emp.FirstNameT ?? '')
-        .trim()
-        .toLowerCase();
-      const lastName = String(emp.LastNameT ?? '')
-        .trim()
-        .toLowerCase();
-      const nickname = String(emp.nickname ?? '')
-        .trim()
-        .toLowerCase();
-
-      const fullName = `${firstName} ${lastName}`.trim();
-
       return (
         code.toLowerCase().includes(keyword) ||
-        firstName.includes(keyword) ||
-        lastName.includes(keyword) ||
-        fullName.includes(keyword) ||
-        nickname.includes(keyword)
+        emp.name.toLowerCase().includes(keyword) ||
+        emp.nickname.toLowerCase().includes(keyword)
       );
     });
   }
 
-  getEmployeeCode(emp: any): string {
-    return String(emp?.ID ?? '').trim();
+  getEmployeeCode(emp: CcEmployee): string {
+    return emp.codeempid;
   }
 
-  trackEmployee(emp: any): string {
-    return String(emp.ID ?? emp.CODEMPID ?? emp.codeempid ?? emp.EMAIL ?? '');
+  trackEmployee(emp: CcEmployee): string {
+    return this.getEmployeeCode(emp);
   }
 
   onSearch(event: Event): void {
@@ -161,8 +159,8 @@ export class CcModal implements OnInit, OnChanges {
     this.filterEmployees();
   }
 
-  addEmployee(emp: any): void {
-    const code = String(emp.EmployeeID ?? '').trim();
+  addEmployee(emp: CcEmployee): void {
+    const code = this.getEmployeeCode(emp);
 
     if (!code) return;
 
@@ -175,9 +173,9 @@ export class CcModal implements OnInit, OnChanges {
       {
         codeempid: code,
         name: this.getEmployeeName(emp),
-        email: emp.Email ?? emp.email ?? '',
-        department: emp.Department ?? '',
-        company: emp.Company ?? '',
+        email: emp.email,
+        department: emp.department,
+        company: emp.company,
       },
     ];
 
@@ -192,14 +190,8 @@ export class CcModal implements OnInit, OnChanges {
     // คนที่ลบจะกลับมาในผลค้นหา
     this.filterEmployees();
   }
-  getEmployeeName(emp: any): string {
-    const firstName = String(emp.FirstNameT ?? '').trim();
-    const lastName = String(emp.LastNameT ?? '').trim();
-    const nickname = String(emp.nickname ?? '').trim();
-
-    const fullName = `${firstName} ${lastName}`.trim();
-
-    return nickname ? `${fullName} (${nickname})` : fullName;
+  getEmployeeName(emp: CcEmployee): string {
+    return emp.nickname ? `${emp.name} (${emp.nickname})` : emp.name;
   }
 
   async save(): Promise<void> {
