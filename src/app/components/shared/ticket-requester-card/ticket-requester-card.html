@@ -31,6 +31,10 @@
 
   @if (showContact) {
     <div class="requester-contact">
+      <div class="contact-item" title="AD User">
+        <i class="fa-solid fa-user" aria-hidden="true"></i>
+        <span>{{ requester.ad_user || '-' }}</span>
+      </div>
       <div class="contact-item">
         <i class="fa-regular fa-envelope" aria-hidden="true"></i>
         <span>{{ requester.email || '-' }}</span>
