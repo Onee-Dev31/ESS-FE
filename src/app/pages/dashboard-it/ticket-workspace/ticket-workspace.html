@@ -355,6 +355,14 @@
         <button class="btn btn-send" (click)="ReOpen()">
           <i class="fas fa-history"></i> Reopen
         </button>
+        <button
+          type="button"
+          class="btn btn-change-type"
+          *ngIf="+(t.ticketTypeId ?? t.ticket_type_id) === 2"
+          (click)="openProblemDetailsModal()"
+        >
+          <i class="fas fa-pen"></i> แก้ไขหมวดหมู่ปัญหา
+        </button>
       </ng-container>
     </section>
   </ng-template>
@@ -495,6 +503,16 @@
       validationMessage="กรุณากรอกเหตุผลในการปิดงาน"
       (closeModal)="closeCloseTicketModal()"
       (submitModal)="submitCloseTicket($event)"
+    />
+  }
+
+  @if (problemDetailsTicket(); as ticket) {
+    <app-change-ticket-type-modal
+      [ticket]="ticket"
+      [problemDetailsOnly]="true"
+      [saving]="savingProblemDetails()"
+      (closeModal)="closeProblemDetailsModal()"
+      (submitModal)="submitProblemDetails($event)"
     />
   }
 

@@ -414,6 +414,8 @@ export class TicketWorkspaceComponent implements OnInit, OnChanges {
   IS_HOLD_TICKET = signal(false);
   IS_CLOSE_TICKET = signal(false);
   IS_CHANGE_TICKET_TYPE = signal(false);
+  readonly problemDetailsTicket = signal<any | null>(null);
+  readonly savingProblemDetails = signal(false);
   IS_ONHOLD_TICKET = signal(false);
   IS_ACKNOWLEDGE_TICKET = signal(false);
   IS_NOTE_TICKET = signal(false);
@@ -2108,6 +2110,50 @@ export class TicketWorkspaceComponent implements OnInit, OnChanges {
 
   closeChangeTicketTypeModal() {
     this.IS_CHANGE_TICKET_TYPE.set(false);
+  }
+
+  openProblemDetailsModal(): void {
+    const ticket = this.selectedTicket();
+    if (ticket?.status !== 'Closed' || Number(ticket.ticketTypeId ?? ticket.ticket_type_id) !== 2) return;
+    this.problemDetailsTicket.set({ ...ticket });
+  }
+
+  closeProblemDetailsModal(): void {
+    if (!this.savingProblemDetails()) this.problemDetailsTicket.set(null);
+  }
+
+  submitProblemDetails(data: {
+    subCategoryId: number | null;
+    subCategoryName?: string;
+    problemSource: 'user' | 'system' | null;
+  }): void {
+    const ticket = this.problemDetailsTicket();
+    if (!ticket?.ticketId || this.savingProblemDetails() || !data.subCategoryId ||
+      (data.problemSource !== 'user' && data.problemSource !== 'system')) return;
+
+    this.savingProblemDetails.set(true);
+    this.itServiceService.updateSubcatProblemby({
+      ticketID: Number(ticket.ticketId),
+      subCategoryID: data.subCategoryId,
+      problemBy: data.problemSource,
+    }).pipe(finalize(() => this.savingProblemDetails.set(false))).subscribe({
+      next: (res) => {
+        if (res?.success === false) {
+          this.swalService.warning(res.message || 'บันทึกหมวดหมู่และปัญหาไม่สำเร็จ');
+          return;
+        }
+        const update = (item: any) => item && isSameTicketId(item.ticketId, ticket.ticketId)
+          ? { ...item, subCategoryId: data.subCategoryId, sub_category_id: data.subCategoryId,
+              ticketCategory: data.subCategoryName, sub_category_name: data.subCategoryName,
+              problemBy: data.problemSource }
+          : item;
+        this.selectedTicket.update(update);
+        this.Tickets.update((items) => items.map(update));
+        this.problemDetailsTicket.set(null);
+        this.swalService.success('บันทึกหมวดหมู่และปัญหาสำเร็จ');
+      },
+      error: () => this.swalService.warning('บันทึกหมวดหมู่และปัญหาไม่สำเร็จ กรุณาลองใหม่'),
+    });
   }
 
   submitChangeTicketType(data: {

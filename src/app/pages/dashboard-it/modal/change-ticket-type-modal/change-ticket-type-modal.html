@@ -1,5 +1,5 @@
 <app-modal-shell
-  title="เปลี่ยนประเภทคำขอ"
+  [title]="problemDetailsOnly ? 'แก้ไขหมวดหมู่ปัญหา' : 'เปลี่ยนประเภทคำขอ'"
   size="sm"
   [padded]="false"
   [showClose]="false"
@@ -8,21 +8,22 @@
   (closeModal)="closeModal.emit()"
 >
   <div class="content">
-    <div class="field-label">เลือกประเภทงาน<span>*</span></div>
-    <div class="type-options">
-      @for (type of availableTicketTypes; track type.id) {
-        <button
-          type="button"
-          class="type-option"
-          [class.selected]="selectedTypeId === type.id"
-          [disabled]="isTypeChangeLocked"
-          (click)="selectType(type.id)"
-        >
-          {{ type.label }}
-        </button>
-      }
-    </div>
-
+    @if (!problemDetailsOnly) {
+      <div class="field-label">เลือกประเภทงาน<span>*</span></div>
+      <div class="type-options">
+        @for (type of availableTicketTypes; track type.id) {
+          <button
+            type="button"
+            class="type-option"
+            [class.selected]="selectedTypeId === type.id"
+            [disabled]="isTypeChangeLocked"
+            (click)="selectType(type.id)"
+          >
+            {{ type.label }}
+          </button>
+        }
+      </div>
+    }
     @if (selectedTypeId === 2) {
       <fieldset class="problem-field">
         <legend class="field-label">หมวดหมู่ปัญหา<span>*</span></legend>
@@ -37,8 +38,13 @@
           <div class="type-options">
             @for (category of categories(); track category.id) {
               <label class="type-option" [class.selected]="selectedCategory === category.id">
-                <input type="radio" name="subCategory" [value]="category.id"
-                  [(ngModel)]="selectedCategory" [disabled]="isTypeChangeLocked" />
+                <input
+                  type="radio"
+                  name="subCategory"
+                  [value]="category.id"
+                  [(ngModel)]="selectedCategory"
+                  [disabled]="isTypeChangeLocked"
+                />
                 {{ category.sub_category_name }}
               </label>
             } @empty {
@@ -51,13 +57,23 @@
         <legend class="field-label">ปัญหา<span>*</span></legend>
         <div class="type-options">
           <label class="type-option" [class.selected]="problemSource === 'user'">
-            <input type="radio" name="problemSource" value="user"
-              [(ngModel)]="problemSource" [disabled]="isTypeChangeLocked" />
+            <input
+              type="radio"
+              name="problemSource"
+              value="user"
+              [(ngModel)]="problemSource"
+              [disabled]="isTypeChangeLocked"
+            />
             user
           </label>
           <label class="type-option" [class.selected]="problemSource === 'system'">
-            <input type="radio" name="problemSource" value="system"
-              [(ngModel)]="problemSource" [disabled]="isTypeChangeLocked" />
+            <input
+              type="radio"
+              name="problemSource"
+              value="system"
+              [(ngModel)]="problemSource"
+              [disabled]="isTypeChangeLocked"
+            />
             system
           </label>
         </div>
@@ -171,11 +187,11 @@
   </div>
 
   <div modalFooter class="modal-actions">
-    <button type="button" class="modal-button" (click)="closeModal.emit()">
+    <button type="button" class="modal-button" [disabled]="saving" (click)="closeModal.emit()">
       <i class="fas fa-times"></i> ยกเลิก
     </button>
     <button type="button" class="modal-button primary" [disabled]="!canSubmit" (click)="save()">
-      <i class="fas fa-paper-plane"></i> ยืนยัน
+      <i class="fas fa-paper-plane"></i> {{ saving ? 'กำลังบันทึก...' : 'ยืนยัน' }}
     </button>
   </div>
 </app-modal-shell>

@@ -2639,6 +2639,11 @@
     --btn-border: var(--btn-close-border);
     --btn-bg: var(--btn-close-bg);
   }
+
+  &.btn-change-type {
+    --btn-border: #7575cda1;
+    --btn-bg: #7575cd;
+  }
 }
 
 /* empty */

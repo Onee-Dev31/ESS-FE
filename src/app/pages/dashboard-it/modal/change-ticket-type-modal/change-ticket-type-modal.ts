@@ -29,11 +29,14 @@ import {
 })
 export class ChangeTicketTypeModal implements OnChanges, OnDestroy {
   @Input() ticket: any;
+  @Input() problemDetailsOnly = false;
+  @Input() saving = false;
   @Output() closeModal = new EventEmitter<void>();
   @Output() submitModal = new EventEmitter<{
     ticketTypeId: number;
     subCategoryId: number | null;
     problemSource: 'user' | 'system' | null;
+    subCategoryName?: string;
     repairCostType?: 'paid' | 'free';
     reason: string;
     attachments: { name: string; size: number; file: File }[];
@@ -276,6 +279,7 @@ export class ChangeTicketTypeModal implements OnChanges, OnDestroy {
   }
 
   get canSubmit(): boolean {
+    if (this.saving) return false;
     if (this.isTypeChangeLocked || (this.selectedTypeId === 3 && !this.isViaEmail)) return false;
     if (!this.hasTypeChanged && !this.hasRepairCostChanged && !this.hasProblemDetailsChanged)
       return false;
@@ -314,6 +318,7 @@ export class ChangeTicketTypeModal implements OnChanges, OnDestroy {
       ticketTypeId: this.selectedTypeId,
       subCategoryId: this.selectedTypeId === 2 ? this.selectedCategory : null,
       problemSource: this.selectedTypeId === 2 ? this.problemSource : null,
+      subCategoryName: this.categories().find((category) => category.id === this.selectedCategory)?.sub_category_name,
       ...(this.selectedTypeId === 1 && { repairCostType: this.repairCostType! }),
       reason: this.reason.trim(),
       attachments: this.attachments,
