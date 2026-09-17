@@ -13,6 +13,7 @@ import { TicketStatusAudience } from '../ticket-status-pill/ticket-status.model'
 import { TextEditorComponent } from '../text-editor/text-editor';
 import { SafeEmailHtmlPipe } from '../../../pipes/safe-email-html.pipe';
 import { ImageErrorFallbackDirective } from '../../../directives/image-error-fallback.directive';
+import { OpenDescriptionImageDirective } from '../../../directives/open-description-image.directive';
 
 @Component({
   selector: 'app-ticket-detail-card',
@@ -23,6 +24,7 @@ import { ImageErrorFallbackDirective } from '../../../directives/image-error-fal
     TextEditorComponent,
     SafeEmailHtmlPipe,
     ImageErrorFallbackDirective,
+    OpenDescriptionImageDirective,
   ],
   templateUrl: './ticket-detail-card.html',
   styleUrl: './ticket-detail-card.scss',
@@ -84,4 +86,5 @@ export class TicketDetailCardComponent implements OnChanges {
   confirmImages() {
     return this.textEditor!.confirmImages();
   }
+
 }

@@ -1,4 +1,5 @@
 import { CommonModule } from '@angular/common';
+import { OpenDescriptionImageDirective } from '../../../directives/open-description-image.directive';
 import {
   Component,
   inject,
@@ -82,6 +83,7 @@ import { PageLoaderComponent } from '../../../components/shared/page-loader/page
   selector: 'app-it-ticket-workspace',
   standalone: true,
   imports: [
+    OpenDescriptionImageDirective,
     CommonModule,
     FormsModule,
     NzSelectModule,

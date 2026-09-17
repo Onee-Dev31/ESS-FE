@@ -162,6 +162,10 @@
   min-height: calc(100% - 100px);
 }
 
+:host ::ng-deep .description img {
+  cursor: zoom-in;
+}
+
 .description {
   width: 100%;
   min-width: 0;

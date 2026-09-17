@@ -21,6 +21,7 @@ import { RatingModalComponent } from '../../components/modals/rating-modal/ratin
 import dayjs from 'dayjs';
 import { SafeEmailHtmlPipe } from '../../pipes/safe-email-html.pipe';
 import { ImageErrorFallbackDirective } from '../../directives/image-error-fallback.directive';
+import { OpenDescriptionImageDirective } from '../../directives/open-description-image.directive';
 import { ItServiceMockService, Ticket } from '../../services/it-service-mock.service';
 import { ItServiceService } from '../../services/it-service.service';
 import { AuthService } from '../../services/auth.service';
@@ -67,6 +68,7 @@ import {
   imports: [
     SafeEmailHtmlPipe,
     ImageErrorFallbackDirective,
+    OpenDescriptionImageDirective,
     CommonModule,
     FormsModule,
     FilePreviewModalComponent,

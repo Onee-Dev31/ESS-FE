@@ -584,6 +584,10 @@ label {
 }
 
 // Placeholder for an image that failed to load in ticket descriptions.
+[appOpenDescriptionImage] img {
+  cursor: zoom-in;
+}
+
 [appImageErrorFallback] .image-error-placeholder {
   display: inline-flex;
   align-items: center;
