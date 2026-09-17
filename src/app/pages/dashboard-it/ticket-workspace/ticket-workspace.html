@@ -351,9 +351,14 @@
       </div>
     </section>
     <section class="tk-actions" *ngIf="t.status === 'Closed'">
-      <ng-container>
+      <div class="btn-group">
         <button class="btn btn-send" (click)="ReOpen()">
           <i class="fas fa-history"></i> Reopen
+        </button>
+      </div>
+      <div class="btn-group">
+        <button type="button" class="btn btn-reply" (click)="openEmailReply()">
+          <i class="fa-solid btn-action-icon fa-reply-all"></i> ตอบกลับ
         </button>
         <button
           type="button"
@@ -363,7 +368,7 @@
         >
           <i class="fas fa-pen"></i> แก้ไขหมวดหมู่ปัญหา
         </button>
-      </ng-container>
+      </div>
     </section>
   </ng-template>
 
