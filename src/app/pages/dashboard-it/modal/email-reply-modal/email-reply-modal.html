@@ -3,7 +3,7 @@
     <header class="modal-header">
       <div>
         <h2><i class="fa-solid fa-reply-all"></i> ตอบกลับอีเมล</h2>
-        <p>{{ ticket?.ticketNumber }} · {{ ticket?.requesterEmail || ticket?.requesterName }}</p>
+        <p>{{ ticket?.ticketNumber }} · {{ ticket?.subject || ticket?.requesterName }}</p>
       </div>
       <button type="button" class="btn-close" (click)="close()" aria-label="ปิด">
         <i class="fa-solid fa-xmark"></i>
@@ -11,6 +11,33 @@
     </header>
 
     <div class="modal-body">
+      <div class="field-group">
+        <label>ถึง</label>
+        <input type="text" class="input-to" [value]="to" disabled />
+      </div>
+
+      <div class="field-group">
+        <label>สำเนาถึง (Cc)</label>
+        <div class="cc-tags">
+          @for (email of cc; track email; let i = $index) {
+            <span class="cc-tag">
+              {{ email }}
+              <button type="button" class="cc-tag-remove" (click)="removeCcTag(i)" aria-label="ลบ">
+                <i class="fa-solid fa-xmark"></i>
+              </button>
+            </span>
+          }
+          <input
+            type="text"
+            class="cc-input"
+            [(ngModel)]="ccInput"
+            (keydown)="onCcInputKeydown($event)"
+            (blur)="addCcTag()"
+            placeholder="เพิ่มอีเมล..."
+          />
+        </div>
+      </div>
+
       <label>ข้อความตอบกลับ <span>*</span></label>
       <app-text-editor
         [value]="message"

@@ -480,6 +480,10 @@ export class ItServiceService {
     return this._http.post(`${this.baseUrl}/tickets/${id}/reply-email`, payload);
   }
 
+  getReplyEmailRecipients(id: string | number): Observable<any> {
+    return this._http.get(`${this.baseUrl}/tickets/${id}/reply-email/recipients`);
+  }
+
   getDetailFromJobsByApplicant(id: string): Observable<any> {
     // return of({ success: true }).pipe(delay(1500));
     const token = this.authservice.allData().accessToken;
