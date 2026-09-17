@@ -38,8 +38,9 @@
                 </div>
 
                 @if (isItDashboard) {
-                  <button type="button" class="btn-remove-cc" (click)="removeCC(cc)" title="ลบ CC">
-                    <i class="fa-solid fa-xmark"></i>
+                  <button type="button" class="btn-remove-cc" (click)="removeCC(cc)"
+                    title="ลบผู้รับสำเนา" [attr.aria-label]="'ลบผู้รับสำเนา ' + cc.name">
+                    <i class="fa-regular fa-trash-can" aria-hidden="true"></i>
                   </button>
                 }
               </div>

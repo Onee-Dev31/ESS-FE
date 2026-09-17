@@ -4,6 +4,12 @@
 
 .modal-overlay {
   @include modal-overlay-styles;
+  color: var(--text);
+
+  button:focus-visible {
+    outline: 2px solid color-mix(in srgb, var(--primary) 55%, var(--text-header));
+    outline-offset: -2px;
+  }
 
   .top-header-strip {
     display: flex;
@@ -49,6 +55,7 @@
       font-size: $font-size-body;
 
       &:hover {
+        background: var(--bg-table-hover);
         color: var(--danger);
         transform: rotate(90deg);
       }
@@ -91,7 +98,7 @@
 
       .btn-close-modal {
         @include close-btn-style;
-        color: var(--text-muted);
+        color: var(--text-sub);
         width: 36px;
         height: 36px;
         font-size: 1.25rem;
@@ -154,7 +161,7 @@
 
         .sub-text {
           font-size: 0.95rem;
-          color: var(--text-muted);
+          color: var(--text-sub);
           font-weight: 400;
           display: block;
         }
@@ -211,6 +218,11 @@
       border-radius: 12px;
       font-weight: 600;
       font-size: $font-size-label;
+
+      &:hover {
+        border-color: var(--primary);
+        color: color-mix(in srgb, var(--primary) 55%, var(--text-header));
+      }
     }
 
     .btn-save-custom {
@@ -229,7 +241,7 @@
       &:disabled {
         background: var(--border-color);
         border-color: var(--border-color);
-        color: var(--text-muted);
+        color: var(--text-sub);
         cursor: not-allowed;
         box-shadow: none;
         opacity: 0.8;
@@ -242,7 +254,7 @@
   width: 100%;
   height: 48px !important;
   padding: 0 20px !important;
-  border: 1px solid var(--text-muted) !important;
+  border: 1px solid var(--text-sub) !important;
   border-radius: 50px !important;
   font-size: 0.95rem !important;
   color: var(--text) !important;
@@ -251,7 +263,7 @@
   font-family: $font-main;
 
   &::placeholder {
-    color: var(--text-muted);
+    color: var(--text-sub);
     font-weight: 400;
   }
 
@@ -277,7 +289,7 @@
   &.disabled,
   &:disabled {
     background: var(--input-disabled-bg) !important;
-    color: var(--text-muted) !important;
+    color: var(--text-sub) !important;
     border-color: var(--input-disabled-border) !important;
     cursor: not-allowed;
     opacity: 1;
@@ -345,7 +357,7 @@ textarea.form-input {
 .chip-remove {
   border: none;
   background: transparent;
-  color: var(--text-muted);
+  color: var(--text-sub);
   cursor: pointer;
   font-size: 11px;
   padding: 0;
@@ -375,7 +387,7 @@ textarea.form-input {
 }
 
 .cc-item:hover {
-  background: #f7f7f7;
+  background: var(--bg-table-hover);
 }
 
 /* avatar */
@@ -383,8 +395,8 @@ textarea.form-input {
   width: 36px;
   height: 36px;
   border-radius: 50%;
-  background: #e6f0ff;
-  color: #1890ff;
+  background: color-mix(in srgb, var(--primary) 12%, var(--bg-card));
+  color: color-mix(in srgb, var(--primary) 55%, var(--text-header));
   display: flex;
   align-items: center;
   justify-content: center;
@@ -409,13 +421,13 @@ textarea.form-input {
 .cc-name {
   font-size: 13px;
   font-weight: 500;
-  color: #222;
+  color: var(--text);
 }
 
 /* meta line */
 .cc-meta {
   font-size: 11px;
-  color: #888;
+  color: var(--text-sub);
   display: flex;
   flex-wrap: wrap;
   gap: 4px;
@@ -423,13 +435,13 @@ textarea.form-input {
 
 /* email */
 .cc-email {
-  color: #666;
+  color: var(--text-sub);
 }
 
 /* empty */
 .empty {
   text-align: center;
-  color: #aaa;
+  color: var(--text-sub);
   font-size: 12px;
   padding: 20px 0;
 }
@@ -440,18 +452,18 @@ textarea.form-input {
   align-items: center;
   gap: 6px;
   padding: 8px 16px;
-  border: 1.5px dashed #d9d9d9;
+  border: 1.5px dashed var(--border-color);
   border-radius: 8px;
   background: none;
-  color: #555;
+  color: var(--text-sub);
   font-size: 13px;
   cursor: pointer;
   transition: all 0.2s;
 
   &:hover {
-    border-color: #1890ff;
-    color: #1890ff;
-    background: #e6f4ff;
+    border-color: color-mix(in srgb, var(--primary) 55%, var(--text-header));
+    color: color-mix(in srgb, var(--primary) 55%, var(--text-header));
+    background: color-mix(in srgb, var(--primary) 12%, var(--bg-card));
   }
 }
 
@@ -474,7 +486,7 @@ textarea.form-input {
   border-radius: 8px;
 
   background: transparent;
-  color: var(--text-muted);
+  color: var(--text-sub);
 
   cursor: pointer;
   transition: all 0.15s ease;
@@ -496,7 +508,7 @@ textarea.form-input {
   border-radius: 999px;
 
   background: var(--bg-table-head);
-  color: var(--text-muted);
+  color: var(--text-sub);
 
   font-size: 11px;
   font-weight: 600;
@@ -513,7 +525,7 @@ textarea.form-input {
   border: 1px dashed var(--border-color);
   border-radius: 10px;
 
-  color: var(--text-muted);
+  color: var(--text-sub);
 
   > i {
     font-size: 18px;
@@ -545,6 +557,8 @@ textarea.form-input {
 }
 
 .picker-header {
+  background: var(--bg-table-head);
+  color: var(--text-header);
   height: 42px;
   padding: 0 14px;
 
@@ -561,12 +575,18 @@ textarea.form-input {
   button {
     border: 0;
     background: transparent;
-    color: var(--text-muted);
+    color: var(--text-sub);
     cursor: pointer;
   }
 }
 
 .employee-search {
+  background: var(--input-bg);
+
+  &:focus-within {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--primary) 20%, transparent);
+  }
   margin: 10px;
   padding: 0 12px;
 
@@ -580,7 +600,7 @@ textarea.form-input {
   border-radius: 8px;
 
   i {
-    color: var(--text-muted);
+    color: var(--text-sub);
     font-size: 12px;
   }
 
@@ -592,6 +612,10 @@ textarea.form-input {
     font-family: inherit;
     font-size: 12px;
     color: var(--text);
+    &::placeholder {
+      color: var(--input-text-placeholder);
+      opacity: 1;
+    }
   }
 }
 
@@ -639,7 +663,7 @@ textarea.form-input {
 
   span {
     font-size: 11px;
-    color: var(--text-muted);
+    color: var(--text-sub);
   }
 }
 
@@ -652,10 +676,10 @@ textarea.form-input {
   align-items: center;
   justify-content: center;
 
-  color: var(--primary);
+  color: color-mix(in srgb, var(--primary) 55%, var(--text-header));
   background: color-mix(in srgb, var(--primary), transparent 90%);
 
-  opacity: 0.65;
+  opacity: 1;
   transform: scale(0.9);
   transition: all 0.15s ease;
 
@@ -677,7 +701,7 @@ textarea.form-input {
 
   span {
     font-size: 10px;
-    color: var(--text-muted);
+    color: var(--text-sub);
   }
 }
 
@@ -698,6 +722,6 @@ textarea.form-input {
 .picker-message {
   padding: 20px;
   text-align: center;
-  color: var(--text-muted);
+  color: var(--text-sub);
   font-size: 12px;
 }
