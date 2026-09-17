@@ -42,7 +42,7 @@
     </div>
   }
 
-  <div class="cc-section">
+  <div class="cc-section" *ngIf="ccCount > 0 || (status !== 'Closed' && status !== 'Denied')">
     <div class="cc-info">
       <i class="fa-solid fa-user-group cc-icon"></i>
 
@@ -57,13 +57,15 @@
       </span>
     </div>
 
-    <button type="button" class="cc-action" (click)="ccClick.emit()">
-      @if (ccCount > 0) {
-        <span>จัดการ</span>
-      } @else {
-        <i class="fa-solid fa-plus"></i>
-        <span>เพิ่ม</span>
-      }
-    </button>
+    @if (status !== 'Closed' && status !== 'Denied') {
+      <button type="button" class="cc-action" (click)="ccClick.emit()">
+        @if (ccCount > 0) {
+          <span>จัดการ</span>
+        } @else {
+          <i class="fa-solid fa-plus"></i>
+          <span>เพิ่ม</span>
+        }
+      </button>
+    }
   </div>
 </section>

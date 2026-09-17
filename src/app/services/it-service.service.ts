@@ -475,7 +475,7 @@ export class ItServiceService {
 
   replyTicketEmail(
     id: string | number,
-    payload: { message: string; replyAll: boolean; executedBy: string },
+    payload: { message: string; replyAll: boolean; executedBy: string; cc?: string[] },
   ): Observable<any> {
     return this._http.post(`${this.baseUrl}/tickets/${id}/reply-email`, payload);
   }

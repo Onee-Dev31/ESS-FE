@@ -12,6 +12,7 @@ import { AvatarPreviewModal } from '../../modals/avatar-preview-modal/avatar-pre
 export class TicketRequesterCardComponent {
   @Input({ required: true }) requester!: any;
   @Input() ccCount = 0;
+  @Input() status = '';
   @Output() ccClick = new EventEmitter<void>();
 
   showContact = false;

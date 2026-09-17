@@ -386,6 +386,7 @@
       *ngIf="t.requester as requester"
       [requester]="requester"
       [ccCount]="t.ccList?.length || 0"
+      [status]="t.status"
       (ccClick)="openCcModal()"
     />
     <!-- Open For -->

@@ -896,6 +896,7 @@ export class TicketWorkspaceComponent implements OnInit, OnChanges {
     this.itServiceService
       .replyTicketEmail(data.id, {
         message: data.message,
+        cc: data.cc || [],
         replyAll: true,
         executedBy,
       })
