@@ -42,7 +42,7 @@ export class EmailReplyModal implements OnInit {
   isSubmitting = signal(false);
   isConfirming = signal(false);
 
-  to = '';
+  to:string[] = [];
   cc: string[] = [];
   ccInput = '';
   employees = signal<CcRecipient[]>([]);
@@ -128,8 +128,8 @@ export class EmailReplyModal implements OnInit {
       this.ticket?.viaEmail === 'true';
 
     if (!viaEmail) {
-      this.to = String(this.ticket?.requester?.email ?? '').trim();
-      if (!this.to) {
+      this.to = [String(this.ticket?.requester?.email ?? '').trim()];
+      if (!this.to[0]) {
         this.swalService.warning('Requester ไม่มี email', 'ไม่พบอีเมลของผู้ขอใช้บริการ กรุณาเพิ่มอีเมลก่อนส่งข้อความ');
       }
       const ccList = Array.isArray(this.ticket?.ccList) ? this.ticket.ccList : [];
@@ -384,7 +384,7 @@ export class EmailReplyModal implements OnInit {
           <div class="email-confirm-recipients">
             <div class="email-confirm-group">
               <div class="email-confirm-label"><i class="fa-regular fa-envelope" aria-hidden="true"></i> ถึง <span>ผู้รับหลัก</span></div>
-              <div class="email-confirm-chips"><span class="email-confirm-chip">${this.escapeHtml(this.to)}</span></div>
+              <div class="email-confirm-chips"><span class="email-confirm-chip">${this.escapeHtml(this.to[0])}</span></div>
             </div>
             <div class="email-confirm-group">
               <div class="email-confirm-label"><i class="fa-solid fa-user-group" aria-hidden="true"></i> Cc <span>${this.cc.length} รายการ</span></div>
@@ -421,7 +421,7 @@ export class EmailReplyModal implements OnInit {
 
         console.log('submit email reply', payload);
 
-        // this.submitModal.emit(payload);
+        this.submitModal.emit(payload);
         this.isSubmitting.set(false);
       },
       error: (error) => {
