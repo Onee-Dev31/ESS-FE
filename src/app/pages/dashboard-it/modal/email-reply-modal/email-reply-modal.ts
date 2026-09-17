@@ -13,6 +13,16 @@ import { FormsModule } from '@angular/forms';
 import { TextEditorComponent } from '../../../../components/shared/text-editor/text-editor';
 import { SwalService } from '../../../../services/swal.service';
 import { ItServiceService } from '../../../../services/it-service.service';
+import { MasterService } from '../../../../services/master.service';
+import { environment } from '../../../../../environments/environment';
+
+interface CcRecipient {
+  email: string;
+  employeeId: string;
+  nickname: string;
+  nameThai: string;
+  nameEnglish: string;
+}
 
 @Component({
   selector: 'app-email-reply-modal',
@@ -30,19 +40,31 @@ export class EmailReplyModal implements OnInit {
   message = '';
   quotedMessage = '';
   isSubmitting = signal(false);
+  isConfirming = signal(false);
 
   to = '';
   cc: string[] = [];
   ccInput = '';
+  employees = signal<CcRecipient[]>([]);
+  ccSuggestionsOpen = false;
+  activeCcIndex = 0;
+  readonly employeeImageUrl = environment.employeeImageUrl;
+
+  onEmployeeImageError(event: Event): void {
+    const image = event.target as HTMLImageElement;
+    if (!image.src.endsWith('/user.png')) image.src = 'user.png';
+  }
 
   private readonly swalService = inject(SwalService);
   private readonly itServiceService = inject(ItServiceService);
+  private readonly masterService = inject(MasterService);
   private readonly cdr = inject(ChangeDetectorRef);
   private readonly replyNotice =
     'หากท่านมีคำถามหรือข้อมูลเพิ่มเติมเกี่ยวกับปัญหาดังกล่าว สามารถตอบกลับอีเมลนี้ได้ทันที';
 
   ngOnInit(): void {
     this.loadRecipients();
+    this.loadEmployees();
     const originalDescription = this.ticket?.description ?? '';
     if (!originalDescription) {
       this.message = '';
@@ -99,6 +121,27 @@ export class EmailReplyModal implements OnInit {
   }
 
   private loadRecipients(): void {
+    const viaEmail =
+      this.ticket?.viaEmail === true ||
+      this.ticket?.viaEmail === 1 ||
+      this.ticket?.viaEmail === '1' ||
+      this.ticket?.viaEmail === 'true';
+
+    if (!viaEmail) {
+      this.to = String(this.ticket?.requester?.email ?? '').trim();
+      if (!this.to) {
+        this.swalService.warning('Requester ไม่มี email', 'ไม่พบอีเมลของผู้ขอใช้บริการ กรุณาเพิ่มอีเมลก่อนส่งข้อความ');
+      }
+      const ccList = Array.isArray(this.ticket?.ccList) ? this.ticket.ccList : [];
+      const emails = ccList
+        .map((cc: any) => String(typeof cc === 'string' ? cc : cc?.email ?? cc?.EMAIL ?? '').trim())
+        .filter((email: string) => this.isValidEmail(email));
+      this.cc = [...new Map<string, string>(
+        emails.map((email: string): [string, string] => [email.toLowerCase(), email]),
+      ).values()];
+      return;
+    }
+
     const ticketId = this.ticket?.ticketId;
     if (!ticketId) return;
 
@@ -119,11 +162,85 @@ export class EmailReplyModal implements OnInit {
     });
   }
 
+  private loadEmployees(): void {
+    const params = {
+      pageNumber: 1,
+      pageSize: 2000,
+    };
+
+    this.masterService.getEmployees(params).subscribe({
+      next: (res: any) => {
+        const items = Array.isArray(res) ? res : Array.isArray(res?.data) ? res.data : [];
+        const recipients = items.map((employee: any): CcRecipient => ({
+          email: String(employee.Email ?? '').trim(),
+          employeeId: String(employee.EmployeeID ?? '').trim(),
+          nickname: String(employee.Nickname ?? '').trim(),
+          nameThai:
+            String(employee.FullName ?? employee.NameThai ?? '').trim() ||
+            `${employee.FirstNameT ?? ''} ${employee.LastNameT ?? ''}`.trim(),
+          nameEnglish:
+            `${employee.FirstName ?? ''} ${employee.LastName ?? ''}`.trim() ||
+            String(employee.NameEng ?? '').trim(),
+        }));
+        const unique = new Map<string, CcRecipient>();
+        for (const recipient of recipients) {
+          if (this.isValidEmail(recipient.email)) {
+            unique.set(recipient.email.toLowerCase(), recipient);
+          }
+        }
+        this.employees.set([...unique.values()]);
+      },
+      error: () => {
+        this.employees.set([]);
+      },
+    });
+  }
+
+  get ccSuggestions(): CcRecipient[] {
+    const keyword = this.ccInput.trim().toLowerCase();
+    if (!keyword) return [];
+    const selected = new Set(this.cc.map((email) => email.toLowerCase()));
+    return this.employees()
+      .filter(
+        (employee) =>
+          !selected.has(employee.email.toLowerCase()) &&
+          [
+            employee.email,
+            employee.nameThai,
+            employee.nameEnglish,
+            employee.nickname,
+            employee.employeeId,
+          ].some((value) => value.toLowerCase().includes(keyword)),
+      )
+      .slice(0, 10);
+  }
+
+  onCcInputChange(): void {
+    this.activeCcIndex = 0;
+    this.ccSuggestionsOpen = true;
+  }
+
+  selectCcRecipient(recipient: CcRecipient): void {
+    this.ccInput = recipient.email;
+    this.addCcTag();
+    this.ccSuggestionsOpen = false;
+    this.activeCcIndex = 0;
+  }
+
+  onCcBlur(): void {
+    this.ccSuggestionsOpen = false;
+    this.addCcTag();
+  }
+
+  private isValidEmail(email: string): boolean {
+    return /^[^\s@,]+@[^\s@,]+\.[^\s@,]+$/.test(email);
+  }
+
   addCcTag(): void {
     const value = this.ccInput.trim().replace(/,$/, '');
+    if (!value || !this.isValidEmail(value)) return;
     this.ccInput = '';
-    if (!value) return;
-    if (this.cc.includes(value)) return;
+    if (this.cc.some((email) => email.toLowerCase() === value.toLowerCase())) return;
 
     this.cc.push(value);
   }
@@ -133,9 +250,37 @@ export class EmailReplyModal implements OnInit {
   }
 
   onCcInputKeydown(event: KeyboardEvent): void {
-    if (event.key === 'Enter' || event.key === ',') {
+    if (event.isComposing) return;
+    if (event.key === 'Backspace' && this.ccInput === '' && this.cc.length > 0) {
       event.preventDefault();
-      this.addCcTag();
+      if (!event.repeat) this.removeCcTag(this.cc.length - 1);
+      return;
+    }
+    const suggestions = this.ccSuggestions;
+    if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
+      event.preventDefault();
+      if (!suggestions.length) return;
+      if (!this.ccSuggestionsOpen) {
+        this.activeCcIndex = 0;
+      } else {
+        const step = event.key === 'ArrowDown' ? 1 : -1;
+        this.activeCcIndex = (this.activeCcIndex + step + suggestions.length) % suggestions.length;
+      }
+      this.ccSuggestionsOpen = true;
+    } else if (event.key === 'Escape') {
+      this.ccSuggestionsOpen = false;
+    } else if (event.key === 'Enter' || event.key === ',') {
+      event.preventDefault();
+      if (
+        event.key === 'Enter' &&
+        this.ccSuggestionsOpen &&
+        suggestions.length &&
+        !this.isValidEmail(this.ccInput.trim())
+      ) {
+        this.selectCcRecipient(suggestions[this.activeCcIndex] ?? suggestions[0]);
+      } else {
+        this.addCcTag();
+      }
     }
   }
 
@@ -220,8 +365,46 @@ export class EmailReplyModal implements OnInit {
     this.closeModal.emit();
   }
 
-  submit(): void {
-    if (!this.hasMessage || !this.ticket?.ticketId || this.isSubmitting()) return;
+  async submit(): Promise<void> {
+    if (!this.hasMessage || !this.ticket?.ticketId || this.isSubmitting() || this.isConfirming()) return;
+
+    this.addCcTag();
+    if (this.ccInput.trim()) {
+      this.swalService.warning('กรุณาตรวจสอบ Cc', 'กรุณาเลือกพนักงานหรือกรอกอีเมลให้ครบก่อนส่ง');
+      return;
+    }
+
+    this.isConfirming.set(true);
+    try {
+      const result = await this.swalService.confirm(
+        'ยืนยันการส่งอีเมล',
+        undefined,
+        `<div class="email-confirm-content">
+          <p class="email-confirm-intro">ตรวจสอบรายชื่อผู้รับให้ครบก่อนส่งข้อความ</p>
+          <div class="email-confirm-recipients">
+            <div class="email-confirm-group">
+              <div class="email-confirm-label"><i class="fa-regular fa-envelope" aria-hidden="true"></i> ถึง <span>ผู้รับหลัก</span></div>
+              <div class="email-confirm-chips"><span class="email-confirm-chip">${this.escapeHtml(this.to)}</span></div>
+            </div>
+            <div class="email-confirm-group">
+              <div class="email-confirm-label"><i class="fa-solid fa-user-group" aria-hidden="true"></i> Cc <span>${this.cc.length} รายการ</span></div>
+              <div class="email-confirm-chips">${this.cc.length ? this.cc.map((email) => `<span class="email-confirm-chip">${this.escapeHtml(email)}</span>`).join('') : '<span class="email-confirm-empty">ไม่มีผู้รับสำเนา</span>'}</div>
+            </div>
+          </div>
+          <p class="email-confirm-note"><i class="fa-regular fa-circle-check" aria-hidden="true"></i> เมื่อข้อมูลถูกต้อง กด “ยืนยันส่งอีเมล” เพื่อดำเนินการ</p>
+        </div>`,
+        {
+          confirmButtonText: 'ยืนยันส่งอีเมล',
+          reverseButtons: true,
+          focusCancel: true,
+          iconHtml: '<i class="fa-regular fa-paper-plane" aria-hidden="true"></i>',
+          customClass: { popup: 'email-confirm-popup' },
+        },
+      );
+      if (!result.isConfirmed) return;
+    } finally {
+      this.isConfirming.set(false);
+    }
 
     this.isSubmitting.set(true);
     this.textEditor.confirmImages().subscribe({

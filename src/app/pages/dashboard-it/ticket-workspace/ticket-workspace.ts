@@ -862,17 +862,6 @@ export class TicketWorkspaceComponent implements OnInit, OnChanges {
     });
   }
 
-  canReplyToEmailTicket(ticket: any): boolean {
-    const viaEmail =
-      ticket?.viaEmail === true ||
-      ticket?.viaEmail === 1 ||
-      ticket?.viaEmail === '1' ||
-      ticket?.viaEmail === 'true';
-    const acknowledgedStatuses = ['In Progress', 'Assigned', 'ReOpened', 'Hold'];
-
-    return viaEmail && acknowledgedStatuses.includes(ticket?.status);
-  }
-
   openEmailReply(): void {
     this.IS_EMAIL_REPLY_MODAL.set(true);
   }
@@ -896,6 +885,7 @@ export class TicketWorkspaceComponent implements OnInit, OnChanges {
     this.itServiceService
       .replyTicketEmail(data.id, {
         message: data.message,
+        to: data.to || [],
         cc: data.cc || [],
         replyAll: true,
         executedBy,
@@ -1761,6 +1751,7 @@ export class TicketWorkspaceComponent implements OnInit, OnChanges {
 
     if (command === 'close') {
       formData.append('itResult', 'Closed');
+      formData.append('assignJson', JSON.stringify(assignees));
       if (comment) formData.append('reason', comment);
     }
 
@@ -1814,7 +1805,10 @@ export class TicketWorkspaceComponent implements OnInit, OnChanges {
       right: [...configuredActions.right],
     };
 
-    if (this.canReplyToEmailTicket(ticket)) {
+    const hasAcknowledgedOrAssigned = ['In Progress', 'Assigned', 'ReOpened'].includes(
+      ticket?.status,
+    );
+    if (hasAcknowledgedOrAssigned && actions.right.some((button) => button.class === 'btn-send')) {
       actions.right.unshift({
         label: 'ตอบกลับ',
         icon: 'fa-reply-all',
@@ -2417,7 +2411,7 @@ export class TicketWorkspaceComponent implements OnInit, OnChanges {
     this.IS_CLOSE_TICKET.set(false);
   }
 
-  submitCloseTicket(data: { reason: string }): void {
+  submitCloseTicket(data: { reason: string; assignees?: { id?: string | number | null }[] }): void {
     const ticket = this.selectedTicket();
     const ticketId = ticket?.ticketId;
     if (!ticketId) {
@@ -2425,9 +2419,24 @@ export class TicketWorkspaceComponent implements OnInit, OnChanges {
       return;
     }
 
+    const employeeCodes = [
+      ...(data.assignees
+        ? data.assignees.map((assignee) => assignee?.id)
+        : (ticket.assignments ?? []).map((assignee: any) => assignee?.codeempid)),
+      this.authService.userData()?.CODEMPID,
+    ];
+    const uniqueCodes = new Map<string, string>();
+    for (const value of employeeCodes) {
+      const code = String(value ?? '').trim();
+      if (code && !uniqueCodes.has(code.toLowerCase())) {
+        uniqueCodes.set(code.toLowerCase(), code);
+      }
+    }
+    const assignees = [...uniqueCodes.values()].map((codeempid) => ({ codeempid }));
+
     this.IS_CLOSE_TICKET.set(false);
     this.swalService.loading('กำลังบันทึกข้อมูล...');
-    this.updateTicket('close', ticketId, '', null, data.reason).subscribe({
+    this.updateTicket('close', ticketId, '', assignees, data.reason).subscribe({
       next: (res) => {
         if (!res?.success) {
           this.swalService.warning('ไม่สามารถบันทึกข้อมูลได้');

@@ -239,6 +239,88 @@ label {
 }
 
 // Reset Password Swal — styled like edit modal
+.swal2-popup.email-confirm-popup {
+  width: min(540px, calc(100vw - 32px));
+  padding: 24px 0;
+  border: 1px solid var(--border-color);
+  border-radius: 20px;
+  background: var(--bg-card);
+  color: var(--text);
+  box-shadow: 0 24px 80px rgba(15, 23, 42, 0.2);
+
+  .swal2-icon {
+    width: 60px;
+    height: 60px;
+    margin: 0 auto 16px;
+    border: 0;
+    border-radius: 18px;
+    background: rgba(99, 102, 241, 0.1);
+    color: #8183f5;
+
+    .swal2-icon-content { font-size: 26px; }
+  }
+
+  .swal2-title {
+    padding: 0 24px;
+    color: var(--text-header);
+    font-size: 1.3rem;
+  }
+
+  .swal2-html-container { margin: 10px 24px 0; padding: 0; }
+  .swal2-actions { gap: 8px; margin: 20px 24px 0; }
+  .swal2-styled { border-radius: 10px; font-size: 0.9rem; }
+  .swal2-cancel {
+    background: var(--bg-body) !important;
+    color: var(--text) !important;
+    border: 1px solid var(--border-color);
+  }
+
+  .email-confirm-content { text-align: left; font-size: 0.85rem; }
+  .email-confirm-intro { margin: 0 0 20px; text-align: center; color: var(--text-muted); }
+  .email-confirm-recipients {
+    max-height: 260px;
+    overflow-y: auto;
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    background: var(--bg-body);
+  }
+  .email-confirm-group {
+    padding: 16px;
+    & + .email-confirm-group { border-top: 1px solid var(--border-color); }
+  }
+  .email-confirm-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 10px;
+    font-weight: 600;
+    color: var(--text-header);
+    i { color: var(--text-muted); }
+    span { margin-left: auto; color: var(--text-muted); font-size: 0.75rem; font-weight: 400; }
+  }
+  .email-confirm-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+  .email-confirm-chip {
+    max-width: 100%;
+    padding: 5px 10px;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    background: var(--bg-card);
+    color: var(--text);
+    font-size: 0.8rem;
+    overflow-wrap: anywhere;
+  }
+  .email-confirm-empty { color: var(--text-muted); font-size: 0.8rem; }
+  .email-confirm-note {
+    display: flex;
+    align-items: baseline;
+    gap: 7px;
+    margin: 14px 0 0;
+    color: var(--text-muted);
+    font-size: 0.75rem;
+    line-height: 1.6;
+  }
+}
+
 .swal-reset-popup {
   border-radius: 16px !important;
   padding: 28px 28px 20px !important;

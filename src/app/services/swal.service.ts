@@ -52,7 +52,12 @@ export class SwalService {
     });
   }
 
-  confirm(title: string, text?: string, html?: string) {
+  confirm(
+    title: string,
+    text?: string,
+    html?: string,
+    options?: Pick<SweetAlertOptions, 'confirmButtonText' | 'focusCancel' | 'customClass' | 'iconHtml' | 'reverseButtons'>,
+  ) {
     return Swal.fire({
       icon: 'question',
       title,
@@ -63,6 +68,7 @@ export class SwalService {
       cancelButtonText: 'ยกเลิก',
       confirmButtonColor: '#6366f1',
       cancelButtonColor: '#9ca3af',
+      ...options,
     });
   }
 

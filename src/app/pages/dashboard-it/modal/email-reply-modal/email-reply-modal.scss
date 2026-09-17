@@ -163,6 +163,151 @@
   background: transparent;
 }
 
+.cc-tags {
+  padding: 8px 12px;
+  transition: border-color 150ms, box-shadow 150ms;
+
+  &:focus-within {
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.12);
+  }
+}
+
+.cc-search-icon {
+  margin-right: 4px;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+}
+
+.cc-suggestions {
+  max-height: 280px;
+  overflow-y: auto;
+  padding: 5px;
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  margin-top: 8px;
+  background: var(--bg-card);
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
+  scrollbar-width: thin;
+
+  button {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    padding: 12px;
+    border: 1px solid transparent;
+    border-radius: 8px;
+    text-align: left;
+    font: inherit;
+    color: var(--text);
+    background: transparent;
+    cursor: pointer;
+    transition: background 150ms, border-color 150ms;
+
+    & + button { margin-top: 3px; }
+
+    &:hover,
+    &.active {
+      background: rgba(59, 130, 246, 0.07);
+      border-color: rgba(59, 130, 246, 0.2);
+
+      .cc-add-icon {
+        color: #fff;
+        background: #2563eb;
+      }
+    }
+  }
+}
+
+.cc-avatar {
+  flex: 0 0 42px;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid var(--bg-card);
+  background: var(--bg-body);
+}
+
+.cc-person {
+  display: flex;
+  flex: 1;
+  min-width: 0;
+  flex-direction: column;
+  gap: 3px;
+  overflow-wrap: anywhere;
+}
+
+.cc-person-heading {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 6px;
+  font-size: 0.9rem;
+  color: var(--text-header);
+}
+
+.cc-nickname,
+.cc-english-name {
+  color: var(--text-muted);
+  font-size: 0.8rem;
+}
+
+.cc-employee-code {
+  padding: 2px 6px;
+  border-radius: 5px;
+  background: rgba(59, 130, 246, 0.09);
+  color: var(--text);
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+}
+
+.cc-email {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--text);
+  font-size: 0.8rem;
+
+  i { color: var(--text-muted); font-size: 0.75rem; }
+}
+
+.cc-add-icon {
+  display: grid;
+  place-items: center;
+  flex: 0 0 28px;
+  height: 28px;
+  border-radius: 8px;
+  color: var(--text-muted);
+  background: var(--bg-body);
+  font-size: 0.75rem;
+}
+
+.cc-keyboard-hint {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 6px;
+  color: var(--text-muted);
+  font-size: 0.7rem;
+
+  kbd {
+    padding: 1px 4px;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    font: inherit;
+  }
+}
+
+@media (max-width: 480px) {
+  .cc-suggestions button { gap: 8px; padding: 10px 8px; }
+  .cc-add-icon { display: none; }
+  .cc-keyboard-hint { display: none; }
+}
+
 :host ::ng-deep .ql-editor blockquote {
   margin: 0 0 0 5px;
   padding: 0 0 0 12px;
