@@ -82,10 +82,16 @@
               (click)="changeTypeClick.emit()"
             >
               <strong>{{ ticket.ticketType }}</strong>
+              @if (ticket.problemBy) {
+                <small class="problem-source">({{ ticket.problemBy }})</small>
+              }
               <i class="fa-solid fa-pen"></i>
             </button>
           } @else {
             <strong>{{ ticket.ticketType }}</strong>
+            @if (ticket.problemBy) {
+              <small class="problem-source">({{ ticket.problemBy }})</small>
+            }
           }
         </div>
       }
