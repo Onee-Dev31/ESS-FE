@@ -1005,19 +1005,19 @@ export class TicketWorkspaceComponent implements OnInit, OnChanges {
   }
 
   filteredTickets(): any[] {
-    const statusMap: Record<string, string> = {
-      open: 'New',
-      reopen: 'Re-Opened',
-      assigned: 'In Progress',
-      done: 'Closed',
-      hold: 'Hold',
-      denied: 'Denied',
+    const statusMap: Record<string, string[]> = {
+      open: ['New'],
+      reopen: ['Re-Opened'],
+      assigned: ['In Progress', 'Assigned'],
+      done: ['Closed'],
+      hold: ['Hold'],
+      denied: ['Denied'],
     };
 
-    const mappedStatus = statusMap[this.filterStatus ?? ''];
+    const mappedStatuses = statusMap[this.filterStatus ?? ''] ?? [];
 
     return this.Tickets().filter((t: any) => {
-      const matchStatus = this.filterStatus === 'all' ? true : t.IT_Status === mappedStatus;
+      const matchStatus = this.filterStatus === 'all' || mappedStatuses.includes(t.IT_Status);
       return matchStatus;
     });
   }

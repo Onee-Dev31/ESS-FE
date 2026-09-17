@@ -1040,6 +1040,7 @@ export class Report {
   openTicketLogs(status: string): void {
     this.currentStatus = status;
     this.page = 1;
+    this.listing.currentPage.set(0);
     this.ticketLogs = [];
     this.isLogModalVisible = true;
     this.textClickFilter = 'status';
