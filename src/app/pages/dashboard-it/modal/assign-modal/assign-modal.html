@@ -30,7 +30,8 @@
             />
             <span>แจ้งปัญหา</span>
           </label>
-          <label class="tag">
+          <!-- ตอน DEPLOY PROD ยังไม่ให้มีแจ้งซ่อม และ ขอใช้บริการ -->
+          <!-- <label class="tag">
             <input
               type="radio"
               name="tag"
@@ -51,7 +52,7 @@
               />
               <span>ขอใช้บริการ</span>
             </label>
-          }
+          } -->
         </div>
       }
     </div>
@@ -70,7 +71,12 @@
           <div class="tag-group">
             @for (category of categories(); track category.id) {
               <label class="tag">
-                <input type="radio" name="subCategory" [value]="category.id" [(ngModel)]="selectedCategory" />
+                <input
+                  type="radio"
+                  name="subCategory"
+                  [value]="category.id"
+                  [(ngModel)]="selectedCategory"
+                />
                 <span>{{ category.sub_category_name }}</span>
               </label>
             } @empty {
@@ -180,12 +186,7 @@
     <button type="button" class="modal-button" (click)="close()">
       <i class="fas fa-times"></i> ยกเลิก
     </button>
-    <button
-      type="button"
-      class="modal-button primary"
-      [disabled]="!canSubmit"
-      (click)="save()"
-    >
+    <button type="button" class="modal-button primary" [disabled]="!canSubmit" (click)="save()">
       <i class="fas fa-paper-plane"></i>
       {{
         selectedAssigneeEmpCodes.length > 0

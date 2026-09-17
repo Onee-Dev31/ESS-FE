@@ -41,7 +41,9 @@ export class ChangeTicketTypeModal implements OnChanges, OnDestroy {
 
   private readonly swalService = inject(SwalService);
   private readonly itService = inject(ItServiceService);
-  readonly categories = signal<{ id: number; sub_category_name: string; display_order?: number }[]>([]);
+  readonly categories = signal<{ id: number; sub_category_name: string; display_order?: number }[]>(
+    [],
+  );
   readonly categoriesLoading = signal(false);
   readonly categoriesError = signal(false);
   selectedCategory: number | null = null;
@@ -50,8 +52,9 @@ export class ChangeTicketTypeModal implements OnChanges, OnDestroy {
 
   readonly ticketTypes = [
     { id: 2, label: 'แจ้งปัญหา' },
-    { id: 1, label: 'แจ้งซ่อม' },
-    { id: 3, label: 'ขอใช้บริการ' },
+    // ตอน DEPLOY PROD ยังไม่ให้มีแจ้งซ่อม และ ขอใช้บริการ
+    // { id: 1, label: 'แจ้งซ่อม' },
+    // { id: 3, label: 'ขอใช้บริการ' },
   ];
 
   get isViaEmail(): boolean {
@@ -95,9 +98,13 @@ export class ChangeTicketTypeModal implements OnChanges, OnDestroy {
     this.selectedTypeId = Number(this.ticket?.ticketTypeId ?? this.ticket?.ticket_type_id ?? 2);
     this.originalTypeId = this.selectedTypeId;
     this.selectedCategory = null;
-    const problemSource = String(this.ticket?.problemBy ?? '').trim().toLowerCase();
-    this.problemSource = this.selectedTypeId === 2 &&
-      (problemSource === 'user' || problemSource === 'system') ? problemSource : null;
+    const problemSource = String(this.ticket?.problemBy ?? '')
+      .trim()
+      .toLowerCase();
+    this.problemSource =
+      this.selectedTypeId === 2 && (problemSource === 'user' || problemSource === 'system')
+        ? problemSource
+        : null;
     this.restoreCategory();
     this.repairCostType =
       this.selectedTypeId === 1 && ['paid', 'free'].includes(this.ticket?.repair_cost_type)
@@ -120,9 +127,11 @@ export class ChangeTicketTypeModal implements OnChanges, OnDestroy {
     this.categoriesError.set(false);
     this.itService.getSubProblem().subscribe({
       next: (res) => {
-        this.categories.set([...(res.data ?? [])]
-          .map((category) => ({ ...category, id: Number(category.id) }))
-          .sort((a, b) => Number(a.display_order ?? 0) - Number(b.display_order ?? 0)));
+        this.categories.set(
+          [...(res.data ?? [])]
+            .map((category) => ({ ...category, id: Number(category.id) }))
+            .sort((a, b) => Number(a.display_order ?? 0) - Number(b.display_order ?? 0)),
+        );
         this.restoreCategory();
         this.categoriesLoading.set(false);
       },
@@ -137,9 +146,10 @@ export class ChangeTicketTypeModal implements OnChanges, OnDestroy {
     if (this.selectedTypeId !== 2 || this.selectedCategory !== null) return;
     const id = Number(this.ticket?.subCategoryId ?? this.ticket?.sub_category_id);
     const name = this.ticket?.ticketCategory ?? this.ticket?.sub_category_name;
-    this.selectedCategory = this.categories().find((category) =>
-      id ? category.id === id : category.sub_category_name === name,
-    )?.id ?? null;
+    this.selectedCategory =
+      this.categories().find((category) =>
+        id ? category.id === id : category.sub_category_name === name,
+      )?.id ?? null;
   }
 
   selectType(ticketTypeId: number): void {
@@ -254,33 +264,48 @@ export class ChangeTicketTypeModal implements OnChanges, OnDestroy {
     if (this.selectedTypeId !== 2) return false;
     const originalId = Number(this.ticket?.subCategoryId ?? this.ticket?.sub_category_id);
     const originalName = this.ticket?.ticketCategory ?? this.ticket?.sub_category_name;
-    const originalCategory = this.categories().find((category) =>
-      originalId ? category.id === originalId : category.sub_category_name === originalName,
-    )?.id ?? null;
-    const source = String(this.ticket?.problemBy ?? '').trim().toLowerCase();
+    const originalCategory =
+      this.categories().find((category) =>
+        originalId ? category.id === originalId : category.sub_category_name === originalName,
+      )?.id ?? null;
+    const source = String(this.ticket?.problemBy ?? '')
+      .trim()
+      .toLowerCase();
     const originalSource = source === 'user' || source === 'system' ? source : null;
     return this.selectedCategory !== originalCategory || this.problemSource !== originalSource;
   }
 
   get canSubmit(): boolean {
     if (this.isTypeChangeLocked || (this.selectedTypeId === 3 && !this.isViaEmail)) return false;
-    if (!this.hasTypeChanged && !this.hasRepairCostChanged && !this.hasProblemDetailsChanged) return false;
-    if (this.selectedTypeId === 2 && (
-      this.categoriesLoading() || this.categoriesError() ||
-      !this.categories().some((category) => category.id === this.selectedCategory) ||
-      (this.problemSource !== 'user' && this.problemSource !== 'system')
-    )) return false;
+    if (!this.hasTypeChanged && !this.hasRepairCostChanged && !this.hasProblemDetailsChanged)
+      return false;
+    if (
+      this.selectedTypeId === 2 &&
+      (this.categoriesLoading() ||
+        this.categoriesError() ||
+        !this.categories().some((category) => category.id === this.selectedCategory) ||
+        (this.problemSource !== 'user' && this.problemSource !== 'system'))
+    )
+      return false;
 
     return this.selectedTypeId !== 1 || this.repairCostType !== null;
   }
 
   save(): void {
     if (!this.canSubmit) return;
-    if ((this.hasTypeChanged || this.hasRepairCostChanged) && this.repairCostType === 'paid' && this.attachments.length === 0) {
+    if (
+      (this.hasTypeChanged || this.hasRepairCostChanged) &&
+      this.repairCostType === 'paid' &&
+      this.attachments.length === 0
+    ) {
       this.showAttachmentError = true;
       return;
     }
-    if ((this.hasTypeChanged || this.hasRepairCostChanged) && this.repairCostType === 'paid' && !this.reason.trim()) {
+    if (
+      (this.hasTypeChanged || this.hasRepairCostChanged) &&
+      this.repairCostType === 'paid' &&
+      !this.reason.trim()
+    ) {
       this.showReasonError = true;
       return;
     }
