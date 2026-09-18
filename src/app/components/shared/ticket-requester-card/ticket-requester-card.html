@@ -46,7 +46,7 @@
     </div>
   }
 
-  <div class="cc-section" *ngIf="ccCount > 0 || (status !== 'Closed' && status !== 'Denied')">
+  <div class="cc-section" *ngIf="ccCount > 0 || canManageCc">
     <div class="cc-info">
       <i class="fa-solid fa-user-group cc-icon"></i>
 
@@ -61,8 +61,13 @@
       </span>
     </div>
 
-    @if (status !== 'Closed' && status !== 'Denied') {
-      <button type="button" class="cc-action" (click)="ccClick.emit()">
+    @if (!canManageCc && ccCount > 0) {
+      <button type="button" class="cc-action" (click)="ccClick.emit(false)">
+        <i class="fa-regular fa-eye" aria-hidden="true"></i>
+        <span>ดูรายชื่อ</span>
+      </button>
+    } @else if (canManageCc) {
+      <button type="button" class="cc-action" (click)="ccClick.emit(true)">
         @if (ccCount > 0) {
           <span>จัดการ</span>
         } @else {

@@ -1201,7 +1201,10 @@ export class TicketWorkspaceComponent implements OnInit, OnChanges {
       .trim();
   }
 
-  openCcModal(): void {
+  canEditCcModal = false;
+
+  openCcModal(canEdit = false): void {
+    this.canEditCcModal = canEdit;
     this.isCcModalVisible = true;
   }
 

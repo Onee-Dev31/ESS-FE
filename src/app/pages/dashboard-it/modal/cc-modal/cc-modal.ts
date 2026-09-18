@@ -60,8 +60,8 @@ export class CcModal implements OnInit, OnChanges {
 
     this.executedBy = String(employee?.CODEMPID ?? '').trim();
 
-    console.log('executedBy:', this.executedBy);
-    this.loadEmployees();
+    // console.log('executedBy:', this.executedBy);
+    if (this.isItDashboard) this.loadEmployees();
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -160,6 +160,7 @@ export class CcModal implements OnInit, OnChanges {
   }
 
   addEmployee(emp: CcEmployee): void {
+    if (!this.isItDashboard) return;
     const code = this.getEmployeeCode(emp);
 
     if (!code) return;
@@ -183,6 +184,7 @@ export class CcModal implements OnInit, OnChanges {
   }
 
   removeCC(cc: any): void {
+    if (!this.isItDashboard) return;
     const code = cc.codeempid ?? cc.CODEMPID;
 
     this.selectedCC = this.selectedCC.filter((item) => (item.codeempid ?? item.CODEMPID) !== code);
@@ -195,6 +197,7 @@ export class CcModal implements OnInit, OnChanges {
   }
 
   async save(): Promise<void> {
+    if (!this.isItDashboard) return;
     if (!this.ticket?.ticketId && !this.ticket?.id) {
       return;
     }

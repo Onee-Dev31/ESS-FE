@@ -386,8 +386,10 @@
     *ngIf="t.requester as requester"
     [requester]="requester"
     [ccCount]="t.ccList?.length || 0"
-    [status]="t.status"
+    [assignments]="t.assignments || []"
+    [readOnly]="true"
     (ccClick)="openCcModal()"
+    [status]="t.status"
   />
   <!-- Open For -->
   <app-ticket-open-for-card *ngIf="t.openFor as openFor" [openFor]="openFor" />
@@ -437,7 +439,7 @@
 }
 
 @if (isCcModalVisible) {
-  <app-cc-modal [ticket]="selectedTicket()" (closeModal)="handleCancel()"> </app-cc-modal>
+  <app-cc-modal [ticket]="selectedTicket()" [isItDashboard]="false" (closeModal)="handleCancel()"> </app-cc-modal>
 }
 
 @if (isDetailModalOpen()) {

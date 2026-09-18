@@ -469,9 +469,9 @@ export class EmailReplyModal implements OnInit {
           attachments: [],
         };
 
-        console.log('submit email reply', payload);
+        // console.log('submit email reply', payload);
 
-        // this.submitModal.emit(payload);
+        this.submitModal.emit(payload);
         this.isSubmitting.set(false);
       },
       error: (error) => {
