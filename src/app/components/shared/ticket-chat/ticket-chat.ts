@@ -565,16 +565,25 @@ export class TicketChatComponent {
         adUser: this.ticket.requesterAduser || requester.aduser || '',
       });
     }
-    const timeline = this.ticket?.assignTimeline ?? [];
-    const latestStep = timeline.at(-1);
-    for (const assignee of latestStep?.Assignee ?? []) {
-      if (assignee.empCode && !seen.has(assignee.empCode)) {
-        seen.add(assignee.empCode);
+    for (const assignee of this.ticket?.assignments ?? []) {
+      if (assignee.codeempid && !seen.has(assignee.codeempid)) {
+        seen.add(assignee.codeempid);
         participants.push({
-          Nickname: assignee.nickName || assignee.fullName || '',
-          FullNameThai: assignee.fullName || '',
-          CODEEMPID: assignee.empCode,
+          Nickname: assignee.nickname || assignee.full_name || '',
+          FullNameThai: assignee.full_name || '',
+          CODEEMPID: assignee.codeempid,
           adUser: assignee.adUser || assignee.aduser || '',
+        });
+      }
+    }
+    for (const cc of this.ticket?.ccList ?? []) {
+      if (cc.codeempid && !seen.has(cc.codeempid)) {
+        seen.add(cc.codeempid);
+        participants.push({
+          Nickname: cc.nickname || cc.name || '',
+          FullNameThai: cc.name || '',
+          CODEEMPID: cc.codeempid,
+          adUser: cc.adUser || cc.aduser || '',
         });
       }
     }
