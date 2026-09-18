@@ -266,6 +266,8 @@
   border-radius: 999px;
   font-size: 0.75rem;
   font-weight: 600;
+  display: flex;
+  width: fit-content;
 
   &.active {
     background: var(--status-success-bg);
