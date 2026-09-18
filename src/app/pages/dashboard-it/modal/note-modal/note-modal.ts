@@ -30,7 +30,7 @@ export class NoteModal {
 
   readonly FILE_CONFIG = {
     maxFiles: 5,
-    maxSizeMB: 5,
+    maxSizeMB: 10,
     allowedTypes: [
       'image/jpeg',
       'image/png',

@@ -184,7 +184,14 @@
 
         @if (canSend) {
           <div class="floating-chat__composer">
-            <input type="file" multiple hidden #fileInput (change)="onFileSelected($event)" />
+            <input
+              type="file"
+              [accept]="acceptedFileTypes"
+              multiple
+              hidden
+              #fileInput
+              (change)="onFileSelected($event)"
+            />
             <button
               class="floating-chat__attach"
               type="button"

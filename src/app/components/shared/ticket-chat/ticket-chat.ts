@@ -52,7 +52,7 @@ export function isSameTicketId(left: unknown, right: unknown): boolean {
 
 export const TICKET_CHAT_FILE_CONFIG: TicketChatFileConfig = {
   maxFiles: 5,
-  maxSizeMB: 5,
+  maxSizeMB: 10,
   allowedTypes: [
     'image/jpeg',
     'image/png',
@@ -276,6 +276,9 @@ export class TicketChatComponent implements OnChanges {
 
   readonly emojiTabs = EMOJI_TABS;
   readonly fileConfig = TICKET_CHAT_FILE_CONFIG;
+  readonly acceptedFileTypes = TICKET_CHAT_FILE_CONFIG.allowedExtensions
+    .map((extension) => `.${extension}`)
+    .join(',');
   emojiPickerOpen = false;
   emojiPickerTab = 0;
   message = '';
