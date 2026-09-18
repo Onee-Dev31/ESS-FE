@@ -5,7 +5,9 @@ import {
   EventEmitter,
   inject,
   Input,
+  OnChanges,
   Output,
+  SimpleChanges,
   ViewChild,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
@@ -237,7 +239,7 @@ const EMOJI_TABS = [
   templateUrl: './ticket-chat.html',
   styleUrl: './ticket-chat.scss',
 })
-export class TicketChatComponent {
+export class TicketChatComponent implements OnChanges {
   @Input({ required: true }) ticket: any;
   @Input() visible = true;
   @Input() isOpen = false;
@@ -281,6 +283,12 @@ export class TicketChatComponent {
   mentionVisible = false;
   mentionResults: any[] = [];
   mentionActiveIndex = 0;
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['isOpen'] && !this.isOpen) {
+      this.clearDraft();
+    }
+  }
 
   get currentUserEmpCode(): string {
     return this.authService.userData()?.CODEMPID ?? '';
@@ -498,6 +506,7 @@ export class TicketChatComponent {
   clearDraft(): void {
     this.message = '';
     this.attachments = [];
+    this.emojiPickerOpen = false;
     this.pendingMentionAdUsers.clear();
     this.closeMention();
   }
