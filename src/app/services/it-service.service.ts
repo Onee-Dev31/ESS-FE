@@ -390,6 +390,7 @@ export class ItServiceService {
     sortOrder?: string;
     thenBy?: string;
     thenOrder?: string;
+    subProblemCategoryId?: number;
   }) {
     // console.log('getTicketByStatus()', params);
     let httpParams = new HttpParams();
@@ -409,6 +410,9 @@ export class ItServiceService {
     if (params.sortOrder) httpParams = httpParams.set('sortOrder', params.sortOrder);
     if (params.thenBy) httpParams = httpParams.set('thenBy', params.thenBy);
     if (params.thenOrder) httpParams = httpParams.set('thenOrder', params.thenOrder);
+    if (params.subProblemCategoryId != null) {
+      httpParams = httpParams.set('subProblemCategoryId', params.subProblemCategoryId);
+    }
 
     return this._http.get(`${this.baseUrl}/tickets/by-status`, { params: httpParams });
   }

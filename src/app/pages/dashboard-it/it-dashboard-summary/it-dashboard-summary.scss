@@ -875,8 +875,63 @@ body[data-theme='dark'] {
 
 // Ant Design controls use the global theme; this page only owns sizing/layout.
 .log-filter {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 16px 12px;
+  padding: 20px;
+  border: 1px solid var(--border-color);
+  border-radius: 14px;
+  background: var(--bg-slate);
+
   .form-field {
     min-width: 0;
+    width: 100%;
+    margin: 0;
+    gap: 6px;
+
+    &:has(.custom-range-picker) {
+      grid-column: span 2;
+    }
+
+    label {
+      margin: 0;
+      color: var(--text-sub);
+      font-size: 12px;
+      font-weight: 600;
+    }
+  }
+
+  .search-input,
+  .search-select,
+  .search-select-company,
+  .search-select-service-type {
+    width: 100%;
+    min-width: 0;
+    height: 44px;
+    box-sizing: border-box;
+  }
+
+  .filter-actions {
+    grid-column: 1 / -1;
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    padding-top: 14px;
+    border-top: 1px solid var(--border-color);
+
+    button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      height: 42px;
+      min-width: 108px;
+      margin: 0;
+    }
+  }
+
+  .search-input:not(:disabled) {
+    background: var(--bg-card);
   }
 
   nz-select {
@@ -888,7 +943,8 @@ body[data-theme='dark'] {
   }
 
   .custom-range-picker {
-    width: 240px;
+    width: 100%;
+    min-width: 0;
     height: 44px;
   }
 }
@@ -905,8 +961,16 @@ body[data-theme='dark'] {
   line-height: 42px;
 }
 
+@media (max-width: 1100px) {
+  .log-filter {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
 @media (max-width: 768px) {
   .log-filter {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    padding: 14px;
     .form-field,
     .search-input,
     .search-select,
@@ -914,6 +978,21 @@ body[data-theme='dark'] {
     .search-select-service-type,
     .custom-range-picker {
       width: 100%;
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .log-filter {
+    grid-template-columns: minmax(0, 1fr);
+
+    .form-field:has(.custom-range-picker) {
+      grid-column: auto;
+    }
+
+    .filter-actions button {
+      flex: 1;
+      min-width: 0;
     }
   }
 }

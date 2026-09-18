@@ -182,6 +182,7 @@ export class ItDashboardSummary {
     company: '',
     dateRange: null as [Date, Date] | null,
     serviceType: '',
+    subProblemCategoryId: null as number | null,
   };
   filterOriginal = {
     status: '',
@@ -192,10 +193,12 @@ export class ItDashboardSummary {
     company: '',
     dateRange: null as [Date, Date] | null,
     serviceType: '',
+    subProblemCategoryId: null as number | null,
   };
   textClickFilter: string = '';
   departmentList: any[] = [];
   companyList: any[] = [];
+  subProblemList: { id: number; sub_category_name: string }[] = [];
   filteredTicketLogs: any[] = [];
   filteredDepartmentList: any[] = [];
 
@@ -214,6 +217,13 @@ export class ItDashboardSummary {
     // this.getAllTickets();
     this.getCompanies();
     this.getDepartments();
+    this.itServiceService.getSubProblem().subscribe({
+      next: (res) => {
+        this.subProblemList = Array.isArray(res?.data) ? res.data : [];
+        this.cdr.markForCheck();
+      },
+      error: (error) => console.error('getSubProblem error:', error),
+    });
   }
 
   onSort(column: SortColumn): void {
@@ -825,7 +835,7 @@ export class ItDashboardSummary {
     const secondarySort = this.sorts[1];
 
     const params = {
-      status: this.statusLabelApi(this.currentStatus),
+      status: this.statusLabelApi(this.filter.status),
       page: this.listing.currentPage() + 1,
       pageSize: this.listing.pageSize(),
       ticketNo: this.filter.ticketNo || undefined,
@@ -834,6 +844,7 @@ export class ItDashboardSummary {
       company: this.filter.company || undefined,
       department: this.filter.department || undefined,
       serviceType: this.filter.serviceType || undefined,
+      subProblemCategoryId: this.filter.subProblemCategoryId ?? undefined,
       dateFrom: dateFrom ? dayjs(dateFrom).format('YYYY-MM-DD') : undefined,
       dateTo: dateTo ? dayjs(dateTo).format('YYYY-MM-DD') : undefined,
       isReal: false,
@@ -876,7 +887,9 @@ export class ItDashboardSummary {
   }
 
   clearFilter() {
-    this.filter = this.filterOriginal;
+    if (this.filterTimer) clearTimeout(this.filterTimer);
+    this.filter = { ...this.filterOriginal };
+    this.listing.currentPage.set(0);
     this.filteredDepartmentList = [];
     this.loadTickets();
   }
@@ -970,13 +983,15 @@ export class ItDashboardSummary {
       case 'New':
         return 'Open';
       default:
-        return this.currentStatus;
+        return status || 'All';
     }
   }
 
   private filterTimer: ReturnType<typeof setTimeout> | null = null;
 
   applyFilter() {
+    if (this.filterTimer) clearTimeout(this.filterTimer);
+    this.listing.currentPage.set(0);
     this.filterTimer = setTimeout(() => {
       this.loadTickets();
     }, 300);
@@ -994,6 +1009,7 @@ export class ItDashboardSummary {
       company: this.filter.company || undefined,
       department: this.filter.department || undefined,
       serviceType: this.filter.serviceType || undefined,
+      subProblemCategoryId: this.filter.subProblemCategoryId ?? undefined,
       dateFrom: dateFrom ? dayjs(dateFrom).format('YYYY-MM-DD') : undefined,
       dateTo: dateTo ? dayjs(dateTo).format('YYYY-MM-DD') : undefined,
       isReal: false,
@@ -1037,6 +1053,7 @@ export class ItDashboardSummary {
       company: this.filter.company || undefined,
       department: this.filter.department || undefined,
       serviceType: this.filter.serviceType || undefined,
+      subProblemCategoryId: this.filter.subProblemCategoryId ?? undefined,
       dateFrom: dateFrom ? dayjs(dateFrom).format('YYYY-MM-DD') : undefined,
       dateTo: dateTo ? dayjs(dateTo).format('YYYY-MM-DD') : undefined,
       isReal: false,

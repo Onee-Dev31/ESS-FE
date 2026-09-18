@@ -195,6 +195,7 @@ export class Report {
     company: '',
     dateRange: null as [Date, Date] | null,
     serviceType: '',
+    subProblemCategoryId: null as number | null,
   };
   filterOriginal = {
     status: '',
@@ -205,10 +206,12 @@ export class Report {
     company: '',
     dateRange: null as [Date, Date] | null,
     serviceType: '',
+    subProblemCategoryId: null as number | null,
   };
   textClickFilter: string = '';
   departmentList: any[] = [];
   companyList: any[] = [];
+  subProblemList: { id: number; sub_category_name: string }[] = [];
   filteredTicketLogs: any[] = [];
   filteredDepartmentList: any[] = [];
   constructor(
@@ -224,6 +227,13 @@ export class Report {
     this.getAllTickets();
     this.getCompanies();
     this.getDepartments();
+    this.itServiceService.getSubProblem().subscribe({
+      next: (res) => {
+        this.subProblemList = Array.isArray(res?.data) ? res.data : [];
+        this.cdr.markForCheck();
+      },
+      error: (error) => console.error('getSubProblem error:', error),
+    });
 
     this.themeObserver = new MutationObserver(() => {
       setTimeout(() => {
@@ -1072,6 +1082,7 @@ export class Report {
       company: this.filter.company || undefined,
       department: this.filter.department || undefined,
       serviceType: this.filter.serviceType || undefined,
+      subProblemCategoryId: this.filter.subProblemCategoryId ?? undefined,
       dateFrom: dateFrom ? dayjs(dateFrom).format('YYYY-MM-DD') : undefined,
       dateTo: dateTo ? dayjs(dateTo).format('YYYY-MM-DD') : undefined,
       isReal: true,
@@ -1105,7 +1116,9 @@ export class Report {
   }
 
   clearFilter() {
-    this.filter = this.filterOriginal;
+    if (this.filterTimer) clearTimeout(this.filterTimer);
+    this.filter = { ...this.filterOriginal };
+    this.listing.currentPage.set(0);
     this.filteredDepartmentList = [];
     this.loadTickets();
   }
@@ -1132,6 +1145,7 @@ export class Report {
       company: '',
       dateRange: null,
       serviceType: '',
+      subProblemCategoryId: null as number | null,
     };
     this.filterOriginal = {
       status: '',
@@ -1142,6 +1156,7 @@ export class Report {
       company: '',
       dateRange: null,
       serviceType: '',
+      subProblemCategoryId: null as number | null,
     };
     this.ticketLogs = [];
     this.page = 1;
@@ -1220,12 +1235,14 @@ export class Report {
       case 'New':
         return 'Open';
       default:
-        return this.currentStatus;
+        return status || 'All';
     }
   }
 
   private filterTimer: ReturnType<typeof setTimeout> | null = null;
   applyFilter() {
+    if (this.filterTimer) clearTimeout(this.filterTimer);
+    this.listing.currentPage.set(0);
     this.filterTimer = setTimeout(() => {
       this.loadTickets();
     }, 300);
@@ -1284,6 +1301,7 @@ export class Report {
       company: this.filter.company || undefined,
       department: this.filter.department || undefined,
       serviceType: this.filter.serviceType || undefined,
+      subProblemCategoryId: this.filter.subProblemCategoryId ?? undefined,
       dateFrom: dateFrom ? dayjs(dateFrom).format('YYYY-MM-DD') : undefined,
       dateTo: dateTo ? dayjs(dateTo).format('YYYY-MM-DD') : undefined,
       isReal: true,
@@ -1338,6 +1356,7 @@ export class Report {
       company: this.filter.company || undefined,
       department: this.filter.department || undefined,
       serviceType: this.filter.serviceType || undefined,
+      subProblemCategoryId: this.filter.subProblemCategoryId ?? undefined,
       dateFrom: dateFrom ? dayjs(dateFrom).format('YYYY-MM-DD') : undefined,
       dateTo: dateTo ? dayjs(dateTo).format('YYYY-MM-DD') : undefined,
       isReal: true,

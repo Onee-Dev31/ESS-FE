@@ -121,6 +121,23 @@
 
     <div class="log-modal-body">
       <div class="log-filter">
+        @if (textClickFilter === 'status' && currentStatus === 'All') {
+          <div class="form-field">
+            <label>Status</label>
+            <nz-select
+              nzShowSearch
+              class="search-select"
+              [(ngModel)]="filter.status"
+              (ngModelChange)="applyFilter()"
+            >
+              <nz-option
+                *ngFor="let k of kpis"
+                [nzLabel]="statusLabel(k.status)"
+                [nzValue]="statusLabel(k.status)"
+              />
+            </nz-select>
+          </div>
+        }
         <div class="form-field">
           <label>Ticket No</label>
           <input
@@ -210,6 +227,23 @@
           </nz-select>
         </div>
         <div class="form-field">
+          <label>หมวดหมู่ย่อย</label>
+          <nz-select
+            nzShowSearch
+            nzAllowClear
+            nzPlaceHolder="ทั้งหมด"
+            class="search-select"
+            [(ngModel)]="filter.subProblemCategoryId"
+            (ngModelChange)="applyFilter()"
+          >
+            <nz-option
+              *ngFor="let sub of subProblemList"
+              [nzLabel]="sub.sub_category_name"
+              [nzValue]="sub.id"
+            />
+          </nz-select>
+        </div>
+        <div class="form-field">
           <label>วันที่เริ่มต้น-วันที่สิ้นสุด</label>
           <nz-range-picker
             nzFormat="dd/MM/yyyy"
@@ -220,12 +254,14 @@
           />
         </div>
 
-        <button class="export-btn" (click)="exportData()">
-          <i class="fas fa-file-excel"></i> Export
-        </button>
-        <button class="btn-clear" (click)="clearFilter()">
-          <i class="fa-solid fa-arrows-rotate"></i>Clear
-        </button>
+        <div class="filter-actions">
+          <button class="export-btn" (click)="exportData()">
+            <i class="fas fa-file-excel"></i> Export
+          </button>
+          <button class="btn-clear" (click)="clearFilter()">
+            <i class="fa-solid fa-arrows-rotate"></i>Clear
+          </button>
+        </div>
       </div>
       <div class="log-summary">ทั้งหมด {{ listing.totalItems() }} รายการ</div>
 
