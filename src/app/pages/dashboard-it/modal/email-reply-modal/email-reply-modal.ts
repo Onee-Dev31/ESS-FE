@@ -74,32 +74,58 @@ export class EmailReplyModal implements OnInit {
     }
     const description = this.removePreviousReplyNotices(originalDescription);
 
-    const senderName = this.escapeHtml(String(this.ticket?.requesterName || 'ผู้ส่ง'));
-    const senderEmail = this.ticket?.requesterEmail
-      ? ` &lt;${this.escapeHtml(String(this.ticket.requesterEmail))}&gt;`
+    // const senderName = this.escapeHtml(String(this.ticket?.requesterName || 'ผู้ส่ง'));
+    // const senderEmail = this.ticket?.requesterEmail
+    //   ? ` &lt;${this.escapeHtml(String(this.ticket.requesterEmail))}&gt;`
+    //   : '';
+    // const sentAt = this.ticket?.createdDate ? new Date(this.ticket.createdDate) : null;
+    const hasEmailMessage = this.ticket?.hasEmailMessage === true;
+
+    const senderNameValue = hasEmailMessage
+      ? this.ticket?.lastEmailSenderName
+      : this.ticket?.requesterName;
+
+    const senderEmailValue = hasEmailMessage
+      ? this.ticket?.lastEmailSender
+      : this.ticket?.requesterEmail;
+
+    const sentAtValue = hasEmailMessage
+      ? this.ticket?.lastEmailReceivedAt
+      : this.ticket?.createdDate;
+    const senderName = senderNameValue ? this.escapeHtml(String(senderNameValue)) : '';
+
+    const senderEmail = senderEmailValue
+      ? ` &lt;${this.escapeHtml(String(senderEmailValue))}&gt;`
       : '';
-    const sentAt = this.ticket?.createdDate ? new Date(this.ticket.createdDate) : null;
+
+    const senderDisplay = senderName ? `${senderName}${senderEmail}` : senderEmail || 'ผู้ส่ง';
+
+    const sentAt = sentAtValue ? new Date(sentAtValue) : null;
+
     let datePrefix = '';
+
     if (sentAt && !Number.isNaN(sentAt.getTime())) {
-      const date = new Intl.DateTimeFormat('th-TH-u-ca-gregory', {
-        weekday: 'short',
+      const date = new Intl.DateTimeFormat('en-US', {
+        weekday: 'long',
         day: 'numeric',
-        month: 'short',
+        month: 'long',
         year: 'numeric',
         timeZone: 'Asia/Bangkok',
       }).format(sentAt);
-      const time = new Intl.DateTimeFormat('th-TH', {
+
+      const time = new Intl.DateTimeFormat('en-US', {
         hour: '2-digit',
         minute: '2-digit',
         hourCycle: 'h23',
         timeZone: 'Asia/Bangkok',
       }).format(sentAt);
-      datePrefix = `ในวันที่ ${date} เวลา ${time} `;
+
+      datePrefix = `On ${date} at ${time}, `;
     }
 
     const originalHeader = `
     <p>
-      ${datePrefix}${senderName}${senderEmail} เขียนว่า:
+      ${datePrefix}${senderDisplay} เขียนว่า:
     </p>
   `;
 
@@ -112,7 +138,6 @@ export class EmailReplyModal implements OnInit {
       ${this.replyNotice}
     </p>
   `;
-
     // Quill รับเฉพาะข้อความตอบใหม่
     this.message = '<p><br></p>';
 
@@ -431,7 +456,10 @@ export class EmailReplyModal implements OnInit {
     this.isSubmitting.set(true);
     this.textEditor.confirmImages().subscribe({
       next: (replyMessage) => {
-        const fullMessage = replyMessage + this.quotedMessage;
+        const fullMessage =
+          replyMessage +
+          `<hr style="border:0;border-top:1px solid #dadce0;margin:16px 0;"/>` +
+          this.quotedMessage;
 
         const payload = {
           id: this.ticket.ticketId,
@@ -441,9 +469,9 @@ export class EmailReplyModal implements OnInit {
           attachments: [],
         };
 
-        // console.log('submit email reply', payload);
+        console.log('submit email reply', payload);
 
-        this.submitModal.emit(payload);
+        // this.submitModal.emit(payload);
         this.isSubmitting.set(false);
       },
       error: (error) => {

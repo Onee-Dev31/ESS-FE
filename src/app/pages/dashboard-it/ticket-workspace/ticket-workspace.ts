@@ -767,6 +767,14 @@ export class TicketWorkspaceComponent implements OnInit, OnChanges {
               // openFor: res.requestFor.emp_code ? res.requestFor : null,
               rejection_reason: ticket.rejection_reason,
               ccList: ccList || [],
+
+              // คนล่าสุดที่ตอบ Email เข้ามา
+              hasEmailMessage: ticket.has_email_message,
+              lastEmailSender: ticket.last_email_sender,
+              lastEmailSenderName: ticket.last_email_sender_name,
+              lastEmailSenderCode: ticket.last_email_sender_code,
+              lastEmailSenderNickname: ticket.last_email_sender_nickname,
+              lastEmailReceivedAt: ticket.last_email_received_at,
             };
             this.selectedTicket.set(objectData);
             if (previousTicketId !== objectData.ticketId) {
