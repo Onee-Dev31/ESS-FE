@@ -1772,7 +1772,7 @@ export class TicketWorkspaceComponent implements OnInit, OnChanges {
 
     if (command === 'deny') {
       formData.append('itResult', 'Denied');
-      formData.append('comment', comment);
+      formData.append('reason', comment);
     }
 
     if (command === 'assign') {
