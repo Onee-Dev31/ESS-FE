@@ -16,6 +16,7 @@ export class TicketRequesterCardComponent {
   @Input() status = '';
   @Input() assignments: any[] = [];
   @Input() readOnly = false;
+  @Input() showAdUser = false;
   @Output() ccClick = new EventEmitter<boolean>();
 
   showContact = false;

@@ -398,6 +398,7 @@
     <app-ticket-requester-card
       *ngIf="t.requester as requester"
       [requester]="requester"
+      [showAdUser]="true"
       [ccCount]="t.ccList?.length || 0"
       [assignments]="t.assignments || []"
       [status]="t.status"
