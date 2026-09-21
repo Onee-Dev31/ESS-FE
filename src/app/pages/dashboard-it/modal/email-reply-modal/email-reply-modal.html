@@ -130,7 +130,6 @@
 
           <span class="template-selector-content">
             <strong>เทมเพลตตอบกลับ</strong>
-            <small>เลือกข้อความสำเร็จรูปเพื่อเพิ่มลงในข้อความ</small>
           </span>
 
           <span class="template-selector-action">
@@ -138,13 +137,6 @@
             <i class="fa-solid fa-chevron-right"></i>
           </span>
         </button>
-
-        @if (templateFeedback) {
-          <div class="template-feedback">
-            <i class="fa-solid fa-check"></i>
-            {{ templateFeedback }}
-          </div>
-        }
       </div>
       <app-text-editor
         [preserveTypedSpacing]="true"
@@ -190,13 +182,12 @@
               <i class="fa-regular fa-file-lines"></i>
               เลือกเทมเพลตตอบกลับ
             </h3>
-
-            <p>เลือกข้อความสำเร็จรูปเพื่อเพิ่มลงในข้อความตอบกลับ</p>
           </div>
 
           <button
             type="button"
             class="template-modal-close"
+            [disabled]="templateBusy() || editingTemplateId !== null"
             (click)="closeTemplateModal()"
             aria-label="ปิด"
           >
@@ -205,30 +196,30 @@
         </header>
 
         <div class="template-modal-tools">
-          <div class="template-tabs">
-            @for (tab of templateTabs; track tab.value) {
-              <button
-                type="button"
-                [class.active]="templateScope === tab.value"
-                (click)="templateScope = tab.value"
-              >
-                {{ tab.label }}
-              </button>
-            }
-          </div>
-
+          <button
+            type="button"
+            class="btn-add-template"
+            [disabled]="templateBusy() || editingTemplateId !== null"
+            (click)="addTemplate()"
+          >
+            <i class="fa-solid fa-plus"></i> เพิ่มเทมเพลต
+          </button>
           <div class="template-search-wrapper">
             <i class="fa-solid fa-magnifying-glass"></i>
 
             <input
               type="search"
               [(ngModel)]="templateSearch"
+              [disabled]="templateBusy() || editingTemplateId !== null"
               placeholder="ค้นหาชื่อหรือรายละเอียดเทมเพลต..."
             />
           </div>
         </div>
 
         <div class="template-modal-body">
+          @if (templateActionError()) {
+            <p class="template-error" role="alert">{{ templateActionError() }}</p>
+          }
           @if (templatesLoading()) {
             <div class="template-state">
               <i class="fa-solid fa-spinner fa-spin"></i>
@@ -241,41 +232,171 @@
               <button type="button" (click)="loadTemplates()">ลองใหม่</button>
             </div>
           } @else {
+            @if (editingTemplateId === 0) {
+              <section class="template-detail template-new-detail">
+                <fieldset [disabled]="templateBusy()">
+                  <h4>เพิ่มเทมเพลตใหม่</h4>
+                  <label for="new-template-title">ชื่อเทมเพลต</label>
+                  <input id="new-template-title" type="text" [(ngModel)]="templateTitle" required />
+                  <label for="new-template-scope">การใช้งาน</label>
+                  <div class="scope-toggle" role="group" aria-label="การใช้งาน">
+                    <button type="button" [class.active]="templateScope === 'PERSONAL'" (click)="templateScope = 'PERSONAL'">ส่วนตัว</button>
+                    <button type="button" [class.active]="templateScope === 'GENERAL'" (click)="templateScope = 'GENERAL'">สาธารณะ</button>
+                  </div>
+                  <label for="new-template-body">ข้อความเทมเพลต</label>
+                  <quill-editor
+                    id="new-template-body"
+                    [(ngModel)]="templateBody"
+                    [modules]="templateEditorModules"
+                    [readOnly]="templateBusy()"
+                    placeholder="กรอกข้อความเทมเพลต..."
+                  />
+                  <div class="template-actions template-detail-actions">
+                    <button
+                      type="button"
+                      class="btn-template-cancel"
+                      (click)="cancelTemplateEdit()"
+                    >
+                      ยกเลิก
+                    </button>
+                    <button
+                      type="button"
+                      class="btn-template-cancel template-use"
+                      [disabled]="!validTemplateDraft || templateBusy()"
+                      (click)="saveNewTemplate()"
+                    >
+                      {{ templateBusy() ? 'กำลังบันทึก...' : 'บันทึก' }}
+                    </button>
+                  </div>
+                </fieldset>
+              </section>
+            }
             <div class="template-modal-list">
-              @for (template of filteredTemplates; track template.id) {
-                <button type="button" class="template-option" (click)="selectTemplate(template)">
-                  <span class="template-option-icon">
-                    <i class="fa-regular fa-file-lines"></i>
-                  </span>
+              @for (template of filteredTemplates; track template.Id) {
+                <div class="template-card" [class.expanded]="expandedTemplateId === template.Id">
+                  <div class="template-option">
+                    <span class="template-option-icon">
+                      <i class="fa-regular fa-file-lines"></i>
+                    </span>
 
-                  <span class="template-option-content">
-                    <span class="template-option-heading">
-                      <strong>{{ template.name }}</strong>
+                    <span class="template-option-content">
+                      <span class="template-option-heading">
+                        <strong>{{ template.Title }}</strong>
 
-                      <span
-                        class="template-badge"
-                        [class.private]="template.visibility === 'private'"
-                      >
-                        <i
-                          class="fa-solid"
-                          [class.fa-users]="template.visibility === 'public'"
-                          [class.fa-lock]="template.visibility === 'private'"
-                        ></i>
+                        <span
+                          class="template-badge"
+                          [class.private]="template.Scope === 'PERSONAL'"
+                        >
+                          <i
+                            class="fa-solid"
+                            [class.fa-users]="template.Scope === 'GENERAL'"
+                            [class.fa-lock]="template.Scope === 'PERSONAL'"
+                          ></i>
 
-                        {{ template.visibility === 'public' ? 'Public' : 'Private' }}
+                          {{ template.Scope === 'GENERAL' ? 'ส่วนกลาง' : 'ของฉัน' }}
+                        </span>
                       </span>
+                      @if (template.Scope === 'GENERAL' && template.Update_By) {
+                        <span class="template-updated-by">แก้ไขโดย {{ template.Update_By }}</span>
+                      }
                     </span>
 
-                    <span class="template-description">
-                      {{ template.description }}
-                    </span>
-                  </span>
-
-                  <span class="template-option-action">
-                    <i class="fa-solid fa-plus"></i>
-                    ใช้เทมเพลต
-                  </span>
-                </button>
+                    <div class="template-actions">
+                      <button
+                        type="button"
+                        class="btn-template-cancel"
+                        [disabled]="templateBusy() || editingTemplateId !== null"
+                        [attr.aria-expanded]="expandedTemplateId === template.Id"
+                        [attr.aria-controls]="'template-detail-' + template.Id"
+                        (click)="toggleTemplate(template)"
+                      >
+                        <i class="fa-regular fa-eye"></i>
+                        {{ expandedTemplateId === template.Id ? 'ซ่อน' : 'ดู' }}
+                      </button>
+                      <button
+                        type="button"
+                        class="btn-template-cancel template-use"
+                        [disabled]="templateBusy() || editingTemplateId !== null"
+                        (click)="selectTemplate(template)"
+                      >
+                        <i class="fa-solid fa-plus"></i>
+                        ใช้เทมเพลต
+                      </button>
+                    </div>
+                  </div>
+                  @if (expandedTemplateId === template.Id) {
+                    <section
+                      class="template-detail"
+                      [id]="'template-detail-' + template.Id"
+                      aria-label="รายละเอียดเทมเพลต"
+                    >
+                      @if (editingTemplateId === template.Id) {
+                        <fieldset [disabled]="templateBusy()">
+                          <label [for]="'template-title-' + template.Id">ชื่อเทมเพลต</label>
+                          <input
+                            [id]="'template-title-' + template.Id"
+                            type="text"
+                            [(ngModel)]="templateTitle"
+                            required
+                          />
+                          <label [for]="'template-scope-' + template.Id">การใช้งาน</label>
+                          <div class="scope-toggle" role="group" aria-label="การใช้งาน">
+                            <button type="button" [class.active]="templateScope === 'PERSONAL'" (click)="templateScope = 'PERSONAL'">ส่วนตัว</button>
+                            <button type="button" [class.active]="templateScope === 'GENERAL'" (click)="templateScope = 'GENERAL'">สาธารณะ</button>
+                          </div>
+                          <label [for]="'template-body-' + template.Id">ข้อความเทมเพลต</label>
+                          <quill-editor
+                            [id]="'template-body-' + template.Id"
+                            [(ngModel)]="templateBody"
+                            [modules]="templateEditorModules"
+                            [readOnly]="templateBusy()"
+                            placeholder="กรอกข้อความเทมเพลต..."
+                          />
+                          <div class="template-actions template-detail-actions">
+                            <button
+                              type="button"
+                              class="btn-template-cancel"
+                              (click)="cancelTemplateEdit()"
+                            >
+                              ยกเลิก
+                            </button>
+                            <button
+                              type="button"
+                              class="btn-template-cancel template-use"
+                              [disabled]="!validTemplateDraft || templateBusy()"
+                              (click)="saveTemplate(template)"
+                            >
+                              {{ templateBusy() ? 'กำลังบันทึก...' : 'บันทึก' }}
+                            </button>
+                          </div>
+                        </fieldset>
+                      } @else {
+                        <div
+                          class="template-preview ql-editor"
+                          [innerHTML]="normalizeTemplateHtml(template.Body)"
+                        ></div>
+                        <div class="template-actions template-detail-actions">
+                          <button
+                            type="button"
+                            class="btn-template-cancel template-delete"
+                            [disabled]="templateBusy()"
+                            (click)="deleteTemplate(template)"
+                          >
+                            <i class="fa-regular fa-trash-can"></i> ลบ
+                          </button>
+                          <button
+                            type="button"
+                            class="btn-template-cancel"
+                            [disabled]="templateBusy()"
+                            (click)="editTemplate(template)"
+                          >
+                            <i class="fa-regular fa-pen-to-square"></i> แก้ไข
+                          </button>
+                        </div>
+                      }
+                    </section>
+                  }
+                </div>
               } @empty {
                 <div class="template-state">
                   <i class="fa-regular fa-folder-open"></i>
@@ -287,12 +408,12 @@
         </div>
 
         <footer class="template-modal-footer">
-          <span>
-            <i class="fa-solid fa-circle-info"></i>
-            สามารถแก้ไขข้อความได้หลังจากเลือกเทมเพลต
-          </span>
-
-          <button type="button" class="btn-template-cancel" (click)="closeTemplateModal()">
+          <button
+            type="button"
+            class="btn-template-cancel"
+            [disabled]="templateBusy() || editingTemplateId !== null"
+            (click)="closeTemplateModal()"
+          >
             ปิด
           </button>
         </footer>

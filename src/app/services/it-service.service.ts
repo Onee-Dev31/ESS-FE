@@ -598,4 +598,41 @@ export class ItServiceService {
       executedBy,
     });
   }
+
+  getEmailReplyTemplates(codeEmpId: string): Observable<any> {
+    return this._http.get<any>(
+      `${this.baseUrl}/template-reply-guide-doc/get-email-reply-template`,
+      {
+        params: { codeEmpId },
+      },
+    );
+  }
+
+  manageEmailReplyTemplate(payload: ManageEmailReplyTemplatePayload): Observable<any> {
+    return this._http.post<any>(
+      `${this.baseUrl}/template-reply-guide-doc/manage-email-reply-template`,
+      payload,
+    );
+  }
+}
+
+export interface EmailReplyTemplateApi {
+  Id: number;
+  Title: string;
+  Body: string;
+  Scope: 'GENERAL' | 'PERSONAL';
+  IsActive: boolean;
+  Created_By: string;
+  Update_By: string | null;
+  created_Date: string;
+  Update_Date: string | null;
+}
+
+export interface ManageEmailReplyTemplatePayload {
+  id: number;
+  title: string;
+  body: string;
+  scope: 'PERSONAL' | 'GENERAL';
+  isActive: boolean;
+  executeBy: string;
 }
