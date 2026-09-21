@@ -614,6 +614,21 @@ export class ItServiceService {
       payload,
     );
   }
+
+  getGuideDocuments(): Observable<any> {
+    return this._http.get<any>(`${this.baseUrl}/template-reply-guide-doc/get-guide-document`);
+  }
+
+  manageGuideDocument(payload: ManageGuideDocumentPayload): Observable<any> {
+    return this._http.post<any>(
+      `${this.baseUrl}/template-reply-guide-doc/manage-guide-document`,
+      payload,
+    );
+  }
+
+  createGuideDocument(payload: Omit<ManageGuideDocumentPayload, 'id'>): Observable<any> {
+    return this.manageGuideDocument({ ...payload, id: 0 });
+  }
 }
 
 export interface EmailReplyTemplateApi {
@@ -633,6 +648,15 @@ export interface ManageEmailReplyTemplatePayload {
   title: string;
   body: string;
   scope: 'PERSONAL' | 'GENERAL';
+  isActive: boolean;
+  executeBy: string;
+}
+
+export interface ManageGuideDocumentPayload {
+  id: number;
+  name: string;
+  fileUrl: string;
+  filePath: string;
   isActive: boolean;
   executeBy: string;
 }

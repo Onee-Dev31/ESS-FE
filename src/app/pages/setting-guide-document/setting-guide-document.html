@@ -1,0 +1,85 @@
+<div class="setting-page">
+  <app-page-header
+    title="กำหนดเอกสารคู่มือ"
+    subtitle="Guide Document Setting"
+    icon="fas fa-folder-open"
+  />
+
+  <section class="setting-card search-card">
+    <h2>ค้นหา</h2>
+    <div class="search-row">
+      <div class="search-input">
+        <i class="fa-solid fa-magnifying-glass"></i
+        ><input
+          class="styled-input"
+          type="search"
+          [(ngModel)]="search"
+          placeholder="ค้นหาชื่อเอกสาร..."
+        />
+      </div>
+      <button class="primary" (click)="load()">
+        <i class="fa-solid fa-rotate-right"></i> ค้นหา
+      </button>
+      <button class="outline" (click)="add()" [disabled]="editingId !== null">
+        <i class="fa-solid fa-plus"></i> เพิ่มเอกสาร
+      </button>
+    </div>
+  </section>
+
+  @if (editingId === 0) {
+    <section class="setting-card form-card">
+      <h2>{{ editingId === 0 ? 'เพิ่มเอกสาร' : 'แก้ไขเอกสาร' }}</h2>
+      <div class="form-grid">
+        <label>ชื่อเอกสาร<input class="styled-input" [(ngModel)]="name" /></label
+        ><label>URL สำหรับเปิดดู<input class="styled-input" [(ngModel)]="fileUrl" /></label
+        ><label>Path ของไฟล์<input class="styled-input" [(ngModel)]="filePath" /></label
+        ><label class="toggle-field"><button type="button" class="toggle" [class.active]="isActive" [attr.aria-pressed]="isActive" (click)="isActive = !isActive"><span></span></button><span>เปิดใช้งาน</span></label>
+      </div>
+      <div class="form-actions">
+        <button class="outline" (click)="cancel()">ยกเลิก</button
+        ><button class="primary" [disabled]="saving()" (click)="save()">
+          {{ saving() ? 'กำลังบันทึก...' : 'บันทึก' }}
+        </button>
+      </div>
+    </section>
+  }
+
+  <section class="setting-card detail-card">
+    <div class="section-title">
+      <h2>รายละเอียด</h2>
+      <span>{{ filtered.length }} รายการ</span>
+    </div>
+    @if (loading()) {
+      <div class="empty">กำลังโหลด...</div>
+    } @else {
+      <div class="document-list">
+        @for (doc of filtered; track doc.id) {
+          <article>
+            <div class="doc-info">
+              <strong>{{ doc.name }}</strong>
+            </div>
+            <div class="doc-actions">
+              <span class="status" [class.off]="!doc.isActive">{{ doc.isActive ? 'ใช้งาน' : 'ปิดใช้งาน' }}</span>
+              <a class="outline" [href]="doc.fileUrl" target="_blank" rel="noopener" aria-label="เปิดเอกสาร" title="เปิด"><i class="fa-solid fa-arrow-up-right-from-square"></i><span class="action-label">เปิด</span></a>
+              <button class="outline" (click)="edit(doc)" aria-label="แก้ไขเอกสาร" title="แก้ไข"><i class="fa-regular fa-pen-to-square"></i><span class="action-label">แก้ไข</span></button>
+              <button class="outline danger" (click)="remove(doc)" aria-label="ลบเอกสาร" title="ลบ"><i class="fa-regular fa-trash-can"></i><span class="action-label">ลบ</span></button>
+            </div>
+            @if (editingId === doc.id) {
+              <div class="inline-edit">
+                <div class="form-grid">
+                  <label>ชื่อเอกสาร<input class="styled-input" [(ngModel)]="name" /></label>
+                  <label>URL สำหรับเปิดดู<input class="styled-input" [(ngModel)]="fileUrl" /></label>
+                  <label>Path ของไฟล์<input class="styled-input" [(ngModel)]="filePath" /></label>
+                  <label class="toggle-field"><button type="button" class="toggle" [class.active]="isActive" [attr.aria-pressed]="isActive" (click)="isActive = !isActive"><span></span></button><span>เปิดใช้งาน</span></label>
+                </div>
+                <div class="form-actions"><button class="outline" (click)="cancel()">ยกเลิก</button><button class="primary" [disabled]="saving()" (click)="save()">{{ saving() ? 'กำลังบันทึก...' : 'บันทึก' }}</button></div>
+              </div>
+            }
+          </article>
+        } @empty {
+          <div class="empty">ไม่พบเอกสาร</div>
+        }
+      </div>
+    }
+  </section>
+</div>

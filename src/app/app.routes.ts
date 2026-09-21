@@ -264,6 +264,14 @@ export const routes: Routes = [
         data: { animation: 'Dashboard' },
       },
       {
+        path: 'guide-document-setting',
+        loadComponent: () =>
+          import('./pages/setting-guide-document/setting-guide-document').then(
+            (m) => m.SettingGuideDocument,
+          ),
+        data: { animation: 'Dashboard' },
+      },
+      {
         path: 'vehicle-policy-setting',
         loadComponent: () =>
           import('./pages/setting-vehicle-policy/setting-vehicle-policy').then(
