@@ -1,0 +1,408 @@
+<div class="page">
+  <div class="breadcrumb">Setting <i class="fa-solid fa-chevron-right"></i> HR สวัสดิการ</div>
+
+  <div class="page-title-row">
+    <div>
+      <h1>HR สวัสดิการ</h1>
+      <p>กำหนด HR ผู้รับผิดชอบตามประเภทสวัสดิการ และบริษัท เพื่อให้การดูแลพนักงานเป็นไปอย่างมีประสิทธิภาพ</p>
+    </div>
+    <button type="button" class="btn-add" (click)="openCreate()">
+      <i class="fa-solid fa-plus"></i> เพิ่มผู้รับผิดชอบสวัสดิการ
+    </button>
+  </div>
+
+  <div class="filter-card">
+    <div class="filter-grid">
+      <div class="field-group field-grow">
+        <label class="field-label">ค้นหา</label>
+        <div class="field-box">
+          <i class="fa-solid fa-magnifying-glass field-icon"></i>
+          <input
+            type="text"
+            class="field-input"
+            placeholder="ค้นหาชื่อ HR, ประเภทสวัสดิการ, บริษัท หรือหมายเหตุ"
+            [ngModel]="searchText()"
+            (ngModelChange)="searchText.set($event)"
+            (keyup.enter)="applyFilter()"
+          />
+        </div>
+      </div>
+      <div class="field-group">
+        <label class="field-label">HR</label>
+        <div class="field-box">
+          <nz-select
+            class="field-nz-select"
+            nzShowSearch
+            nzAllowClear
+            nzPlaceHolder="เลือก HR"
+            [ngModel]="filterHrCode()"
+            (ngModelChange)="filterHrCode.set($event); applyFilter()"
+          >
+            @for (hr of hrList; track hr.code) {
+              <nz-option [nzValue]="hr.code" [nzLabel]="hr.name" />
+            }
+          </nz-select>
+        </div>
+      </div>
+      <div class="field-group">
+        <label class="field-label">ประเภทสวัสดิการ</label>
+        <div class="field-box">
+          <nz-select
+            class="field-nz-select"
+            nzShowSearch
+            nzAllowClear
+            nzPlaceHolder="เลือกประเภทสวัสดิการ"
+            [ngModel]="filterWelfareType()"
+            (ngModelChange)="filterWelfareType.set($event); applyFilter()"
+          >
+            @for (type of welfareTypeList; track type) {
+              <nz-option [nzValue]="type" [nzLabel]="type" />
+            }
+          </nz-select>
+        </div>
+      </div>
+      <div class="field-group">
+        <label class="field-label">บริษัท</label>
+        <div class="field-box">
+          <nz-select
+            class="field-nz-select"
+            nzShowSearch
+            nzAllowClear
+            nzPlaceHolder="เลือกบริษัท"
+            [ngModel]="filterCompany()"
+            (ngModelChange)="filterCompany.set($event); applyFilter()"
+          >
+            @for (company of companyList; track company) {
+              <nz-option [nzValue]="company" [nzLabel]="company" />
+            }
+          </nz-select>
+        </div>
+      </div>
+      <div class="filter-bottom-row">
+        <button type="button" class="btn-clear" (click)="clearFilter()">
+          <i class="fa-solid fa-rotate-left"></i> ล้างค่า
+        </button>
+        <button type="button" class="btn-search" (click)="applyFilter()">
+          <i class="fa-solid fa-magnifying-glass"></i> ค้นหา
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="content-card">
+    <div class="card-header-row">
+      <div class="card-header-title">ทั้งหมด {{ totalItems() }} รายการ</div>
+      <div class="table-toolbar">
+        <label class="page-size-select">
+          แสดง
+          <select [ngModel]="pageSize()" (ngModelChange)="setPageSize($event)">
+            @for (size of pageSizeOptions; track size) {
+              <option [ngValue]="size">{{ size }} รายการ</option>
+            }
+          </select>
+        </label>
+        @if (totalPages() > 1) {
+          <div class="page-pills">
+            <button
+              type="button"
+              class="page-pill-nav"
+              [disabled]="currentPage() === 0"
+              (click)="goToPage(currentPage() - 1)"
+            >
+              <i class="fa-solid fa-chevron-left"></i>
+            </button>
+            @for (page of pageNumbers(); track page) {
+              <button
+                type="button"
+                class="page-pill"
+                [class.active]="page === currentPage() + 1"
+                (click)="goToPage(page - 1)"
+              >
+                {{ page }}
+              </button>
+            }
+            <button
+              type="button"
+              class="page-pill-nav"
+              [disabled]="currentPage() >= totalPages() - 1"
+              (click)="goToPage(currentPage() + 1)"
+            >
+              <i class="fa-solid fa-chevron-right"></i>
+            </button>
+          </div>
+        }
+      </div>
+    </div>
+
+    <div class="table-responsive">
+      <table class="modern-table">
+        <thead>
+          <tr>
+            <th>ลำดับ</th>
+            <th>HR ผู้รับผิดชอบ</th>
+            <th>ประเภทสวัสดิการ</th>
+            <th>บริษัท</th>
+            <th>หมายเหตุ</th>
+            <th class="action-column">จัดการ</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (row of paginatedRows(); track row.id; let i = $index) {
+            <tr>
+              <td>{{ currentPage() * pageSize() + i + 1 }}</td>
+              <td class="cell-primary">{{ row.hrName }}</td>
+              <td>
+                <div class="tag-list">
+                  @for (tag of visibleTags(row.welfareTypes); track tag) {
+                    <span class="tag tag-welfare">{{ tag }}</span>
+                  }
+                  @if (overflowCount(row.welfareTypes); as more) {
+                    @if (more > 0) {
+                      <span class="tag tag-more">+{{ more }}</span>
+                    }
+                  }
+                </div>
+              </td>
+              <td>
+                <div class="tag-list">
+                  @for (tag of visibleTags(row.companies); track tag) {
+                    <span class="tag tag-company">{{ tag }}</span>
+                  }
+                  @if (overflowCount(row.companies); as more) {
+                    @if (more > 0) {
+                      <span class="tag tag-more">+{{ more }}</span>
+                    }
+                  }
+                </div>
+              </td>
+              <td class="cell-note">{{ row.note }}</td>
+              <td class="action-column">
+                <div class="row-actions">
+                  <button type="button" class="btn-icon-edit" title="แก้ไข" (click)="openEdit(row)">
+                    <i class="fa-solid fa-pen"></i>
+                  </button>
+                  <button
+                    type="button"
+                    class="btn-icon-delete"
+                    title="ลบ"
+                    [disabled]="deletingId() === row.id"
+                    (click)="deleteRow(row)"
+                  >
+                    <i class="fa-solid fa-trash-can"></i>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          } @empty {
+            <tr>
+              <td colspan="6" class="no-data-cell">
+                <app-empty-state
+                  title="ไม่พบข้อมูล"
+                  description="ยังไม่มีผู้รับผิดชอบสวัสดิการ"
+                  icon="fas fa-user-slash"
+                />
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <div class="card-list-view">
+      @for (row of paginatedRows(); track row.id) {
+        <div class="mobile-card">
+          <div class="card-header">
+            <span class="card-dept-name">{{ row.hrName }}</span>
+          </div>
+          <div class="card-body">
+            <div class="info-row">
+              <span class="label">ประเภทสวัสดิการ:</span>
+              <div class="tag-list">
+                @for (tag of row.welfareTypes; track tag) {
+                  <span class="tag tag-welfare">{{ tag }}</span>
+                }
+              </div>
+            </div>
+            <div class="info-row">
+              <span class="label">บริษัท:</span>
+              <div class="tag-list">
+                @for (tag of row.companies; track tag) {
+                  <span class="tag tag-company">{{ tag }}</span>
+                }
+              </div>
+            </div>
+            <div class="info-row">
+              <span class="label">หมายเหตุ:</span>
+              <span class="value">{{ row.note }}</span>
+            </div>
+            <div class="card-footer-actions">
+              <button type="button" class="btn-edit-sm" (click)="openEdit(row)">
+                <i class="fa-solid fa-pen"></i> แก้ไข
+              </button>
+              <button
+                type="button"
+                class="btn-delete-sm"
+                [disabled]="deletingId() === row.id"
+                (click)="deleteRow(row)"
+              >
+                <i class="fa-solid fa-trash-can"></i> ลบ
+              </button>
+            </div>
+          </div>
+        </div>
+      } @empty {
+        <app-empty-state
+          title="ไม่พบข้อมูล"
+          description="ยังไม่มีผู้รับผิดชอบสวัสดิการ"
+          icon="fas fa-user-slash"
+        />
+      }
+    </div>
+
+  </div>
+</div>
+
+@if (isModalOpen()) {
+  <app-modal-shell
+    [title]="editingId() === null ? 'เพิ่มผู้รับผิดชอบสวัสดิการ' : 'แก้ไขผู้รับผิดชอบสวัสดิการ'"
+    size="xl"
+    [closeOnBackdrop]="!isSaving()"
+    [closeOnEscape]="!isSaving()"
+    (closeModal)="closeModal()"
+  >
+    <form id="hr-welfare-form" (ngSubmit)="save()">
+      <div class="field-grid cols-3">
+      <div class="field-group">
+        <label class="field-label">HR ผู้รับผิดชอบ *</label>
+        <div class="modal-select-box" [class.input-invalid]="hasSubmitted() && form.hrCodes.length === 0">
+        <div class="select-trigger">
+          <span class="select-trigger-text">เลือก HR (เลือกได้หลายคน)</span>
+          <i class="fa-solid fa-chevron-down select-trigger-chevron"></i>
+          <nz-select
+            nzMode="multiple"
+            class="field-nz-select select-trigger-overlay"
+            [(ngModel)]="form.hrCodes"
+            name="hrCodes"
+          >
+            @for (hr of hrList; track hr.code) {
+              <nz-option [nzValue]="hr.code" [nzLabel]="hr.name" />
+            }
+          </nz-select>
+        </div>
+        @if (form.hrCodes.length > 0) {
+          <div class="chip-row">
+            @for (code of form.hrCodes; track code) {
+              <span class="chip">
+                {{ hrNameByCode(code) }}
+                <button type="button" class="chip-remove" (click)="removeHr(code)">
+                  <i class="fa-solid fa-xmark"></i>
+                </button>
+              </span>
+            }
+          </div>
+        }
+        </div>
+        @if (hasSubmitted() && form.hrCodes.length === 0) {
+          <small class="field-error">กรุณาเลือก HR ผู้รับผิดชอบ</small>
+        }
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">ประเภทสวัสดิการ *</label>
+        <div class="modal-select-box" [class.input-invalid]="hasSubmitted() && form.welfareTypes.length === 0">
+        <div class="select-trigger">
+          <span class="select-trigger-text">เลือกประเภทสวัสดิการ (เลือกได้หลายรายการ)</span>
+          <i class="fa-solid fa-chevron-down select-trigger-chevron"></i>
+          <nz-select
+            nzMode="multiple"
+            class="field-nz-select select-trigger-overlay"
+            [(ngModel)]="form.welfareTypes"
+            name="welfareTypes"
+          >
+            @for (type of welfareTypeList; track type) {
+              <nz-option [nzValue]="type" [nzLabel]="type" />
+            }
+          </nz-select>
+        </div>
+        @if (form.welfareTypes.length > 0) {
+          <div class="chip-row">
+            @for (type of form.welfareTypes; track type) {
+              <span class="chip">
+                {{ type }}
+                <button type="button" class="chip-remove" (click)="removeWelfareType(type)">
+                  <i class="fa-solid fa-xmark"></i>
+                </button>
+              </span>
+            }
+          </div>
+        }
+        </div>
+        @if (hasSubmitted() && form.welfareTypes.length === 0) {
+          <small class="field-error">กรุณาเลือกประเภทสวัสดิการ</small>
+        }
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">บริษัท *</label>
+        <div class="modal-select-box" [class.input-invalid]="hasSubmitted() && form.companies.length === 0">
+        <div class="select-trigger">
+          <span class="select-trigger-text">เลือกบริษัท (เลือกได้หลายบริษัท)</span>
+          <i class="fa-solid fa-chevron-down select-trigger-chevron"></i>
+          <nz-select
+            nzMode="multiple"
+            class="field-nz-select select-trigger-overlay"
+            [(ngModel)]="form.companies"
+            name="companies"
+          >
+            @for (company of companyList; track company) {
+              <nz-option [nzValue]="company" [nzLabel]="company" />
+            }
+          </nz-select>
+        </div>
+        @if (form.companies.length > 0) {
+          <div class="chip-row">
+            @for (company of form.companies; track company) {
+              <span class="chip">
+                {{ company }}
+                <button type="button" class="chip-remove" (click)="removeCompany(company)">
+                  <i class="fa-solid fa-xmark"></i>
+                </button>
+              </span>
+            }
+          </div>
+        }
+        </div>
+        @if (hasSubmitted() && form.companies.length === 0) {
+          <small class="field-error">กรุณาเลือกบริษัท</small>
+        }
+      </div>
+      </div>
+
+      <label class="form-field">
+        <span>หมายเหตุ</span>
+        <textarea
+          class="form-textarea"
+          name="note"
+          rows="3"
+          maxlength="500"
+          placeholder="ระบุหมายเหตุ (ถ้ามี)"
+          [(ngModel)]="form.note"
+        ></textarea>
+        <small class="char-count">{{ form.note.length }}/500</small>
+      </label>
+    </form>
+
+    <div modalFooter>
+      <button type="button" class="modal-button" (click)="closeModal()" [disabled]="isSaving()">
+        ยกเลิก
+      </button>
+      <button type="submit" form="hr-welfare-form" class="modal-button primary" [disabled]="isSaving()">
+        @if (isSaving()) {
+          <i class="fa-solid fa-spinner spin"></i> กำลังบันทึก...
+        } @else {
+          บันทึก
+        }
+      </button>
+    </div>
+  </app-modal-shell>
+}

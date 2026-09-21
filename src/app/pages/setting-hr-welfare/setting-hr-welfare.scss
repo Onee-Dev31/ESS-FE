@@ -1,0 +1,697 @@
+@use '../../../styles/variables' as *;
+@use '../../../styles/mixins' as *;
+
+.page {
+  padding: 20px;
+
+  @include mobile {
+    padding: 14px;
+  }
+}
+
+// ==================== HEADER ====================
+.breadcrumb {
+  font-size: $font-size-hint;
+  color: var(--text-muted);
+  margin-bottom: 10px;
+
+  i {
+    font-size: 0.6rem;
+    margin: 0 4px;
+    vertical-align: middle;
+  }
+}
+
+.page-title-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 1.5rem;
+
+  @include mobile {
+    flex-direction: column;
+  }
+
+  h1 {
+    margin: 0;
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: var(--text-header);
+  }
+
+  p {
+    margin: 6px 0 0;
+    color: var(--text-muted);
+    font-size: $font-size-label;
+  }
+}
+
+.btn-add {
+  @include btn-primary;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 18px;
+  height: 44px;
+  border-radius: 10px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+// ==================== FILTER CARD ====================
+.filter-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-table-head);
+  box-shadow:
+    0 1px 4px rgba(0, 0, 0, 0.08),
+    0 4px 16px rgba(0, 0, 0, 0.06);
+  border-radius: 16px;
+  padding: 1.5rem;
+
+  @include large-tablet {
+    padding: 1.25rem;
+  }
+}
+
+.filter-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1rem;
+  align-items: end;
+
+  @include tablet {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  @include mobile {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.field-grow {
+  grid-column: span 1;
+}
+
+.field-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.field-label {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--text-header);
+}
+
+.field-box {
+  position: relative;
+  border: 1.5px solid #cbd5e1;
+  border-radius: 10px;
+  padding: 0 14px;
+  background: var(--input-bg);
+  height: 44px;
+  display: flex;
+  align-items: center;
+  transition:
+    border-color 0.2s,
+    box-shadow 0.2s;
+
+  &:focus-within {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary), transparent 85%);
+  }
+
+  .field-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    margin-right: 10px;
+    flex: 0 0 auto;
+  }
+
+  .field-nz-select {
+    width: 100%;
+
+    ::ng-deep .ant-select-selector {
+      border: none !important;
+      box-shadow: none !important;
+      background: transparent !important;
+      padding: 0 24px 0 0 !important;
+      height: 32px !important;
+      display: flex !important;
+      align-items: center !important;
+      overflow: hidden;
+
+      .ant-select-selection-search-input {
+        height: 32px !important;
+      }
+      .ant-select-selection-placeholder,
+      .ant-select-selection-item {
+        line-height: 32px !important;
+        font-size: $font-size-label;
+        color: var(--input-text);
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        min-width: 0;
+        max-width: 100%;
+      }
+    }
+  }
+
+  .field-input {
+    width: 100%;
+    appearance: none;
+    color-scheme: light;
+    border: none !important;
+    outline: none;
+    background: transparent !important;
+    font-size: $font-size-label;
+    font-weight: 500;
+    color: var(--text) !important;
+    padding: 0;
+    line-height: 1;
+    height: auto;
+
+    &::placeholder {
+      color: var(--text-muted);
+      font-weight: 400;
+    }
+  }
+}
+
+.filter-bottom-row {
+  grid-column: 1 / -1;
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+
+  @include mobile {
+    flex-direction: column;
+  }
+}
+
+.btn-search,
+.btn-clear {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 1.5rem;
+  height: 44px;
+  border-radius: 10px;
+  font-size: $font-size-label;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.btn-search {
+  background: var(--primary);
+  color: #fff;
+
+  &:hover {
+    background: color-mix(in srgb, var(--primary), black 12%);
+  }
+}
+
+.btn-clear {
+  background: var(--bg-table-head);
+  color: var(--text-sub);
+  border: 1px solid var(--border-table-head);
+
+  &:hover {
+    background: var(--border-toolbar);
+  }
+}
+
+// ==================== CONTENT CARD ====================
+.content-card {
+  @include content-card;
+  margin-top: 16px;
+  padding: 0;
+}
+
+.card-header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding: 1.25rem 1.5rem 1rem;
+}
+
+.card-header-title {
+  font-size: $font-size-header;
+  font-weight: 700;
+  color: var(--text-header);
+}
+
+.table-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.page-size-select {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: $font-size-label;
+  color: var(--text-sub);
+
+  select {
+    border: 1px solid var(--border-table-head);
+    border-radius: 8px;
+    background: var(--bg-card);
+    color: var(--text);
+    padding: 6px 10px;
+    font-size: $font-size-label;
+    cursor: pointer;
+  }
+}
+
+.page-pills {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.page-pill,
+.page-pill-nav {
+  min-width: 30px;
+  height: 30px;
+  padding: 0 6px;
+  border-radius: 8px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--text-sub);
+  font-size: $font-size-label;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+
+  &:hover:not(:disabled) {
+    background: var(--bg-table-head);
+  }
+
+  &:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+}
+
+.page-pill.active {
+  background: var(--primary);
+  color: #fff;
+}
+
+.table-responsive {
+  overflow-x: auto;
+  padding: 0 1.5rem 1.5rem;
+
+  @include tablet {
+    display: none !important;
+  }
+}
+
+.modern-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+
+  thead tr {
+    background: var(--bg-table-head);
+  }
+
+  th {
+    padding: 14px 16px;
+    text-align: left;
+    font-size: $font-size-label;
+    font-weight: 600;
+    color: var(--text-sub);
+    border-bottom: 2px solid var(--border);
+    white-space: nowrap;
+  }
+
+  tbody tr:hover td {
+    background: color-mix(in srgb, $primary 3%, var(--bg-card));
+  }
+
+  td {
+    padding: 14px 16px;
+    font-size: $font-size-label;
+    color: var(--text);
+    border-bottom: 1px solid var(--border-table);
+    vertical-align: middle;
+  }
+
+  tbody tr:last-child td {
+    border-bottom: none;
+  }
+
+  .cell-primary {
+    font-weight: 600;
+    color: var(--text-header);
+  }
+
+  .cell-note {
+    color: var(--text-sub);
+    max-width: 240px;
+  }
+
+  .no-data-cell {
+    text-align: center;
+    padding: 0;
+  }
+}
+
+.tag-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.tag-welfare {
+  background: color-mix(in srgb, var(--primary), transparent 88%);
+  color: var(--primary);
+}
+
+.tag-company {
+  background: color-mix(in srgb, $warning, transparent 85%);
+  color: $warning;
+}
+
+.tag-more {
+  background: var(--bg-table-head);
+  color: var(--text-muted);
+}
+
+.action-column {
+  width: 90px;
+  text-align: center;
+}
+
+.row-actions {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.btn-icon-edit {
+  @include icon-btn-ghost($primary);
+}
+
+.btn-icon-delete {
+  @include icon-btn-ghost($danger);
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: wait;
+  }
+}
+
+// ==================== MOBILE CARDS ====================
+.card-list-view {
+  display: none;
+
+  @include tablet {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding: 1rem;
+  }
+
+  .mobile-card {
+    background: var(--bg-card);
+    border-radius: 16px;
+    border: 1px solid rgba(0, 0, 0, 0.06);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    overflow: hidden;
+
+    .card-header {
+      background: var(--bg-card);
+      border-bottom: 1px solid var(--border-toolbar);
+      padding: 14px 16px;
+
+      .card-dept-name {
+        font-weight: 700;
+        color: $primary;
+        font-size: 1rem;
+      }
+    }
+
+    .card-body {
+      padding: 16px;
+
+      .info-row {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        margin-bottom: 12px;
+        font-size: $font-size-label;
+
+        .label {
+          color: var(--text-sub);
+        }
+
+        .value {
+          font-weight: 600;
+          color: var(--text-header);
+        }
+      }
+
+      .card-footer-actions {
+        margin-top: 4px;
+        padding-top: 12px;
+        border-top: 1px solid var(--border-toolbar);
+        display: flex;
+        gap: 10px;
+
+        button {
+          flex: 1;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          gap: 8px;
+          padding: 9px 14px;
+          border-radius: 10px;
+          font-size: $font-size-label;
+          font-weight: 600;
+          cursor: pointer;
+          border: none;
+          transition: all 0.2s;
+        }
+
+        .btn-edit-sm {
+          background: color-mix(in srgb, $primary, transparent 88%);
+          color: $primary;
+
+          &:hover {
+            background: color-mix(in srgb, $primary, transparent 75%);
+          }
+        }
+
+        .btn-delete-sm {
+          background: color-mix(in srgb, $danger, transparent 88%);
+          color: $danger;
+
+          &:hover {
+            background: color-mix(in srgb, $danger, transparent 75%);
+          }
+
+          &:disabled {
+            opacity: 0.5;
+            cursor: wait;
+          }
+        }
+      }
+    }
+  }
+}
+
+
+// ==================== MODAL FORM ====================
+.field-grid {
+  display: grid;
+  gap: 14px;
+
+  &.cols-3 {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  @include mobile {
+    &.cols-3 {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+
+  .form-field {
+    margin-bottom: 0;
+  }
+}
+
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 18px;
+
+  span {
+    color: var(--text-sub);
+    font-size: $font-size-label;
+    font-weight: 500;
+  }
+}
+
+// Picker box: label + a trigger that always shows its fixed placeholder + chip list below.
+.modal-select-box {
+  border: 1.5px solid #cbd5e1;
+  border-radius: 10px;
+  padding: 10px 14px 12px;
+  background: var(--input-bg);
+  transition:
+    border-color 0.2s,
+    box-shadow 0.2s;
+
+  &:focus-within {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary), transparent 85%);
+  }
+
+  &.input-invalid {
+    border-color: var(--danger);
+  }
+}
+
+// The real nz-select stays fully functional (search, keyboard, options) but invisible —
+// it sits under a fixed label so the trigger never shows ant's own multi-select tags,
+// matching the target design where selections only ever appear as chips underneath.
+.select-trigger {
+  position: relative;
+  height: 34px;
+}
+
+.select-trigger-text {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  font-size: $font-size-label;
+  color: var(--text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding-right: 20px;
+  pointer-events: none;
+}
+
+.select-trigger-chevron {
+  position: absolute;
+  right: 2px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-muted);
+  font-size: 0.7rem;
+  pointer-events: none;
+}
+
+.select-trigger-overlay {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+
+  ::ng-deep .ant-select-selector {
+    height: 34px !important;
+  }
+}
+
+.chip-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 8px 4px 12px;
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--primary), transparent 88%);
+  color: var(--primary);
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.chip-remove {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  color: inherit;
+  font-size: 0.7rem;
+  cursor: pointer;
+  padding: 0;
+
+  &:hover {
+    background: color-mix(in srgb, var(--primary), transparent 70%);
+  }
+}
+
+.form-textarea {
+  @include input-field;
+  width: 100%;
+  resize: vertical;
+  min-height: 80px;
+  font-family: inherit;
+  background: var(--input-bg);
+  border-color: #cbd5e1;
+}
+
+.char-count {
+  align-self: flex-end;
+  color: var(--text-muted);
+  font-size: $font-size-hint;
+}
+
+.field-error {
+  color: var(--danger);
+  font-size: $font-size-hint;
+}
+
+.spin {
+  animation: spin 0.7s linear infinite;
+}
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
