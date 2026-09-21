@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpErrorResponse, HttpParams } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse, HttpParams, HttpContext } from '@angular/common/http';
+import { SKIP_ERROR_TOAST } from '../interceptors/error.interceptor';
 import { catchError, Observable, of, throwError } from 'rxjs';
 import { environment } from '../../environments/environment';
 
@@ -66,6 +67,7 @@ export class EmpAdService {
   getAdUserInfo(samAccountName: string): Observable<any> {
     return this._http.get(`${this.baseUrl}/ActiveDirectory/GetUserInfo`, {
       params: new HttpParams().set('samAccountName', samAccountName),
+      context: new HttpContext().set(SKIP_ERROR_TOAST, true),
     });
   }
 

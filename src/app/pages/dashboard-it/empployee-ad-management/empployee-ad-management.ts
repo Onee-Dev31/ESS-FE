@@ -1,8 +1,8 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectorRef, Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { forkJoin, of } from 'rxjs';
-import { catchError, map } from 'rxjs/operators';
+import { from, of } from 'rxjs';
+import { catchError, map, mergeMap, toArray } from 'rxjs/operators';
 import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzModalModule } from 'ng-zorro-antd/modal';
 import { NzSelectModule } from 'ng-zorro-antd/select';
@@ -69,6 +69,7 @@ export class EmpployeeAdManagement {
   departmentList: any[] = [];
   filteredDepartmentList: any[] = [];
 
+  allEmployees: any[] = [];
   employees: any[] = [];
   totalItems = 0;
   totalPages = 1;
@@ -89,7 +90,7 @@ export class EmpployeeAdManagement {
   ngOnInit() {
     this.getCompanies();
     this.getDepartments();
-    this.loadData(1, this.pageSize);
+    this.loadData();
   }
 
   getCompanies() {
@@ -146,7 +147,7 @@ export class EmpployeeAdManagement {
       : '';
     this.currentPage = 0;
     this.updateAppliedFilters();
-    this.loadData(1, this.pageSize);
+    this.loadData();
   }
 
   removeFilter(key: string) {
@@ -166,8 +167,9 @@ export class EmpployeeAdManagement {
       this.appliedSearch = '';
     }
     this.currentPage = 0;
+
     this.updateAppliedFilters();
-    this.loadData(1, this.pageSize);
+    this.loadData();
   }
 
   clearAllFilters() {
@@ -179,8 +181,9 @@ export class EmpployeeAdManagement {
     this.appliedDepartment = '';
     this.appliedSearch = '';
     this.currentPage = 0;
+
     this.updateAppliedFilters();
-    this.loadData(1, this.pageSize);
+    this.loadData();
   }
 
   openAdd() {
@@ -236,25 +239,41 @@ export class EmpployeeAdManagement {
     return !!this.editTel && this.editTel.length !== 4 && this.editTel.length !== 10;
   }
 
-  private loadAdInfo(employees: any[]) {
-    const withAd = employees.filter((e) => e.adUser);
-    if (!withAd.length) return;
+  private loadAdInfo(employees: any[]): void {
+    const adUsers = [...new Set(employees.map((e) => e.adUser?.trim()).filter(Boolean))];
 
-    const requests = withAd.map((e) =>
-      this.empAdService.getAdUserInfo(e.adUser).pipe(
-        map((res) => ({ adUser: e.adUser, data: res })),
-        catchError(() => of({ adUser: e.adUser, data: null })),
-      ),
-    );
+    if (!adUsers.length) {
+      this.adInfoMap = {};
+      return;
+    }
 
-    forkJoin(requests).subscribe((results) => {
-      const newMap: { [k: string]: any } = {};
-      results.forEach((r) => {
-        if (r.data) newMap[r.adUser] = r.data;
+    from(adUsers)
+      .pipe(
+        mergeMap(
+          (adUser) =>
+            this.empAdService.getAdUserInfo(adUser).pipe(
+              map((data) => ({
+                adUser,
+                data,
+              })),
+              catchError(() => of(null)),
+            ),
+          5,
+        ),
+        toArray(),
+      )
+      .subscribe((results) => {
+        const newMap: Record<string, any> = {};
+
+        results.forEach((result) => {
+          if (result?.data) {
+            newMap[result.adUser] = result.data;
+          }
+        });
+
+        this.adInfoMap = newMap;
+        this.cdr.detectChanges();
       });
-      this.adInfoMap = newMap;
-      this.cdr.detectChanges();
-    });
   }
 
   async toggleDisable(emp: any) {
@@ -432,7 +451,7 @@ export class EmpployeeAdManagement {
         this.cdr.detectChanges();
         setTimeout(() => {
           this.swalService.success(`อัปเดต AD User สำหรับ ${payload.codeMpId} เรียบร้อยแล้ว`);
-          this.loadData(this.currentPage + 1, this.pageSize);
+          this.loadData();
         }, 300);
       },
       error: (err) => {
@@ -447,17 +466,18 @@ export class EmpployeeAdManagement {
     });
   }
 
-  goToPage(page: number) {
+  goToPage(page: number): void {
     this.currentPage = page;
-    this.loadData(page + 1, this.pageSize);
+    this.updatePagedEmployees();
   }
-
-  setPageSize(size: number) {
+  setPageSize(size: number): void {
     this.pageSize = size;
     this.currentPage = 0;
-    this.loadData(1, size);
-  }
 
+    this.totalPages = Math.ceil(this.totalItems / this.pageSize) || 1;
+
+    this.updatePagedEmployees();
+  }
   private splitAtSpace(text: string): [string, string] {
     const idx = text.indexOf(' ');
     if (idx === -1) return [text, ''];
@@ -494,13 +514,13 @@ export class EmpployeeAdManagement {
     };
   }
 
-  private loadData(page: number, pageSize: number) {
+  private loadData() {
     this.isLoading = true;
 
     this.empAdService
       .getEmployees({
-        pageNumber: page,
-        pageSize,
+        pageNumber: 1,
+        pageSize: 2000,
         searchText: this.appliedSearch || undefined,
         companyCode: this.appliedCompany || undefined,
         department: this.appliedDepartment || undefined,
@@ -509,27 +529,35 @@ export class EmpployeeAdManagement {
         next: (res: any) => {
           const items = Array.isArray(res) ? res : (res.data ?? []);
 
-          const pagination = res.pagination;
+          this.allEmployees = items.map((i: any) => this.mapEmployee(i));
 
-          this.employees = items.map((i: any) => this.mapEmployee(i));
+          this.totalItems = this.allEmployees.length;
 
-          if (pagination) {
-            this.totalItems = pagination.total ?? items.length;
-            this.totalPages = pagination.totalPages ?? Math.ceil(this.totalItems / pageSize);
-            this.currentPage = (pagination.page ?? page) - 1;
-          } else {
-            this.totalItems = items.length;
-            this.totalPages = Math.ceil(items.length / pageSize) || 1;
-          }
+          this.totalPages = Math.ceil(this.totalItems / this.pageSize) || 1;
+
+          this.currentPage = 0;
+
+          this.updatePagedEmployees();
 
           this.isLoading = false;
           this.cdr.detectChanges();
-          this.loadAdInfo(this.employees);
         },
         error: () => {
           this.isLoading = false;
           this.cdr.detectChanges();
         },
       });
+  }
+
+  private updatePagedEmployees(): void {
+    const start = this.currentPage * this.pageSize;
+    const end = start + this.pageSize;
+
+    this.employees = this.allEmployees.slice(start, end);
+
+    // โหลด AD เฉพาะคนที่แสดงในหน้านี้
+    this.loadAdInfo(this.employees);
+
+    this.cdr.detectChanges();
   }
 }
