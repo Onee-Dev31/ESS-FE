@@ -1077,6 +1077,21 @@
   background: transparent;
   font-size: 13px;
 }
+.clear-search {
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  color: var(--text-muted);
+  background: transparent;
+  cursor: pointer;
+}
+.clear-search:hover { color: var(--text); background: var(--border-color); }
+.clear-search .material-symbols-outlined { font-size: 18px; }
 
 /* pills */
 .tk-pill {

@@ -618,6 +618,10 @@ export class TicketWorkspaceComponent implements OnInit, OnChanges {
     }, 300);
   }
 
+  clearKeyword(): void {
+    this.onKeywordChange('');
+  }
+
   trackById = (_: number, item: TicketItem) => item.id;
 
   private focusTicketsZone(retries = 10) {

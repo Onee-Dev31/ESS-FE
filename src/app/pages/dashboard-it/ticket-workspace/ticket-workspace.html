@@ -64,6 +64,11 @@
             (ngModelChange)="onKeywordChange($event)"
             placeholder="Number, Subject, Name "
           />
+          @if (keyword) {
+            <button type="button" class="clear-search" (click)="clearKeyword()" aria-label="Clear search">
+              <span class="material-symbols-outlined">close</span>
+            </button>
+          }
         </div>
 
         <div class="ticket-list" #ticketList>
