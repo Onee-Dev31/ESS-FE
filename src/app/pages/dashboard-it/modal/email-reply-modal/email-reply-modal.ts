@@ -15,6 +15,13 @@ import { SwalService } from '../../../../services/swal.service';
 import { ItServiceService } from '../../../../services/it-service.service';
 import { MasterService } from '../../../../services/master.service';
 import { environment } from '../../../../../environments/environment';
+import { AuthService } from '../../../../services/auth.service';
+import {
+  EmailReplyTemplate,
+  EmailReplyTemplateService,
+} from '../../../../services/email-reply-template.service';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { DestroyRef } from '@angular/core';
 
 interface CcRecipient {
   email: string;
@@ -38,6 +45,21 @@ export class EmailReplyModal implements OnInit {
   @Output() closeModal = new EventEmitter<void>();
 
   message = '';
+  templates = signal<EmailReplyTemplate[]>([]);
+  templatesLoading = signal(false);
+  templatesError = signal(false);
+  templateScope: 'all' | 'public' | 'private' = 'all';
+  templateSearch = '';
+  templateModalOpen = false;
+  templateFeedback = '';
+  readonly templateTabs = [
+    { value: 'all', label: 'ทั้งหมด' },
+    { value: 'public', label: 'Public · ส่วนกลาง' },
+    { value: 'private', label: 'Private · ของฉัน' },
+  ] as const;
+  private readonly templateService = inject(EmailReplyTemplateService);
+  private readonly authService = inject(AuthService);
+  private readonly destroyRef = inject(DestroyRef);
   quotedMessage = '';
   isSubmitting = signal(false);
   isConfirming = signal(false);
@@ -64,6 +86,7 @@ export class EmailReplyModal implements OnInit {
     'หากท่านมีคำถามหรือข้อมูลเพิ่มเติมเกี่ยวกับปัญหาดังกล่าว สามารถตอบกลับอีเมลนี้ได้ทันที';
 
   ngOnInit(): void {
+    this.loadTemplates();
     this.loadRecipients();
     this.loadEmployees();
     const originalDescription = this.ticket?.description ?? '';
@@ -145,6 +168,41 @@ export class EmailReplyModal implements OnInit {
     this.quotedMessage =
       originalHeader + replyNoticeHtml + `<blockquote>${description}</blockquote>`;
   }
+
+  loadTemplates(): void {
+    this.templatesLoading.set(true);
+    this.templatesError.set(false);
+    const userId = String(this.authService.userData()?.CODEMPID ?? '');
+    this.templateService
+      .getTemplates(userId)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (templates) => {
+          this.templates.set(templates);
+          this.templatesLoading.set(false);
+        },
+        error: () => {
+          this.templatesError.set(true);
+          this.templatesLoading.set(false);
+        },
+      });
+  }
+
+  get filteredTemplates(): EmailReplyTemplate[] {
+    const query = this.templateSearch.trim().toLowerCase();
+    return this.templates().filter(
+      (item) =>
+        (this.templateScope === 'all' || item.visibility === this.templateScope) &&
+        `${item.name} ${item.description}`.toLowerCase().includes(query),
+    );
+  }
+
+  // insertTemplate(template: EmailReplyTemplate): void {
+  //   if (this.isSubmitting() || this.isConfirming()) return;
+  //   if (this.textEditor?.appendHtml(template.html)) {
+  //     this.templateFeedback = `เพิ่ม “${template.name}” ในข้อความแล้ว`;
+  //   }
+  // }
 
   private loadRecipients(): void {
     const viaEmail =
@@ -393,6 +451,32 @@ export class EmailReplyModal implements OnInit {
     return hasText || hasImage;
   }
 
+  selectTemplate(template: EmailReplyTemplate): void {
+    if (this.isSubmitting() || this.isConfirming()) {
+      return;
+    }
+
+    const inserted = this.textEditor?.appendHtml(template.html);
+
+    if (!inserted) {
+      return;
+    }
+
+    this.templateFeedback = `เพิ่ม “${template.name}” ในข้อความแล้ว`;
+
+    this.closeTemplateModal();
+  }
+
+  openTemplateModal(): void {
+    this.templateModalOpen = true;
+    this.templateSearch = '';
+    this.templateScope = 'all';
+  }
+
+  closeTemplateModal(): void {
+    this.templateModalOpen = false;
+  }
+
   onMessageChange(value: string | null): void {
     this.message = value ?? '';
   }
@@ -469,7 +553,7 @@ export class EmailReplyModal implements OnInit {
           attachments: [],
         };
 
-        // console.log('submit email reply', payload);
+        console.log('submit email reply', payload);
 
         this.submitModal.emit(payload);
         this.isSubmitting.set(false);

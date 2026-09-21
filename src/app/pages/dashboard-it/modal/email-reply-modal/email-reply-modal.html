@@ -45,7 +45,11 @@
             aria-autocomplete="list"
             aria-controls="reply-cc-suggestions"
             [attr.aria-expanded]="ccSuggestionsOpen && ccSuggestions.length > 0"
-            [attr.aria-activedescendant]="ccSuggestionsOpen && ccSuggestions.length > 0 ? 'reply-cc-option-' + activeCcIndex : null"
+            [attr.aria-activedescendant]="
+              ccSuggestionsOpen && ccSuggestions.length > 0
+                ? 'reply-cc-option-' + activeCcIndex
+                : null
+            "
             autocomplete="off"
             [(ngModel)]="ccInput"
             (ngModelChange)="onCcInputChange()"
@@ -56,7 +60,12 @@
           />
         </div>
         @if (ccSuggestionsOpen && ccSuggestions.length > 0) {
-          <div id="reply-cc-suggestions" class="cc-suggestions" role="listbox" aria-label="รายชื่อผู้รับสำเนา">
+          <div
+            id="reply-cc-suggestions"
+            class="cc-suggestions"
+            role="listbox"
+            aria-label="รายชื่อผู้รับสำเนา"
+          >
             @for (employee of ccSuggestions; track employee.email; let i = $index) {
               <button
                 type="button"
@@ -70,7 +79,11 @@
               >
                 <img
                   class="cc-avatar"
-                  [src]="employee.employeeId ? employeeImageUrl + '/' + employee.employeeId + '.jpg' : 'user.png'"
+                  [src]="
+                    employee.employeeId
+                      ? employeeImageUrl + '/' + employee.employeeId + '.jpg'
+                      : 'user.png'
+                  "
                   (error)="onEmployeeImageError($event)"
                   alt=""
                   loading="lazy"
@@ -88,18 +101,53 @@
                   @if (employee.nameThai && employee.nameEnglish) {
                     <span class="cc-english-name">{{ employee.nameEnglish }}</span>
                   }
-                  <span class="cc-email"><i class="fa-regular fa-envelope" aria-hidden="true"></i>{{ employee.email }}</span>
+                  <span class="cc-email"
+                    ><i class="fa-regular fa-envelope" aria-hidden="true"></i
+                    >{{ employee.email }}</span
+                  >
                 </span>
                 <span class="cc-add-icon" aria-hidden="true"><i class="fa-solid fa-plus"></i></span>
               </button>
             }
           </div>
-          <div class="cc-keyboard-hint"><span>↑ ↓ เลือกรายชื่อ</span><span><kbd>Enter</kbd> เพิ่มผู้รับสำเนา</span></div>
+          <div class="cc-keyboard-hint">
+            <span>↑ ↓ เลือกรายชื่อ</span><span><kbd>Enter</kbd> เพิ่มผู้รับสำเนา</span>
+          </div>
         }
       </div>
 
       <label>ข้อความตอบกลับ <span>*</span></label>
+      <div class="template-selector">
+        <button
+          type="button"
+          class="btn-open-template"
+          (click)="openTemplateModal()"
+          [disabled]="isSubmitting() || isConfirming()"
+        >
+          <span class="template-selector-icon">
+            <i class="fa-regular fa-file-lines"></i>
+          </span>
+
+          <span class="template-selector-content">
+            <strong>เทมเพลตตอบกลับ</strong>
+            <small>เลือกข้อความสำเร็จรูปเพื่อเพิ่มลงในข้อความ</small>
+          </span>
+
+          <span class="template-selector-action">
+            เลือกเทมเพลต
+            <i class="fa-solid fa-chevron-right"></i>
+          </span>
+        </button>
+
+        @if (templateFeedback) {
+          <div class="template-feedback">
+            <i class="fa-solid fa-check"></i>
+            {{ templateFeedback }}
+          </div>
+        }
+      </div>
       <app-text-editor
+        [preserveTypedSpacing]="true"
         [value]="message"
         [focusAtStart]="true"
         (valueChange)="onMessageChange($event)"
@@ -126,4 +174,129 @@
       </button>
     </footer>
   </div>
+
+  @if (templateModalOpen) {
+    <div class="template-modal-overlay" (mousedown)="closeTemplateModal()">
+      <div
+        class="template-modal"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="template-modal-title"
+        (mousedown)="$event.stopPropagation()"
+      >
+        <header class="template-modal-header">
+          <div>
+            <h3 id="template-modal-title">
+              <i class="fa-regular fa-file-lines"></i>
+              เลือกเทมเพลตตอบกลับ
+            </h3>
+
+            <p>เลือกข้อความสำเร็จรูปเพื่อเพิ่มลงในข้อความตอบกลับ</p>
+          </div>
+
+          <button
+            type="button"
+            class="template-modal-close"
+            (click)="closeTemplateModal()"
+            aria-label="ปิด"
+          >
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </header>
+
+        <div class="template-modal-tools">
+          <div class="template-tabs">
+            @for (tab of templateTabs; track tab.value) {
+              <button
+                type="button"
+                [class.active]="templateScope === tab.value"
+                (click)="templateScope = tab.value"
+              >
+                {{ tab.label }}
+              </button>
+            }
+          </div>
+
+          <div class="template-search-wrapper">
+            <i class="fa-solid fa-magnifying-glass"></i>
+
+            <input
+              type="search"
+              [(ngModel)]="templateSearch"
+              placeholder="ค้นหาชื่อหรือรายละเอียดเทมเพลต..."
+            />
+          </div>
+        </div>
+
+        <div class="template-modal-body">
+          @if (templatesLoading()) {
+            <div class="template-state">
+              <i class="fa-solid fa-spinner fa-spin"></i>
+              กำลังโหลดเทมเพลต...
+            </div>
+          } @else if (templatesError()) {
+            <div class="template-state">
+              <span>โหลดเทมเพลตไม่สำเร็จ</span>
+
+              <button type="button" (click)="loadTemplates()">ลองใหม่</button>
+            </div>
+          } @else {
+            <div class="template-modal-list">
+              @for (template of filteredTemplates; track template.id) {
+                <button type="button" class="template-option" (click)="selectTemplate(template)">
+                  <span class="template-option-icon">
+                    <i class="fa-regular fa-file-lines"></i>
+                  </span>
+
+                  <span class="template-option-content">
+                    <span class="template-option-heading">
+                      <strong>{{ template.name }}</strong>
+
+                      <span
+                        class="template-badge"
+                        [class.private]="template.visibility === 'private'"
+                      >
+                        <i
+                          class="fa-solid"
+                          [class.fa-users]="template.visibility === 'public'"
+                          [class.fa-lock]="template.visibility === 'private'"
+                        ></i>
+
+                        {{ template.visibility === 'public' ? 'Public' : 'Private' }}
+                      </span>
+                    </span>
+
+                    <span class="template-description">
+                      {{ template.description }}
+                    </span>
+                  </span>
+
+                  <span class="template-option-action">
+                    <i class="fa-solid fa-plus"></i>
+                    ใช้เทมเพลต
+                  </span>
+                </button>
+              } @empty {
+                <div class="template-state">
+                  <i class="fa-regular fa-folder-open"></i>
+                  ไม่พบเทมเพลตที่ตรงกับการค้นหา
+                </div>
+              }
+            </div>
+          }
+        </div>
+
+        <footer class="template-modal-footer">
+          <span>
+            <i class="fa-solid fa-circle-info"></i>
+            สามารถแก้ไขข้อความได้หลังจากเลือกเทมเพลต
+          </span>
+
+          <button type="button" class="btn-template-cancel" (click)="closeTemplateModal()">
+            ปิด
+          </button>
+        </footer>
+      </div>
+    </div>
+  }
 </div>

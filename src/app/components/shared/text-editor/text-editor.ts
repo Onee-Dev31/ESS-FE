@@ -1,12 +1,22 @@
-import { Component, EventEmitter, inject, Input, Output } from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  inject,
+  Input,
+  Output,
+  OnChanges,
+  SimpleChanges,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { QuillModule } from 'ngx-quill';
+import Quill, { Delta } from 'quill';
+import DOMPurify from 'dompurify';
+import { map, Observable, of } from 'rxjs';
+
 import { TextEditorImageManager } from './image-manager';
-import Quill from 'quill';
 import { TextEditorImageService } from '../../../services/text-editor-image.service';
 import { SwalService } from '../../../services/swal.service';
-import { map, Observable, of } from 'rxjs';
 
 @Component({
   selector: 'app-text-editor',
@@ -15,49 +25,378 @@ import { map, Observable, of } from 'rxjs';
   templateUrl: './text-editor.html',
   styleUrl: './text-editor.scss',
 })
-export class TextEditorComponent {
+export class TextEditorComponent implements OnChanges {
   @Input() value = '';
   @Input() focusAtStart = false;
-
+  @Input() preserveTypedSpacing = false;
   @Input() placeholder = 'กรอกรายละเอียด...';
 
   @Output() valueChange = new EventEmitter<string>();
-
   @Output() imagePathsChange = new EventEmitter<string[]>();
 
-  quill: any;
+  quill!: Quill;
+
+  /**
+   * ค่า HTML ภายใน editor
+   *
+   * สำคัญ:
+   * ไม่ bind Quill เข้ากับ @Input value โดยตรง
+   * เพราะ parent จะส่ง value กลับมา แล้ว Quill จะ import HTML ใหม่
+   * ซึ่งอาจ normalize whitespace ของ template เก่า
+   */
+  editorValue = '';
 
   private imageManager!: TextEditorImageManager;
-
   private uploadedImages = new Set<string>();
 
-  quillConfig = {
-    toolbar: [['bold', 'italic'], ['image']],
-  };
+  /**
+   * ป้องกัน ngOnChanges เอาค่าที่เราเพิ่ง emit
+   * กลับมา setContents ซ้ำอีกครั้ง
+   */
+  private lastEmittedValue = '';
 
   private swalService = inject(SwalService);
   private textEditorImageService = inject(TextEditorImageService);
 
-  onEditorCreated(quill: Quill) {
+  quillConfig = {
+    toolbar: [['bold', 'italic'], ['image']],
+
+    keyboard: {
+      bindings: {
+        // Tab = 4 spaces จริง ๆ
+        // replyTab: {
+        //   key: 'Tab',
+        //   shiftKey: false,
+        //   handler: (range: { index: number; length: number }) => {
+        //     if (!this.preserveTypedSpacing) {
+        //       return true;
+        //     }
+        //     this.insertSpacing(range, '\u00A0'.repeat(4));
+        //     return false;
+        //   },
+        // },
+        // Spacebar = space ที่ HTML ไม่ยุบ
+        // replySpace: {
+        //   key: ' ',
+        //   handler: (range: { index: number; length: number }) => {
+        //     if (!this.preserveTypedSpacing) {
+        //       return true;
+        //     }
+        //     this.insertSpacing(range, '\u00a0');
+        //     return false;
+        //   },
+        // },
+      },
+    },
+  };
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (!changes['value']) {
+      return;
+    }
+
+    const incomingValue = this.value ?? '';
+
+    /**
+     * ถ้าเป็นค่าที่ editor เพิ่ง emit ออกไปเอง
+     * ไม่ต้อง import กลับเข้า Quill
+     */
+    if (incomingValue === this.lastEmittedValue) {
+      return;
+    }
+
+    this.editorValue = incomingValue;
+
+    /**
+     * ถ้า Quill ถูกสร้างแล้ว และ parent เปลี่ยน value
+     * จากภายนอกจริง ๆ เช่นเปลี่ยน ticket
+     */
+    if (this.quill) {
+      this.setExternalValue(incomingValue);
+    }
+  }
+
+  onEditorCreated(quill: Quill): void {
     this.quill = quill;
+
+    if (this.preserveTypedSpacing) {
+      const keyboard = quill.getModule('keyboard') as any;
+
+      const tabBinding = {
+        key: 'Tab',
+
+        handler: (range: { index: number; length: number }) => {
+          this.insertSpacing(range, '\u00A0'.repeat(4));
+          return false;
+        },
+      };
+
+      keyboard.bindings['Tab'] = [tabBinding, ...(keyboard.bindings['Tab'] ?? [])];
+    }
 
     this.imageManager = new TextEditorImageManager(quill, (file) => this.uploadEditorImage(file));
 
     this.imageManager.attach();
 
+    if (this.value) {
+      this.setExternalValue(this.value);
+    }
+
     if (this.focusAtStart) {
-      quill.focus({ preventScroll: true });
-      quill.setSelection(0, 0, 'silent');
-      quill.root.scrollTop = 0;
+      queueMicrotask(() => {
+        quill.focus({ preventScroll: true });
+        quill.setSelection(0, 0, 'silent');
+        quill.root.scrollTop = 0;
+      });
     }
   }
 
-  private uploadEditorImage(file: File) {
+  /**
+   * รับค่าจาก parent จริง ๆ
+   * เช่นเปิด ticket ใหม่
+   */
+  private setExternalValue(html: string): void {
+    if (!this.quill) {
+      return;
+    }
+
+    const sanitizedHtml = DOMPurify.sanitize(html ?? '');
+
+    const preparedHtml = this.preserveHtmlSpaces(sanitizedHtml);
+
+    const delta = this.quill.clipboard.convert({
+      html: preparedHtml,
+    });
+
+    this.quill.setContents(delta, 'silent');
+
+    this.editorValue = this.quill.root.innerHTML;
+  }
+
+  /**
+   * แปลง whitespace ที่ HTML ปกติจะ collapse
+   *
+   * เช่น
+   *
+   * <p>        ข้อความ</p>
+   *
+   * ให้กลายเป็น NBSP ก่อนเข้า Quill
+   *
+   * ไม่ใช้ ql-indent เพราะ requirement
+   * คือรักษา space จริง ๆ จาก template
+   */
+  private preserveHtmlSpaces(html: string): string {
+    const template = document.createElement('template');
+
+    template.innerHTML = html;
+
+    const walker = document.createTreeWalker(template.content, NodeFilter.SHOW_TEXT);
+
+    let node: Node | null;
+
+    while ((node = walker.nextNode())) {
+      const text = node.textContent ?? '';
+
+      if (!text) {
+        continue;
+      }
+
+      /**
+       * whitespace ระหว่าง tag เช่น
+       *
+       * </p>
+       * <p>
+       *
+       * ไม่ต้องเก็บ
+       */
+      if (!text.trim() && /[\r\n]/.test(text)) {
+        continue;
+      }
+
+      node.textContent = this.convertSignificantSpaces(text);
+    }
+
+    return template.innerHTML;
+  }
+
+  /**
+   * รักษา:
+   * - space ต้นข้อความ
+   * - space หลายตัวติดกัน
+   *
+   * แต่ space ปกติระหว่างคำ 1 ตัว
+   * ยังคงเป็น normal space
+   */
+  private convertSignificantSpaces(text: string): string {
+    return (
+      text
+        /**
+         * leading spaces
+         */
+        .replace(/^ +/, (spaces) => '\u00a0'.repeat(spaces.length))
+
+        /**
+         * consecutive spaces
+         */
+        .replace(/ {2,}/g, (spaces) => '\u00a0'.repeat(spaces.length))
+
+        /**
+         * tab = 4 spaces
+         */
+        .replace(/\t/g, '\u00a0'.repeat(4))
+    );
+  }
+
+  /**
+   * ใช้สำหรับ Tab ที่ผู้ใช้กดเอง
+   */
+  private insertSpacing(
+    range: {
+      index: number;
+      length: number;
+    },
+    spacing: string,
+  ): void {
+    if (!this.quill) {
+      return;
+    }
+
+    const formats = this.quill.getFormat(range.index, range.length);
+
+    this.quill.updateContents(
+      new Delta().retain(range.index).delete(range.length).insert(spacing, formats),
+      'user',
+    );
+
+    this.quill.setSelection(range.index + spacing.length, 0, 'silent');
+  }
+
+  /**
+   * ngx-quill เรียกตอนผู้ใช้พิมพ์
+   *
+   * สำคัญ:
+   * update editorValue ภายใน
+   * แล้ว emit parent
+   *
+   * แต่ไม่เอา @Input value มาเขียนทับ Quill
+   */
+  onContentChange(value: string | null): void {
+    const normalizedValue = value ?? '';
+
+    this.editorValue = normalizedValue;
+    this.lastEmittedValue = normalizedValue;
+
+    this.valueChange.emit(normalizedValue);
+
+    this.checkDeletedImages();
+  }
+
+  appendHtml(html: string): boolean {
+    if (!this.quill) return false;
+
+    const editor = this.quill;
+
+    const sanitizedHtml = DOMPurify.sanitize(html);
+    const preparedHtml = this.preserveHtmlSpaces(sanitizedHtml);
+
+    const content = editor.clipboard.convert({
+      html: preparedHtml,
+    });
+
+    let insertIndex = Math.max(0, editor.getLength() - 1);
+
+    if (insertIndex > 0) {
+      editor.insertText(insertIndex, '\n', 'user');
+      insertIndex++;
+    }
+
+    editor.updateContents(new Delta().retain(insertIndex).concat(content), 'user');
+
+    const end = Math.max(0, editor.getLength() - 1);
+
+    editor.focus({ preventScroll: true });
+    editor.setSelection(end, 0, 'silent');
+
+    return true;
+  }
+
+  private preserveSpacesForOutput(html: string): string {
+    const template = document.createElement('template');
+    template.innerHTML = html;
+
+    const walker = document.createTreeWalker(template.content, NodeFilter.SHOW_TEXT);
+
+    let node: Node | null;
+
+    while ((node = walker.nextNode())) {
+      const text = node.textContent ?? '';
+
+      if (!text) continue;
+
+      // ไม่ยุ่งกับ whitespace ที่ใช้จัด format HTML ระหว่าง tags
+      if (!text.trim() && /[\r\n]/.test(text)) {
+        continue;
+      }
+
+      node.textContent = text
+        // tab -> NBSP 4 ตัว
+        .replace(/\t/g, '\u00A0'.repeat(4))
+
+        // space ที่ต้นบรรทัด
+        .replace(/^ +/, (spaces) => '\u00A0'.repeat(spaces.length))
+
+        // space 2 ตัวขึ้นไป
+        .replace(/ {2,}/g, (spaces) => '\u00A0'.repeat(spaces.length));
+    }
+
+    return template.innerHTML.replace(/\u00A0/g, '&nbsp;');
+  }
+
+  getOutputHtml(): string {
+    const html = this.quill ? this.quill.root.innerHTML : this.editorValue;
+
+    return this.preserveSpacesForOutput(html);
+  }
+
+  private preserveDeltaSpaces(text: string): string {
+    return (
+      text
+        // Tab จริง -> NBSP 4 ตัว
+        .replace(/\t/g, '\u00A0'.repeat(4))
+
+        // space หลายตัวติดกัน -> NBSP
+        .replace(/ {2,}/g, (spaces) => '\u00A0'.repeat(spaces.length))
+
+        // space ต้นบรรทัด -> NBSP
+        .replace(
+          /(^|\n)( +)/g,
+          (_, prefix: string, spaces: string) => prefix + '\u00A0'.repeat(spaces.length),
+        )
+    );
+  }
+
+  private getCurrentHtml(): string {
+    if (!this.quill) {
+      return this.editorValue;
+    }
+
+    return this.quill.root.innerHTML.replace(/\u00A0/g, '&nbsp;');
+  }
+
+  private emitCurrentHtml(): void {
+    const html = this.getCurrentHtml();
+
+    this.editorValue = html;
+    this.lastEmittedValue = html;
+
+    this.valueChange.emit(html);
+  }
+  private uploadEditorImage(file: File): void {
     this.textEditorImageService.uploadTemp(file).subscribe({
       next: (res) => {
-        console.log(res);
-
-        if (!res.success) return;
+        if (!res.success) {
+          return;
+        }
 
         const imageUrl = res.data.filePath;
 
@@ -67,12 +406,9 @@ export class TextEditorComponent {
 
         const range = this.quill.getSelection(true);
 
-        this.quill.insertEmbed(
-          range ? range.index : this.quill.getLength(),
-          'image',
-          imageUrl,
-          'user',
-        );
+        const index = range ? range.index : Math.max(0, this.quill.getLength() - 1);
+
+        this.quill.insertEmbed(index, 'image', imageUrl, 'user');
 
         const images = this.quill.root.querySelectorAll('img');
 
@@ -82,10 +418,9 @@ export class TextEditorComponent {
           }
         });
 
-        this.quill.setSelection((range ? range.index : this.quill.getLength()) + 1);
-
-        console.log(this.quill.root.innerHTML);
+        this.quill.setSelection(index + 1, 0, 'silent');
       },
+
       error: (err) => {
         console.error(err);
 
@@ -94,8 +429,10 @@ export class TextEditorComponent {
     });
   }
 
-  private checkDeletedImages() {
-    if (!this.quill) return;
+  private checkDeletedImages(): void {
+    if (!this.quill) {
+      return;
+    }
 
     const currentImages = new Set(
       Array.from(this.quill.root.querySelectorAll('img') as NodeListOf<HTMLImageElement>).map(
@@ -111,9 +448,9 @@ export class TextEditorComponent {
       }
     });
 
-    if (!deletedImages.length) return;
-
-    console.log('Deleted Images', deletedImages);
+    if (!deletedImages.length) {
+      return;
+    }
 
     this.textEditorImageService
       .deleteTemp({
@@ -126,9 +463,8 @@ export class TextEditorComponent {
           });
 
           this.emitImagePaths();
-
-          console.log('Delete success');
         },
+
         error: (err) => {
           console.error(err);
         },
@@ -136,8 +472,12 @@ export class TextEditorComponent {
   }
 
   confirmImages(): Observable<string> {
+    const rawHtml = this.quill ? this.quill.root.innerHTML : this.editorValue;
+
+    const currentHtml = this.preserveSpacesForOutput(rawHtml);
+
     if (this.uploadedImages.size === 0) {
-      return of(this.value);
+      return of(currentHtml);
     }
 
     return this.textEditorImageService
@@ -146,7 +486,7 @@ export class TextEditorComponent {
       })
       .pipe(
         map((res) => {
-          let html = this.value;
+          let html = currentHtml;
 
           res.data.forEach((item: any) => {
             html = html.replaceAll(item.tempPath, item.fileUrl);
@@ -157,19 +497,22 @@ export class TextEditorComponent {
       );
   }
 
-  clear() {
+  clear(): void {
     this.clearImages();
 
     this.uploadedImages.clear();
 
-    this.value = '';
+    this.editorValue = '';
+    this.lastEmittedValue = '';
+
+    if (this.quill) {
+      this.quill.setText('', 'silent');
+    }
 
     this.valueChange.emit('');
-
-    this.quill?.setContents([]);
   }
 
-  clearImages() {
+  clearImages(): void {
     if (this.uploadedImages.size === 0) {
       return;
     }
@@ -185,25 +528,15 @@ export class TextEditorComponent {
           this.uploadedImages.clear();
 
           this.emitImagePaths();
-
-          console.log('Delete temp images success');
         },
+
         error: (err) => {
           console.error(err);
         },
       });
   }
 
-  onContentChange(value: string | null) {
-    const normalizedValue = value ?? '';
-
-    this.value = normalizedValue;
-    this.valueChange.emit(normalizedValue);
-
-    this.checkDeletedImages();
-  }
-
-  private emitImagePaths() {
+  private emitImagePaths(): void {
     this.imagePathsChange.emit([...this.uploadedImages]);
   }
 }
