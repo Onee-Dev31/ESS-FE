@@ -926,6 +926,21 @@
 }
 .template-detail .scope-toggle button:hover { color: #2563eb; background: rgba(37, 99, 235, .08); }
 .template-detail .scope-toggle button.active { color: #2563eb; background: var(--bg-card); box-shadow: 0 1px 3px rgba(15, 23, 42, .14); font-weight: 600; }
+
+:host ::ng-deep .template-detail .ql-container { position: relative; }
+:host ::ng-deep .template-detail .ql-tooltip {
+  left: 8px !important;
+  right: 8px !important;
+  width: auto;
+  max-width: calc(100% - 16px);
+  box-sizing: border-box;
+  transform: none !important;
+  white-space: normal;
+}
+:host ::ng-deep .template-detail .ql-tooltip input[type='text'] {
+  width: min(180px, calc(100% - 72px));
+  box-sizing: border-box;
+}
 @media (max-width: 520px) {
   .template-option { flex-wrap: wrap; }
   .template-option > .template-actions { width: 100%; justify-content: flex-end; }

@@ -1,10 +1,7 @@
 import { Component, EventEmitter, inject, Input, OnInit, Output, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../services/auth.service';
-import {
-  ItServiceService,
-  ManageGuideDocumentPayload,
-} from '../../services/it-service.service';
+import { ItServiceService, ManageGuideDocumentPayload } from '../../services/it-service.service';
 import { SwalService } from '../../services/swal.service';
 import { PageHeaderComponent } from '../../components/shared/page-header/page-header';
 
@@ -47,14 +44,16 @@ export class SettingGuideDocument implements OnInit {
     this.api.getGuideDocuments().subscribe({
       next: (res) => {
         const data = Array.isArray(res) ? res : (res?.data ?? []);
-        console.log('Guide documents loaded:', data);
-        this.documents.set(data.map((item: any) => ({
-          id: item.Id ?? item.id,
-          name: item.Name ?? item.name,
-          fileUrl: item.File_Url ?? item.fileUrl,
-          filePath: item.File_Path ?? item.filePath,
-          isActive: item.IsActive ?? item.isActive,
-        })));
+        // console.log('Guide documents loaded:', data);
+        this.documents.set(
+          data.map((item: any) => ({
+            id: item.Id ?? item.id,
+            name: item.Name ?? item.name,
+            fileUrl: item.File_Url ?? item.fileUrl,
+            filePath: item.File_Path ?? item.filePath,
+            isActive: item.IsActive ?? item.isActive,
+          })),
+        );
         this.loading.set(false);
       },
       error: () => {
@@ -103,9 +102,10 @@ export class SettingGuideDocument implements OnInit {
     };
     this.saving.set(true);
     const { id: _id, ...createPayload } = payload;
-    const request = this.editingId === 0
-      ? this.api.createGuideDocument(createPayload)
-      : this.api.manageGuideDocument(payload);
+    const request =
+      this.editingId === 0
+        ? this.api.createGuideDocument(createPayload)
+        : this.api.manageGuideDocument(payload);
     request.subscribe({
       next: () => {
         this.saving.set(false);
