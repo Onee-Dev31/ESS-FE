@@ -28,6 +28,8 @@ interface CcRecipient {
   nameEnglish: string;
 }
 
+interface GuideDocumentOption { id: number; name: string; fileUrl: string; isActive: boolean; }
+
 @Component({
   selector: 'app-email-reply-modal',
   standalone: true,
@@ -47,6 +49,11 @@ export class EmailReplyModal implements OnInit {
   templatesError = signal(false);
   templateSearch = '';
   templateModalOpen = false;
+  guideModalOpen = false;
+  guideSearch = '';
+  guideDocuments = signal<GuideDocumentOption[]>([]);
+  guideLoading = signal(false);
+  guideInsertTarget: 'reply' | 'template' = 'reply';
   expandedTemplateId: number | null = null;
   editingTemplateId: number | null = null;
   templateTitle = '';
@@ -473,6 +480,44 @@ export class EmailReplyModal implements OnInit {
     this.templateModalOpen = false;
     this.expandedTemplateId = null;
     this.templateActionError.set('');
+  }
+
+  openGuideModal(target: 'reply' | 'template' = 'reply'): void {
+    this.guideInsertTarget = target;
+    this.guideModalOpen = true;
+    this.guideSearch = '';
+    if (!this.guideDocuments().length) this.loadGuideDocuments();
+  }
+
+  closeGuideModal(): void { this.guideModalOpen = false; }
+
+  private loadGuideDocuments(): void {
+    this.guideLoading.set(true);
+    this.itServiceService.getGuideDocuments().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+      next: (res) => {
+        const rows = Array.isArray(res) ? res : (res?.data ?? []);
+        this.guideDocuments.set(rows.map((item: any) => ({ id: item.Id ?? item.id, name: item.Name ?? item.name, fileUrl: item.File_Url ?? item.fileUrl, isActive: item.IsActive ?? item.isActive })).filter((item: GuideDocumentOption) => item.isActive));
+        this.guideLoading.set(false);
+      },
+      error: () => { this.guideLoading.set(false); this.swalService.warning('โหลดเอกสารคู่มือไม่สำเร็จ'); },
+    });
+  }
+
+  get filteredGuideDocuments(): GuideDocumentOption[] {
+    const query = this.guideSearch.trim().toLowerCase();
+    return this.guideDocuments().filter(item => !query || `${item.name} ${item.fileUrl}`.toLowerCase().includes(query));
+  }
+
+  insertGuideDocument(document: GuideDocumentOption): void {
+    const name = this.escapeHtml(document.name);
+    const url = this.escapeHtml(document.fileUrl);
+    const linkHtml = `<p>คู่มือที่เกี่ยวข้อง: <a href="${url}" target="_blank" rel="noopener noreferrer">${name}</a></p>`;
+    if (this.guideInsertTarget === 'template') {
+      this.templateBody = `${this.templateBody || ''}${linkHtml}`;
+      this.closeGuideModal();
+      return;
+    }
+    if (this.textEditor?.appendHtml(linkHtml)) this.closeGuideModal();
   }
 
   toggleTemplate(template: EmailReplyTemplateApi): void {

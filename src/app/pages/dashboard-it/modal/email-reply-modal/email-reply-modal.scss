@@ -1,8 +1,12 @@
 @use '../../../../../styles/variables' as *;
 
 .template-selector {
+  display: grid;
+  gap: 8px;
   margin-bottom: 14px;
 }
+.guide-picker-modal .template-option { cursor: default; }
+.guide-picker-modal .template-description { max-width: 480px; }
 
 .btn-open-template {
   display: flex;
@@ -887,6 +891,7 @@
 .template-option-heading strong { overflow-wrap: anywhere; }
 .template-updated-by { display: block; margin-top: 4px; color: var(--text-muted); font-size: 10px; }
 .template-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.template-expand-button { width: 34px; padding: 0; justify-content: center; }
 .template-use { color: #fff; background: #2563eb; border-color: #2563eb; }
 .template-delete { color: #dc2626; }
 .template-detail {
@@ -913,6 +918,7 @@
 .template-preview ol > li { counter-increment: preview-item; position: relative; }
 .template-preview ol > li::before { content: counter(preview-item) '. '; position: absolute; right: 100%; margin-right: 6px; }
 .template-detail-actions { justify-content: flex-end; margin-top: 16px; }
+.btn-select-guide { margin-top: 12px; color: #2563eb; border-color: rgba(37,99,235,.35); }
 .template-error { color: #dc2626; padding: 10px; font-size: 12px; }
 .template-modal button:disabled { opacity: .5; cursor: not-allowed; }
 .template-modal button:focus-visible { outline: 2px solid #2563eb; outline-offset: 3px; }
