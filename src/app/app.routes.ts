@@ -250,6 +250,12 @@ export const routes: Routes = [
         data: { animation: 'Dashboard' },
       },
       {
+        path: 'hr-welfare-setting',
+        loadComponent: () =>
+          import('./pages/setting-hr-welfare/setting-hr-welfare').then((m) => m.SettingHrWelfare),
+        data: { animation: 'Dashboard' },
+      },
+      {
         path: 'notification-setting',
         loadComponent: () =>
           import('./pages/setting-notification/setting-notification').then(
