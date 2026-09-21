@@ -120,7 +120,7 @@
                 <span class="status-badge" [ngStyle]="getStatusClass(claim.status)">
                   {{ claim.status | statusLabel }}
                 </span>
-                @if (claim.status.toLowerCase() === 'pending') {
+                @if (isEditableClaim(claim.status)) {
                   <button
                     class="btn-icon edit"
                     (click)="$event.stopPropagation(); editRequest(claim)"
@@ -275,7 +275,7 @@
                 </td>
 
                 <td class="text-center" (click)="$event.stopPropagation()">
-                  @if (claim.status.toLowerCase() === 'pending') {
+                  @if (isEditableClaim(claim.status)) {
                     <div class="action-btns">
                       <button
                         class="btn-icon edit mr-10"

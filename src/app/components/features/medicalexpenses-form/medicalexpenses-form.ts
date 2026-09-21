@@ -786,7 +786,7 @@ export class MedicalexpensesForm implements OnInit, OnDestroy {
 
     const confirmed = await this.dialogService.confirm({
       title: this.isEditMode() ? 'ยืนยันการแก้ไขการเบิก' : 'ยืนยันการส่งเรื่องเบิก',
-      message: `ต้องการ${this.isEditMode() ? 'แก้ไข' : 'ส่ง'}เรื่องเบิกค่ารักษาพยาบาล <strong>${rawType.nameTh}</strong><br>จำนวน <strong>${this.parseNumber(this.amount).toLocaleString('th-TH')} บาท</strong> ใช่หรือไม่?`,
+      message: `ต้องการ${this.isEditMode() ? 'แก้ไข' : 'ส่ง'}เรื่องเบิกค่ารักษาพยาบาล <br><strong>${rawType.nameTh}</strong><br>จำนวน <strong>${this.parseNumber(this.amount).toLocaleString('th-TH')} บาท</strong> ใช่หรือไม่?`,
       confirmText: this.isEditMode() ? 'ยืนยันการแก้ไข' : 'ส่งเรื่องเบิก',
       cancelText: 'ยกเลิก',
       type: 'info',

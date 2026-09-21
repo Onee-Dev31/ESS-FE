@@ -288,6 +288,11 @@ export class MedicalexpensesComponent implements OnInit {
     return StatusUtil.getStatusBadgeClaims(status);
   }
 
+  isEditableClaim(status: string): boolean {
+    const normalizedStatus = status?.trim().toLowerCase().replace(/[_-]+/g, ' ');
+    return normalizedStatus === 'pending' || normalizedStatus === 'referred back';
+  }
+
   trackById(_: number, claim: MedicalClaim): number {
     return claim.claimId;
   }
