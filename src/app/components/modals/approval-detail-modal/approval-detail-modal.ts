@@ -61,6 +61,8 @@ export class ApprovalDetailModalComponent implements OnInit {
 
   @Input({ required: true }) approvalItem!: ApprovalItem;
   @Input() initialAction: 'Approved' | 'Rejected' | 'Referred Back' | null = null;
+  @Input() showActions = true;
+  @Input() showRequesterInfo = true;
 
   @Output() onClose = new EventEmitter<void>();
   @Output() onStatusUpdated = new EventEmitter<void>();
@@ -81,8 +83,15 @@ export class ApprovalDetailModalComponent implements OnInit {
   vehicleDetail = signal<any>(null);
   taxiDetail = signal<any>(null);
 
+  private normalizedStatus = computed(() =>
+    (this.detailedStatus() || this.approvalItem.rawStatus || '')
+      .trim()
+      .toLowerCase()
+      .replace(/[_-]+/g, ' '),
+  );
+
   steps = computed(() => {
-    const status = this.detailedStatus() || this.approvalItem.rawStatus;
+    const status = this.normalizedStatus();
     const isRejected = status === 'rejected';
 
     return [
@@ -97,9 +106,11 @@ export class ApprovalDetailModalComponent implements OnInit {
   });
 
   currentStepIndex = computed(() => {
-    const status = this.detailedStatus() || this.approvalItem.rawStatus;
+    const status = this.normalizedStatus();
+
     if (!status) return 0;
     if (status === 'new') return 1;
+    if (status === 'referred back') return 1;
     if (status === 'pending') return 2;
     if (status === 'rejected') return 3;
     if (status === 'approved') return 4;
@@ -107,9 +118,10 @@ export class ApprovalDetailModalComponent implements OnInit {
   });
 
   isRejected = computed(() => {
-    const status = this.detailedStatus() || this.approvalItem.rawStatus;
-    return status === 'rejected';
+    return this.normalizedStatus() === 'rejected';
   });
+
+  isReferredBack = computed(() => this.normalizedStatus() === 'referred back');
 
   getDisplayStatus(): string {
     const status = this.detailedStatus() || this.approvalItem.rawStatus;

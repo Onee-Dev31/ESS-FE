@@ -2,6 +2,7 @@ import { Component, OnInit, signal, computed, inject, Inject, PLATFORM_ID } from
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MedicalClaim } from '../../interfaces/medical.interface';
+import { ApprovalItem } from '../../interfaces/approval.interface';
 import { MedicalService } from '../../services/medical.service';
 import { AuthService } from '../../services/auth.service';
 import { SwalService } from '../../services/swal.service';
@@ -25,6 +26,7 @@ import { en_US, NzI18nService } from 'ng-zorro-antd/i18n';
 import { NzInputModule } from 'ng-zorro-antd/input';
 import { NzIconModule } from 'ng-zorro-antd/icon';
 import { FileConverterService } from '../../services/file-converter';
+import { ApprovalDetailModalComponent } from '../../components/modals/approval-detail-modal/approval-detail-modal';
 /** หน้าแสดงรายการเบิกค่ารักษาพยาบาล */
 @Component({
   selector: 'app-medicalexpenses',
@@ -42,6 +44,7 @@ import { FileConverterService } from '../../services/file-converter';
     NzDatePickerModule,
     NzInputModule,
     NzIconModule,
+    ApprovalDetailModalComponent,
   ],
   templateUrl: './medicalexpenses.html',
   styleUrl: './medicalexpenses.scss',
@@ -74,6 +77,7 @@ export class MedicalexpensesComponent implements OnInit {
   sorting = signal<SortingState>([{ id: 'claimId', desc: true }]);
 
   isModalOpen = signal<boolean>(false);
+  selectedDetailItem = signal<ApprovalItem | null>(null);
   isPolicyModalOpen = signal<boolean>(false);
   selectedClaimId = signal<number | null>(null);
   isPreviewModalOpen = signal<boolean>(false);
@@ -107,12 +111,11 @@ export class MedicalexpensesComponent implements OnInit {
   totalItems = computed(() => this.allClaims().length);
   totalAmount = computed(() => this.allClaims().reduce((s, c) => s + c.requestedAmount, 0));
   pendingCount = computed(
-    () =>
-      this.allClaims().filter((c) =>
-        ['NEW', 'PENDING_APPROVAL', 'WAITING_CHECK'].includes(c.status),
-      ).length,
+    () => this.allClaims().filter((claim) => this.isPendingStatus(claim.status)).length,
   );
-  approvedCount = computed(() => this.allClaims().filter((c) => c.status === 'APPROVED').length);
+  approvedCount = computed(
+    () => this.allClaims().filter((claim) => claim.status.toLowerCase() === 'approved').length,
+  );
 
   table = createAngularTable(() => ({
     data: this.paginatedClaims(),
@@ -202,8 +205,7 @@ export class MedicalexpensesComponent implements OnInit {
 
     this.medicalService.getClaims(payload).subscribe({
       next: (res) => {
-        console.log(res.data);
-        this.allClaims.set(res.data);
+        this.allClaims.set(this.mapApiData(res.data));
         this.listing.currentPage.set(0);
         this.loadingService.stop('medical-list');
         this.isRefreshing.set(false);
@@ -217,6 +219,44 @@ export class MedicalexpensesComponent implements OnInit {
     });
   }
 
+  private mapApiData(items: MedicalClaim[] | null | undefined): MedicalClaim[] {
+    return (items ?? []).map((item) => ({
+      ...item,
+      claimId: Number(item.claimId ?? 0),
+      expenseTypeId: Number(item.expenseTypeId ?? 0),
+      hospitalId: Number(item.hospitalId ?? 0),
+      diseaseId: Number(item.diseaseId ?? 0),
+      treatmentDays: Number(item.treatmentDays ?? 0),
+      requestedAmount: Number(item.requestedAmount ?? 0),
+      approvedAmount: Number(item.approvedAmount ?? 0),
+      typeTotalLimit: Number(item.typeTotalLimit ?? 0),
+      typeUsedAmount: Number(item.typeUsedAmount ?? 0),
+      typeRemainingAmount: Number(item.typeRemainingAmount ?? 0),
+      status: this.mapStatus(item.status),
+      attachments: (item.attachments ?? []).map((attachment) => ({
+        ...attachment,
+        claimId: Number(attachment.claimId ?? item.claimId ?? 0),
+        attachmentId: Number(attachment.attachmentId ?? 0),
+        fileSize: Number(attachment.fileSize ?? 0),
+      })),
+    }));
+  }
+
+  private mapStatus(status: string | null | undefined): string {
+    if (!status) return '';
+
+    const normalizedStatus = status.trim().toLowerCase().replace(/[_-]+/g, ' ');
+    if (normalizedStatus === 'pending') return 'New';
+    if (normalizedStatus === 'referred back') return 'Referred Back';
+
+    return normalizedStatus.charAt(0).toUpperCase() + normalizedStatus.slice(1);
+  }
+
+  private isPendingStatus(status: string): boolean {
+    const normalizedStatus = status.trim().toLowerCase().replace(/[_-]+/g, ' ');
+    return ['new', 'pending approval', 'waiting check'].includes(normalizedStatus);
+  }
+
   openModal(claimId?: number) {
     this.selectedClaimId.set(claimId ?? null);
     this.isModalOpen.set(true);
@@ -224,6 +264,50 @@ export class MedicalexpensesComponent implements OnInit {
 
   editRequest(claim: MedicalClaim) {
     this.openModal(claim.claimId);
+  }
+
+  viewRequest(claim: MedicalClaim) {
+    this.selectedDetailItem.set({
+      requestId: claim.claimId,
+      requestNo: claim.voucherNo ?? `#${claim.claimId}`,
+      requestDate: claim.claimDate,
+      requestBy: {
+        name: claim.employeeName ?? claim.employeeCode,
+        employeeId: claim.employeeCode,
+        department: claim.departmentName ?? '-',
+        company: claim.companyName ?? '-',
+        profileImage: claim.employeeImageUrl ?? undefined,
+      },
+      requestType: 'ค่ารักษาพยาบาล',
+      typeId: claim.expenseTypeId,
+      requestDetail: `${claim.expenseTypeName} — ${claim.diseaseName} (${claim.hospitalName})`,
+      remark: claim.remark || '',
+      amount: claim.requestedAmount,
+      status: this.toApprovalStatus(claim.status),
+      rawStatus: claim.status,
+      type: 'medical',
+      originalData: claim,
+    });
+  }
+
+  closeDetail() {
+    this.selectedDetailItem.set(null);
+  }
+
+  private toApprovalStatus(
+    status: string,
+  ): 'Pending' | 'Approved' | 'Rejected' | 'Referred Back' {
+    switch (status?.trim().toLowerCase()) {
+      case 'approved':
+        return 'Approved';
+      case 'rejected':
+        return 'Rejected';
+      case 'referred back':
+      case 'referred_back':
+        return 'Referred Back';
+      default:
+        return 'Pending';
+    }
   }
 
   deleteRequest(claim: MedicalClaim) {
@@ -290,7 +374,7 @@ export class MedicalexpensesComponent implements OnInit {
 
   isEditableClaim(status: string): boolean {
     const normalizedStatus = status?.trim().toLowerCase().replace(/[_-]+/g, ' ');
-    return normalizedStatus === 'pending' || normalizedStatus === 'referred back';
+    return ['pending', 'new', 'referred back'].includes(normalizedStatus);
   }
 
   trackById(_: number, claim: MedicalClaim): number {

@@ -408,10 +408,6 @@
   }
 
   <div class="form-actions-footer">
-    <div class="submit-hint" *ngIf="selectedClaimType() && !isEditMode()">
-      <i class="fas fa-shield-heart"></i>
-      ระบบจะตรวจสิทธิ์ก่อนส่งเบิก หากไม่ผ่านเงื่อนไขจะแจ้งเหตุผลให้ทราบทันที
-    </div>
     <button class="btn-back-custom" type="button" [disabled]="isSaving()" (click)="close()">
       <i class="fas fa-times"></i> ยกเลิก
     </button>

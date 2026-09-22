@@ -11,7 +11,7 @@
     </div>
     <div class="right">
       <div class="header-actions-group" *ngIf="approvalItem.rawStatus === 'pending'">
-        @if (!isActionConfirm()) {
+        @if (showActions && !isActionConfirm()) {
           <button class="btn-action-green" (click)="openActionConfirm('Approved')">Approve</button>
           <button class="btn-action-orange" (click)="openActionConfirm('Referred Back')">
             Refer Back
@@ -45,6 +45,7 @@
               [class.completed]="currentStepIndex() > step.id && !isRejected()"
               [class.active]="currentStepIndex() === step.id && !isRejected()"
               [class.rejected]="isRejected()"
+              [class.referred-back]="isReferredBack() && step.id === 1"
             >
               <div class="step-icon-circle">
                 @if (currentStepIndex() > step.id) {
@@ -61,7 +62,7 @@
       </div>
     </div>
 
-    <div class="content">
+    <div class="content" [class.without-requester-info]="!showRequesterInfo">
       <div class="main-panel">
         <div class="summary-cards-grid">
           <div class="summary-card status-card" [ngClass]="getStatusClass(getDisplayStatus())">
@@ -389,7 +390,8 @@
         }
       </div>
 
-      <div class="side-panel">
+      @if (showRequesterInfo) {
+        <div class="side-panel">
         <h3 class="side-title">Requester Info</h3>
         <div class="side-groups-row">
           <div class="side-group">
@@ -424,12 +426,13 @@
           </div>
         </div>
 
-        <div class="side-divider"></div>
-      </div>
+          <div class="side-divider"></div>
+        </div>
+      }
     </div>
   </main>
 
-  @if (!isActionConfirm()) {
+  @if (showActions && !isActionConfirm()) {
     <div class="form-actions-footer" [ngClass]="actionType()?.toLowerCase()?.replace(' ', '-')">
       <div class="header-actions-group" *ngIf="approvalItem.rawStatus === 'pending'">
         <button class="btn-action-green" (click)="openActionConfirm('Approved')">Approve</button>
@@ -441,7 +444,7 @@
     </div>
   }
 
-  @if (isActionConfirm()) {
+  @if (showActions && isActionConfirm()) {
     <div class="form-actions-footer" [ngClass]="actionType()?.toLowerCase()?.replace(' ', '-')">
       <div class="confirm-inner">
         <div class="action-title">
