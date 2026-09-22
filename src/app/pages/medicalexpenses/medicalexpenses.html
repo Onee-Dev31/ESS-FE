@@ -120,6 +120,15 @@
                 <span class="status-badge" [ngStyle]="getStatusClass(claim.status)">
                   {{ claim.status | statusLabel }}
                 </span>
+                <button
+                  type="button"
+                  class="act-btn act-view"
+                  (click)="$event.stopPropagation(); viewRequest(claim)"
+                  title="ดูรายละเอียด"
+                  aria-label="ดูรายละเอียด"
+                >
+                  <i class="far fa-eye"></i>
+                </button>
                 @if (isEditableClaim(claim.status)) {
                   <button
                     class="btn-icon edit"
@@ -195,10 +204,9 @@
         <table class="modern-table">
           <thead>
             <tr>
-              <th>ประเภท</th>
-              <th>วันที่รักษา</th>
-              <th>สถานพยาบาล</th>
-              <th>โรค</th>
+              <th class="col-text-left">ประเภท</th>
+              <th class="col-text-left">วันที่รักษา</th>
+              <th class="col-text-left">รายละเอียดการรักษา</th>
               <th class="text-right">ยอดเงิน</th>
               <th>สถานะ</th>
               <th>เอกสาร</th>
@@ -211,7 +219,7 @@
             @for (claim of paginatedClaims(); track trackById($index, claim)) {
               <tr>
                 <!-- ประเภท -->
-                <td>
+                <td class="col-text-left">
                   <div class="type-badge">
                     <span class="type-name">{{ claim.expenseTypeName }}</span>
                   </div>
@@ -222,18 +230,26 @@
                   </div>
                 </td>
                 <!-- วันที่ -->
-                <td>
+                <td class="col-text-left">
                   {{ dateUtil.formatDateToBE(claim.treatmentDateFrom, 'DD/MM/YYYY') }} –
                   {{ dateUtil.formatDateToBE(claim.treatmentDateTo, 'DD/MM/YYYY') }}
 
                   <span class="sub-text"> {{ claim.treatmentDays }} วัน </span>
                 </td>
 
-                <!-- โรงพยาบาล -->
-                <td>{{ claim.hospitalName }}</td>
-
-                <!-- โรค -->
-                <td>{{ claim.diseaseName }}</td>
+                <!-- รายละเอียดการรักษา -->
+                <td class="col-text-left">
+                  <div class="treatment-detail">
+                    <div class="treatment-detail__hospital">
+                      <i class="fas fa-hospital"></i>
+                      <span>{{ claim.hospitalName }}</span>
+                    </div>
+                    <div class="treatment-detail__disease">
+                      <i class="fas fa-virus"></i>
+                      <span>{{ claim.diseaseName }}</span>
+                    </div>
+                  </div>
+                </td>
 
                 <!-- จำนวนเงิน -->
                 <td class="text-right">
@@ -275,10 +291,19 @@
                 </td>
 
                 <td class="text-center" (click)="$event.stopPropagation()">
-                  @if (isEditableClaim(claim.status)) {
-                    <div class="action-btns">
+                  <div class="action-btns">
+                    <button
+                      type="button"
+                      class="act-btn act-view"
+                      (click)="viewRequest(claim)"
+                      title="ดูรายละเอียด"
+                      aria-label="ดูรายละเอียด"
+                    >
+                      <i class="far fa-eye"></i>
+                    </button>
+                    @if (isEditableClaim(claim.status)) {
                       <button
-                        class="btn-icon edit mr-10"
+                        class="btn-icon edit"
                         (click)="editRequest(claim)"
                         title="แก้ไข"
                       >
@@ -287,13 +312,13 @@
                       <button class="btn-icon delete" (click)="deleteRequest(claim)" title="ลบ">
                         <i class="far fa-trash-alt"></i>
                       </button>
-                    </div>
-                  }
+                    }
+                  </div>
                 </td>
               </tr>
             } @empty {
               <tr>
-                <td colspan="9">
+                <td colspan="8">
                   <app-empty-state
                     title="ไม่พบรายการ"
                     description="ไม่พบรายการที่ตรงกับเงื่อนไขการค้นหา"
@@ -317,6 +342,25 @@
             [requestId]="selectedClaimId()?.toString() ?? ''"
             (onClose)="closeModal()"
           ></app-medicalexpenses-form>
+        } @loading {
+          <div class="p-4 text-center">
+            <i class="fas fa-spinner fa-spin fa-2x text-primary p-4"></i>
+          </div>
+        }
+      </div>
+    </div>
+  }
+
+  @if (selectedDetailItem(); as item) {
+    <div class="modal-overlay">
+      <div class="modal-container">
+        @defer {
+          <app-approval-detail-modal
+            [approvalItem]="item"
+            [showActions]="false"
+            [showRequesterInfo]="false"
+            (onClose)="closeDetail()"
+          />
         } @loading {
           <div class="p-4 text-center">
             <i class="fas fa-spinner fa-spin fa-2x text-primary p-4"></i>
