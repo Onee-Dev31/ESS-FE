@@ -1,4 +1,11 @@
-import { Component, DestroyRef, OnInit, computed, inject, signal } from '@angular/core';
+import {
+  Component,
+  DestroyRef,
+  OnInit,
+  computed,
+  inject,
+  signal,
+} from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { NzSelectModule } from 'ng-zorro-antd/select';
@@ -145,7 +152,13 @@ function emptyForm(): HrWelfareFormValue {
 
 @Component({
   selector: 'app-setting-hr-welfare',
-  imports: [FormsModule, NzSelectModule, EmptyStateComponent, ModalShellComponent, SkeletonComponent],
+  imports: [
+    FormsModule,
+    NzSelectModule,
+    EmptyStateComponent,
+    ModalShellComponent,
+    SkeletonComponent,
+  ],
   templateUrl: './setting-hr-welfare.html',
   styleUrl: './setting-hr-welfare.scss',
 })
@@ -157,7 +170,7 @@ export class SettingHrWelfare implements OnInit {
 
   readonly hrList = signal<{ code: string; name: string }[]>(MOCK_HR_LIST);
   readonly welfareTypeList = signal<{ code: string; name: string }[]>(MOCK_WELFARE_TYPES);
-  companyList: string[] = [...MOCK_COMPANY_CODES];
+  readonly companyList = signal<string[]>([...MOCK_COMPANY_CODES]);
 
   readonly rows = signal<HrWelfareResponsibility[]>([]);
   readonly isLoading = signal(true);
@@ -213,7 +226,7 @@ export class SettingHrWelfare implements OnInit {
         if (!res) return;
         const list = Array.isArray(res) ? res : (res.data ?? []);
         const codes = list.map((c: any) => c.COMPANY_CODE).filter(Boolean);
-        if (codes.length > 0) this.companyList = codes;
+        if (codes.length > 0) this.companyList.set(codes);
       });
   }
 
@@ -231,7 +244,7 @@ export class SettingHrWelfare implements OnInit {
         const list = items
           .map((item: any) => ({
             code: item.CODEMPID,
-            name: item.FULLNAME || item.CODEMPID,
+            name: item.FULLNAME + ' (' + item.NICKNAME + ')' || item.CODEMPID,
           }))
           .filter((hr: { code: string; name: string }) => !!hr.code);
         if (list.length > 0) this.hrList.set(list);
@@ -291,9 +304,7 @@ export class SettingHrWelfare implements OnInit {
 
   readonly totalPages = computed(() => Math.max(1, Math.ceil(this.totalItems() / this.pageSize())));
 
-  readonly pageNumbers = computed(() =>
-    Array.from({ length: this.totalPages() }, (_, i) => i + 1),
-  );
+  readonly pageNumbers = computed(() => Array.from({ length: this.totalPages() }, (_, i) => i + 1));
 
   readonly paginatedRows = computed(() => {
     const start = this.currentPage() * this.pageSize();
@@ -396,7 +407,9 @@ export class SettingHrWelfare implements OnInit {
 
     const editingId = this.editingId();
     const confirmation = await this.swalService.confirm(
-      editingId === null ? 'ยืนยันการเพิ่มผู้รับผิดชอบสวัสดิการ?' : 'ยืนยันการแก้ไขผู้รับผิดชอบสวัสดิการ?',
+      editingId === null
+        ? 'ยืนยันการเพิ่มผู้รับผิดชอบสวัสดิการ?'
+        : 'ยืนยันการแก้ไขผู้รับผิดชอบสวัสดิการ?',
     );
     if (!confirmation.isConfirmed) return;
 
@@ -432,7 +445,13 @@ export class SettingHrWelfare implements OnInit {
     this.masterDataService
       .saveWelfareResponsibilities(items)
       .pipe(
-        catchError((err) => of({ success: false, message: err?.error?.message ?? 'บันทึกข้อมูลไม่สำเร็จ', totalRecords: 0 })),
+        catchError((err) =>
+          of({
+            success: false,
+            message: err?.error?.message ?? 'บันทึกข้อมูลไม่สำเร็จ',
+            totalRecords: 0,
+          }),
+        ),
         takeUntilDestroyed(this.destroyRef),
       )
       .subscribe((res) => {
@@ -444,7 +463,9 @@ export class SettingHrWelfare implements OnInit {
         this.isModalOpen.set(false);
         this.loadRows();
         this.swalService.success(
-          editingId === null ? 'เพิ่มผู้รับผิดชอบสวัสดิการสำเร็จ' : 'แก้ไขผู้รับผิดชอบสวัสดิการสำเร็จ',
+          editingId === null
+            ? 'เพิ่มผู้รับผิดชอบสวัสดิการสำเร็จ'
+            : 'แก้ไขผู้รับผิดชอบสวัสดิการสำเร็จ',
         );
       });
   }
@@ -463,7 +484,9 @@ export class SettingHrWelfare implements OnInit {
     this.masterDataService
       .deleteWelfareResponsibility(row.id, this.getCurrentExecutor())
       .pipe(
-        catchError((err) => of({ success: false, message: err?.error?.message ?? 'ลบข้อมูลไม่สำเร็จ' })),
+        catchError((err) =>
+          of({ success: false, message: err?.error?.message ?? 'ลบข้อมูลไม่สำเร็จ' }),
+        ),
         takeUntilDestroyed(this.destroyRef),
       )
       .subscribe((res) => {

@@ -72,7 +72,7 @@
             [ngModel]="filterCompany()"
             (ngModelChange)="filterCompany.set($event); applyFilter()"
           >
-            @for (company of companyList; track company) {
+            @for (company of companyList(); track company) {
               <nz-option [nzValue]="company" [nzLabel]="company" />
             }
           </nz-select>
@@ -358,7 +358,7 @@
             [(ngModel)]="form.companies"
             name="companies"
           >
-            @for (company of companyList; track company) {
+            @for (company of companyList(); track company) {
               <nz-option [nzValue]="company" [nzLabel]="company" />
             }
           </nz-select>
