@@ -746,10 +746,14 @@ $status-cancelled-text: var(--text-table-head);
       font-weight: 400;
     }
 
+    &:hover:not(:focus):not(:focus-within) {
+      border-color: var(--text-muted) !important;
+    }
+
     &:focus {
       outline: none;
-      border-color: #a78bfa !important;
-      box-shadow: 0 0 0 4px rgba(167, 139, 250, 0.1) !important;
+      border-color: var(--primary) !important;
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.12) !important;
     }
 
     &.readonly,
@@ -854,19 +858,27 @@ $status-cancelled-text: var(--text-table-head);
     }
   }
 
-  ::ng-deep .select-status.ant-select .ant-select-arrow {
-    top: 50% !important;
-    color: var(--text-muted) !important;
-    right: 16px !important;
-    inset-inline-end: 16px !important;
-    transform: translateY(-50%) !important;
-    margin-top: 0 !important;
+  ::ng-deep .select-status.ant-select:not(.ant-select-focused):hover .ant-select-selector {
+    border-color: var(--text-muted) !important;
+    box-shadow: none !important;
   }
 
-  ::ng-deep .select-status.ant-select.ant-select-focused .ant-select-selector,
-  ::ng-deep .select-status.ant-select:hover .ant-select-selector {
-    border-color: #a78bfa !important;
-    box-shadow: 0 0 0 4px rgba(167, 139, 250, 0.1) !important;
+  ::ng-deep .select-status.ant-select.ant-select-focused .ant-select-selector {
+    border-color: var(--primary) !important;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.12) !important;
+  }
+
+  ::ng-deep .custom-range-picker.ant-picker:not(.ant-picker-focused):hover,
+  ::ng-deep
+    nz-input-wrapper.form-input.ant-input-affix-wrapper:not(.ant-input-affix-wrapper-focused):hover {
+    border-color: var(--text-muted) !important;
+    box-shadow: none !important;
+  }
+
+  ::ng-deep .custom-range-picker.ant-picker.ant-picker-focused,
+  ::ng-deep nz-input-wrapper.form-input.ant-input-affix-wrapper-focused {
+    border-color: var(--primary) !important;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.12) !important;
   }
 }
 

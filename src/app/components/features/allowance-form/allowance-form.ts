@@ -13,6 +13,8 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { NzButtonModule } from 'ng-zorro-antd/button';
+import { NzSelectModule } from 'ng-zorro-antd/select';
 import {
   AllowanceService,
   AllowanceItem,
@@ -28,7 +30,7 @@ import { MealAllowanceRate } from '../../../interfaces';
 @Component({
   selector: 'app-allowance-form',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, NzButtonModule, NzSelectModule],
   templateUrl: './allowance-form.html',
   styleUrls: ['./allowance-form.scss'],
 })
@@ -287,7 +289,6 @@ export class AllowanceFormComponent implements OnInit, OnChanges {
             log.actualExtraHours = saved.actualExtraHours;
           }
 
-          console.log(log);
           return log;
         });
         this.updateTotal();
