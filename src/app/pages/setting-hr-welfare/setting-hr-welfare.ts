@@ -417,26 +417,36 @@ export class SettingHrWelfare implements OnInit {
 
     const executedBy = this.getCurrentExecutor();
     const remark = this.form.note.trim();
-    const welfareCodes = this.form.welfareTypes.join(',');
-    const companies = this.form.companies.join(',');
 
+    // 1 HR = 1 แถวเสมอ — ถ้า HR คนนี้มีแถวอยู่แล้ว (เลือกซ้ำตอนเพิ่ม) ให้ merge ประเภทสวัสดิการ/บริษัท
+    // เข้าแถวเดิม (แก้ id เดิม) แทนการ insert แถวใหม่ซ้ำชื่อคนเดิม
     const items: SaveWelfareResponsibilityItem[] =
       editingId === null
-        ? this.form.hrCodes.map((hrCodeEmp) => ({
-            hrCodeEmp,
-            hrName: this.hrNameByCode(hrCodeEmp),
-            welfareCodes,
-            companyCodes: companies,
-            remark,
-            executedBy,
-          }))
+        ? this.form.hrCodes.map((hrCodeEmp) => {
+            const existing = this.rows().find((r) => r.hrCodeEmp === hrCodeEmp);
+            const welfareCodes = existing
+              ? Array.from(new Set([...existing.welfareCodes, ...this.form.welfareTypes]))
+              : this.form.welfareTypes;
+            const companyCodes = existing
+              ? Array.from(new Set([...existing.companyCodes, ...this.form.companies]))
+              : this.form.companies;
+            return {
+              id: existing?.id ?? null,
+              hrCodeEmp,
+              hrName: this.hrNameByCode(hrCodeEmp),
+              welfareCodes: welfareCodes.join(','),
+              companyCodes: companyCodes.join(','),
+              remark,
+              executedBy,
+            };
+          })
         : [
             {
               id: editingId,
               hrCodeEmp: this.form.hrCodes[0],
               hrName: this.hrNameByCode(this.form.hrCodes[0]),
-              welfareCodes,
-              companyCodes: companies,
+              welfareCodes: this.form.welfareTypes.join(','),
+              companyCodes: this.form.companies.join(','),
               remark,
               executedBy,
             },
