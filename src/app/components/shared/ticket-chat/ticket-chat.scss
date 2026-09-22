@@ -144,6 +144,50 @@
   gap: 8px;
   margin-bottom: 8px;
 }
+.note__top-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+.note__reply-btn {
+  border: 0;
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 2px 4px;
+  font-size: 0.8rem;
+  border-radius: 6px;
+}
+.note__reply-btn:hover {
+  color: var(--primary);
+  background: color-mix(in srgb, var(--primary) 10%, transparent);
+}
+.note__quote {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  width: 100%;
+  margin-bottom: 6px;
+  padding: 6px 10px;
+  border-left: 3px solid var(--primary);
+  border-radius: 6px;
+  background: color-mix(in srgb, var(--primary) 8%, var(--bg-page));
+  text-align: left;
+  cursor: pointer;
+}
+.note__quote-sender {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--primary);
+}
+.note__quote-msg {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
 .note__who {
   display: flex;
   align-items: center;
@@ -327,6 +371,46 @@
 .mention-sub {
   font-size: 0.75rem;
   color: var(--text-sub);
+}
+.floating-chat__reply-preview {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  border-top: 1px solid var(--border-color);
+  background: var(--bg-page);
+}
+.floating-chat__reply-preview-body {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  flex: 1;
+  padding-left: 10px;
+  border-left: 3px solid var(--primary);
+}
+.floating-chat__reply-preview-sender {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--primary);
+}
+.floating-chat__reply-preview-msg {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.floating-chat__reply-preview-cancel {
+  border: 0;
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  flex-shrink: 0;
+  padding: 4px;
+}
+.floating-chat__reply-preview-cancel:hover {
+  color: var(--danger);
 }
 .floating-chat__composer {
   min-height: 70px;

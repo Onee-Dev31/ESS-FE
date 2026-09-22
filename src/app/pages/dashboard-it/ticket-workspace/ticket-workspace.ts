@@ -1434,6 +1434,9 @@ export class TicketWorkspaceComponent implements OnInit, OnChanges {
             role: 'user',
             senderRole,
           },
+          parentReplyId: r.parent_reply_id ?? null,
+          parentMessage: r.parent_message ?? null,
+          parentSenderName: r.parent_sender_name ?? null,
         };
       }),
     );
@@ -2572,6 +2575,7 @@ export class TicketWorkspaceComponent implements OnInit, OnChanges {
     const formData = new FormData();
     formData.append('Message', data.message);
     formData.append('ExecutedBy', this.authService.userData().CODEMPID);
+    if (data.replyToId) formData.append('ParentReplyId', String(data.replyToId));
 
     (data.attachments ?? []).forEach((item: any) => {
       if (item?.file instanceof File) {

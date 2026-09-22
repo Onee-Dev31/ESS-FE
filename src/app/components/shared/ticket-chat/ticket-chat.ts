@@ -42,6 +42,7 @@ export interface TicketChatSubmit {
   message: string;
   attachments: TicketChatAttachment[];
   mentionedAdUsers: string[];
+  replyToId?: number | null;
 }
 
 export type TicketChatMode = 'it-dashboard' | 'service-list';
@@ -286,6 +287,7 @@ export class TicketChatComponent implements OnChanges {
   mentionVisible = false;
   mentionResults: any[] = [];
   mentionActiveIndex = 0;
+  replyingTo: any = null;
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['isOpen'] && !this.isOpen) {
@@ -502,6 +504,7 @@ export class TicketChatComponent implements OnChanges {
       message,
       attachments: [...this.attachments],
       mentionedAdUsers: [...this.pendingMentionAdUsers],
+      replyToId: this.replyingTo?.id ?? null,
     });
     this.clearDraft();
   }
@@ -512,6 +515,21 @@ export class TicketChatComponent implements OnChanges {
     this.emojiPickerOpen = false;
     this.pendingMentionAdUsers.clear();
     this.closeMention();
+    this.cancelReply();
+  }
+
+  startReply(note: any): void {
+    this.replyingTo = note;
+    this.focusComposer();
+  }
+
+  cancelReply(): void {
+    this.replyingTo = null;
+  }
+
+  scrollToNote(noteId: number | string): void {
+    const el = this.root?.nativeElement.querySelector(`[data-note-id="${noteId}"]`);
+    el?.scrollIntoView({ behavior: 'smooth', block: 'center' });
   }
 
   selectMention(employee: any): void {

@@ -44,6 +44,7 @@
               @for (note of notes; track note.id; let i = $index; let last = $last) {
                 <div
                   class="note"
+                  [attr.data-note-id]="note.id"
                   [class.note--me]="note.createBy.empCode === currentUserEmpCode"
                   [class.note--they]="note.createBy.empCode !== currentUserEmpCode"
                   [class.note--requester]="note.createBy.senderRole === 'requester'"
@@ -64,14 +65,37 @@
                       </div>
                       <b>{{ note.createBy.nickName }}</b>
                     </div>
-                    <div class="muted">
-                      @if (isToday(note.createdDate)) {
-                        {{ note.createdDate | date: 'HH:mm' }}
-                      } @else {
-                        {{ note.createdDate | date: 'EEE dd, HH:mm' : '' : 'en' }}
+                    <div class="note__top-actions">
+                      <div class="muted">
+                        @if (isToday(note.createdDate)) {
+                          {{ note.createdDate | date: 'HH:mm' }}
+                        } @else {
+                          {{ note.createdDate | date: 'EEE dd, HH:mm' : '' : 'en' }}
+                        }
+                      </div>
+                      @if (canSend) {
+                        <button
+                          class="note__reply-btn"
+                          type="button"
+                          title="ตอบกลับข้อความนี้"
+                          (click)="startReply(note)"
+                        >
+                          <i class="fa-solid fa-reply"></i>
+                        </button>
                       }
                     </div>
                   </div>
+                  @if (note.parentReplyId) {
+                    <button
+                      class="note__quote"
+                      type="button"
+                      title="ไปที่ข้อความต้นทาง"
+                      (click)="scrollToNote(note.parentReplyId)"
+                    >
+                      <span class="note__quote-sender">{{ note.parentSenderName }}</span>
+                      <span class="note__quote-msg">{{ note.parentMessage }}</span>
+                    </button>
+                  }
                   <div class="note__msg">
                     @if (note.referred_title === '[REFERRED]') {
                       <span class="refer_tag referred">{{ note.referred_title }}</span>
@@ -182,6 +206,24 @@
           </div>
         }
 
+        @if (canSend && replyingTo) {
+          <div class="floating-chat__reply-preview">
+            <div class="floating-chat__reply-preview-body">
+              <span class="floating-chat__reply-preview-sender">{{
+                replyingTo.createBy.nickName
+              }}</span>
+              <span class="floating-chat__reply-preview-msg">{{ replyingTo.message }}</span>
+            </div>
+            <button
+              class="floating-chat__reply-preview-cancel"
+              type="button"
+              title="ยกเลิกการตอบกลับ"
+              (click)="cancelReply()"
+            >
+              <i class="fas fa-times"></i>
+            </button>
+          </div>
+        }
         @if (canSend) {
           <div class="floating-chat__composer">
             <input
