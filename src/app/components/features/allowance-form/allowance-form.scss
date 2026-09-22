@@ -196,13 +196,48 @@
           flex-direction: column;
         }
 
-        .form-control {
-          @include select-dropdown;
+        .form-input {
           flex: 1;
+          min-width: 0;
+        }
+
+        ::ng-deep .filter-select.ant-select {
+          height: 44px;
+          line-height: 44px;
+
+          @include tablet {
+            height: 42px;
+            line-height: 42px;
+          }
+
+          @include mobile {
+            width: 100%;
+            height: 38px;
+            line-height: 38px;
+          }
+        }
+
+        ::ng-deep .filter-select.ant-select .ant-select-selector {
+          height: 44px !important;
+          padding: 0 44px 0 16px !important;
+          display: flex !important;
+          align-items: center !important;
+          background: var(--bg-table-head) !important;
+          border: 1.5px solid var(--border-table-head) !important;
+          border-radius: 10px !important;
+
+          @include tablet {
+            height: 42px !important;
+          }
+
+          @include mobile {
+            height: 38px !important;
+          }
         }
 
         .btn-search {
           @include btn-primary;
+          height: 44px;
         }
       }
     }
@@ -278,6 +313,74 @@
           font-weight: 900;
         }
       }
+    }
+  }
+}
+
+// Day type legend
+.day-type-legend {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+  margin-bottom: 10px;
+  padding: 10px 14px;
+  color: var(--text-sub);
+  background: var(--bg-slate);
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  font-size: $font-size-hint;
+
+  .legend-title {
+    padding-right: 16px;
+    color: var(--text) !important;
+    font-weight: 600;
+    border-right: 1px solid var(--border-color);
+  }
+
+  .legend-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    white-space: nowrap;
+  }
+
+  .legend-code {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 700;
+  }
+
+  .legend-workday .legend-code {
+    color: var(--primary) !important;
+    background: color-mix(in srgb, var(--primary) 12%, transparent);
+  }
+
+  .legend-holiday .legend-code {
+    color: var(--danger) !important;
+    background: color-mix(in srgb, var(--danger) 12%, transparent);
+  }
+
+  .legend-traditional .legend-code {
+    color: var(--status-warning-text) !important;
+    background: var(--status-warning-bg);
+  }
+
+  @include mobile {
+    align-items: flex-start;
+    gap: 8px 12px;
+
+    .legend-title {
+      width: 100%;
+      padding-right: 0;
+      padding-bottom: 6px;
+      border-right: 0;
+      border-bottom: 1px solid var(--border-color);
     }
   }
 }

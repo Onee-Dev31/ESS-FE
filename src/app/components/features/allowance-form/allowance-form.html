@@ -26,29 +26,37 @@
           <div class="month-selector">
             <label>ประจำเดือน :</label>
             <div class="inputs-row">
-              <select
+              <nz-select
                 [(ngModel)]="selectedMonthIndex"
-                (change)="generateCalendar()"
-                class="form-control"
+                (ngModelChange)="generateCalendar()"
+                class="form-input filter-select"
                 title="เลือกเดือน"
+                aria-label="เลือกเดือน"
               >
                 @for (m of thaiMonths; track $index) {
-                  <option [ngValue]="$index">{{ m }}</option>
+                  <nz-option [nzValue]="$index" [nzLabel]="m" />
                 }
-              </select>
-              <select
+              </nz-select>
+              <nz-select
                 [(ngModel)]="selectedYearBE"
-                (change)="generateCalendar()"
-                class="form-control"
+                (ngModelChange)="generateCalendar()"
+                class="form-input filter-select"
                 title="เลือกปี"
+                aria-label="เลือกปี"
               >
                 @for (y of years; track y) {
-                  <option [ngValue]="y">{{ y }}</option>
+                  <nz-option [nzValue]="y" [nzLabel]="y.toString()" />
                 }
-              </select>
-              <button type="button" class="btn-search" (click)="generateCalendar()">
+              </nz-select>
+              <!-- <button
+                nz-button
+                nzType="primary"
+                type="button"
+                class="btn-search"
+                (click)="generateCalendar()"
+              >
                 ค้นหาข้อมูล
-              </button>
+              </button> -->
             </div>
           </div>
         </section>
@@ -106,9 +114,21 @@
         </section>
       </div>
 
-      <div>W - เวลาทำงานปกติ</div>
-      <div>H - วันหยุด</div>
-      <div>T - วันหยุดประเพณี</div>
+      <div class="day-type-legend" aria-label="คำอธิบายประเภทวัน">
+        <span class="legend-title">ประเภทวัน</span>
+        <div class="legend-item legend-workday">
+          <span class="legend-code">W</span>
+          <span>เวลาทำงานปกติ</span>
+        </div>
+        <div class="legend-item legend-holiday">
+          <span class="legend-code">H</span>
+          <span>วันหยุด</span>
+        </div>
+        <div class="legend-item legend-traditional">
+          <span class="legend-code">T</span>
+          <span>วันหยุดประเพณี</span>
+        </div>
+      </div>
 
       @if (isPolicyPopupOpen()) {
         <div class="policy-popup-overlay" (click)="isPolicyPopupOpen.set(false)">
