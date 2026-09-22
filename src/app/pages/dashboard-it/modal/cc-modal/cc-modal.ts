@@ -18,6 +18,7 @@ interface CcEmployee {
   codeempid: string;
   name: string;
   nickname: string;
+  nameEng: string;
   email: string;
   department: string;
   company: string;
@@ -101,6 +102,7 @@ export class CcModal implements OnInit, OnChanges {
           return {
             codeempid: String(emp.EmployeeID ?? '').trim(),
             name: String(emp.FullName ?? '').trim() || `${firstName} ${lastName}`.trim(),
+            nameEng: `${emp.FirstName} ${emp.LastName}`.trim(),
             nickname: String(emp.Nickname ?? '').trim(),
             email: String(emp.Email ?? '').trim(),
             department: String(emp.DepartmentName ?? emp.Department ?? '').trim(),
@@ -139,6 +141,7 @@ export class CcModal implements OnInit, OnChanges {
       return (
         code.toLowerCase().includes(keyword) ||
         emp.name.toLowerCase().includes(keyword) ||
+        emp.nameEng.toLowerCase().includes(keyword) ||
         emp.nickname.toLowerCase().includes(keyword)
       );
     });

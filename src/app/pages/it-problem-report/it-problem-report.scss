@@ -2109,3 +2109,37 @@ $table-label-bg: var(--border-toolbar);
   color: #ff4d4f;
   font-size: $font-size-hint;
 }
+
+::ng-deep .cc-employee-option {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 6px 2px;
+  line-height: 1.35;
+
+  .cc-employee-name-th {
+    color: var(--text);
+    font-weight: 600;
+  }
+
+  .cc-employee-name-en {
+    color: var(--text);
+    font-weight: 500;
+  }
+
+  .cc-employee-code {
+    color: var(--text-muted);
+    font-size: $font-size-hint;
+  }
+}
+
+::ng-deep .cc-employee-dropdown .ant-select-item-option {
+  min-height: 64px;
+  padding-block: 4px;
+  align-items: center;
+}
+
+::ng-deep .cc-employee-dropdown .ant-select-item-option-content {
+  overflow: visible;
+  white-space: normal;
+}

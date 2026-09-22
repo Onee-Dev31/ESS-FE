@@ -34,6 +34,14 @@ import { TextEditorComponent } from '../../components/shared/text-editor/text-ed
 import { IT_ATTACHMENT_FILE_CONFIG } from '../../constants/it-attachment-file.constant';
 import { PageLoaderComponent } from '../../components/shared/page-loader/page-loader';
 
+interface CcEmployeeOption {
+  label: string;
+  value: string;
+  fullNameThai: string;
+  fullNameEng: string;
+  nickname: string;
+}
+
 @Component({
   selector: 'app-it-problem-report',
   standalone: true,
@@ -82,8 +90,8 @@ export class ItProblemReportComponent implements OnInit {
   @Input() openBy!: string;
 
   // CC
-  ccSelected = signal<{ label: string; value: string }[]>([]);
-  ccOptions = signal<{ label: string; value: string }[]>([]);
+  ccSelected = signal<CcEmployeeOption[]>([]);
+  ccOptions = signal<CcEmployeeOption[]>([]);
   readonly nzFilterOption = () => true;
   ccSearched = signal<boolean>(false);
   readonly CC_CATEGORIES = ['BMS', 'Oracle', 'ONEE App'];
@@ -124,11 +132,20 @@ export class ItProblemReportComponent implements OnInit {
       next: (res) => {
         // console.log(res);
         this.ccOptions.set(
-          (res.data || []).map((e: any) => ({
-            // label: `${e.FullNameThai || e.FullNameEng || e.FullName || e.fullname || e.name || '-'} (${e.UserID || e.CODEEMPID || e.EmpNo || e.codeempid || '-'})`,
-            label: `${e.UserID}-${e.FullNameThai} (${e.Nickname})`,
-            value: e.UserID || e.CODEEMPID || e.EmpNo || e.codeempid || '',
-          })),
+          (res.data || []).map((e: any) => {
+            const fullNameThai = e.FullNameThai || '-';
+            const fullNameEng = e.FullNameEng || '-';
+            const nickname = e.Nickname || '';
+            const value = e.UserID || e.CODEEMPID || e.EmpNo || e.codeempid || '';
+
+            return {
+              label: `${value}-${fullNameThai} / ${fullNameEng}${nickname ? ` (${nickname})` : ''}`,
+              value,
+              fullNameThai,
+              fullNameEng,
+              nickname,
+            };
+          }),
         );
       },
     });

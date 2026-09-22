@@ -38,8 +38,13 @@
                 </div>
 
                 @if (isItDashboard) {
-                  <button type="button" class="btn-remove-cc" (click)="removeCC(cc)"
-                    title="ลบผู้รับสำเนา" [attr.aria-label]="'ลบผู้รับสำเนา ' + cc.name">
+                  <button
+                    type="button"
+                    class="btn-remove-cc"
+                    (click)="removeCC(cc)"
+                    title="ลบผู้รับสำเนา"
+                    [attr.aria-label]="'ลบผู้รับสำเนา ' + cc.name"
+                  >
                     <i class="fa-regular fa-trash-can" aria-hidden="true"></i>
                   </button>
                 }
@@ -90,6 +95,7 @@
 
                     <div class="employee-info">
                       <strong>{{ getEmployeeName(emp) }}</strong>
+                      <strong>{{ emp.nameEng }}</strong>
                       <span>{{ emp.codeempid }}</span>
                     </div>
 

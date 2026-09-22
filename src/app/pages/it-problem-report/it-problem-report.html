@@ -225,6 +225,8 @@
               nzMode="multiple"
               nzShowSearch
               nzAllowClear
+              [nzOptionHeightPx]="64"
+              nzDropdownClassName="cc-employee-dropdown"
               nzPlaceHolder="ค้นหาพนักงาน..."
               [nzFilterOption]="nzFilterOption"
               [ngModel]="ccSelected()"
@@ -233,7 +235,18 @@
               [nzNotFoundContent]="ccNotFound"
             >
               @for (opt of ccOptions(); track opt.value) {
-                <nz-option [nzLabel]="opt.label" [nzValue]="opt" />
+                <nz-option [nzLabel]="opt.label" [nzValue]="opt" nzCustomContent>
+                  <div class="cc-employee-option">
+                    <span class="cc-employee-name-th">
+                      {{ opt.fullNameThai }}
+                      @if (opt.nickname) {
+                        ({{ opt.nickname }})
+                      }
+                    </span>
+                    <span class="cc-employee-name-en">{{ opt.fullNameEng }}</span>
+                    <span class="cc-employee-code">{{ opt.value }}</span>
+                  </div>
+                </nz-option>
               }
               <ng-template #ccNotFound>
                 @if (ccSearched()) {
