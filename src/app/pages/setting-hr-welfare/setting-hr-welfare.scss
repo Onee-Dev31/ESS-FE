@@ -406,6 +406,13 @@
 .tag-more {
   background: var(--bg-table-head);
   color: var(--text-muted);
+  border: none;
+  font-family: inherit;
+  cursor: pointer;
+
+  &:hover {
+    background: color-mix(in srgb, var(--bg-table-head), var(--text-muted) 15%);
+  }
 }
 
 .action-column {

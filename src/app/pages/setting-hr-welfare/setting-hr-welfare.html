@@ -156,25 +156,31 @@
               <td class="cell-primary">{{ row.hrName }}</td>
               <td>
                 <div class="tag-list">
-                  @for (tag of visibleTags(row.welfareCodes); track tag) {
+                  @for (tag of visibleTags(row.welfareCodes, isExpanded(row.id, 'welfare')); track tag) {
                     <span class="tag tag-welfare">{{ welfareNameByCode(tag) }}</span>
                   }
-                  @if (overflowCount(row.welfareCodes); as more) {
+                  @if (overflowCount(row.welfareCodes, isExpanded(row.id, 'welfare')); as more) {
                     @if (more > 0) {
-                      <span class="tag tag-more">+{{ more }}</span>
+                      <button type="button" class="tag tag-more" (click)="toggleExpand(row.id, 'welfare')">+{{ more }}</button>
                     }
+                  }
+                  @if (isExpanded(row.id, 'welfare') && row.welfareCodes.length > 2) {
+                    <button type="button" class="tag tag-more" (click)="toggleExpand(row.id, 'welfare')">ย่อ</button>
                   }
                 </div>
               </td>
               <td>
                 <div class="tag-list">
-                  @for (tag of visibleTags(row.companyCodes); track tag) {
+                  @for (tag of visibleTags(row.companyCodes, isExpanded(row.id, 'company')); track tag) {
                     <span class="tag tag-company">{{ tag }}</span>
                   }
-                  @if (overflowCount(row.companyCodes); as more) {
+                  @if (overflowCount(row.companyCodes, isExpanded(row.id, 'company')); as more) {
                     @if (more > 0) {
-                      <span class="tag tag-more">+{{ more }}</span>
+                      <button type="button" class="tag tag-more" (click)="toggleExpand(row.id, 'company')">+{{ more }}</button>
                     }
+                  }
+                  @if (isExpanded(row.id, 'company') && row.companyCodes.length > 2) {
+                    <button type="button" class="tag tag-more" (click)="toggleExpand(row.id, 'company')">ย่อ</button>
                   }
                 </div>
               </td>
@@ -280,11 +286,12 @@
         <label class="field-label">HR ผู้รับผิดชอบ *</label>
         <div class="modal-select-box" [class.input-invalid]="hasSubmitted() && form.hrCodes.length === 0">
         <div class="select-trigger">
-          <span class="select-trigger-text">เลือก HR (เลือกได้หลายคน)</span>
+          <span class="select-trigger-text">{{ editingId() === null ? 'เลือก HR (เลือกได้หลายคน)' : 'HR ผู้รับผิดชอบแถวนี้' }}</span>
           <i class="fa-solid fa-chevron-down select-trigger-chevron"></i>
           <nz-select
             nzMode="multiple"
             class="field-nz-select select-trigger-overlay"
+            [nzDisabled]="editingId() !== null"
             [(ngModel)]="form.hrCodes"
             name="hrCodes"
           >
@@ -298,9 +305,11 @@
             @for (code of form.hrCodes; track code) {
               <span class="chip">
                 {{ hrNameByCode(code) }}
-                <button type="button" class="chip-remove" (click)="removeHr(code)">
-                  <i class="fa-solid fa-xmark"></i>
-                </button>
+                @if (editingId() === null) {
+                  <button type="button" class="chip-remove" (click)="removeHr(code)">
+                    <i class="fa-solid fa-xmark"></i>
+                  </button>
+                }
               </span>
             }
           </div>

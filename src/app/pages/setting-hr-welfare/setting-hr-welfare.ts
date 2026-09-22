@@ -70,6 +70,9 @@ export class SettingHrWelfare implements OnInit {
   readonly deletingId = signal<number | null>(null);
   form: HrWelfareFormValue = emptyForm();
 
+  // ตาราง: คีย์ "{id}:{welfare|company}" ของแถวที่กด "+N" ขยายดูเต็มแล้ว
+  readonly expandedCells = signal<Set<string>>(new Set());
+
   ngOnInit(): void {
     this.loadRows();
     this.loadCompanies();
@@ -104,7 +107,10 @@ export class SettingHrWelfare implements OnInit {
       .subscribe((res) => {
         if (!res) return;
         const list = Array.isArray(res) ? res : (res.data ?? []);
-        const codes = list.map((c: any) => c.COMPANY_CODE).filter(Boolean);
+        const codes = list
+          .map((c: any) => c.COMPANY_CODE)
+          .filter(Boolean)
+          .sort((a: string, b: string) => a.localeCompare(b));
         if (codes.length > 0) this.companyList.set(codes);
       });
   }
@@ -219,12 +225,23 @@ export class SettingHrWelfare implements OnInit {
     this.currentPage.set(0);
   }
 
-  visibleTags(list: string[], max = 2): string[] {
-    return list.slice(0, max);
+  visibleTags(list: string[], expanded: boolean, max = 2): string[] {
+    return expanded ? list : list.slice(0, max);
   }
 
-  overflowCount(list: string[], max = 2): number {
-    return Math.max(0, list.length - max);
+  overflowCount(list: string[], expanded: boolean, max = 2): number {
+    return expanded ? 0 : Math.max(0, list.length - max);
+  }
+
+  isExpanded(rowId: number, column: 'welfare' | 'company'): boolean {
+    return this.expandedCells().has(`${rowId}:${column}`);
+  }
+
+  toggleExpand(rowId: number, column: 'welfare' | 'company'): void {
+    const key = `${rowId}:${column}`;
+    const next = new Set(this.expandedCells());
+    next.has(key) ? next.delete(key) : next.add(key);
+    this.expandedCells.set(next);
   }
 
   hrNameByCode(code: string): string {
