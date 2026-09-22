@@ -726,7 +726,7 @@
 
   &.outpatient-card {
     background: color-mix(in srgb, var(--danger) 5%, var(--bg-card));
-    border-color: rgba($danger, 0.3);
+    border-color: var(--border-box);
 
     [data-theme='dark'] & {
       background: color-mix(in srgb, var(--danger) 14%, var(--bg-card));
@@ -736,7 +736,7 @@
 
   &.inpatient-card {
     background: color-mix(in srgb, var(--success) 5%, var(--bg-card));
-    border-color: rgba($success, 0.3);
+    border-color: var(--border-box);
 
     [data-theme='dark'] & {
       background: color-mix(in srgb, var(--success) 14%, var(--bg-card));
