@@ -79,6 +79,14 @@ import {
 import { formatElapsedTime } from '../../../utils/time.util';
 import { PageLoaderComponent } from '../../../components/shared/page-loader/page-loader';
 
+interface TeamGroupOption {
+  id: number;
+  group_name: string;
+  description: string;
+  is_active: boolean;
+  sort_order: number;
+}
+
 @Component({
   selector: 'app-it-ticket-workspace',
   standalone: true,
@@ -342,6 +350,9 @@ export class TicketWorkspaceComponent implements OnInit, OnChanges {
   filter = {
     dateRange: [dayjs().startOf('year').toDate(), dayjs().toDate()] as [Date, Date] | null,
   };
+  showFilter = false;
+  teamGroups = signal<TeamGroupOption[]>([]);
+  selectedTeamGroupId: number | null = null;
 
   @ViewChild('ticketList') ticketList!: ElementRef;
 
@@ -472,6 +483,7 @@ export class TicketWorkspaceComponent implements OnInit, OnChanges {
       this.isPageLoading.set(false);
     }
     this.initialized = true;
+    this.loadTeamGroups();
     this.getAssignItDropdown();
     (this.route.queryParams ?? EMPTY)
       .pipe(takeUntilDestroyed(this.destroyRef))
@@ -620,6 +632,24 @@ export class TicketWorkspaceComponent implements OnInit, OnChanges {
 
   clearKeyword(): void {
     this.onKeywordChange('');
+  }
+
+  onTicketFilterChange(): void {
+    this.getAllTickets();
+  }
+
+  private loadTeamGroups(): void {
+    this.itServiceService.getTeamGroups().subscribe({
+      next: (res) => {
+        const rows: TeamGroupOption[] = Array.isArray(res) ? res : (res?.data ?? []);
+        this.teamGroups.set(
+          rows
+            .filter((group) => group.is_active)
+            .sort((a, b) => a.sort_order - b.sort_order),
+        );
+      },
+      error: () => this.teamGroups.set([]),
+    });
   }
 
   trackById = (_: number, item: TicketItem) => item.id;
@@ -1552,8 +1582,8 @@ export class TicketWorkspaceComponent implements OnInit, OnChanges {
 
     const searchText = this.keyword.trim();
     const [from, to] = this.filter.dateRange ?? [];
-    const dateFrom = dayjs(from).format('YYYY-MM-DD');
-    const dateTo = dayjs(to).format('YYYY-MM-DD');
+    const dateFrom = from ? dayjs(from).format('YYYY-MM-DD') : undefined;
+    const dateTo = to ? dayjs(to).format('YYYY-MM-DD') : undefined;
 
     this.itServiceService
       .getAllTickets({
@@ -1561,6 +1591,9 @@ export class TicketWorkspaceComponent implements OnInit, OnChanges {
         myTicket: this.myTicket ? this.authService.userData().AD_USER : null,
         dateFrom,
         dateTo,
+        assignGroupId: this.selectedTeamGroupId
+          ? String(this.selectedTeamGroupId)
+          : undefined,
       })
       .pipe(
         finalize(() => {
@@ -1680,6 +1713,7 @@ export class TicketWorkspaceComponent implements OnInit, OnChanges {
   getAssignItDropdown() {
     this.itServiceService.getAssignItDropdown().subscribe({
       next: (res) => {
+        console.log(res);
         const rows = res.data;
         const groupMap: Record<any, any> = {};
         const assigneeGroup: any = [];

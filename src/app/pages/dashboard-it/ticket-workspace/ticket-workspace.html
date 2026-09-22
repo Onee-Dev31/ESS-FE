@@ -57,17 +57,52 @@
           </div>
         </div>
 
-        <div class="tk-left__search">
-          <span class="material-symbols-outlined ic">search</span>
-          <input
-            [(ngModel)]="keyword"
-            (ngModelChange)="onKeywordChange($event)"
-            placeholder="Number, Subject, Name "
-          />
-          @if (keyword) {
-            <button type="button" class="clear-search" (click)="clearKeyword()" aria-label="Clear search">
-              <span class="material-symbols-outlined">close</span>
+        <div class="tk-left__search-area">
+          <div class="tk-left__search-row">
+            <div class="tk-left__search">
+              <span class="material-symbols-outlined ic">search</span>
+              <input
+                [(ngModel)]="keyword"
+                (ngModelChange)="onKeywordChange($event)"
+                placeholder="Number, Subject, Name "
+              />
+              @if (keyword) {
+                <button
+                  type="button"
+                  class="clear-search"
+                  (click)="clearKeyword()"
+                  aria-label="Clear search"
+                >
+                  <span class="material-symbols-outlined">close</span>
+                </button>
+              }
+            </div>
+
+            <button
+              type="button"
+              class="ticket-filter-button"
+              [class.active]="showFilter"
+              (click)="showFilter = !showFilter"
+              aria-label="Ticket filters"
+            >
+              <i class="fa-solid fa-filter"></i>
             </button>
+          </div>
+
+          @if (showFilter) {
+            <div class="ticket-filter-panel">
+              <nz-select
+                class="ticket-team-filter"
+                [(ngModel)]="selectedTeamGroupId"
+                (ngModelChange)="onTicketFilterChange()"
+                nzAllowClear
+                nzPlaceHolder="All teams"
+              >
+                @for (group of teamGroups(); track group.id) {
+                  <nz-option [nzValue]="group.id" [nzLabel]="group.group_name" />
+                }
+              </nz-select>
+            </div>
           }
         </div>
 
