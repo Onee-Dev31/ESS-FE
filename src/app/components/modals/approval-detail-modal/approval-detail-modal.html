@@ -84,6 +84,23 @@
               </div>
             </div>
           </div>
+          @if (
+            approvalItem.type === 'medical' &&
+            isReferredBack() &&
+            medicalDetail()?.rejectionReason
+          ) {
+            <div class="referral-reason-card">
+              <div class="referral-reason-card__icon">
+                <i class="fas fa-rotate-left"></i>
+              </div>
+              <div class="referral-reason-card__content">
+                <span class="referral-reason-card__label">เหตุผลที่ส่งกลับ</span>
+                <span class="referral-reason-card__value">
+                  {{ medicalDetail().rejectionReason }}
+                </span>
+              </div>
+            </div>
+          }
         </div>
 
         @if (medicalDetail()) {

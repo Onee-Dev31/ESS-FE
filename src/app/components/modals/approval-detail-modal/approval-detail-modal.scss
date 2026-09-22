@@ -568,6 +568,51 @@
         .s-value.text-success {
           color: var(--green);
         }
+
+      }
+
+      .referral-reason-card {
+        grid-column: 1 / -1;
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+        padding: 12px 14px;
+        border: 1px solid color-mix(in srgb, var(--warning) 28%, transparent);
+        border-radius: 10px;
+        background: color-mix(in srgb, var(--warning) 7%, var(--bg-card));
+
+        &__icon {
+          display: grid;
+          place-items: center;
+          flex: 0 0 30px;
+          width: 30px;
+          height: 30px;
+          border-radius: 50%;
+          color: var(--warning);
+          background: color-mix(in srgb, var(--warning) 15%, transparent);
+        }
+
+        &__content {
+          display: flex;
+          flex-direction: column;
+          min-width: 0;
+          gap: 3px;
+        }
+
+        &__label {
+          color: var(--warning);
+          font-size: $font-size-hint;
+          font-weight: 700;
+        }
+
+        &__value {
+          color: var(--text);
+          font-size: $font-size-label;
+          font-weight: 500;
+          line-height: 1.5;
+          white-space: pre-wrap;
+          overflow-wrap: anywhere;
+        }
       }
     }
 

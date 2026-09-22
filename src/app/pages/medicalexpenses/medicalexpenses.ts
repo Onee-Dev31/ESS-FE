@@ -206,6 +206,7 @@ export class MedicalexpensesComponent implements OnInit {
     this.medicalService.getClaims(payload).subscribe({
       next: (res) => {
         this.allClaims.set(this.mapApiData(res.data));
+        console.log('allClaims:', this.allClaims());
         this.listing.currentPage.set(0);
         this.loadingService.stop('medical-list');
         this.isRefreshing.set(false);
@@ -294,9 +295,7 @@ export class MedicalexpensesComponent implements OnInit {
     this.selectedDetailItem.set(null);
   }
 
-  private toApprovalStatus(
-    status: string,
-  ): 'Pending' | 'Approved' | 'Rejected' | 'Referred Back' {
+  private toApprovalStatus(status: string): 'Pending' | 'Approved' | 'Rejected' | 'Referred Back' {
     switch (status?.trim().toLowerCase()) {
       case 'approved':
         return 'Approved';
