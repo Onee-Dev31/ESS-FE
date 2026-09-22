@@ -1,0 +1,349 @@
+<div class="page">
+  <app-page-header
+    title="กำหนดสวัสดิการบริษัท"
+    subtitle="Company Welfare Setting"
+    icon="fas fa-gift"
+  />
+
+  <div class="content-card">
+    <div class="card-header-title">
+      <div class="header-row">
+        <div>รายการสวัสดิการ</div>
+        <div class="card-actions">
+          <button type="button" class="btn-add" (click)="openCreate()">
+            <i class="fa-solid fa-plus"></i> เพิ่มสวัสดิการ
+          </button>
+        </div>
+      </div>
+      <p>กำหนดประเภทสวัสดิการแยกตามบริษัท</p>
+    </div>
+
+    <div class="table-responsive">
+      @if (isLoading()) {
+        <app-skeleton type="table" [rows]="5"></app-skeleton>
+      } @else if (errorMessage()) {
+        <app-empty-state
+          title="เกิดข้อผิดพลาด"
+          [description]="errorMessage()!"
+          icon="fas fa-triangle-exclamation"
+          actionLabel="ลองอีกครั้ง"
+          actionIcon="fas fa-rotate-right"
+          (action)="loadInitialData()"
+        ></app-empty-state>
+      } @else if (welfares().length === 0) {
+        <app-empty-state
+          title="ยังไม่มีสวัสดิการ"
+          description="เริ่มเพิ่มสวัสดิการแรกได้เลย"
+          icon="fas fa-gift"
+        ></app-empty-state>
+      } @else {
+        <table class="modern-table">
+          <thead>
+            <tr>
+              <th>ลำดับ</th>
+              <th>บริษัท</th>
+              <th>รหัส</th>
+              <th>ชื่อสวัสดิการ</th>
+              <th>คำอธิบาย</th>
+              <th class="action-column"></th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (welfare of welfares(); track welfare.id) {
+              <tr>
+                <td>{{ welfare.sortOrder }}</td>
+                <td>
+                  <div class="company-cell">
+                    <span>{{ welfare.companyShortName || welfare.companyCode }}</span>
+                    <small>{{ welfare.companyNameTH }}</small>
+                  </div>
+                </td>
+                <td>
+                  <span class="code-badge">{{ welfare.welfareCode }}</span>
+                </td>
+                <td>
+                  <div class="name-cell">
+                    <span>{{ welfare.welfareNameTH }}</span>
+                    <small>{{ welfare.welfareNameEN }}</small>
+                  </div>
+                </td>
+                <td class="description-cell">{{ welfare.welfareDescriptionTH }}</td>
+                <td class="action-column">
+                  <div class="row-actions">
+                    <button
+                      type="button"
+                      class="btn-icon-edit"
+                      title="แก้ไขสวัสดิการ"
+                      (click)="openEdit(welfare)"
+                    >
+                      <i class="fa-solid fa-pen"></i>
+                    </button>
+                    <button
+                      type="button"
+                      class="btn-icon-delete"
+                      title="ลบสวัสดิการ"
+                      [disabled]="deletingWelfareId() === welfare.id"
+                      (click)="deleteWelfare(welfare)"
+                    >
+                      <i
+                        class="fa-solid"
+                        [class.fa-trash-can]="deletingWelfareId() !== welfare.id"
+                        [class.fa-spinner]="deletingWelfareId() === welfare.id"
+                        [class.spin]="deletingWelfareId() === welfare.id"
+                      ></i>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      }
+    </div>
+
+    <div class="card-list-view">
+      @if (isLoading()) {
+        <app-skeleton type="card" [rows]="3"></app-skeleton>
+      } @else if (errorMessage()) {
+        <app-empty-state
+          title="เกิดข้อผิดพลาด"
+          [description]="errorMessage()!"
+          icon="fas fa-triangle-exclamation"
+          actionLabel="ลองอีกครั้ง"
+          actionIcon="fas fa-rotate-right"
+          (action)="loadInitialData()"
+        ></app-empty-state>
+      } @else if (welfares().length === 0) {
+        <app-empty-state
+          title="ยังไม่มีสวัสดิการ"
+          description="เริ่มเพิ่มสวัสดิการแรกได้เลย"
+          icon="fas fa-gift"
+        ></app-empty-state>
+      } @else {
+        @for (welfare of welfares(); track welfare.id) {
+          <div class="mobile-card">
+            <div class="card-header">
+              <div class="header-content">
+                <span class="card-dept-name">{{ welfare.welfareNameTH }}</span>
+                <div class="card-dept-code">{{ welfare.welfareCode }}</div>
+              </div>
+              <span class="sort-badge">#{{ welfare.sortOrder }}</span>
+            </div>
+            <div class="card-body">
+              <div class="info-row">
+                <span class="label">บริษัท:</span>
+                <span class="value">{{ welfare.companyShortName || welfare.companyCode }}</span>
+              </div>
+              <div class="info-row">
+                <span class="label">ชื่ออังกฤษ:</span>
+                <span class="value">{{ welfare.welfareNameEN }}</span>
+              </div>
+              <div class="info-row">
+                <span class="label">คำอธิบาย:</span>
+                <span class="value">{{ welfare.welfareDescriptionTH }}</span>
+              </div>
+              <div class="card-footer-actions">
+                <button type="button" class="btn-edit-sm" (click)="openEdit(welfare)">
+                  <i class="fa-solid fa-pen"></i> แก้ไข
+                </button>
+                <button
+                  type="button"
+                  class="btn-delete-sm"
+                  [disabled]="deletingWelfareId() === welfare.id"
+                  (click)="deleteWelfare(welfare)"
+                >
+                  <i
+                    class="fa-solid"
+                    [class.fa-trash-can]="deletingWelfareId() !== welfare.id"
+                    [class.fa-spinner]="deletingWelfareId() === welfare.id"
+                    [class.spin]="deletingWelfareId() === welfare.id"
+                  ></i>
+                  ลบ
+                </button>
+              </div>
+            </div>
+          </div>
+        }
+      }
+    </div>
+  </div>
+</div>
+
+@if (isModalOpen()) {
+  <app-modal-shell
+    [title]="editingWelfareId() === null ? 'เพิ่มสวัสดิการ' : 'แก้ไขสวัสดิการ'"
+    subtitle="Company Welfare"
+    size="lg"
+    [closeOnBackdrop]="!isSaving()"
+    [closeOnEscape]="!isSaving() && !isConfirming()"
+    (closeModal)="closeModal()"
+  >
+    <form id="welfare-form" (ngSubmit)="saveWelfare()">
+      <fieldset class="field-group">
+        <legend>ข้อมูลบริษัท</legend>
+        <div class="field-grid cols-2 company-grid">
+          <label class="form-field">
+            <span>บริษัท</span>
+            <select
+              name="companyCode"
+              required
+              class="form-input"
+              [class.input-invalid]="getFieldError('companyCode')"
+              [(ngModel)]="form.companyCode"
+              (ngModelChange)="onCompanyChange()"
+            >
+              <option value="">เลือกบริษัท</option>
+              @for (company of companies(); track company.CompanyCode) {
+                <option [value]="company.CompanyCode">
+                  {{ company.CompanyNameTH || company.CompanyNameEN || company.CompanyShortName || company.CompanyCode }}
+                </option>
+              }
+            </select>
+            @if (getFieldError('companyCode'); as error) {
+              <small class="field-error">{{ error }}</small>
+            }
+          </label>
+          <label class="form-field">
+            <span>ชื่อย่อบริษัท</span>
+            <input
+              type="text"
+              name="companyShortName"
+              required
+              autocomplete="off"
+              class="form-input"
+              [class.input-invalid]="getFieldError('companyShortName')"
+              [(ngModel)]="form.companyShortName"
+            />
+            @if (getFieldError('companyShortName'); as error) {
+              <small class="field-error">{{ error }}</small>
+            }
+          </label>
+        </div>
+      </fieldset>
+
+      <fieldset class="field-group">
+        <legend>ข้อมูลสวัสดิการ</legend>
+        <div class="field-grid cols-2">
+          <label class="form-field">
+            <span>รหัสสวัสดิการ</span>
+            <input
+              type="text"
+              name="welfareCode"
+              required
+              autocomplete="off"
+              class="form-input"
+              [class.input-invalid]="getFieldError('welfareCode')"
+              [(ngModel)]="form.welfareCode"
+            />
+            @if (getFieldError('welfareCode'); as error) {
+              <small class="field-error">{{ error }}</small>
+            }
+          </label>
+          <label class="form-field">
+            <span>ลำดับ</span>
+            <input
+              type="number"
+              min="1"
+              step="1"
+              name="sortOrder"
+              required
+              class="form-input"
+              [class.input-invalid]="getFieldError('sortOrder')"
+              [(ngModel)]="form.sortOrder"
+            />
+            @if (getFieldError('sortOrder'); as error) {
+              <small class="field-error">{{ error }}</small>
+            }
+          </label>
+        </div>
+
+        <div class="field-grid cols-2">
+          <label class="form-field">
+            <span>ชื่อสวัสดิการภาษาไทย</span>
+            <input
+              type="text"
+              name="welfareNameTH"
+              required
+              autocomplete="off"
+              class="form-input"
+              [class.input-invalid]="getFieldError('welfareNameTH')"
+              [(ngModel)]="form.welfareNameTH"
+            />
+            @if (getFieldError('welfareNameTH'); as error) {
+              <small class="field-error">{{ error }}</small>
+            }
+          </label>
+          <label class="form-field">
+            <span>ชื่อสวัสดิการภาษาอังกฤษ</span>
+            <input
+              type="text"
+              name="welfareNameEN"
+              required
+              autocomplete="off"
+              class="form-input"
+              [class.input-invalid]="getFieldError('welfareNameEN')"
+              [(ngModel)]="form.welfareNameEN"
+            />
+            @if (getFieldError('welfareNameEN'); as error) {
+              <small class="field-error">{{ error }}</small>
+            }
+          </label>
+        </div>
+
+        <label class="form-field">
+          <span>คำอธิบายภาษาไทย</span>
+          <textarea
+            name="welfareDescriptionTH"
+            rows="3"
+            required
+            class="form-input textarea"
+            [class.input-invalid]="getFieldError('welfareDescriptionTH')"
+            [(ngModel)]="form.welfareDescriptionTH"
+          ></textarea>
+          @if (getFieldError('welfareDescriptionTH'); as error) {
+            <small class="field-error">{{ error }}</small>
+          }
+        </label>
+
+        <label class="form-field">
+          <span>คำอธิบายภาษาอังกฤษ</span>
+          <textarea
+            name="welfareDescriptionEN"
+            rows="3"
+            required
+            class="form-input textarea"
+            [class.input-invalid]="getFieldError('welfareDescriptionEN')"
+            [(ngModel)]="form.welfareDescriptionEN"
+          ></textarea>
+          @if (getFieldError('welfareDescriptionEN'); as error) {
+            <small class="field-error">{{ error }}</small>
+          }
+        </label>
+      </fieldset>
+
+      @if (isLoadingDetail()) {
+        <div class="detail-loading">
+          <i class="fa-solid fa-spinner spin"></i> กำลังโหลดรายละเอียด...
+        </div>
+      }
+    </form>
+
+    <div modalFooter>
+      <button type="button" class="modal-button" (click)="closeModal()" [disabled]="isSaving()">
+        ยกเลิก
+      </button>
+      <button
+        type="submit"
+        form="welfare-form"
+        class="modal-button primary"
+        [disabled]="isSaving() || isConfirming() || isLoadingDetail()"
+      >
+        @if (isSaving()) {
+          <i class="fa-solid fa-spinner spin"></i> กำลังบันทึก...
+        } @else {
+          <i class="fa-solid fa-check"></i> บันทึก
+        }
+      </button>
+    </div>
+  </app-modal-shell>
+}

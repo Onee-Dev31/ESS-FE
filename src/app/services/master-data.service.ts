@@ -20,7 +20,7 @@ import {
   SaveWelfareResponsibilityItem,
   SaveWelfareResponsibilityResponse,
 } from '../interfaces/hr-welfare.interface';
-
+import { CompanyWelfarePayload } from '../interfaces/welfare.interface';
 export interface ClaimType {
   id: string;
   label: string;
@@ -178,7 +178,9 @@ export class MasterDataService {
 
   /** GET api/welfare/responsibility — HR ผู้รับผิดชอบสวัสดิการ ทั้งหมด */
   getWelfareResponsibilities(): Observable<GetWelfareResponsibilityResponse> {
-    return this._http.get<GetWelfareResponsibilityResponse>(`${this.baseUrl}/welfare/responsibility`);
+    return this._http.get<GetWelfareResponsibilityResponse>(
+      `${this.baseUrl}/welfare/responsibility`,
+    );
   }
 
   /** POST api/welfare/responsibility — บันทึกได้หลายแถวต่อ 1 request (id มี = update, ไม่มี/0 = insert) */
@@ -192,7 +194,10 @@ export class MasterDataService {
   }
 
   /** DELETE api/welfare/responsibility/{id} */
-  deleteWelfareResponsibility(id: number, executedBy: string): Observable<{ success: boolean; message: string }> {
+  deleteWelfareResponsibility(
+    id: number,
+    executedBy: string,
+  ): Observable<{ success: boolean; message: string }> {
     return this._http.delete<{ success: boolean; message: string }>(
       `${this.baseUrl}/welfare/responsibility/${id}`,
       { params: new HttpParams().set('executedBy', executedBy) },
@@ -207,5 +212,25 @@ export class MasterDataService {
   /** GET api/Master/hr-personnel — รายชื่อ HR จริงข้ามบริษัททั้งเครือ (CODEMPID/FULLNAME/COMPANY_CODE) */
   getHrPersonnel(): Observable<any> {
     return this._http.get(`${this.baseUrl}/Master/hr-personnel`);
+  }
+
+  /** GET api/Master/company-welfares/{companyCode}/{welfareCode} */
+  getCompanyWelfare(companyCode: string, welfareCode: string): Observable<any> {
+    return this._http.get(`${this.baseUrl}/Master/company-welfares/${companyCode}/${welfareCode}`);
+  }
+
+  /** POST api/Master/company-welfares */
+  createCompanyWelfare(payload: CompanyWelfarePayload): Observable<any> {
+    return this._http.post(`${this.baseUrl}/Master/company-welfares`, payload);
+  }
+
+  /** PUT api/Master/company-welfares/{id} */
+  updateCompanyWelfare(id: number, payload: CompanyWelfarePayload): Observable<any> {
+    return this._http.put(`${this.baseUrl}/Master/company-welfares/${id}`, payload);
+  }
+
+  /** DELETE api/Master/company-welfares/{id} */
+  deleteCompanyWelfare(id: number): Observable<any> {
+    return this._http.delete(`${this.baseUrl}/Master/company-welfares/${id}`);
   }
 }
