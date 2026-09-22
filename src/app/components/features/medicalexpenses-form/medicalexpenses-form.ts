@@ -16,7 +16,6 @@ import { FormsModule } from '@angular/forms';
 import { HttpErrorResponse } from '@angular/common/http';
 import { AuthService } from '../../../services/auth.service';
 import { MedicalExpenseTypeWithBalance } from '../../../interfaces/medical.interface';
-import { ToastService } from '../../../services/toast';
 import { DateUtilityService } from '../../../services/date-utility.service';
 import { DialogService } from '../../../services/dialog';
 import {
@@ -24,7 +23,7 @@ import {
   FilePreviewItem,
 } from '../../modals/file-preview-modal/file-preview-modal';
 import dayjs from 'dayjs';
-import { Subject, Subscription, debounceTime, switchMap, catchError, of } from 'rxjs';
+import { Subject, Subscription, debounce, timer, switchMap, catchError, of } from 'rxjs';
 
 import { ClaimType } from '../../../services/master-data.service';
 import { MedicalService } from '../../../services/medical.service';
@@ -32,6 +31,7 @@ import { Hospital, DiseaseType } from '../../../interfaces/medical.interface';
 import { formatMoneyInput } from '../../../utils/formatText';
 import { SwalService } from '../../../services/swal.service';
 import { NzDatePickerModule } from 'ng-zorro-antd/date-picker';
+import { NzSelectModule } from 'ng-zorro-antd/select';
 import { SkeletonComponent } from '../../shared/skeleton/skeleton';
 import { CdkScrollable } from '@angular/cdk/scrolling';
 
@@ -43,6 +43,7 @@ import { CdkScrollable } from '@angular/cdk/scrolling';
     FormsModule,
     FilePreviewModalComponent,
     NzDatePickerModule,
+    NzSelectModule,
     SkeletonComponent,
     CdkScrollable,
   ],
@@ -53,7 +54,6 @@ export class MedicalexpensesForm implements OnInit, OnDestroy {
   private static readonly PROBATION_DAYS = 119;
 
   private authService = inject(AuthService);
-  private toastService = inject(ToastService);
   private dateUtil = inject(DateUtilityService);
   private medicalService = inject(MedicalService);
   private dialogService = inject(DialogService);
@@ -77,6 +77,7 @@ export class MedicalexpensesForm implements OnInit, OnDestroy {
   amountHighlight = signal<boolean>(false);
   hospitalHighlight = signal<boolean>(false);
   diseaseHighlight = signal<boolean>(false);
+  showRequiredErrors = signal<boolean>(false);
 
   hospital = signal<string>('');
   selectedHospitalObj = signal<Hospital | null>(null);
@@ -92,8 +93,10 @@ export class MedicalexpensesForm implements OnInit, OnDestroy {
 
   @ViewChild('claimTypeSection') claimTypeSectionEl?: ElementRef<HTMLElement>;
   @ViewChild('amountInput') amountInputEl?: ElementRef<HTMLInputElement>;
-  @ViewChild('hospitalInput') hospitalInputEl?: ElementRef<HTMLInputElement>;
-  @ViewChild('diseaseInput') diseaseInputEl?: ElementRef<HTMLInputElement>;
+  @ViewChild('hospitalInput', { read: ElementRef })
+  hospitalInputEl?: ElementRef<HTMLElement>;
+  @ViewChild('diseaseInput', { read: ElementRef })
+  diseaseInputEl?: ElementRef<HTMLElement>;
   @ViewChild('hospitalDropdownEl') hospitalDropdownEl?: ElementRef<HTMLDivElement>;
 
   private hospitalSearch$ = new Subject<string>();
@@ -412,7 +415,7 @@ export class MedicalexpensesForm implements OnInit, OnDestroy {
 
     this.searchSub = this.hospitalSearch$
       .pipe(
-        debounceTime(300),
+        debounce((keyword) => timer(keyword.trim() ? 300 : 0)),
         switchMap((keyword) => {
           // reset pagination เมื่อ keyword เปลี่ยน
           this.currentKeyword = keyword;
@@ -435,7 +438,7 @@ export class MedicalexpensesForm implements OnInit, OnDestroy {
 
     this.diseaseSearchSub = this.diseaseSearch$
       .pipe(
-        debounceTime(300),
+        debounce((keyword) => timer(keyword.trim() ? 300 : 0)),
         switchMap((keyword) => {
           this.diseaseKeyword = keyword;
           this.diseasePage = 1;
@@ -456,6 +459,10 @@ export class MedicalexpensesForm implements OnInit, OnDestroy {
         this.isDiseaseDropdownOpen.set(res.data.length > 0);
         this.isDiseaseLoading.set(false);
       });
+
+    // Preload both lookup lists while the form is initializing so the first open is immediate.
+    this.hospitalSearch$.next('');
+    this.diseaseSearch$.next('');
   }
 
   ngOnDestroy() {
@@ -479,6 +486,19 @@ export class MedicalexpensesForm implements OnInit, OnDestroy {
 
   onHospitalBlur() {
     setTimeout(() => this.isHospitalDropdownOpen.set(false), 200);
+  }
+
+  onHospitalOpenChange(open: boolean) {
+    this.isHospitalDropdownOpen.set(open);
+    if (open && this.hospitalDropdown().length === 0) {
+      this.hospitalSearch$.next('');
+    }
+  }
+
+  onHospitalScrollToBottom() {
+    if (this.hasNextPage && !this.isHospitalLoadingMore()) {
+      this.loadMoreHospitals();
+    }
   }
 
   onDropdownScroll(event: Event) {
@@ -525,6 +545,19 @@ export class MedicalexpensesForm implements OnInit, OnDestroy {
 
   onDiseaseBlur() {
     setTimeout(() => this.isDiseaseDropdownOpen.set(false), 200);
+  }
+
+  onDiseaseOpenChange(open: boolean) {
+    this.isDiseaseDropdownOpen.set(open);
+    if (open && this.diseaseDropdown().length === 0) {
+      this.diseaseSearch$.next('');
+    }
+  }
+
+  onDiseaseScrollToBottom() {
+    if (this.diseaseHasNext && !this.isDiseaseLoadingMore()) {
+      this.loadMoreDiseases();
+    }
   }
 
   onDiseaseDropdownScroll(event: Event) {
@@ -650,10 +683,10 @@ export class MedicalexpensesForm implements OnInit, OnDestroy {
       typeof type === 'string' ? this.claimTypes.find((item) => item.id === type) : type;
     if (!selected) return;
     if (selected.disabled) {
-      // this.toastService.warning(selected.disabledReason || 'ประเภทนี้ยังไม่สามารถเลือกได้');
       return;
     }
     this.selectedClaimType.set(selected.id);
+    this.validateAmountAgainstSelectedClaimType();
   }
 
   deleteAttachment(id: number) {
@@ -722,8 +755,9 @@ export class MedicalexpensesForm implements OnInit, OnDestroy {
   async save() {
     if (this.isSaving()) return;
 
+    this.showRequiredErrors.set(true);
+
     if (!this.selectedClaimType()) {
-      this.toastService.warning('กรุณาเลือกประเภทการเบิกก่อนดำเนินการต่อ');
       this.claimTypeSectionEl?.nativeElement.scrollIntoView({
         behavior: 'smooth',
         block: 'center',
@@ -734,17 +768,14 @@ export class MedicalexpensesForm implements OnInit, OnDestroy {
     }
 
     if (!this.startDate() || !this.endDate()) {
-      this.toastService.warning('กรุณาระบุวันที่รักษา');
       return;
     }
 
     if (!this.dateUtil.isValidDateRange(this.startDate(), this.endDate())) {
-      this.toastService.warning('วันที่เริ่มต้นต้องไม่มากกว่าวันที่สิ้นสุด');
       return;
     }
 
     if (this.parseNumber(this.amount) <= 0) {
-      this.toastService.warning('จำนวนเงินที่เบิกต้องมากกว่า 0');
       this.amountInputEl?.nativeElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
       this.amountInputEl?.nativeElement.focus();
       this.amountHighlight.set(true);
@@ -752,19 +783,24 @@ export class MedicalexpensesForm implements OnInit, OnDestroy {
       return;
     }
 
+    this.validateAmountAgainstSelectedClaimType();
+    if (this.amountError) {
+      this.amountInputEl?.nativeElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      this.amountInputEl?.nativeElement.focus();
+      return;
+    }
+
     const rawType = this.expenseTypesRaw.find(
       (t) => t.code.toLowerCase() === this.selectedClaimType(),
     );
     if (!rawType) {
-      this.toastService.warning('ไม่พบข้อมูลประเภทการเบิก');
       return;
     }
 
     const hosp = this.selectedHospitalObj();
     if (!hosp) {
-      this.toastService.warning('กรุณาเลือกสถานพยาบาลจากรายการ');
       this.hospitalInputEl?.nativeElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      this.hospitalInputEl?.nativeElement.focus();
+      this.hospitalInputEl?.nativeElement.querySelector<HTMLInputElement>('input')?.focus();
       this.hospitalHighlight.set(true);
       setTimeout(() => this.hospitalHighlight.set(false), 800);
       return;
@@ -772,9 +808,8 @@ export class MedicalexpensesForm implements OnInit, OnDestroy {
 
     const disease = this.selectedDiseaseObj();
     if (!disease) {
-      this.toastService.warning('กรุณาเลือกประเภทโรคจากรายการ');
       this.diseaseInputEl?.nativeElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      this.diseaseInputEl?.nativeElement.focus();
+      this.diseaseInputEl?.nativeElement.querySelector<HTMLInputElement>('input')?.focus();
       this.diseaseHighlight.set(true);
       setTimeout(() => this.diseaseHighlight.set(false), 800);
       return;
@@ -910,15 +945,49 @@ export class MedicalexpensesForm implements OnInit, OnDestroy {
     // อัพเดต input จริง ๆ ให้แสดงค่า formatted
     input.value = money;
 
-    // ตรวจสอบ max amount
+    this.validateAmountAgainstSelectedClaimType();
+  }
+
+  private validateAmountAgainstSelectedClaimType(): void {
     const selectedId = this.selectedClaimType();
     const claim = this.claimTypes.find((item) => item.id === selectedId);
-    const maxAmount = this.parseNumber(claim?.amount || 0);
-    const numericValue = this.parseNumber(money);
+
+    if (!claim || !this.amount.trim()) {
+      this.amountError = null;
+      return;
+    }
+
+    const maxAmount = this.parseNumber(claim.amount || 0);
+    const numericValue = this.parseNumber(this.amount);
 
     this.amountError =
       numericValue > maxAmount
         ? `จำนวนเงินต้องไม่เกิน ${maxAmount.toLocaleString('en-US')} บาท`
         : null;
+  }
+
+  isRequiredInvalid(field: 'claimType' | 'hospital' | 'disease' | 'startDate' | 'endDate' | 'amount'): boolean {
+    if (!this.showRequiredErrors()) return false;
+
+    switch (field) {
+      case 'claimType':
+        return !this.selectedClaimType();
+      case 'hospital':
+        return !this.selectedHospitalObj();
+      case 'disease':
+        return !this.selectedDiseaseObj();
+      case 'startDate':
+        return (
+          !this.startDate() ||
+          (!!this.endDate() && !this.dateUtil.isValidDateRange(this.startDate(), this.endDate()))
+        );
+      case 'endDate':
+        return (
+          !this.endDate() ||
+          (!!this.startDate() && !this.dateUtil.isValidDateRange(this.startDate(), this.endDate()))
+        );
+      case 'amount':
+        return !this.amount.trim() || this.parseNumber(this.amount) <= 0;
+    }
   }
 }

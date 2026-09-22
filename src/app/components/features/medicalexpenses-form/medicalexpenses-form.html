@@ -31,7 +31,11 @@
           <div class="hint-title"><i class="fas fa-circle-info"></i> เงื่อนไขการใช้สิทธิ์</div>
           <div class="hint-line" *ngFor="let line of eligibilityHintLines">{{ line }}</div>
         </div>
-        <div class="claim-type-groups" [class.highlight-required]="claimTypeHighlight()">
+        <div
+          class="claim-type-groups"
+          [class.highlight-required]="claimTypeHighlight()"
+          [class.required-invalid]="isRequiredInvalid('claimType')"
+        >
           <div class="claim-groups-labels">
             <div
               class="claim-group-label-cell"
@@ -166,82 +170,82 @@
         <div class="details-grid">
           <div class="input-field-group">
             <label>สถานพยาบาล <span class="required">*</span></label>
-            <div class="hospital-autocomplete">
-              <div class="search-input-wrapper">
-                <input
-                  #hospitalInput
-                  type="text"
-                  class="custom-form-control"
-                  placeholder="ค้นหาโรงพยาบาล/คลินิก"
-                  [class.input-highlight]="hospitalHighlight()"
-                  [ngModel]="hospital()"
-                  (ngModelChange)="onHospitalInput($event)"
-                  (focus)="onHospitalFocus()"
-                  (blur)="onHospitalBlur()"
+            <nz-select
+              #hospitalInput
+              class="medical-lookup-select"
+              [class.input-highlight]="hospitalHighlight()"
+              [class.required-invalid]="isRequiredInvalid('hospital')"
+              [ngModel]="selectedHospitalObj()"
+              (ngModelChange)="selectHospital($event)"
+              (nzOnSearch)="onHospitalInput($event)"
+              (nzOpenChange)="onHospitalOpenChange($event)"
+              (nzScrollToBottom)="onHospitalScrollToBottom()"
+              [nzLoading]="isHospitalLoading()"
+              nzShowSearch
+              nzServerSearch
+              nzPlaceHolder="ค้นหาโรงพยาบาล/คลินิก"
+            >
+              @if (selectedHospitalObj(); as selectedHospital) {
+                <nz-option
+                  [nzValue]="selectedHospital"
+                  [nzLabel]="selectedHospital.nameTh"
+                  [nzHide]="true"
                 />
-                <i class="fas fa-spinner fa-spin search-icon" *ngIf="isHospitalLoading()"></i>
-                <i class="fas fa-search search-icon" *ngIf="!isHospitalLoading()"></i>
-              </div>
-              <div
-                class="hospital-dropdown"
-                #hospitalDropdownEl
-                *ngIf="isHospitalDropdownOpen()"
-                (scroll)="onDropdownScroll($event)"
-              >
-                <div
-                  class="hospital-option"
-                  *ngFor="let h of hospitalDropdown()"
-                  (mousedown)="selectHospital(h)"
-                >
-                  <span class="hospital-name">{{ h.nameTh }}</span>
-                  <span class="hospital-contracted" *ngIf="h.isContracted">
-                    <i class="fas fa-check-circle"></i> ในเครือ
-                  </span>
-                </div>
-                <div class="dropdown-loading-more" *ngIf="isHospitalLoadingMore()">
-                  <i class="fas fa-spinner fa-spin"></i> กำลังโหลด...
-                </div>
-              </div>
-            </div>
+              }
+              @for (h of hospitalDropdown(); track h.hospitalId) {
+                <nz-option [nzValue]="h" [nzLabel]="h.nameTh" nzCustomContent>
+                  <span class="lookup-option-name">{{ h.nameTh }}</span>
+                  @if (h.isContracted) {
+                    <span class="lookup-option-badge">
+                      <i class="fas fa-check-circle"></i> ในเครือ
+                    </span>
+                  }
+                </nz-option>
+              }
+              @if (isHospitalLoadingMore()) {
+                <nz-option nzDisabled nzCustomContent nzValue="__hospital_loading__" nzLabel="">
+                  <span class="lookup-loading"><i class="fas fa-spinner fa-spin"></i> กำลังโหลด...</span>
+                </nz-option>
+              }
+            </nz-select>
           </div>
 
           <div class="input-field-group">
             <label>ประเภทโรค <span class="required">*</span></label>
-            <div class="hospital-autocomplete">
-              <div class="search-input-wrapper">
-                <input
-                  #diseaseInput
-                  type="text"
-                  class="custom-form-control"
-                  placeholder="ค้นหาประเภทโรค"
-                  [class.input-highlight]="diseaseHighlight()"
-                  [ngModel]="disease()"
-                  (ngModelChange)="onDiseaseInput($event)"
-                  (focus)="onDiseaseFocus()"
-                  (blur)="onDiseaseBlur()"
+            <nz-select
+              #diseaseInput
+              class="medical-lookup-select"
+              [class.input-highlight]="diseaseHighlight()"
+              [class.required-invalid]="isRequiredInvalid('disease')"
+              [ngModel]="selectedDiseaseObj()"
+              (ngModelChange)="selectDisease($event)"
+              (nzOnSearch)="onDiseaseInput($event)"
+              (nzOpenChange)="onDiseaseOpenChange($event)"
+              (nzScrollToBottom)="onDiseaseScrollToBottom()"
+              [nzLoading]="isDiseaseLoading()"
+              nzShowSearch
+              nzServerSearch
+              nzPlaceHolder="ค้นหาประเภทโรค"
+            >
+              @if (selectedDiseaseObj(); as selectedDisease) {
+                <nz-option
+                  [nzValue]="selectedDisease"
+                  [nzLabel]="selectedDisease.nameTh"
+                  [nzHide]="true"
                 />
-                <i class="fas fa-spinner fa-spin search-icon" *ngIf="isDiseaseLoading()"></i>
-                <i class="fas fa-search search-icon" *ngIf="!isDiseaseLoading()"></i>
-              </div>
-              <div
-                class="hospital-dropdown"
-                #diseaseDropdownEl
-                *ngIf="isDiseaseDropdownOpen()"
-                (scroll)="onDiseaseDropdownScroll($event)"
-              >
-                <div
-                  class="hospital-option"
-                  *ngFor="let d of diseaseDropdown()"
-                  (mousedown)="selectDisease(d)"
-                >
-                  <span class="hospital-name">{{ d.nameTh }}</span>
-                  <span class="disease-code">{{ d.icd10Code }}</span>
-                </div>
-                <div class="dropdown-loading-more" *ngIf="isDiseaseLoadingMore()">
-                  <i class="fas fa-spinner fa-spin"></i> กำลังโหลด...
-                </div>
-              </div>
-            </div>
+              }
+              @for (d of diseaseDropdown(); track d.diseaseId) {
+                <nz-option [nzValue]="d" [nzLabel]="d.nameTh" nzCustomContent>
+                  <span class="lookup-option-name">{{ d.nameTh }}</span>
+                  <span class="lookup-option-code">{{ d.icd10Code }}</span>
+                </nz-option>
+              }
+              @if (isDiseaseLoadingMore()) {
+                <nz-option nzDisabled nzCustomContent nzValue="__disease_loading__" nzLabel="">
+                  <span class="lookup-loading"><i class="fas fa-spinner fa-spin"></i> กำลังโหลด...</span>
+                </nz-option>
+              }
+            </nz-select>
           </div>
 
           <div class="input-field-group">
@@ -255,6 +259,7 @@
                     </div> -->
             <nz-date-picker
               class="input-field custom-picker"
+              [class.required-invalid]="isRequiredInvalid('startDate')"
               nzDropdownClassName="custom-picker-popup"
               nzFormat="dd/MM/yyyy"
               [ngModel]="startDate()"
@@ -273,6 +278,7 @@
                     </div> -->
             <nz-date-picker
               class="input-field custom-picker"
+              [class.required-invalid]="isRequiredInvalid('endDate')"
               nzDropdownClassName="custom-picker-popup"
               nzFormat="dd/MM/yyyy"
               [ngModel]="endDate()"
@@ -305,6 +311,7 @@
                 class="custom-form-control text-right"
                 placeholder="0.00"
                 [class.input-highlight]="amountHighlight()"
+                [class.required-invalid]="isRequiredInvalid('amount')"
                 [ngModel]="amount"
                 (input)="onAmountInput($event)"
               />
@@ -413,9 +420,8 @@
     </button>
     <button
       class="btn-save-custom"
-      [class.disable]="!isValidSave()"
       (click)="save()"
-      [disabled]="isSaving() || !isValidSave()"
+      [disabled]="isSaving()"
     >
       <i
         [class]="
