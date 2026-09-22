@@ -22,130 +22,6 @@ import {
   SaveWelfareResponsibilityItem,
 } from '../../interfaces/hr-welfare.interface';
 
-/** Fallback รายชื่อ HR — ใช้เมื่อเรียก Master/employees ไม่สำเร็จ */
-const MOCK_HR_LIST = [
-  { code: 'HR001', name: 'นก' },
-  { code: 'HR002', name: 'ศิริพร' },
-  { code: 'HR003', name: 'วราภรณ์' },
-  { code: 'HR004', name: 'กมลชนก' },
-  { code: 'HR005', name: 'อัญชนา' },
-];
-
-/** Fallback ประเภทสวัสดิการ — ใช้เมื่อเรียก Master/company-welfares ไม่สำเร็จ */
-const MOCK_WELFARE_TYPES = [
-  { code: 'WF001', name: 'ค่ารักษาพยาบาล' },
-  { code: 'WF002', name: 'ประกันชีวิต' },
-  { code: 'WF003', name: 'เงินช่วยเหลือกรณีฉุกเฉิน' },
-  { code: 'WF004', name: 'สวัสดิการครอบครัว' },
-  { code: 'WF005', name: 'ทุนการศึกษา' },
-  { code: 'WF006', name: 'ประกันอุบัติเหตุ' },
-  { code: 'WF007', name: 'ตรวจสุขภาพประจำปี' },
-  { code: 'WF008', name: 'วัคซีน' },
-];
-
-const MOCK_COMPANY_CODES = ['ONEE', 'GMMTV', 'CHANGE', 'ATIME'];
-
-function createMockRows(): HrWelfareResponsibility[] {
-  return [
-    {
-      id: 1,
-      hrCodeEmp: 'HR001',
-      hrName: 'นก',
-      welfareCodes: ['WF001', 'WF002', 'WF003'],
-      companyCodes: ['ONEE', 'GMMTV'],
-      remark: 'ดูแลพนักงานสำนักงานใหญ่',
-      createdBy: 'system',
-      createdDate: new Date().toISOString(),
-      updatedBy: null,
-      updatedDate: null,
-    },
-    {
-      id: 2,
-      hrCodeEmp: 'HR002',
-      hrName: 'ศิริพร',
-      welfareCodes: ['WF003'],
-      companyCodes: ['ONEE'],
-      remark: 'เฉพาะพนักงานประจำ',
-      createdBy: 'system',
-      createdDate: new Date().toISOString(),
-      updatedBy: null,
-      updatedDate: null,
-    },
-    {
-      id: 3,
-      hrCodeEmp: 'HR003',
-      hrName: 'วราภรณ์',
-      welfareCodes: ['WF004', 'WF005', 'WF002'],
-      companyCodes: ['ONEE', 'CHANGE', 'GMMTV'],
-      remark: 'รวมบุตรบุญธรรม',
-      createdBy: 'system',
-      createdDate: new Date().toISOString(),
-      updatedBy: null,
-      updatedDate: null,
-    },
-    {
-      id: 4,
-      hrCodeEmp: 'HR004',
-      hrName: 'กมลชนก',
-      welfareCodes: ['WF006'],
-      companyCodes: ['GMMTV'],
-      remark: null,
-      createdBy: 'system',
-      createdDate: new Date().toISOString(),
-      updatedBy: null,
-      updatedDate: null,
-    },
-    {
-      id: 5,
-      hrCodeEmp: 'HR005',
-      hrName: 'อัญชนา',
-      welfareCodes: ['WF007', 'WF008'],
-      companyCodes: ['ONEE', 'ATIME'],
-      remark: 'ประสานงานกับ รพ. คู่สัญญา',
-      createdBy: 'system',
-      createdDate: new Date().toISOString(),
-      updatedBy: null,
-      updatedDate: null,
-    },
-    {
-      id: 6,
-      hrCodeEmp: 'HR001',
-      hrName: 'นก',
-      welfareCodes: ['WF007'],
-      companyCodes: ['CHANGE'],
-      remark: null,
-      createdBy: 'system',
-      createdDate: new Date().toISOString(),
-      updatedBy: null,
-      updatedDate: null,
-    },
-    {
-      id: 7,
-      hrCodeEmp: 'HR002',
-      hrName: 'ศิริพร',
-      welfareCodes: ['WF006', 'WF008'],
-      companyCodes: ['ATIME'],
-      remark: null,
-      createdBy: 'system',
-      createdDate: new Date().toISOString(),
-      updatedBy: null,
-      updatedDate: null,
-    },
-    {
-      id: 8,
-      hrCodeEmp: 'HR003',
-      hrName: 'วราภรณ์',
-      welfareCodes: ['WF001'],
-      companyCodes: ['ONEE'],
-      remark: 'ดูแลกรณีฉุกเฉินนอกเวลางาน',
-      createdBy: 'system',
-      createdDate: new Date().toISOString(),
-      updatedBy: null,
-      updatedDate: null,
-    },
-  ];
-}
-
 function emptyForm(): HrWelfareFormValue {
   return { hrCodes: [], welfareTypes: [], companies: [], note: '' };
 }
@@ -168,9 +44,9 @@ export class SettingHrWelfare implements OnInit {
   private readonly authService = inject(AuthService);
   private readonly destroyRef = inject(DestroyRef);
 
-  readonly hrList = signal<{ code: string; name: string }[]>(MOCK_HR_LIST);
-  readonly welfareTypeList = signal<{ code: string; name: string }[]>(MOCK_WELFARE_TYPES);
-  readonly companyList = signal<string[]>([...MOCK_COMPANY_CODES]);
+  readonly hrList = signal<{ code: string; name: string }[]>([]);
+  readonly welfareTypeList = signal<{ code: string; name: string }[]>([]);
+  readonly companyList = signal<string[]>([]);
 
   readonly rows = signal<HrWelfareResponsibility[]>([]);
   readonly isLoading = signal(true);
@@ -206,7 +82,10 @@ export class SettingHrWelfare implements OnInit {
     this.masterDataService
       .getWelfareResponsibilities()
       .pipe(
-        catchError(() => of({ success: true, data: createMockRows() })),
+        catchError(() => {
+          this.swalService.error('โหลดข้อมูลไม่สำเร็จ', 'ไม่สามารถดึงข้อมูลผู้รับผิดชอบสวัสดิการได้');
+          return of({ success: false, data: [] });
+        }),
         takeUntilDestroyed(this.destroyRef),
       )
       .subscribe((res) => {
@@ -230,7 +109,7 @@ export class SettingHrWelfare implements OnInit {
       });
   }
 
-  /** ดึงรายชื่อ HR จริงจาก Master/hr-personnel (fallback เป็น MOCK_HR_LIST ถ้าเรียกไม่สำเร็จ) */
+  /** ดึงรายชื่อ HR จริงจาก Master/hr-personnel */
   loadHrList(): void {
     this.masterDataService
       .getHrPersonnel()
@@ -252,7 +131,7 @@ export class SettingHrWelfare implements OnInit {
   }
 
   /** ดึง master ประเภทสวัสดิการจาก Master/company-welfares (ผูกคู่ CompanyCode+WelfareCode
-   * เลยต้อง dedupe เอา WelfareCode ที่ไม่ซ้ำ, fallback เป็น MOCK_WELFARE_TYPES ถ้าเรียกไม่สำเร็จ) */
+   * เลยต้อง dedupe เอา WelfareCode ที่ไม่ซ้ำ) */
   loadWelfareTypes(): void {
     this.masterDataService
       .getCompanyWelfares()
@@ -309,6 +188,14 @@ export class SettingHrWelfare implements OnInit {
   readonly paginatedRows = computed(() => {
     const start = this.currentPage() * this.pageSize();
     return this.filteredRows().slice(start, start + this.pageSize());
+  });
+
+  /** ตัวเลือก HR ในโมดัล — โหมดเพิ่ม: ตัด HR ที่มีแถวอยู่แล้วออก (กันแถวซ้ำคนเดิม, ต้องแก้ไขแถวเดิมแทน)
+   * โหมดแก้ไข: เห็นเต็มลิสต์ตามปกติ (มีแค่ตัวเองอยู่แล้วในฟอร์ม) */
+  readonly modalHrOptions = computed(() => {
+    if (this.editingId() !== null) return this.hrList();
+    const usedCodes = new Set(this.rows().map((r) => r.hrCodeEmp));
+    return this.hrList().filter((hr) => !usedCodes.has(hr.code));
   });
 
   applyFilter(): void {
@@ -418,28 +305,18 @@ export class SettingHrWelfare implements OnInit {
     const executedBy = this.getCurrentExecutor();
     const remark = this.form.note.trim();
 
-    // 1 HR = 1 แถวเสมอ — ถ้า HR คนนี้มีแถวอยู่แล้ว (เลือกซ้ำตอนเพิ่ม) ให้ merge ประเภทสวัสดิการ/บริษัท
-    // เข้าแถวเดิม (แก้ id เดิม) แทนการ insert แถวใหม่ซ้ำชื่อคนเดิม
+    // 1 HR = 1 แถวเสมอ — modalHrOptions ตัด HR ที่มีแถวอยู่แล้วออกจากตัวเลือกตอนเพิ่ม
+    // ไปแล้ว จึงเลือกซ้ำคนเดิมจากโมดัลนี้ไม่ได้ (ต้องแก้ไขแถวเดิมแทน)
     const items: SaveWelfareResponsibilityItem[] =
       editingId === null
-        ? this.form.hrCodes.map((hrCodeEmp) => {
-            const existing = this.rows().find((r) => r.hrCodeEmp === hrCodeEmp);
-            const welfareCodes = existing
-              ? Array.from(new Set([...existing.welfareCodes, ...this.form.welfareTypes]))
-              : this.form.welfareTypes;
-            const companyCodes = existing
-              ? Array.from(new Set([...existing.companyCodes, ...this.form.companies]))
-              : this.form.companies;
-            return {
-              id: existing?.id ?? null,
-              hrCodeEmp,
-              hrName: this.hrNameByCode(hrCodeEmp),
-              welfareCodes: welfareCodes.join(','),
-              companyCodes: companyCodes.join(','),
-              remark,
-              executedBy,
-            };
-          })
+        ? this.form.hrCodes.map((hrCodeEmp) => ({
+            hrCodeEmp,
+            hrName: this.hrNameByCode(hrCodeEmp),
+            welfareCodes: this.form.welfareTypes.join(','),
+            companyCodes: this.form.companies.join(','),
+            remark,
+            executedBy,
+          }))
         : [
             {
               id: editingId,
