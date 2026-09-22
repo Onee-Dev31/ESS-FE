@@ -351,9 +351,9 @@
                 color: var(--warning);
                 transform: scale(1.2);
                 animation: none;
-                box-shadow:
-                  0 8px 24px color-mix(in srgb, var(--warning) 25%, transparent),
-                  0 0 0 8px color-mix(in srgb, var(--warning) 10%, transparent);
+                // box-shadow:
+                //   0 8px 24px color-mix(in srgb, var(--warning) 25%, transparent),
+                //   0 0 0 8px color-mix(in srgb, var(--warning) 10%, transparent);
               }
 
               .step-label {
