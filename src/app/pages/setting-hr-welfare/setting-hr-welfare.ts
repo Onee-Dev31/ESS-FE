@@ -1,12 +1,21 @@
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, DestroyRef, OnInit, computed, inject, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { NzSelectModule } from 'ng-zorro-antd/select';
+import { catchError, of } from 'rxjs';
 import { EmptyStateComponent } from '../../components/shared/empty-state/empty-state';
 import { ModalShellComponent } from '../../components/shared/modal-shell/modal-shell';
+import { SkeletonComponent } from '../../components/shared/skeleton/skeleton';
+import { AuthService } from '../../services/auth.service';
+import { MasterDataService } from '../../services/master-data.service';
 import { SwalService } from '../../services/swal.service';
-import { HrWelfareFormValue, HrWelfareResponsible } from '../../interfaces/hr-welfare.interface';
+import {
+  HrWelfareFormValue,
+  HrWelfareResponsibility,
+  SaveWelfareResponsibilityItem,
+} from '../../interfaces/hr-welfare.interface';
 
-/** Mock master data — TODO: replace with real Master API once backend is ready. */
+/** Fallback รายชื่อ HR — ใช้เมื่อเรียก Master/employees ไม่สำเร็จ */
 const MOCK_HR_LIST = [
   { code: 'HR001', name: 'นก' },
   { code: 'HR002', name: 'ศิริพร' },
@@ -15,86 +24,117 @@ const MOCK_HR_LIST = [
   { code: 'HR005', name: 'อัญชนา' },
 ];
 
+/** Fallback ประเภทสวัสดิการ — ใช้เมื่อเรียก Master/company-welfares ไม่สำเร็จ */
 const MOCK_WELFARE_TYPES = [
-  'ค่ารักษาพยาบาล',
-  'ประกันชีวิต',
-  'เงินช่วยเหลือกรณีฉุกเฉิน',
-  'สวัสดิการครอบครัว',
-  'ทุนการศึกษา',
-  'ประกันอุบัติเหตุ',
-  'ตรวจสุขภาพประจำปี',
-  'วัคซีน',
+  { code: 'WF001', name: 'ค่ารักษาพยาบาล' },
+  { code: 'WF002', name: 'ประกันชีวิต' },
+  { code: 'WF003', name: 'เงินช่วยเหลือกรณีฉุกเฉิน' },
+  { code: 'WF004', name: 'สวัสดิการครอบครัว' },
+  { code: 'WF005', name: 'ทุนการศึกษา' },
+  { code: 'WF006', name: 'ประกันอุบัติเหตุ' },
+  { code: 'WF007', name: 'ตรวจสุขภาพประจำปี' },
+  { code: 'WF008', name: 'วัคซีน' },
 ];
 
-const MOCK_COMPANIES = ['ONEE', 'GMMTV', 'CHANGE', 'ATIME'];
+const MOCK_COMPANY_CODES = ['ONEE', 'GMMTV', 'CHANGE', 'ATIME'];
 
-let mockIdSeq = 100;
-
-function createMockRows(): HrWelfareResponsible[] {
+function createMockRows(): HrWelfareResponsibility[] {
   return [
     {
       id: 1,
-      hrCode: 'HR001',
+      hrCodeEmp: 'HR001',
       hrName: 'นก',
-      welfareTypes: ['ค่ารักษาพยาบาล', 'ประกันชีวิต', 'เงินช่วยเหลือกรณีฉุกเฉิน'],
-      companies: ['ONEE', 'GMMTV'],
-      note: 'ดูแลพนักงานสำนักงานใหญ่',
+      welfareCodes: ['WF001', 'WF002', 'WF003'],
+      companyCodes: ['ONEE', 'GMMTV'],
+      remark: 'ดูแลพนักงานสำนักงานใหญ่',
+      createdBy: 'system',
+      createdDate: new Date().toISOString(),
+      updatedBy: null,
+      updatedDate: null,
     },
     {
       id: 2,
-      hrCode: 'HR002',
+      hrCodeEmp: 'HR002',
       hrName: 'ศิริพร',
-      welfareTypes: ['เงินช่วยเหลือกรณีฉุกเฉิน'],
-      companies: ['ONEE'],
-      note: 'เฉพาะพนักงานประจำ',
+      welfareCodes: ['WF003'],
+      companyCodes: ['ONEE'],
+      remark: 'เฉพาะพนักงานประจำ',
+      createdBy: 'system',
+      createdDate: new Date().toISOString(),
+      updatedBy: null,
+      updatedDate: null,
     },
     {
       id: 3,
-      hrCode: 'HR003',
+      hrCodeEmp: 'HR003',
       hrName: 'วราภรณ์',
-      welfareTypes: ['สวัสดิการครอบครัว', 'ทุนการศึกษา', 'ประกันชีวิต'],
-      companies: ['ONEE', 'CHANGE', 'GMMTV'],
-      note: 'รวมบุตรบุญธรรม',
+      welfareCodes: ['WF004', 'WF005', 'WF002'],
+      companyCodes: ['ONEE', 'CHANGE', 'GMMTV'],
+      remark: 'รวมบุตรบุญธรรม',
+      createdBy: 'system',
+      createdDate: new Date().toISOString(),
+      updatedBy: null,
+      updatedDate: null,
     },
     {
       id: 4,
-      hrCode: 'HR004',
+      hrCodeEmp: 'HR004',
       hrName: 'กมลชนก',
-      welfareTypes: ['ประกันอุบัติเหตุ'],
-      companies: ['GMMTV'],
-      note: '-',
+      welfareCodes: ['WF006'],
+      companyCodes: ['GMMTV'],
+      remark: null,
+      createdBy: 'system',
+      createdDate: new Date().toISOString(),
+      updatedBy: null,
+      updatedDate: null,
     },
     {
       id: 5,
-      hrCode: 'HR005',
+      hrCodeEmp: 'HR005',
       hrName: 'อัญชนา',
-      welfareTypes: ['ตรวจสุขภาพประจำปี', 'วัคซีน'],
-      companies: ['ONEE', 'ATIME'],
-      note: 'ประสานงานกับ รพ. คู่สัญญา',
+      welfareCodes: ['WF007', 'WF008'],
+      companyCodes: ['ONEE', 'ATIME'],
+      remark: 'ประสานงานกับ รพ. คู่สัญญา',
+      createdBy: 'system',
+      createdDate: new Date().toISOString(),
+      updatedBy: null,
+      updatedDate: null,
     },
     {
       id: 6,
-      hrCode: 'HR001',
+      hrCodeEmp: 'HR001',
       hrName: 'นก',
-      welfareTypes: ['ตรวจสุขภาพประจำปี'],
-      companies: ['CHANGE'],
-      note: '-',
+      welfareCodes: ['WF007'],
+      companyCodes: ['CHANGE'],
+      remark: null,
+      createdBy: 'system',
+      createdDate: new Date().toISOString(),
+      updatedBy: null,
+      updatedDate: null,
     },
     {
       id: 7,
-      hrCode: 'HR002',
+      hrCodeEmp: 'HR002',
       hrName: 'ศิริพร',
-      welfareTypes: ['ประกันอุบัติเหตุ', 'วัคซีน'],
-      companies: ['ATIME'],
-      note: '-',
+      welfareCodes: ['WF006', 'WF008'],
+      companyCodes: ['ATIME'],
+      remark: null,
+      createdBy: 'system',
+      createdDate: new Date().toISOString(),
+      updatedBy: null,
+      updatedDate: null,
     },
     {
       id: 8,
-      hrCode: 'HR003',
+      hrCodeEmp: 'HR003',
       hrName: 'วราภรณ์',
-      welfareTypes: ['ค่ารักษาพยาบาล'],
-      companies: ['ONEE'],
-      note: 'ดูแลกรณีฉุกเฉินนอกเวลางาน',
+      welfareCodes: ['WF001'],
+      companyCodes: ['ONEE'],
+      remark: 'ดูแลกรณีฉุกเฉินนอกเวลางาน',
+      createdBy: 'system',
+      createdDate: new Date().toISOString(),
+      updatedBy: null,
+      updatedDate: null,
     },
   ];
 }
@@ -105,18 +145,22 @@ function emptyForm(): HrWelfareFormValue {
 
 @Component({
   selector: 'app-setting-hr-welfare',
-  imports: [FormsModule, NzSelectModule, EmptyStateComponent, ModalShellComponent],
+  imports: [FormsModule, NzSelectModule, EmptyStateComponent, ModalShellComponent, SkeletonComponent],
   templateUrl: './setting-hr-welfare.html',
   styleUrl: './setting-hr-welfare.scss',
 })
-export class SettingHrWelfare {
+export class SettingHrWelfare implements OnInit {
+  private readonly masterDataService = inject(MasterDataService);
   private readonly swalService = inject(SwalService);
+  private readonly authService = inject(AuthService);
+  private readonly destroyRef = inject(DestroyRef);
 
-  readonly hrList = MOCK_HR_LIST;
-  readonly welfareTypeList = MOCK_WELFARE_TYPES;
-  readonly companyList = MOCK_COMPANIES;
+  readonly hrList = signal<{ code: string; name: string }[]>(MOCK_HR_LIST);
+  readonly welfareTypeList = signal<{ code: string; name: string }[]>(MOCK_WELFARE_TYPES);
+  companyList: string[] = [...MOCK_COMPANY_CODES];
 
-  readonly rows = signal<HrWelfareResponsible[]>(createMockRows());
+  readonly rows = signal<HrWelfareResponsibility[]>([]);
+  readonly isLoading = signal(true);
 
   // filter bar
   readonly searchText = signal('');
@@ -137,6 +181,87 @@ export class SettingHrWelfare {
   readonly deletingId = signal<number | null>(null);
   form: HrWelfareFormValue = emptyForm();
 
+  ngOnInit(): void {
+    this.loadRows();
+    this.loadCompanies();
+    this.loadHrList();
+    this.loadWelfareTypes();
+  }
+
+  loadRows(): void {
+    this.isLoading.set(true);
+    this.masterDataService
+      .getWelfareResponsibilities()
+      .pipe(
+        catchError(() => of({ success: true, data: createMockRows() })),
+        takeUntilDestroyed(this.destroyRef),
+      )
+      .subscribe((res) => {
+        this.rows.set(res.data);
+        this.isLoading.set(false);
+      });
+  }
+
+  loadCompanies(): void {
+    this.masterDataService
+      .getCompanyMaster()
+      .pipe(
+        catchError(() => of(null)),
+        takeUntilDestroyed(this.destroyRef),
+      )
+      .subscribe((res) => {
+        if (!res) return;
+        const list = Array.isArray(res) ? res : (res.data ?? []);
+        const codes = list.map((c: any) => c.COMPANY_CODE).filter(Boolean);
+        if (codes.length > 0) this.companyList = codes;
+      });
+  }
+
+  /** ดึงรายชื่อ HR จริงจาก Master/hr-personnel (fallback เป็น MOCK_HR_LIST ถ้าเรียกไม่สำเร็จ) */
+  loadHrList(): void {
+    this.masterDataService
+      .getHrPersonnel()
+      .pipe(
+        catchError(() => of(null)),
+        takeUntilDestroyed(this.destroyRef),
+      )
+      .subscribe((res) => {
+        if (!res) return;
+        const items = res.data ?? [];
+        const list = items
+          .map((item: any) => ({
+            code: item.CODEMPID,
+            name: item.FULLNAME || item.CODEMPID,
+          }))
+          .filter((hr: { code: string; name: string }) => !!hr.code);
+        if (list.length > 0) this.hrList.set(list);
+      });
+  }
+
+  /** ดึง master ประเภทสวัสดิการจาก Master/company-welfares (ผูกคู่ CompanyCode+WelfareCode
+   * เลยต้อง dedupe เอา WelfareCode ที่ไม่ซ้ำ, fallback เป็น MOCK_WELFARE_TYPES ถ้าเรียกไม่สำเร็จ) */
+  loadWelfareTypes(): void {
+    this.masterDataService
+      .getCompanyWelfares()
+      .pipe(
+        catchError(() => of(null)),
+        takeUntilDestroyed(this.destroyRef),
+      )
+      .subscribe((res) => {
+        if (!res) return;
+        const items = Array.isArray(res) ? res : (res.data ?? []);
+        const seen = new Set<string>();
+        const list: { code: string; name: string }[] = [];
+        for (const item of items) {
+          const code = item.WelfareCode || item.welfareCode;
+          if (!code || seen.has(code)) continue;
+          seen.add(code);
+          list.push({ code, name: item.WelfareNameTH || item.welfareNameTH || code });
+        }
+        if (list.length > 0) this.welfareTypeList.set(list);
+      });
+  }
+
   readonly filteredRows = computed(() => {
     const text = this.searchText().trim().toLowerCase();
     const hrCode = this.filterHrCode();
@@ -144,11 +269,16 @@ export class SettingHrWelfare {
     const company = this.filterCompany();
 
     return this.rows().filter((row) => {
-      if (hrCode && row.hrCode !== hrCode) return false;
-      if (welfareType && !row.welfareTypes.includes(welfareType)) return false;
-      if (company && !row.companies.includes(company)) return false;
+      if (hrCode && row.hrCodeEmp !== hrCode) return false;
+      if (welfareType && !row.welfareCodes.includes(welfareType)) return false;
+      if (company && !row.companyCodes.includes(company)) return false;
       if (text) {
-        const haystack = [row.hrName, ...row.welfareTypes, ...row.companies, row.note]
+        const haystack = [
+          row.hrName,
+          ...row.welfareCodes.map((c) => this.welfareNameByCode(c)),
+          ...row.companyCodes,
+          row.remark ?? '',
+        ]
           .join(' ')
           .toLowerCase();
         if (!haystack.includes(text)) return false;
@@ -200,7 +330,11 @@ export class SettingHrWelfare {
   }
 
   hrNameByCode(code: string): string {
-    return this.hrList.find((hr) => hr.code === code)?.name ?? code;
+    return this.hrList().find((hr) => hr.code === code)?.name ?? code;
+  }
+
+  welfareNameByCode(code: string): string {
+    return this.welfareTypeList().find((wf) => wf.code === code)?.name ?? code;
   }
 
   // The 3 multi-selects below keep ant's real nzMode="multiple" control (bound directly to
@@ -211,8 +345,8 @@ export class SettingHrWelfare {
     this.form.hrCodes = this.form.hrCodes.filter((c) => c !== code);
   }
 
-  removeWelfareType(type: string): void {
-    this.form.welfareTypes = this.form.welfareTypes.filter((t) => t !== type);
+  removeWelfareType(code: string): void {
+    this.form.welfareTypes = this.form.welfareTypes.filter((c) => c !== code);
   }
 
   removeCompany(company: string): void {
@@ -226,14 +360,14 @@ export class SettingHrWelfare {
     this.isModalOpen.set(true);
   }
 
-  openEdit(row: HrWelfareResponsible): void {
+  openEdit(row: HrWelfareResponsibility): void {
     this.editingId.set(row.id);
     this.hasSubmitted.set(false);
     this.form = {
-      hrCodes: [row.hrCode],
-      welfareTypes: [...row.welfareTypes],
-      companies: [...row.companies],
-      note: row.note === '-' ? '' : row.note,
+      hrCodes: [row.hrCodeEmp],
+      welfareTypes: [...row.welfareCodes],
+      companies: [...row.companyCodes],
+      note: row.remark ?? '',
     };
     this.isModalOpen.set(true);
   }
@@ -251,6 +385,11 @@ export class SettingHrWelfare {
     );
   }
 
+  private getCurrentExecutor(): string {
+    const user = this.authService.userData();
+    return user?.CODEMPID ?? user?.AD_USER ?? '';
+  }
+
   async save(): Promise<void> {
     this.hasSubmitted.set(true);
     if (!this.isFormValid()) return;
@@ -263,39 +402,54 @@ export class SettingHrWelfare {
 
     this.isSaving.set(true);
 
-    const note = this.form.note.trim() || '-';
-    const welfareTypes = [...this.form.welfareTypes];
-    const companies = [...this.form.companies];
+    const executedBy = this.getCurrentExecutor();
+    const remark = this.form.note.trim();
+    const welfareCodes = this.form.welfareTypes.join(',');
+    const companies = this.form.companies.join(',');
 
-    if (editingId === null) {
-      const newRows: HrWelfareResponsible[] = this.form.hrCodes.map((hrCode) => ({
-        id: ++mockIdSeq,
-        hrCode,
-        hrName: this.hrNameByCode(hrCode),
-        welfareTypes,
-        companies,
-        note,
-      }));
-      this.rows.update((current) => [...current, ...newRows]);
-    } else {
-      const hrCode = this.form.hrCodes[0];
-      this.rows.update((current) =>
-        current.map((row) =>
-          row.id === editingId
-            ? { ...row, hrCode, hrName: this.hrNameByCode(hrCode), welfareTypes, companies, note }
-            : row,
-        ),
-      );
-    }
+    const items: SaveWelfareResponsibilityItem[] =
+      editingId === null
+        ? this.form.hrCodes.map((hrCodeEmp) => ({
+            hrCodeEmp,
+            hrName: this.hrNameByCode(hrCodeEmp),
+            welfareCodes,
+            companyCodes: companies,
+            remark,
+            executedBy,
+          }))
+        : [
+            {
+              id: editingId,
+              hrCodeEmp: this.form.hrCodes[0],
+              hrName: this.hrNameByCode(this.form.hrCodes[0]),
+              welfareCodes,
+              companyCodes: companies,
+              remark,
+              executedBy,
+            },
+          ];
 
-    this.isSaving.set(false);
-    this.isModalOpen.set(false);
-    this.swalService.success(
-      editingId === null ? 'เพิ่มผู้รับผิดชอบสวัสดิการสำเร็จ' : 'แก้ไขผู้รับผิดชอบสวัสดิการสำเร็จ',
-    );
+    this.masterDataService
+      .saveWelfareResponsibilities(items)
+      .pipe(
+        catchError((err) => of({ success: false, message: err?.error?.message ?? 'บันทึกข้อมูลไม่สำเร็จ', totalRecords: 0 })),
+        takeUntilDestroyed(this.destroyRef),
+      )
+      .subscribe((res) => {
+        this.isSaving.set(false);
+        if (!res.success) {
+          this.swalService.error('บันทึกไม่สำเร็จ', res.message);
+          return;
+        }
+        this.isModalOpen.set(false);
+        this.loadRows();
+        this.swalService.success(
+          editingId === null ? 'เพิ่มผู้รับผิดชอบสวัสดิการสำเร็จ' : 'แก้ไขผู้รับผิดชอบสวัสดิการสำเร็จ',
+        );
+      });
   }
 
-  async deleteRow(row: HrWelfareResponsible): Promise<void> {
+  async deleteRow(row: HrWelfareResponsibility): Promise<void> {
     if (this.deletingId() !== null) return;
 
     const confirmation = await this.swalService.confirm(
@@ -305,11 +459,24 @@ export class SettingHrWelfare {
     if (!confirmation.isConfirmed) return;
 
     this.deletingId.set(row.id);
-    this.rows.update((current) => current.filter((r) => r.id !== row.id));
-    this.deletingId.set(null);
-    this.swalService.success('ลบผู้รับผิดชอบสวัสดิการสำเร็จ');
 
-    const maxPage = this.totalPages() - 1;
-    if (this.currentPage() > maxPage) this.currentPage.set(maxPage);
+    this.masterDataService
+      .deleteWelfareResponsibility(row.id, this.getCurrentExecutor())
+      .pipe(
+        catchError((err) => of({ success: false, message: err?.error?.message ?? 'ลบข้อมูลไม่สำเร็จ' })),
+        takeUntilDestroyed(this.destroyRef),
+      )
+      .subscribe((res) => {
+        this.deletingId.set(null);
+        if (!res.success) {
+          this.swalService.error('ลบไม่สำเร็จ', res.message);
+          return;
+        }
+        this.loadRows();
+        this.swalService.success('ลบผู้รับผิดชอบสวัสดิการสำเร็จ');
+
+        const maxPage = this.totalPages() - 1;
+        if (this.currentPage() > maxPage) this.currentPage.set(maxPage);
+      });
   }
 }

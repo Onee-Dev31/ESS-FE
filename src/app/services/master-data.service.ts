@@ -15,6 +15,11 @@ import {
   MedicalBenefitPlan,
   UpsertMedicalBenefitPlanPayload,
 } from '../interfaces/medical.interface';
+import {
+  GetWelfareResponsibilityResponse,
+  SaveWelfareResponsibilityItem,
+  SaveWelfareResponsibilityResponse,
+} from '../interfaces/hr-welfare.interface';
 
 export interface ClaimType {
   id: string;
@@ -169,5 +174,38 @@ export class MasterDataService {
   /** POST api/Master/UpsertMedicalBenefitPlans */
   upsertMedicalBenefitPlan(payload: UpsertMedicalBenefitPlanPayload): Observable<any> {
     return this._http.post(`${this.baseUrl}/Master/UpsertMedicalBenefitPlans`, payload);
+  }
+
+  /** GET api/welfare/responsibility — HR ผู้รับผิดชอบสวัสดิการ ทั้งหมด */
+  getWelfareResponsibilities(): Observable<GetWelfareResponsibilityResponse> {
+    return this._http.get<GetWelfareResponsibilityResponse>(`${this.baseUrl}/welfare/responsibility`);
+  }
+
+  /** POST api/welfare/responsibility — บันทึกได้หลายแถวต่อ 1 request (id มี = update, ไม่มี/0 = insert) */
+  saveWelfareResponsibilities(
+    items: SaveWelfareResponsibilityItem[],
+  ): Observable<SaveWelfareResponsibilityResponse> {
+    return this._http.post<SaveWelfareResponsibilityResponse>(
+      `${this.baseUrl}/welfare/responsibility`,
+      items,
+    );
+  }
+
+  /** DELETE api/welfare/responsibility/{id} */
+  deleteWelfareResponsibility(id: number, executedBy: string): Observable<{ success: boolean; message: string }> {
+    return this._http.delete<{ success: boolean; message: string }>(
+      `${this.baseUrl}/welfare/responsibility/${id}`,
+      { params: new HttpParams().set('executedBy', executedBy) },
+    );
+  }
+
+  /** GET api/Master/company-welfares — master ประเภทสวัสดิการ (ผูกคู่กับ CompanyCode, อาจมีหลายแถวต่อ WelfareCode เดียวกัน) */
+  getCompanyWelfares(): Observable<any> {
+    return this._http.get(`${this.baseUrl}/Master/company-welfares`);
+  }
+
+  /** GET api/Master/hr-personnel — รายชื่อ HR จริงข้ามบริษัททั้งเครือ (CODEMPID/FULLNAME/COMPANY_CODE) */
+  getHrPersonnel(): Observable<any> {
+    return this._http.get(`${this.baseUrl}/Master/hr-personnel`);
   }
 }

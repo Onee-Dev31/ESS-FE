@@ -38,7 +38,7 @@
             [ngModel]="filterHrCode()"
             (ngModelChange)="filterHrCode.set($event); applyFilter()"
           >
-            @for (hr of hrList; track hr.code) {
+            @for (hr of hrList(); track hr.code) {
               <nz-option [nzValue]="hr.code" [nzLabel]="hr.name" />
             }
           </nz-select>
@@ -55,8 +55,8 @@
             [ngModel]="filterWelfareType()"
             (ngModelChange)="filterWelfareType.set($event); applyFilter()"
           >
-            @for (type of welfareTypeList; track type) {
-              <nz-option [nzValue]="type" [nzLabel]="type" />
+            @for (type of welfareTypeList(); track type.code) {
+              <nz-option [nzValue]="type.code" [nzLabel]="type.name" />
             }
           </nz-select>
         </div>
@@ -134,6 +134,9 @@
       </div>
     </div>
 
+    @if (isLoading()) {
+      <app-skeleton type="table" [rows]="5" />
+    } @else {
     <div class="table-responsive">
       <table class="modern-table">
         <thead>
@@ -153,10 +156,10 @@
               <td class="cell-primary">{{ row.hrName }}</td>
               <td>
                 <div class="tag-list">
-                  @for (tag of visibleTags(row.welfareTypes); track tag) {
-                    <span class="tag tag-welfare">{{ tag }}</span>
+                  @for (tag of visibleTags(row.welfareCodes); track tag) {
+                    <span class="tag tag-welfare">{{ welfareNameByCode(tag) }}</span>
                   }
-                  @if (overflowCount(row.welfareTypes); as more) {
+                  @if (overflowCount(row.welfareCodes); as more) {
                     @if (more > 0) {
                       <span class="tag tag-more">+{{ more }}</span>
                     }
@@ -165,17 +168,17 @@
               </td>
               <td>
                 <div class="tag-list">
-                  @for (tag of visibleTags(row.companies); track tag) {
+                  @for (tag of visibleTags(row.companyCodes); track tag) {
                     <span class="tag tag-company">{{ tag }}</span>
                   }
-                  @if (overflowCount(row.companies); as more) {
+                  @if (overflowCount(row.companyCodes); as more) {
                     @if (more > 0) {
                       <span class="tag tag-more">+{{ more }}</span>
                     }
                   }
                 </div>
               </td>
-              <td class="cell-note">{{ row.note }}</td>
+              <td class="cell-note">{{ row.remark || '-' }}</td>
               <td class="action-column">
                 <div class="row-actions">
                   <button type="button" class="btn-icon-edit" title="แก้ไข" (click)="openEdit(row)">
@@ -218,22 +221,22 @@
             <div class="info-row">
               <span class="label">ประเภทสวัสดิการ:</span>
               <div class="tag-list">
-                @for (tag of row.welfareTypes; track tag) {
-                  <span class="tag tag-welfare">{{ tag }}</span>
+                @for (tag of row.welfareCodes; track tag) {
+                  <span class="tag tag-welfare">{{ welfareNameByCode(tag) }}</span>
                 }
               </div>
             </div>
             <div class="info-row">
               <span class="label">บริษัท:</span>
               <div class="tag-list">
-                @for (tag of row.companies; track tag) {
+                @for (tag of row.companyCodes; track tag) {
                   <span class="tag tag-company">{{ tag }}</span>
                 }
               </div>
             </div>
             <div class="info-row">
               <span class="label">หมายเหตุ:</span>
-              <span class="value">{{ row.note }}</span>
+              <span class="value">{{ row.remark || '-' }}</span>
             </div>
             <div class="card-footer-actions">
               <button type="button" class="btn-edit-sm" (click)="openEdit(row)">
@@ -258,6 +261,7 @@
         />
       }
     </div>
+    }
 
   </div>
 </div>
@@ -284,7 +288,7 @@
             [(ngModel)]="form.hrCodes"
             name="hrCodes"
           >
-            @for (hr of hrList; track hr.code) {
+            @for (hr of hrList(); track hr.code) {
               <nz-option [nzValue]="hr.code" [nzLabel]="hr.name" />
             }
           </nz-select>
@@ -319,8 +323,8 @@
             [(ngModel)]="form.welfareTypes"
             name="welfareTypes"
           >
-            @for (type of welfareTypeList; track type) {
-              <nz-option [nzValue]="type" [nzLabel]="type" />
+            @for (type of welfareTypeList(); track type.code) {
+              <nz-option [nzValue]="type.code" [nzLabel]="type.name" />
             }
           </nz-select>
         </div>
@@ -328,7 +332,7 @@
           <div class="chip-row">
             @for (type of form.welfareTypes; track type) {
               <span class="chip">
-                {{ type }}
+                {{ welfareNameByCode(type) }}
                 <button type="button" class="chip-remove" (click)="removeWelfareType(type)">
                   <i class="fa-solid fa-xmark"></i>
                 </button>
