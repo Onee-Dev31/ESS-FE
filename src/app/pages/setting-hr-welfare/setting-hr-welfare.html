@@ -288,7 +288,7 @@
             [(ngModel)]="form.hrCodes"
             name="hrCodes"
           >
-            @for (hr of hrList(); track hr.code) {
+            @for (hr of modalHrOptions(); track hr.code) {
               <nz-option [nzValue]="hr.code" [nzLabel]="hr.name" />
             }
           </nz-select>
