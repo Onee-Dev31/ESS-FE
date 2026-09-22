@@ -288,10 +288,14 @@ export class TicketChatComponent implements OnChanges {
   mentionResults: any[] = [];
   mentionActiveIndex = 0;
   replyingTo: any = null;
+  showScrollToBottom = false;
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['isOpen'] && !this.isOpen) {
       this.clearDraft();
+    }
+    if (changes['ticket']) {
+      this.showScrollToBottom = false;
     }
   }
 
@@ -639,7 +643,15 @@ export class TicketChatComponent implements OnChanges {
     requestAnimationFrame(() => {
       const element = this.cardBody?.nativeElement;
       if (element) element.scrollTop = element.scrollHeight;
+      this.showScrollToBottom = false;
     });
+  }
+
+  onChatScroll(): void {
+    const element = this.cardBody?.nativeElement;
+    if (!element) return;
+    const distanceFromBottom = element.scrollHeight - element.scrollTop - element.clientHeight;
+    this.showScrollToBottom = distanceFromBottom > 150;
   }
 
   contains(target: EventTarget | null): boolean {

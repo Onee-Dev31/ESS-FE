@@ -38,7 +38,7 @@
           </button>
         </div>
 
-        <div class="floating-chat__body" #cardBody>
+        <div class="floating-chat__body" #cardBody (scroll)="onChatScroll()">
           @if (notes.length) {
             <div class="note-list">
               @for (note of notes; track note.id; let i = $index; let last = $last) {
@@ -166,6 +166,16 @@
             </div>
           } @else {
             <div class="tk-empty">ยังไม่มีข้อความ</div>
+          }
+          @if (showScrollToBottom) {
+            <button
+              class="floating-chat__scroll-bottom"
+              type="button"
+              title="เลื่อนไปข้อความล่าสุด"
+              (click)="scrollToBottom()"
+            >
+              <i class="fa-solid fa-chevron-down"></i>
+            </button>
           }
         </div>
 
