@@ -168,14 +168,21 @@ export class ApprovalDetailModalComponent implements OnInit {
     });
 
     return Array.from(map.entries()).map(([stepNo, approvers]) => {
-      const statusOf = (approver: any) => String(approver.status ?? '').trim().toLowerCase();
+      const statusOf = (approver: any) =>
+        String(approver.status ?? '')
+          .trim()
+          .toLowerCase();
       const approved = approvers.find((a) => statusOf(a) === 'approved');
       const rejected = approvers.find((a) => statusOf(a) === 'rejected');
       const referredBack = approvers.find(
         (a) =>
           ['cancelled', 'canceled'].includes(statusOf(a)) &&
-          String(a.acted_by ?? '').trim().toUpperCase() ===
-            String(a.approver_emp_no ?? '').trim().toUpperCase(),
+          String(a.acted_by ?? '')
+            .trim()
+            .toUpperCase() ===
+            String(a.approver_emp_no ?? '')
+              .trim()
+              .toUpperCase(),
       );
       const acted = approved ?? rejected ?? referredBack ?? null;
 
@@ -403,11 +410,16 @@ export class ApprovalDetailModalComponent implements OnInit {
       },
     };
     const confirmation = confirmationText[action];
-    const result = await this.swalService.confirm(confirmation.title, confirmation.text, undefined, {
-      confirmButtonText: confirmation.confirmButtonText,
-      cancelButtonText: 'กลับไปตรวจสอบ',
-      focusCancel: true,
-    });
+    const result = await this.swalService.confirm(
+      confirmation.title,
+      confirmation.text,
+      undefined,
+      {
+        confirmButtonText: confirmation.confirmButtonText,
+        cancelButtonText: 'กลับไปตรวจสอบ',
+        focusCancel: true,
+      },
+    );
 
     if (!result.isConfirmed) return;
 
@@ -490,7 +502,7 @@ export class ApprovalDetailModalComponent implements OnInit {
     const payload = {
       action: action.toLowerCase(),
       approver_aduser: this.authService.userData().CODEMPID,
-      ...(action.toLowerCase() === 'rejected' && {
+      ...((action.toLowerCase() === 'rejected' || action.toLowerCase() === 'referred back') && {
         remark: reason?.trim() || '',
       }),
     };
