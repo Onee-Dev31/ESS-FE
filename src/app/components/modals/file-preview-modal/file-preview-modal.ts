@@ -37,6 +37,9 @@ export class FilePreviewModalComponent implements OnInit {
 
   selectedFile: FilePreviewItem | null = null;
   hasError: boolean = false;
+  // cache ไว้ตอนเลือกไฟล์ — ถ้าเรียก getSafeUrl() ตรงๆ ใน template ทุกรอบ change detection
+  // จะได้ SafeResourceUrl object ใหม่ทุกครั้ง ทำให้ iframe ตีความว่า src เปลี่ยนแล้วโหลดไฟล์ซ้ำ (กระพริบ)
+  safePreviewUrl: SafeResourceUrl | '' = '';
 
   // ngOnChanges(changes: SimpleChanges) {
   //   if (changes['files']) {
@@ -48,12 +51,14 @@ export class FilePreviewModalComponent implements OnInit {
     if (this.files.length > 0) {
       this.selectedFile = this.files[this.initialSelectedIndex] ?? this.files[0];
       this.hasError = false;
+      this.safePreviewUrl = this.getSafeUrl(this.selectedFile?.url);
     }
   }
 
   selectFile(file: FilePreviewItem) {
     this.selectedFile = file;
     this.hasError = false;
+    this.safePreviewUrl = this.getSafeUrl(file.url);
   }
 
   onPreviewError() {

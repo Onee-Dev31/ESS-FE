@@ -100,11 +100,7 @@
                   (error)="onPreviewError()"
                 />
               } @else if (isPdf(selectedFile)) {
-                <iframe
-                  [src]="getSafeUrl(selectedFile.url)"
-                  class="preview-pdf"
-                  frameborder="0"
-                ></iframe>
+                <iframe [src]="safePreviewUrl" class="preview-pdf" frameborder="0"></iframe>
               } @else {
                 <div class="mock-image">
                   <i class="fas fa-file-alt fa-3x"></i>
