@@ -1,14 +1,16 @@
 /** HR Welfare Responsibility mapping — backed by freelance-api's WelfareController
  * (GET/POST/DELETE api/welfare/responsibility -> dbo.HR_WelfareResponsibility table).
- * WelfareCodes/CompanyCodes are stored as CSV strings on the backend; the GET endpoint
- * parses them into arrays server-side, but POST expects CSV strings back. */
+ * WelfareCodes is stored as a single CSV string on the backend, each token being a
+ * "CompanyCode-WelfareCode" pair (e.g. "OTD-WF001"); the GET endpoint splits it into
+ * an array server-side, but POST expects the CSV string back. There is no separate
+ * CompanyCodes column — company is embedded in each WelfareCodes token. */
 
 export interface HrWelfareResponsibility {
   id: number;
   hrCodeEmp: string;
+  adUser: string;
   hrName: string;
   welfareCodes: string[];
-  companyCodes: string[];
   remark: string | null;
   createdBy: string;
   createdDate: string;
@@ -22,17 +24,16 @@ export interface GetWelfareResponsibilityResponse {
 }
 
 /** POST body item for api/welfare/responsibility.
- * id absent/0 = insert, id present = update. welfareCodes/companyCodes must be CSV
- * strings (e.g. "WF001,WF002") — sp_HR_WelfareResponsibility_Save reads them as plain
- * string columns, not JSON arrays. */
+ * sp_HR_WelfareResponsibility_Save upserts by matching AdUser (then HrCodeEmp) — id is
+ * ignored, so it's not sent. welfareCodes must be a CSV string of "CompanyCode-WelfareCode"
+ * pairs (e.g. "OTD-WF001,OTD-WF002") — the SP reads it as a plain string column. */
 export interface SaveWelfareResponsibilityItem {
-  id?: number | null;
   hrCodeEmp: string;
+  adUser: string;
   hrName: string;
   welfareCodes: string;
-  companyCodes: string;
   remark: string;
-  executedBy: string;
+  createdBy: string;
 }
 
 export interface SaveWelfareResponsibilityResponse {

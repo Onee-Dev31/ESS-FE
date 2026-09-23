@@ -156,30 +156,30 @@
               <td class="cell-primary">{{ row.hrName }}</td>
               <td>
                 <div class="tag-list">
-                  @for (tag of visibleTags(row.welfareCodes, isExpanded(row.id, 'welfare')); track tag) {
+                  @for (tag of visibleTags(welfareTypesOfRow(row), isExpanded(row.id, 'welfare')); track tag) {
                     <span class="tag tag-welfare">{{ welfareNameByCode(tag) }}</span>
                   }
-                  @if (overflowCount(row.welfareCodes, isExpanded(row.id, 'welfare')); as more) {
+                  @if (overflowCount(welfareTypesOfRow(row), isExpanded(row.id, 'welfare')); as more) {
                     @if (more > 0) {
                       <button type="button" class="tag tag-more" (click)="toggleExpand(row.id, 'welfare')">+{{ more }}</button>
                     }
                   }
-                  @if (isExpanded(row.id, 'welfare') && row.welfareCodes.length > 2) {
+                  @if (isExpanded(row.id, 'welfare') && welfareTypesOfRow(row).length > 2) {
                     <button type="button" class="tag tag-more" (click)="toggleExpand(row.id, 'welfare')">ย่อ</button>
                   }
                 </div>
               </td>
               <td>
                 <div class="tag-list">
-                  @for (tag of visibleTags(row.companyCodes, isExpanded(row.id, 'company')); track tag) {
+                  @for (tag of visibleTags(companyCodesOfRow(row), isExpanded(row.id, 'company')); track tag) {
                     <span class="tag tag-company">{{ tag }}</span>
                   }
-                  @if (overflowCount(row.companyCodes, isExpanded(row.id, 'company')); as more) {
+                  @if (overflowCount(companyCodesOfRow(row), isExpanded(row.id, 'company')); as more) {
                     @if (more > 0) {
                       <button type="button" class="tag tag-more" (click)="toggleExpand(row.id, 'company')">+{{ more }}</button>
                     }
                   }
-                  @if (isExpanded(row.id, 'company') && row.companyCodes.length > 2) {
+                  @if (isExpanded(row.id, 'company') && companyCodesOfRow(row).length > 2) {
                     <button type="button" class="tag tag-more" (click)="toggleExpand(row.id, 'company')">ย่อ</button>
                   }
                 </div>
@@ -227,7 +227,7 @@
             <div class="info-row">
               <span class="label">ประเภทสวัสดิการ:</span>
               <div class="tag-list">
-                @for (tag of row.welfareCodes; track tag) {
+                @for (tag of welfareTypesOfRow(row); track tag) {
                   <span class="tag tag-welfare">{{ welfareNameByCode(tag) }}</span>
                 }
               </div>
@@ -235,7 +235,7 @@
             <div class="info-row">
               <span class="label">บริษัท:</span>
               <div class="tag-list">
-                @for (tag of row.companyCodes; track tag) {
+                @for (tag of companyCodesOfRow(row); track tag) {
                   <span class="tag tag-company">{{ tag }}</span>
                 }
               </div>

@@ -44,7 +44,7 @@ export class SettingHrWelfare implements OnInit {
   private readonly authService = inject(AuthService);
   private readonly destroyRef = inject(DestroyRef);
 
-  readonly hrList = signal<{ code: string; name: string }[]>([]);
+  readonly hrList = signal<{ code: string; name: string; adUser: string }[]>([]);
   readonly welfareTypeList = signal<{ code: string; name: string }[]>([]);
   readonly companyList = signal<string[]>([]);
 
@@ -130,8 +130,9 @@ export class SettingHrWelfare implements OnInit {
           .map((item: any) => ({
             code: item.CODEMPID,
             name: item.FULLNAME + ' (' + item.NICKNAME + ')' || item.CODEMPID,
+            adUser: item.AD_USER ?? '',
           }))
-          .filter((hr: { code: string; name: string }) => !!hr.code);
+          .filter((hr: { code: string; name: string; adUser: string }) => !!hr.code);
         if (list.length > 0) this.hrList.set(list);
       });
   }
@@ -168,13 +169,14 @@ export class SettingHrWelfare implements OnInit {
 
     return this.rows().filter((row) => {
       if (hrCode && row.hrCodeEmp !== hrCode) return false;
-      if (welfareType && !row.welfareCodes.includes(welfareType)) return false;
-      if (company && !row.companyCodes.includes(company)) return false;
+      if (welfareType && !row.welfareCodes.some((c) => this.welfarePartOf(c) === welfareType))
+        return false;
+      if (company && !row.welfareCodes.some((c) => this.companyPartOf(c) === company)) return false;
       if (text) {
         const haystack = [
           row.hrName,
           ...row.welfareCodes.map((c) => this.welfareNameByCode(c)),
-          ...row.companyCodes,
+          ...this.companyCodesOfRow(row),
           row.remark ?? '',
         ]
           .join(' ')
@@ -248,8 +250,33 @@ export class SettingHrWelfare implements OnInit {
     return this.hrList().find((hr) => hr.code === code)?.name ?? code;
   }
 
+  adUserByCode(code: string): string {
+    return this.hrList().find((hr) => hr.code === code)?.adUser ?? '';
+  }
+
+  // welfareCodes token คือ "CompanyCode-WelfareCode" ต่อกัน เช่น "OTD-WF001"
+  private companyPartOf(code: string): string {
+    const idx = code.indexOf('-');
+    return idx === -1 ? '' : code.slice(0, idx);
+  }
+
+  private welfarePartOf(code: string): string {
+    const idx = code.indexOf('-');
+    return idx === -1 ? code : code.slice(idx + 1);
+  }
+
   welfareNameByCode(code: string): string {
-    return this.welfareTypeList().find((wf) => wf.code === code)?.name ?? code;
+    const welfareCode = this.welfarePartOf(code);
+    return this.welfareTypeList().find((wf) => wf.code === welfareCode)?.name ?? welfareCode;
+  }
+
+  companyCodesOfRow(row: HrWelfareResponsibility): string[] {
+    return Array.from(new Set(row.welfareCodes.map((c) => this.companyPartOf(c)).filter(Boolean)));
+  }
+
+  // row.welfareCodes เป็น cross-join บริษัท x ประเภท ต้อง dedupe ไม่งั้นชื่อประเภทซ้ำตามจำนวนบริษัท
+  welfareTypesOfRow(row: HrWelfareResponsibility): string[] {
+    return Array.from(new Set(row.welfareCodes.map((c) => this.welfarePartOf(c))));
   }
 
   // The 3 multi-selects below keep ant's real nzMode="multiple" control (bound directly to
@@ -280,8 +307,8 @@ export class SettingHrWelfare implements OnInit {
     this.hasSubmitted.set(false);
     this.form = {
       hrCodes: [row.hrCodeEmp],
-      welfareTypes: [...row.welfareCodes],
-      companies: [...row.companyCodes],
+      welfareTypes: Array.from(new Set(row.welfareCodes.map((c) => this.welfarePartOf(c)))),
+      companies: this.companyCodesOfRow(row),
       note: row.remark ?? '',
     };
     this.isModalOpen.set(true);
@@ -305,6 +332,17 @@ export class SettingHrWelfare implements OnInit {
     return user?.CODEMPID ?? user?.AD_USER ?? '';
   }
 
+  // cross-join บริษัท x ประเภทที่เลือกในฟอร์ม เป็น "CompanyCode-WelfareCode" คั่นด้วย comma
+  private buildWelfareCodes(): string {
+    const pairs: string[] = [];
+    for (const company of this.form.companies) {
+      for (const welfareType of this.form.welfareTypes) {
+        pairs.push(`${company}-${welfareType}`);
+      }
+    }
+    return pairs.join(',');
+  }
+
   async save(): Promise<void> {
     this.hasSubmitted.set(true);
     if (!this.isFormValid()) return;
@@ -319,32 +357,19 @@ export class SettingHrWelfare implements OnInit {
 
     this.isSaving.set(true);
 
-    const executedBy = this.getCurrentExecutor();
+    const createdBy = this.getCurrentExecutor();
     const remark = this.form.note.trim();
+    const welfareCodes = this.buildWelfareCodes();
 
-    // 1 HR = 1 แถวเสมอ — modalHrOptions ตัด HR ที่มีแถวอยู่แล้วออกจากตัวเลือกตอนเพิ่ม
-    // ไปแล้ว จึงเลือกซ้ำคนเดิมจากโมดัลนี้ไม่ได้ (ต้องแก้ไขแถวเดิมแทน)
-    const items: SaveWelfareResponsibilityItem[] =
-      editingId === null
-        ? this.form.hrCodes.map((hrCodeEmp) => ({
-            hrCodeEmp,
-            hrName: this.hrNameByCode(hrCodeEmp),
-            welfareCodes: this.form.welfareTypes.join(','),
-            companyCodes: this.form.companies.join(','),
-            remark,
-            executedBy,
-          }))
-        : [
-            {
-              id: editingId,
-              hrCodeEmp: this.form.hrCodes[0],
-              hrName: this.hrNameByCode(this.form.hrCodes[0]),
-              welfareCodes: this.form.welfareTypes.join(','),
-              companyCodes: this.form.companies.join(','),
-              remark,
-              executedBy,
-            },
-          ];
+    // ไม่ส่ง id — SP จับคู่ insert/update เองจาก adUser/hrCodeEmp
+    const items: SaveWelfareResponsibilityItem[] = this.form.hrCodes.map((hrCodeEmp) => ({
+      hrCodeEmp,
+      adUser: this.adUserByCode(hrCodeEmp),
+      hrName: this.hrNameByCode(hrCodeEmp),
+      welfareCodes,
+      remark,
+      createdBy,
+    }));
 
     this.masterDataService
       .saveWelfareResponsibilities(items)
