@@ -14,7 +14,7 @@ import { ToastService } from '../../../services/toast';
 import { FilePreviewModalComponent } from '../file-preview-modal/file-preview-modal';
 import { StatusLabelPipe } from '../../../pipes/status-label.pipe';
 import { UnifiedItem, ApprovalItem } from '../../../interfaces/approval.interface';
-import { MedicalApproveClaim } from '../../../interfaces/medical.interface';
+import { MedicalApproveClaim, MedicalClaim } from '../../../interfaces/medical.interface';
 import { REQUEST_STATUS } from '../../../constants/request-status.constant';
 import { StatusUtil } from '../../../utils/status.util';
 import { ApprovalsHelperService } from '../../../services/approvals-helper.service';
@@ -254,8 +254,8 @@ export class ApprovalDetailModalComponent implements OnInit {
 
   private loadMedicalDetail(item: ApprovalItem) {
     console.log('loadMedicalDetail', item);
-    const claim = item.originalData as MedicalApproveClaim;
-    if (claim?.claimID == null) {
+    const claim = item.originalData as MedicalApproveClaim | MedicalClaim;
+    if (!claim || (!('claimID' in claim) && !('claimId' in claim))) {
       this.loadFallbackDetail(item);
       return;
     }
@@ -568,7 +568,7 @@ export class ApprovalDetailModalComponent implements OnInit {
   }
 
   openAllAttachments() {
-    const claim = this.approvalItem.originalData as MedicalApproveClaim;
+    const claim = this.approvalItem.originalData as MedicalApproveClaim | MedicalClaim;
     if (!claim?.attachments?.length) return;
     this.previewFiles.set(this.fileConverter.buildPreviewFiles(claim.attachments));
     this.isPreviewModalOpen.set(true);
