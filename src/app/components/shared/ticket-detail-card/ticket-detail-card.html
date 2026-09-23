@@ -24,6 +24,17 @@
   <header class="detail-header">
     <div class="detail-title">
       <span>รายละเอียด</span>
+      @if (audience === 'it') {
+        <button
+          type="button"
+          class="type-info-button"
+          title="ดูสรุปประเภทคำขอ"
+          aria-label="ดูสรุปประเภทคำขอ"
+          (click)="typeInfoClick.emit()"
+        >
+          <i class="fa-solid fa-info"></i>
+        </button>
+      }
       @if (allAttachments.length) {
         <button
           type="button"
@@ -83,16 +94,10 @@
               (click)="changeTypeClick.emit()"
             >
               <strong>{{ ticket.ticketType }}</strong>
-              @if (ticket.problemBy) {
-                <small class="problem-source">({{ ticket.problemBy }})</small>
-              }
               <i class="fa-solid fa-pen"></i>
             </button>
           } @else {
             <strong>{{ ticket.ticketType }}</strong>
-            @if (ticket.problemBy) {
-              <small class="problem-source">({{ ticket.problemBy }})</small>
-            }
           }
         </div>
       }

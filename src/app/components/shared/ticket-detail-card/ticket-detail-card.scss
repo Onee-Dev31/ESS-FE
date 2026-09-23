@@ -237,6 +237,25 @@
   color: var(--text-muted);
   font-size: $font-size-hint;
 }
+
+.type-info-button {
+  display: inline-flex;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid color-mix(in srgb, var(--primary), transparent 45%);
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--primary), transparent 92%);
+  color: var(--primary);
+  cursor: pointer;
+
+  &:hover {
+    background: var(--primary);
+    color: white;
+  }
+}
 .problem-source {
   color: var(--text-sub);
   font-size: $font-size-hint;

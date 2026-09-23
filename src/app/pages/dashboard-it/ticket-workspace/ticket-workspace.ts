@@ -54,6 +54,7 @@ import { AcknowledgeModal } from '../modal/acknowledge-modal/acknowledge-modal';
 import { EmailReplyModal } from '../modal/email-reply-modal/email-reply-modal';
 import { DenyModal } from '../modal/deny-modal/deny-modal';
 import { ChangeTicketTypeModal } from '../modal/change-ticket-type-modal/change-ticket-type-modal';
+import { TicketTypeSummaryModal } from '../modal/ticket-type-summary-modal/ticket-type-summary-modal';
 import { AssignModal } from '../modal/assign-modal/assign-modal';
 import { NoteModal } from '../modal/note-modal/note-modal';
 import { DateUtilityService } from '../../../services/date-utility.service';
@@ -107,6 +108,7 @@ interface TeamGroupOption {
     EmailReplyModal,
     DenyModal,
     ChangeTicketTypeModal,
+    TicketTypeSummaryModal,
     AssignModal,
     NoteModal,
     ServicesDetailModal,
@@ -128,6 +130,15 @@ export class TicketWorkspaceComponent implements OnInit, OnChanges {
   @Input() showTicketList = true;
   @Input() ticketId: string | null = null;
   readonly ticketLoadError = signal(false);
+  readonly typeSummaryTicket = signal<any | null>(null);
+
+  openTypeSummary(ticket: any): void {
+    this.typeSummaryTicket.set(ticket);
+  }
+
+  closeTypeSummary(): void {
+    this.typeSummaryTicket.set(null);
+  }
   private detailRequestVersion = 0;
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -1767,6 +1778,7 @@ export class TicketWorkspaceComponent implements OnInit, OnChanges {
     repairCostType?: string,
     reason?: string,
     subCategoryId?: number | null,
+    serviceTypeIds?: number[],
   ) {
     // console.log(command, ticketId, ticketTypeId, comment, attachments);
 
@@ -1799,6 +1811,7 @@ export class TicketWorkspaceComponent implements OnInit, OnChanges {
       formData.append('newTicketTypeId', ticketTypeId || '2');
       if (repairCostType) formData.append('repairCostType', repairCostType);
       if (reason) formData.append('reason', reason);
+      serviceTypeIds?.forEach((id) => formData.append('serviceTypeIds', String(id)));
     }
 
     if (command === 'close') {
@@ -2242,10 +2255,11 @@ export class TicketWorkspaceComponent implements OnInit, OnChanges {
       });
   }
 
-  submitChangeTicketType(data: {
+  async submitChangeTicketType(data: {
     ticketTypeId: number;
     subCategoryId: number | null;
     problemSource: 'user' | 'system' | null;
+    serviceTypeIds: number[];
     repairCostType?: 'paid' | 'free';
     reason: string;
     attachments: { name: string; size: number; file: File; description?: string }[];
@@ -2272,7 +2286,25 @@ export class TicketWorkspaceComponent implements OnInit, OnChanges {
       Number(data.ticketTypeId) !== Number(ticket.ticketTypeId ?? ticket.ticket_type_id);
     const hasRepairCostChanged =
       Number(data.ticketTypeId) === 1 && data.repairCostType !== ticket.repair_cost_type;
+    // ยิง approve เฉพาะเมื่อเปลี่ยนประเภทงานหรือประเภทค่าใช้จ่าย
+    // ถ้าแก้รายละเอียดของประเภทเดิม จะยิง endpoint เฉพาะอย่างเดียว
     const needsTicketUpdate = hasTypeChanged || hasRepairCostChanged;
+
+    const confirmTitle = hasTypeChanged
+      ? 'ยืนยันการเปลี่ยนประเภทคำขอ'
+      : Number(data.ticketTypeId) === 2
+        ? 'ยืนยันการแก้ไขหมวดหมู่และปัญหา'
+        : Number(data.ticketTypeId) === 3
+          ? 'ยืนยันการแก้ไขประเภทบริการ'
+          : 'ยืนยันการแก้ไขข้อมูลคำขอ';
+    const confirmResult = await this.swalService.confirm(
+      confirmTitle,
+      'กรุณาตรวจสอบข้อมูลให้เรียบร้อยก่อนยืนยัน',
+      undefined,
+      { confirmButtonText: 'ยืนยัน' },
+    );
+    if (!confirmResult.isConfirmed) return;
+
     this.swalService.loading(
       needsTicketUpdate ? 'กำลังเปลี่ยนประเภทคำขอ...' : 'กำลังบันทึกข้อมูล...',
     );
@@ -2290,6 +2322,8 @@ export class TicketWorkspaceComponent implements OnInit, OnChanges {
           data.attachments.map((attachment) => ({ ...attachment, description: 'From IT' })),
           data.repairCostType,
           data.reason,
+          undefined,
+          data.serviceTypeIds,
         )
       : of({ success: true, message: 'บันทึกหมวดหมู่และปัญหาสำเร็จ' });
 
@@ -2297,21 +2331,40 @@ export class TicketWorkspaceComponent implements OnInit, OnChanges {
       .pipe(
         concatMap((res) => {
           if (!res?.success) return of(res);
+
           typeChanged = needsTicketUpdate;
-          return this.itServiceService
-            .updateSubcatProblemby({
+          const ticketTypeId = Number(data.ticketTypeId);
+
+          // แจ้งปัญหา: บันทึกหมวดหมู่ปัญหาและสาเหตุจาก User/System
+          if (ticketTypeId === 2) {
+            return this.itServiceService
+              .updateSubcatProblemby({
+                ticketID: Number(ticketId),
+                subCategoryID: data.subCategoryId,
+                problemBy: data.problemSource,
+              })
+              .pipe(
+                map((result) => {
+                  if (result?.success === false) {
+                    throw new Error(result.message || 'บันทึกหมวดหมู่และปัญหาไม่สำเร็จ');
+                  }
+                  return res;
+                }),
+              );
+          }
+
+          // ขอใช้บริการ: บันทึกประเภทบริการพร้อม AD User ของผู้ดำเนินการ
+          if (ticketTypeId === 3) {
+            const servicePayload = {
               ticketID: Number(ticketId),
-              subCategoryID: data.ticketTypeId === 2 ? data.subCategoryId : null,
-              problemBy: data.ticketTypeId === 2 ? data.problemSource : null,
-            })
-            .pipe(
-              map((result) => {
-                if (result?.success === false) {
-                  throw new Error(result.message || 'บันทึกหมวดหมู่และปัญหาไม่สำเร็จ');
-                }
-                return res;
-              }),
-            );
+              serviceTypeIDs: data.serviceTypeIds,
+              executeBy: this.authService.userData()?.AD_USER ?? '',
+            };
+            return this.itServiceService.updateChangeSubCatService(servicePayload);
+          }
+
+          // ประเภทอื่นไม่มีข้อมูลหมวดหมู่เพิ่มเติม
+          return of(res);
         }),
       )
       .subscribe({
@@ -2343,7 +2396,9 @@ export class TicketWorkspaceComponent implements OnInit, OnChanges {
           console.error('Change Ticket Type Error:', error);
           if (typeChanged) {
             this.swalService.warning(
-              'เปลี่ยนประเภทสำเร็จ แต่บันทึกหมวดหมู่และปัญหาไม่สำเร็จ',
+              Number(data.ticketTypeId) === 3
+                ? 'เปลี่ยนประเภทสำเร็จ แต่บันทึกประเภทบริการไม่สำเร็จ'
+                : 'เปลี่ยนประเภทสำเร็จ แต่บันทึกหมวดหมู่และปัญหาไม่สำเร็จ',
               error?.error?.message || error?.message || 'กรุณาตรวจสอบข้อมูลอีกครั้ง',
             );
             this.selectTicket(ticketId);

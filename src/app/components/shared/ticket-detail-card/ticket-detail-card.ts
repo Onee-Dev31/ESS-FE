@@ -44,6 +44,7 @@ export class TicketDetailCardComponent implements OnChanges {
   @Output() descriptionChange = new EventEmitter<string>();
   @Output() copyClick = new EventEmitter<void>();
   @Output() changeTypeClick = new EventEmitter<void>();
+  @Output() typeInfoClick = new EventEmitter<void>();
   @Output() detailClick = new EventEmitter<void>();
 
   ngOnChanges(changes: SimpleChanges): void {

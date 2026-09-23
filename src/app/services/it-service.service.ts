@@ -474,6 +474,14 @@ export class ItServiceService {
     return this._http.post(`${this.baseUrl}/it/updateSubcatProblemby`, payload);
   }
 
+  updateChangeSubCatService(payload: {
+    ticketID: number;
+    serviceTypeIDs: number[];
+    executeBy: string;
+  }): Observable<any> {
+    return this._http.post(`${this.baseUrl}/it/UpdateChangeSubCatService`, payload);
+  }
+
   re_submit(formData: FormData): Observable<any> {
     return this._http.put<any>(`${this.baseUrl}/tickets/re-submit`, formData);
   }

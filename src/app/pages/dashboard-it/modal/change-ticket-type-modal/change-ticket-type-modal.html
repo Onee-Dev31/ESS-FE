@@ -23,6 +23,12 @@
           </button>
         }
       </div>
+      @if (selectedTypeId === 3 && originalTypeId !== 3) {
+        <div class="service-change-warning" role="alert">
+          <i class="fas fa-exclamation-circle"></i>
+          การเปลี่ยนเป็น “ขอใช้บริการ” จะไม่มีการส่งกลับไปอนุมัติ (Approve)
+        </div>
+      }
     }
     @if (selectedTypeId === 2) {
       <fieldset class="problem-field">
@@ -76,6 +82,71 @@
             />
             system
           </label>
+        </div>
+      </fieldset>
+    }
+
+    @if (selectedTypeId === 3) {
+      <fieldset class="problem-field">
+        <legend class="field-label service-type-title">
+          ประเภทบริการ (Service Type)<span>*</span>
+          <small>(เลือกได้มากกว่า 1 รายการ)</small>
+        </legend>
+
+        <div class="service-groups">
+          <section class="service-subgroup">
+            <div class="field-label service-group-label">ระบบพื้นฐาน</div>
+            @if (servicesLoading()) {
+              <p role="status">กำลังโหลดหมวดหมู่บริการ...</p>
+            } @else if (servicesError()) {
+              <p role="alert">โหลดหมวดหมู่บริการไม่สำเร็จ</p>
+              <button type="button" class="modal-button" (click)="loadServiceTypes()">
+                <i class="fas fa-rotate-right"></i> ลองใหม่
+              </button>
+            } @else {
+              <div class="type-options">
+                @for (service of mainServices(); track service.id) {
+                  <label class="type-option" [class.selected]="service.checked">
+                    <input
+                      type="checkbox"
+                      [checked]="service.checked"
+                      [disabled]="isTypeChangeLocked"
+                      (change)="toggleService(service.id)"
+                    />
+                    {{ service.label }}
+                  </label>
+                } @empty {
+                  <p role="status">ไม่พบหมวดหมู่บริการ</p>
+                }
+              </div>
+            }
+
+            @if (isRequestUserSelected) {
+              <div class="basic-system">
+                <b>รายการระบบ : </b>
+                @for (service of userSubOptions(); track service.id; let last = $last) {
+                  <span>{{ service.label }}{{ !last ? ', ' : '' }}</span>
+                }
+              </div>
+            }
+          </section>
+
+          <section class="service-subgroup">
+            <div class="field-label service-group-label">ระบบเฉพาะ</div>
+            <div class="type-options">
+              @for (service of systemSubOptions(); track service.id) {
+                <label class="type-option" [class.selected]="service.checked">
+                  <input
+                    type="checkbox"
+                    [checked]="service.checked"
+                    [disabled]="isTypeChangeLocked"
+                    (change)="toggleSubService('specific', service.id)"
+                  />
+                  {{ service.label }}
+                </label>
+              }
+            </div>
+          </section>
         </div>
       </fieldset>
     }

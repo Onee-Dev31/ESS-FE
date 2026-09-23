@@ -2,9 +2,6 @@
   <div class="progress-header" [class.has-note-action]="showNoteButton">
     <div class="progress-status-row">
       <app-ticket-status-pill [ticket]="ticket" [audience]="audience" />
-      @if (ticket.ticketCategory && ticket.ticketTypeId === 2) {
-        <span class="ticket-category">{{ ticket.ticketCategory }}</span>
-      }
     </div>
     @if (showNoteButton) {
       <button

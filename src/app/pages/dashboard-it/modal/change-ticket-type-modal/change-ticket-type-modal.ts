@@ -38,6 +38,7 @@ export class ChangeTicketTypeModal implements OnChanges, OnDestroy {
     ticketTypeId: number;
     subCategoryId: number | null;
     problemSource: 'user' | 'system' | null;
+    serviceTypeIds: number[];
     subCategoryName?: string;
     repairCostType?: 'paid' | 'free';
     reason: string;
@@ -52,14 +53,22 @@ export class ChangeTicketTypeModal implements OnChanges, OnDestroy {
   );
   readonly categoriesLoading = signal(false);
   readonly categoriesError = signal(false);
+  readonly mainServices = signal<any[]>([]);
+  readonly userSubOptions = signal<any[]>([]);
+  readonly systemSubOptions = signal<any[]>([]);
+  readonly servicesLoading = signal(false);
+  readonly servicesError = signal(false);
   selectedCategory: number | null = null;
   problemSource: 'user' | 'system' | null = null;
   readonly fileConfig = IT_ATTACHMENT_FILE_CONFIG;
 
   get ticketTypes(): { id: number; label: string }[] {
-    const types = [{ id: 2, label: 'แจ้งปัญหา' }];
+    const types = [
+      { id: 2, label: 'แจ้งปัญหา' },
+      // ตอน DEPLOY PROD ยังไม่ให้มีแจ้งซ่อม และ ขอใช้บริการ
+      // { id: 1, label: 'แจ้งซ่อม' },
+    ];
 
-    // { id: 1, label: 'แจ้งซ่อม' },
     if (this.canAccessAdditionalTicketTypes) {
       types.push({ id: 3, label: 'ขอใช้บริการ' });
     }
@@ -142,6 +151,80 @@ export class ChangeTicketTypeModal implements OnChanges, OnDestroy {
 
   ngOnInit(): void {
     this.loadCategories();
+    this.loadServiceTypes();
+  }
+
+  loadServiceTypes(): void {
+    this.servicesLoading.set(true);
+    this.servicesError.set(false);
+    this.itService.getServiceType().subscribe({
+      next: (res) => {
+        console.log(res);
+        const selectedIds = new Set(
+          (this.ticket?.services ?? []).map((service: any) =>
+            Number(service.service_type_id ?? service.serviceTypeId ?? service.id),
+          ),
+        );
+        const mapOptions = (items: any[] = []) =>
+          items.map((item) => ({
+            ...item,
+            id: Number(item.id),
+            checked: selectedIds.has(Number(item.id)),
+          }));
+
+        this.mainServices.set(
+          mapOptions((res?.data?.mainServices ?? []).filter((item: any) => Number(item.id) !== 6)),
+        );
+        this.userSubOptions.set(mapOptions(res?.data?.userSubOptions));
+        this.systemSubOptions.set(mapOptions(res?.data?.systemSubOptions));
+        this.servicesLoading.set(false);
+      },
+      error: () => {
+        this.servicesLoading.set(false);
+        this.servicesError.set(true);
+      },
+    });
+  }
+
+  toggleService(id: number): void {
+    if (this.isTypeChangeLocked) return;
+    this.mainServices.update((items) =>
+      items.map((item) => (Number(item.id) === id ? { ...item, checked: !item.checked } : item)),
+    );
+    this.userSubOptions.update((items) =>
+      items.map((item) => ({ ...item, checked: this.isRequestUserSelected })),
+    );
+  }
+
+  get isRequestUserSelected(): boolean {
+    return this.mainServices().some((service) => Number(service.id) === 22 && service.checked);
+  }
+
+  toggleSubService(group: 'basic' | 'specific', id: number): void {
+    if (this.isTypeChangeLocked) return;
+    const target = group === 'basic' ? this.userSubOptions : this.systemSubOptions;
+    target.update((items) =>
+      items.map((item) => (Number(item.id) === id ? { ...item, checked: !item.checked } : item)),
+    );
+  }
+
+  private get selectedServiceTypeIds(): number[] {
+    return [...this.mainServices(), ...this.userSubOptions(), ...this.systemSubOptions()]
+      .filter((item) => item.checked)
+      .map((item) => Number(item.id));
+  }
+
+  get hasServiceDetailsChanged(): boolean {
+    if (this.selectedTypeId !== 3) return false;
+    const originalIds = (this.ticket?.services ?? [])
+      .map((service: any) => Number(service.service_type_id ?? service.serviceTypeId ?? service.id))
+      .filter(Number.isFinite)
+      .sort((a: number, b: number) => a - b);
+    const selectedIds = [...this.selectedServiceTypeIds].sort((a, b) => a - b);
+    return (
+      originalIds.length !== selectedIds.length ||
+      originalIds.some((id: number, index: number) => id !== selectedIds[index])
+    );
   }
 
   loadCategories(): void {
@@ -175,7 +258,7 @@ export class ChangeTicketTypeModal implements OnChanges, OnDestroy {
   }
 
   selectType(ticketTypeId: number): void {
-    console.log(ticketTypeId);
+    // console.log(ticketTypeId);
     if (this.isTypeChangeLocked) return;
     // if (this.isTypeChangeLocked || (ticketTypeId === 3 && !this.isViaEmail)) return;
     if (this.selectedTypeId === 1) {
@@ -303,7 +386,12 @@ export class ChangeTicketTypeModal implements OnChanges, OnDestroy {
     if (this.saving) return false;
     if (this.isTypeChangeLocked) return false;
     // if (this.isTypeChangeLocked || (this.selectedTypeId === 3 && !this.isViaEmail)) return false;
-    if (!this.hasTypeChanged && !this.hasRepairCostChanged && !this.hasProblemDetailsChanged)
+    if (
+      !this.hasTypeChanged &&
+      !this.hasRepairCostChanged &&
+      !this.hasProblemDetailsChanged &&
+      !this.hasServiceDetailsChanged
+    )
       return false;
     if (
       this.selectedTypeId === 2 &&
@@ -311,6 +399,13 @@ export class ChangeTicketTypeModal implements OnChanges, OnDestroy {
         this.categoriesError() ||
         !this.categories().some((category) => category.id === this.selectedCategory) ||
         (this.problemSource !== 'user' && this.problemSource !== 'system'))
+    )
+      return false;
+    if (
+      this.selectedTypeId === 3 &&
+      (this.servicesLoading() ||
+        this.servicesError() ||
+        ![...this.mainServices(), ...this.systemSubOptions()].some((item) => item.checked))
     )
       return false;
 
@@ -340,6 +435,7 @@ export class ChangeTicketTypeModal implements OnChanges, OnDestroy {
       ticketTypeId: this.selectedTypeId,
       subCategoryId: this.selectedTypeId === 2 ? this.selectedCategory : null,
       problemSource: this.selectedTypeId === 2 ? this.problemSource : null,
+      serviceTypeIds: this.selectedTypeId === 3 ? this.selectedServiceTypeIds : [],
       subCategoryName: this.categories().find((category) => category.id === this.selectedCategory)
         ?.sub_category_name,
       ...(this.selectedTypeId === 1 && { repairCostType: this.repairCostType! }),
