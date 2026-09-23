@@ -49,14 +49,17 @@
         </button>
       }
     </div>
-    @if (services.length) {
+    @if (displayServices.length) {
       <div class="services">
-        @for (service of services.slice(0, serviceLimit); track service.service_type_id) {
-          <span>{{ service.service_name_th }}</span>
+        @for (
+          service of displayServices.slice(0, serviceLimit);
+          track service.service_type_id ?? service.id
+        ) {
+          <span>{{ serviceName(service) }}</span>
         }
-        @if (services.length > serviceLimit) {
+        @if (displayServices.length > serviceLimit) {
           <button type="button" (click)="servicesClick.emit(services)">
-            +{{ services.length - serviceLimit }}
+            +{{ displayServices.length - serviceLimit }}
           </button>
         }
       </div>

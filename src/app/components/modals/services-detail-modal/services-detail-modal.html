@@ -4,7 +4,7 @@
       <div class="header-content">
         <span class="header-icon"><i class="fa-solid fa-desktop"></i></span>
         <div class="header-text">
-          <h3>Services</h3>
+          <h3>รายละเอียดบริการ</h3>
         </div>
       </div>
       <button type="button" class="btn-close" title="ปิด" (click)="close()">
@@ -13,21 +13,39 @@
     </div>
 
     <div class="modal-body">
-      @for (group of groupedServices | keyvalue: keepOrder; track group.key) {
-        <div class="group-section">
-          <div class="group-title">
-            {{ group.key }}
-          </div>
+      <div class="group-section">
+        <div class="group-title">ระบบพื้นฐาน</div>
+        <ul class="services-list">
+          @for (service of basicServices; track service.service_type_id ?? service.id) {
+            <li>
+              {{ serviceName(service) }}
+              @if (isRequestUserService(service) && requestUserServices.length) {
+                <ul class="services-list nested-list">
+                  @for (
+                    userService of requestUserServices;
+                    track userService.service_type_id ?? userService.id
+                  ) {
+                    <li>{{ serviceName(userService) }}</li>
+                  }
+                </ul>
+              }
+            </li>
+          } @empty {
+            <li class="empty-text">-</li>
+          }
+        </ul>
+      </div>
 
-          <div class="services-list">
-            @for (service of group.value; track service.service_type_id) {
-              <div class="service-item">
-                {{ service.service_name_th }}
-              </div>
-            }
-          </div>
-        </div>
-      }
+      <div class="group-section">
+        <div class="group-title">ระบบเฉพาะ</div>
+        <ul class="services-list">
+          @for (service of specificServices; track service.service_type_id ?? service.id) {
+            <li>{{ serviceName(service) }}</li>
+          } @empty {
+            <li class="empty-text">-</li>
+          }
+        </ul>
+      </div>
     </div>
   </div>
 </div>

@@ -170,16 +170,28 @@ $shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.08);
   }
 
   .services-list {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
+    display: grid;
+    gap: 7px;
+    margin: 0;
+    padding-left: 22px;
+    font-size: 13px;
+
+    li::marker {
+      color: var(--primary);
+    }
   }
 
-  .service-item {
-    padding: 6px 12px;
-    border-radius: 20px;
-    background-color: #f1f3f5;
-    font-size: 13px;
+  .nested-list {
+    margin-top: 7px;
+    padding-left: 20px;
+
+    li::marker {
+      color: var(--text-muted);
+    }
+  }
+
+  .empty-text {
+    color: var(--text-muted);
   }
 
   @include tablet {

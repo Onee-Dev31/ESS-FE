@@ -64,6 +64,30 @@ export class TicketDetailCardComponent implements OnChanges {
     return this.ticket?.services ?? [];
   }
 
+  get displayServices(): any[] {
+    const requestUser = this.services.find((service) => this.isRequestUserService(service));
+    if (!requestUser) return this.services;
+
+    const specificServices = this.services.filter((service) => {
+      const group = String(
+        service?.group_type ?? service?.groupType ?? service?.service_group ?? '',
+      )
+        .trim()
+        .toLowerCase();
+      return !!group && !['main', 'basic', 'user'].includes(group);
+    });
+    return [requestUser, ...specificServices];
+  }
+
+  serviceName(service: any): string {
+    return service?.service_name_th ?? service?.label ?? service?.service_name ?? '-';
+  }
+
+  private isRequestUserService(service: any): boolean {
+    const id = Number(service?.service_type_id ?? service?.serviceTypeId ?? service?.id);
+    return id === 22 || this.serviceName(service).trim().toLowerCase() === 'ขอ user';
+  }
+
   get canChangeTicketType(): boolean {
     const isApproved =
       String(this.ticket?.approval_status ?? this.ticket?.approvalStatus ?? '')

@@ -25,7 +25,19 @@
         <div class="section-title">ระบบพื้นฐาน</div>
         <ul class="summary-list">
           @for (service of basicServices; track service.service_type_id ?? service.id) {
-            <li>{{ serviceName(service) }}</li>
+            <li>
+              {{ serviceName(service) }}
+              @if (isRequestUserService(service) && requestUserServices.length) {
+                <ul class="summary-list nested-list">
+                  @for (
+                    userService of requestUserServices;
+                    track userService.service_type_id ?? userService.id
+                  ) {
+                    <li>{{ serviceName(userService) }}</li>
+                  }
+                </ul>
+              }
+            </li>
           } @empty {
             <li class="empty-text">-</li>
           }

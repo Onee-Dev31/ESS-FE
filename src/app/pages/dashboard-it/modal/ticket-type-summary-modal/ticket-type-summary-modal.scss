@@ -53,6 +53,15 @@
   }
 }
 
+.nested-list {
+  margin-top: 8px;
+  padding-left: 20px;
+
+  li::marker {
+    color: var(--text-muted);
+  }
+}
+
 .empty-text {
   color: var(--text-muted);
 }

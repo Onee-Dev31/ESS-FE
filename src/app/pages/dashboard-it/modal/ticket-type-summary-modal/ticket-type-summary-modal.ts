@@ -37,26 +37,52 @@ export class TicketTypeSummaryModal {
   }
 
   get basicServices(): any[] {
-    return this.services.filter((service: any) => this.isBasicService(service));
+    const services = this.allBasicServices;
+    const requestUser = services.find((service: any) => this.isRequestUserService(service));
+    return requestUser ? [requestUser] : services;
+  }
+
+  get requestUserServices(): any[] {
+    const requestUser = this.allBasicServices.find((service: any) =>
+      this.isRequestUserService(service),
+    );
+    if (!requestUser) return [];
+    return this.allBasicServices.filter(
+      (service: any) => !this.isRequestUserService(service),
+    );
   }
 
   get specificServices(): any[] {
     // รายการที่ไม่ใช่กลุ่มพื้นฐานให้แสดงในระบบเฉพาะ เพื่อไม่ให้ข้อมูลจาก API ตกหล่น
-    return this.services.filter((service: any) => !this.isBasicService(service));
+    return this.services.filter((service: any) => {
+      const group = this.serviceGroup(service);
+      return !!group && !['main', 'basic', 'user'].includes(group);
+    });
   }
 
   private get services(): any[] {
     return Array.isArray(this.ticket?.services) ? this.ticket.services : [];
   }
 
-  private isBasicService(service: any): boolean {
-    const group = String(
+  private get allBasicServices(): any[] {
+    return this.services.filter((service: any) => {
+      const group = this.serviceGroup(service);
+      return !group || ['main', 'basic', 'user'].includes(group);
+    });
+  }
+
+  private serviceGroup(service: any): string {
+    return String(
       service?.group_type ?? service?.groupType ?? service?.service_group ?? '',
     )
       .trim()
       .toLowerCase();
+  }
 
-    return !group || ['main', 'user', 'basic'].includes(group);
+  isRequestUserService(service: any): boolean {
+    const id = Number(service?.service_type_id ?? service?.serviceTypeId ?? service?.id);
+    const name = this.serviceName(service).trim().toLowerCase();
+    return id === 22 || name === 'ขอ user';
   }
 
   serviceName(service: any): string {

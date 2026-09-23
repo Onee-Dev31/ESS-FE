@@ -1,4 +1,4 @@
-import { Component, EventEmitter, inject, Input, Output, signal } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 @Component({
@@ -10,31 +10,46 @@ import { CommonModule } from '@angular/common';
 export class ServicesDetailModal {
   @Output() onClose = new EventEmitter<void>();
   @Input() services: any[] = [];
-  keepOrder = () => 0;
 
-  groupedServices: Record<string, any[]> = {};
-
-  ngOnChanges() {
-    this.groupServices();
+  get basicServices(): any[] {
+    const requestUser = this.allBasicServices.find((service) =>
+      this.isRequestUserService(service),
+    );
+    return requestUser ? [requestUser] : this.allBasicServices;
   }
 
-  groupServices() {
-    const grouped = this.services.reduce((acc: any, service: any) => {
-      const key = service.group_type || 'อื่นๆ';
+  get requestUserServices(): any[] {
+    if (!this.allBasicServices.some((service) => this.isRequestUserService(service))) return [];
+    return this.allBasicServices.filter((service) => !this.isRequestUserService(service));
+  }
 
-      if (!acc[key]) {
-        acc[key] = [];
-      }
+  get specificServices(): any[] {
+    return this.services.filter((service) => {
+      const group = this.serviceGroup(service);
+      return !!group && !['main', 'basic', 'user'].includes(group);
+    });
+  }
 
-      acc[key].push(service);
-      return acc;
-    }, {});
+  private get allBasicServices(): any[] {
+    return this.services.filter((service) => {
+      const group = this.serviceGroup(service);
+      return !group || ['main', 'basic', 'user'].includes(group);
+    });
+  }
 
-    this.groupedServices = {
-      main: grouped.main ?? {},
+  private serviceGroup(service: any): string {
+    return String(service?.group_type ?? service?.groupType ?? service?.service_group ?? '')
+      .trim()
+      .toLowerCase();
+  }
 
-      ...Object.fromEntries(Object.entries(grouped).filter(([key]) => key !== 'main')),
-    };
+  isRequestUserService(service: any): boolean {
+    const id = Number(service?.service_type_id ?? service?.serviceTypeId ?? service?.id);
+    return id === 22 || this.serviceName(service).trim().toLowerCase() === 'ขอ user';
+  }
+
+  serviceName(service: any): string {
+    return service?.service_name_th ?? service?.label ?? service?.service_name ?? '-';
   }
 
   close() {
