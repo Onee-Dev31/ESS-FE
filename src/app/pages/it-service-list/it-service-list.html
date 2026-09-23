@@ -213,7 +213,7 @@
   />
 
   <!-- REASON [Denied] -->
-  <section class="tk-card reason" *ngIf="t.status === 'Denied'">
+  <!-- <section class="tk-card reason" *ngIf="t.status === 'Denied'">
     <div class="tk-card__head">
       <div class="tk-card__title">
         เหตุผลในการ
@@ -224,9 +224,8 @@
     </div>
     <div class="tk-card__body">
       <div class="tk-text html-detail" [innerHTML]="t.rejection_reason"></div>
-      <!-- <div class="tk-text" [innerHTML]="formatText.getFormatTextHTML(t.rejection_reason)"></div> -->
     </div>
-  </section>
+  </section> -->
 
   <!-- ATTACHMENTS -->
   <section class="tk-card waiting-attachments" *ngIf="false">
@@ -439,7 +438,8 @@
 }
 
 @if (isCcModalVisible) {
-  <app-cc-modal [ticket]="selectedTicket()" [isItDashboard]="false" (closeModal)="handleCancel()"> </app-cc-modal>
+  <app-cc-modal [ticket]="selectedTicket()" [isItDashboard]="false" (closeModal)="handleCancel()">
+  </app-cc-modal>
 }
 
 @if (isDetailModalOpen()) {
@@ -452,7 +452,12 @@
         </button>
       </div>
       <div class="modal-body">
-        <div class="html-detail" appImageErrorFallback appOpenDescriptionImage [innerHTML]="selectedDetail() | safeEmailHtml"></div>
+        <div
+          class="html-detail"
+          appImageErrorFallback
+          appOpenDescriptionImage
+          [innerHTML]="selectedDetail() | safeEmailHtml"
+        ></div>
         <!-- <div [innerHTML]="formatText.getFormatTextHTML(selectedDetail())"></div> -->
       </div>
     </div>
