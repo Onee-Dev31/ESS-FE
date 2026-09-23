@@ -169,9 +169,43 @@ $col-desc: auto;
           flex-direction: column;
         }
 
-        .form-control {
-          @include select-dropdown;
+        .form-input {
           flex: 1;
+          min-width: 0;
+        }
+
+        ::ng-deep .filter-select.ant-select {
+          height: 44px;
+          line-height: 44px;
+
+          @include tablet {
+            height: 42px;
+            line-height: 42px;
+          }
+
+          @include mobile {
+            width: 100%;
+            height: 38px;
+            line-height: 38px;
+          }
+        }
+
+        ::ng-deep .filter-select.ant-select .ant-select-selector {
+          height: 44px !important;
+          padding: 0 44px 0 16px !important;
+          display: flex !important;
+          align-items: center !important;
+          background: var(--bg-table-head) !important;
+          border: 1.5px solid var(--border-table-head) !important;
+          border-radius: 10px !important;
+
+          @include tablet {
+            height: 42px !important;
+          }
+
+          @include mobile {
+            height: 38px !important;
+          }
         }
 
         .btn-search {
@@ -253,6 +287,18 @@ $col-desc: auto;
       }
     }
   }
+}
+
+.empty-row {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  min-height: 220px;
+  color: var(--text-muted);
+  font-weight: 600;
+  text-align: center;
 }
 
 // ==========================================

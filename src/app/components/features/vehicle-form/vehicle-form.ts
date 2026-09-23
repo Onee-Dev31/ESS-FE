@@ -11,6 +11,8 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { NzButtonModule } from 'ng-zorro-antd/button';
+import { NzSelectModule } from 'ng-zorro-antd/select';
 import { VehicleRequest } from '../../../services/transport.service';
 import { AttendanceLog } from '../../../interfaces/transport.interface';
 import { DateUtilityService } from '../../../services/date-utility.service';
@@ -45,7 +47,7 @@ import { finalize } from 'rxjs';
 @Component({
   selector: 'app-vehicle-form',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, NzButtonModule, NzSelectModule],
   templateUrl: './vehicle-form.html',
   styleUrls: ['./vehicle-form.scss'],
 })
@@ -69,6 +71,8 @@ export class VehicleFormComponent implements OnInit, OnChanges {
   years: number[] = [];
   selectedMonthIndex: number = new Date().getMonth() + 1;
   selectedYearBE: number = new Date().getFullYear() + 543;
+  private loadedMonthIndex: number = this.selectedMonthIndex;
+  private loadedYearBE: number = this.selectedYearBE;
   logs: VehicleLogItem[] = [];
 
   MODE_EDIT: boolean = false;
@@ -108,6 +112,39 @@ export class VehicleFormComponent implements OnInit, OnChanges {
   // ─── Create mode ────────────────────────────────────────────
 
   loadData() {
+    this.generateCalendar();
+  }
+
+  async onPeriodChange(): Promise<void> {
+    if (
+      this.selectedMonthIndex === this.loadedMonthIndex &&
+      this.selectedYearBE === this.loadedYearBE
+    ) {
+      return;
+    }
+
+    if (this.logs.some((log) => log.selected)) {
+      const result = await this.swalService.confirm(
+        'เปลี่ยนช่วงเวลาที่ต้องการเบิก?',
+        'รายการที่เลือกและข้อมูลที่กรอกไว้จะถูกล้าง จากนั้นระบบจะแสดงข้อมูลตามเดือนและปีที่เลือกใหม่',
+        undefined,
+        {
+          confirmButtonText: 'เปลี่ยนช่วงเวลา',
+          cancelButtonText: 'กลับไปแก้ไข',
+          focusCancel: true,
+        },
+      );
+
+      if (!result.isConfirmed) {
+        this.selectedMonthIndex = this.loadedMonthIndex;
+        this.selectedYearBE = this.loadedYearBE;
+        this.cdr.detectChanges();
+        return;
+      }
+    }
+
+    this.loadedMonthIndex = this.selectedMonthIndex;
+    this.loadedYearBE = this.selectedYearBE;
     this.generateCalendar();
   }
 
@@ -155,6 +192,16 @@ export class VehicleFormComponent implements OnInit, OnChanges {
   }
 
   hasInvalid(): boolean {
+    const hasSelected = this.logs.some((log) => log.selected);
+
+    if (this.MODE_EDIT && !hasSelected) {
+      return false;
+    }
+
+    if (!hasSelected) {
+      return true;
+    }
+
     return this.logs.some(
       (log) => log.selected && (!log.description || log.description.trim() === ''),
     );
