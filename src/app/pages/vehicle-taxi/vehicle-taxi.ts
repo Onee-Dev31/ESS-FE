@@ -30,6 +30,8 @@ import { NzInputModule } from 'ng-zorro-antd/input';
 import dayjs from 'dayjs';
 import { SwalService } from '../../services/swal.service';
 import { VehicleTaxiFormV2Component } from '../../components/features/vehicle-taxi-form-v2/vehicle-taxi-form-v2';
+import { ApprovalItem } from '../../interfaces/approval.interface';
+import { ApprovalDetailModalComponent } from '../../components/modals/approval-detail-modal/approval-detail-modal';
 
 /** ข้อความ fallback ของ popup เงื่อนไข Taxi (ใช้ก่อน API ตอบกลับ หรือถ้าเรียก API ไม่สำเร็จ) */
 const DEFAULT_POLICY_TEXTS: Record<string, string> = {
@@ -64,6 +66,7 @@ const DEFAULT_POLICY_TEXTS: Record<string, string> = {
     NzSelectModule,
     NzInputModule,
     VehicleTaxiFormV2Component,
+    ApprovalDetailModalComponent,
   ],
   templateUrl: './vehicle-taxi.html',
   styleUrl: './vehicle-taxi.scss',
@@ -99,6 +102,7 @@ export class VehicleTaxiComponent implements OnInit {
   // selectedRequestId = signal<string>('');
   selectedRequestId = '';
   selectedRequest: any = null;
+  selectedDetailItem = signal<ApprovalItem | null>(null);
   isPreviewModalOpen = signal<boolean>(false);
   previewFiles = signal<any[]>([]);
 
@@ -286,6 +290,53 @@ export class VehicleTaxiComponent implements OnInit {
     this.isModalOpen.set(false);
     this.selectedRequest = '';
     this.loadData();
+  }
+
+  viewRequest(claim: any) {
+    const user = this.authservice.userData() ?? {};
+    const claimId = Number(claim.claimId ?? claim.id);
+
+    this.selectedDetailItem.set({
+      requestId: claimId,
+      requestNo: claim.claimNo ?? claim.voucherNo ?? `#${claimId}`,
+      requestDate: claim.claimDate ?? claim.createDate,
+      requestBy: {
+        name: claim.employeeName ?? user.NAMETH ?? user.NAMEENG ?? claim.employeeCode ?? '-',
+        employeeId: claim.employeeCode ?? user.CODEMPID ?? '-',
+        department: claim.departmentName ?? user.DEPARTMENT ?? '-',
+        company: claim.companyName ?? user.COMPANY_NAME ?? '-',
+        profileImage: claim.employeeImageUrl ?? undefined,
+      },
+      requestType: 'ค่าแท็กซี่',
+      typeId: claim.typeId ?? 0,
+      requestDetail: `จำนวน ${claim.items?.length ?? 0} รายการ`,
+      remark: claim.remark ?? '',
+      amount: claim.amount ?? claim.totalAmount ?? 0,
+      status: this.toApprovalStatus(claim.status),
+      rawStatus: claim.status ?? '',
+      type: 'taxi',
+      originalData: {
+        ...claim,
+        claimId: claim.claimId ?? claim.id,
+      },
+    });
+  }
+
+  closeDetail() {
+    this.selectedDetailItem.set(null);
+  }
+
+  private toApprovalStatus(status: string): 'Pending' | 'Approved' | 'Rejected' | 'Referred Back' {
+    switch (status?.trim().toLowerCase().replace(/[_-]+/g, ' ')) {
+      case 'approved':
+        return 'Approved';
+      case 'rejected':
+        return 'Rejected';
+      case 'referred back':
+        return 'Referred Back';
+      default:
+        return 'Pending';
+    }
   }
 
   openPreviewModalForRequest(requestId: string) {

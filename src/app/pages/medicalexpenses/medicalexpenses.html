@@ -204,6 +204,7 @@
         <table class="modern-table">
           <thead>
             <tr>
+              <th class="col-view"></th>
               <th class="col-text-left col-type">ประเภท</th>
               <th class="col-text-left col-treatment-date">วันที่รักษา</th>
               <th class="col-text-left col-treatment-detail">รายละเอียดการรักษา</th>
@@ -216,6 +217,18 @@
           <tbody>
             @for (claim of paginatedClaims(); track trackById($index, claim)) {
               <tr>
+                <td class="text-center col-view">
+                  <button
+                    type="button"
+                    class="act-btn act-view"
+                    (click)="viewRequest(claim)"
+                    title="ดูรายละเอียด"
+                    aria-label="ดูรายละเอียด"
+                  >
+                    <i class="far fa-eye"></i>
+                  </button>
+                </td>
+
                 <!-- ประเภท -->
                 <td class="col-text-left col-type">
                   <div class="type-badge">
@@ -287,15 +300,6 @@
 
                 <td class="text-center col-row-actions" (click)="$event.stopPropagation()">
                   <div class="action-btns">
-                    <button
-                      type="button"
-                      class="act-btn act-view"
-                      (click)="viewRequest(claim)"
-                      title="ดูรายละเอียด"
-                      aria-label="ดูรายละเอียด"
-                    >
-                      <i class="far fa-eye"></i>
-                    </button>
                     @if (isEditableClaim(claim.status)) {
                       <button
                         class="btn-icon edit"
@@ -313,7 +317,7 @@
               </tr>
             } @empty {
               <tr>
-                <td colspan="8">
+                <td colspan="9">
                   <app-empty-state
                     title="ไม่พบรายการ"
                     description="ไม่พบรายการที่ตรงกับเงื่อนไขการค้นหา"

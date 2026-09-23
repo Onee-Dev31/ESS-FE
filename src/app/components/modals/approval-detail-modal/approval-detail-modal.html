@@ -34,7 +34,10 @@
             class="progress-line-fill"
             [class.rejected-line]="isRejected()"
             [style.width.%]="
-              Math.min((Math.max(0, currentStepIndex() - 1) / (steps().length - 1)) * 80, 80)
+              Math.min(
+                (Math.max(0, currentStepIndex() - 1) / (steps().length - 1)) * (200 / 3),
+                200 / 3
+              )
             "
           ></div>
 

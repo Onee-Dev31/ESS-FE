@@ -617,6 +617,12 @@ app-empty-state {
     min-width: 140px;
   }
 
+  .col-view {
+    width: 56px;
+    min-width: 56px;
+    text-align: center;
+  }
+
   @include large-tablet {
     th,
     td {

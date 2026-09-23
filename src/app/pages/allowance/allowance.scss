@@ -554,6 +554,13 @@ $status-cancelled-text: var(--text-table-head);
       text-align: center;
     }
 
+    th.col-view,
+    td.col-view {
+      width: 56px;
+      min-width: 56px;
+      text-align: center;
+    }
+
     td.col-item {
       .request-no,
       .nested-items {
