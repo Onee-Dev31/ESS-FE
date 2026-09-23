@@ -97,6 +97,10 @@ export class MedicalexpensesForm implements OnInit, OnDestroy {
   hospitalInputEl?: ElementRef<HTMLElement>;
   @ViewChild('diseaseInput', { read: ElementRef })
   diseaseInputEl?: ElementRef<HTMLElement>;
+  @ViewChild('startDateInput', { read: ElementRef })
+  startDateInputEl?: ElementRef<HTMLElement>;
+  @ViewChild('endDateInput', { read: ElementRef })
+  endDateInputEl?: ElementRef<HTMLElement>;
   @ViewChild('hospitalDropdownEl') hospitalDropdownEl?: ElementRef<HTMLDivElement>;
 
   private hospitalSearch$ = new Subject<string>();
@@ -434,6 +438,7 @@ export class MedicalexpensesForm implements OnInit, OnDestroy {
         this.hasNextPage = res.pagination?.hasNext ?? false;
         this.isHospitalDropdownOpen.set(res.data.length > 0);
         this.isHospitalLoading.set(false);
+        this.selectExactHospitalMatch();
       });
 
     this.diseaseSearchSub = this.diseaseSearch$
@@ -458,6 +463,7 @@ export class MedicalexpensesForm implements OnInit, OnDestroy {
         this.diseaseHasNext = res.pagination?.hasNext ?? false;
         this.isDiseaseDropdownOpen.set(res.data.length > 0);
         this.isDiseaseLoading.set(false);
+        this.selectExactDiseaseMatch();
       });
 
     // Preload both lookup lists while the form is initializing so the first open is immediate.
@@ -471,6 +477,17 @@ export class MedicalexpensesForm implements OnInit, OnDestroy {
   }
 
   onHospitalInput(value: string) {
+    const selected = this.selectedHospitalObj();
+    const keyword = this.normalizeLookupText(value);
+    if (
+      selected &&
+      (!keyword ||
+        keyword === this.normalizeLookupText(selected.nameTh) ||
+        keyword === this.normalizeLookupText(selected.nameEn))
+    ) {
+      return;
+    }
+
     this.hospital.set(value);
     this.selectedHospitalObj.set(null);
     this.hospitalSearch$.next(value);
@@ -529,7 +546,32 @@ export class MedicalexpensesForm implements OnInit, OnDestroy {
     this.isHospitalDropdownOpen.set(false);
   }
 
+  private selectExactHospitalMatch(): void {
+    if (this.selectedHospitalObj()) return;
+    const keyword = this.normalizeLookupText(this.hospital());
+    if (!keyword) return;
+
+    const match = this.hospitalDropdown().find(
+      (hospital) =>
+        this.normalizeLookupText(hospital.nameTh) === keyword ||
+        this.normalizeLookupText(hospital.nameEn) === keyword,
+    );
+    if (match) this.selectHospital(match);
+  }
+
   onDiseaseInput(value: string) {
+    const selected = this.selectedDiseaseObj();
+    const keyword = this.normalizeLookupText(value);
+    if (
+      selected &&
+      (!keyword ||
+        keyword === this.normalizeLookupText(selected.nameTh) ||
+        keyword === this.normalizeLookupText(selected.nameEn) ||
+        keyword === this.normalizeLookupText(selected.icd10Code ?? ''))
+    ) {
+      return;
+    }
+
     this.disease.set(value);
     this.selectedDiseaseObj.set(null);
     this.diseaseSearch$.next(value);
@@ -592,6 +634,24 @@ export class MedicalexpensesForm implements OnInit, OnDestroy {
     this.disease.set(d.nameTh);
     this.selectedDiseaseObj.set(d);
     this.isDiseaseDropdownOpen.set(false);
+  }
+
+  private selectExactDiseaseMatch(): void {
+    if (this.selectedDiseaseObj()) return;
+    const keyword = this.normalizeLookupText(this.disease());
+    if (!keyword) return;
+
+    const match = this.diseaseDropdown().find(
+      (disease) =>
+        this.normalizeLookupText(disease.nameTh) === keyword ||
+        this.normalizeLookupText(disease.nameEn) === keyword ||
+        this.normalizeLookupText(disease.icd10Code ?? '') === keyword,
+    );
+    if (match) this.selectDisease(match);
+  }
+
+  private normalizeLookupText(value: string | null | undefined): string {
+    return String(value ?? '').trim().toLocaleLowerCase('th-TH');
   }
 
   loadRequestData() {
@@ -757,6 +817,24 @@ export class MedicalexpensesForm implements OnInit, OnDestroy {
 
     this.showRequiredErrors.set(true);
 
+    // จับคู่ข้อความที่พิมพ์ตรงกับ master ก่อนตรวจช่องบังคับ
+    this.selectExactHospitalMatch();
+    this.selectExactDiseaseMatch();
+
+    const missingFields: string[] = [];
+    if (!this.selectedClaimType()) missingFields.push('ประเภทการเบิก');
+    if (!this.selectedHospitalObj()) missingFields.push('สถานพยาบาล');
+    if (!this.selectedDiseaseObj()) missingFields.push('ประเภทโรค');
+    if (!this.startDate()) missingFields.push('วันที่รักษาตั้งแต่');
+    if (!this.endDate()) missingFields.push('วันที่รักษาถึง');
+    if (this.parseNumber(this.amount || '0') <= 0) missingFields.push('จำนวนเงินที่ขอเบิก');
+
+    if (missingFields.length) {
+      await this.swalService.warning('ข้อมูลไม่ครบ', `กรุณากรอก: ${missingFields.join(', ')}`);
+      this.focusFirstMissingField();
+      return;
+    }
+
     if (!this.selectedClaimType()) {
       this.claimTypeSectionEl?.nativeElement.scrollIntoView({
         behavior: 'smooth',
@@ -772,6 +850,11 @@ export class MedicalexpensesForm implements OnInit, OnDestroy {
     }
 
     if (!this.dateUtil.isValidDateRange(this.startDate(), this.endDate())) {
+      await this.swalService.warning(
+        'ช่วงวันที่ไม่ถูกต้อง',
+        'วันที่สิ้นสุดการรักษาต้องไม่น้อยกว่าวันที่เริ่มรักษา',
+      );
+      this.scrollToField(this.startDateInputEl);
       return;
     }
 
@@ -886,6 +969,56 @@ export class MedicalexpensesForm implements OnInit, OnDestroy {
     return this.isEditMode()
       ? 'เกิดข้อผิดพลาดในการแก้ไขรายการ กรุณาลองใหม่อีกครั้ง'
       : 'เกิดข้อผิดพลาดในการส่งเรื่อง กรุณาลองใหม่อีกครั้ง';
+  }
+
+  private focusFirstMissingField(): void {
+    if (!this.selectedClaimType()) {
+      this.claimTypeSectionEl?.nativeElement.scrollIntoView({
+        behavior: 'smooth',
+        block: 'center',
+      });
+      this.claimTypeHighlight.set(true);
+      setTimeout(() => this.claimTypeHighlight.set(false), 800);
+      return;
+    }
+
+    if (!this.selectedHospitalObj()) {
+      this.hospitalInputEl?.nativeElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      this.hospitalInputEl?.nativeElement.querySelector<HTMLInputElement>('input')?.focus();
+      this.hospitalHighlight.set(true);
+      setTimeout(() => this.hospitalHighlight.set(false), 800);
+      return;
+    }
+
+    if (!this.selectedDiseaseObj()) {
+      this.diseaseInputEl?.nativeElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      this.diseaseInputEl?.nativeElement.querySelector<HTMLInputElement>('input')?.focus();
+      this.diseaseHighlight.set(true);
+      setTimeout(() => this.diseaseHighlight.set(false), 800);
+      return;
+    }
+
+    if (!this.startDate()) {
+      this.scrollToField(this.startDateInputEl);
+      return;
+    }
+
+    if (!this.endDate()) {
+      this.scrollToField(this.endDateInputEl);
+      return;
+    }
+
+    if (this.parseNumber(this.amount || '0') <= 0) {
+      this.amountInputEl?.nativeElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      this.amountInputEl?.nativeElement.focus();
+      this.amountHighlight.set(true);
+      setTimeout(() => this.amountHighlight.set(false), 800);
+    }
+  }
+
+  private scrollToField(element?: ElementRef<HTMLElement>): void {
+    element?.nativeElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    element?.nativeElement.querySelector<HTMLInputElement>('input')?.focus();
   }
 
   private extractApiMessage(error: HttpErrorResponse): string | undefined {

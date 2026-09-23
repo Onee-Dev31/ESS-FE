@@ -169,6 +169,36 @@ export interface MedicalClaimAttachment {
   createdAt: string;
 }
 
+export interface MedicalApproveClaimAttachment {
+  fileName: string;
+  fileUrl: string;
+  fileType: string;
+}
+
+export interface MedicalApproveClaim {
+  claimID: number;
+  voucherNo: string;
+  claimDate: string;
+  employeeCode: string;
+  employeeName: string;
+  departmentName: string;
+  companyName: string;
+  expenseTypeName: string;
+  hospitalName: string;
+  diseaseName: string;
+  requestedAmount: number;
+  approvedAmount: number;
+  status: string;
+  approverStepStatus: string;
+  remark: string | null;
+  attachments: MedicalApproveClaimAttachment[];
+}
+
+export interface MedicalApproveClaimsResponse {
+  success: boolean;
+  data: MedicalApproveClaim[];
+}
+
 export interface MedicalClaim {
   claimId: number;
   voucherNo: string | null;

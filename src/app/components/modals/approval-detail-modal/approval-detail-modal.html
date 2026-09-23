@@ -144,10 +144,7 @@
             <div class="med-info-item">
               <label><i class="far fa-calendar-alt"></i> วันที่รักษา</label>
               <span>
-                {{ dateUtil.formatDateToBE(medicalDetail()?.treatmentDateFrom, 'DD/MM/YYYY') }}
-                –
-                {{ dateUtil.formatDateToBE(medicalDetail()?.treatmentDateTo, 'DD/MM/YYYY') }}
-                <span class="text-muted">({{ medicalDetail()?.treatmentDays }} วัน)</span>
+                {{ dateUtil.formatDateToBE(medicalDetail()?.claimDate, 'DD/MM/YYYY') }}
               </span>
             </div>
             @if (medicalDetail().remark) {

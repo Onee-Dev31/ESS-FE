@@ -117,24 +117,23 @@
 
               <div class="claim-card__employee">
                 <div
-                  class="emp-avatar"
-                  [class.clickable]="claim.employeeImageUrl"
-                  (click)="openProfileImage(claim)"
+                  class="emp-avatar clickable"
+                  role="button"
+                  tabindex="0"
                   title="คลิกดูรูปขนาดใหญ่"
+                  (click)="openProfileImage(req)"
+                  (keydown.enter)="openProfileImage(req)"
                 >
                   <img
-                    [src]="claim.employeeImageUrl"
-                    alt="{{ claim.employeeCode }}"
+                    [src]="req.employeeImageUrl"
+                    [alt]="claim.employeeName"
                     (error)="onImgError($event)"
                   />
                   <i class="fas fa-user-circle fallback-icon"></i>
                 </div>
                 <div class="emp-info">
                   <div class="emp-name">
-                    {{ claim.employeeName ?? claim.employeeCode }}
-                    @if (claim.employeeNickname) {
-                      <span class="emp-nickname">({{ claim.employeeNickname }})</span>
-                    }
+                    {{ claim.employeeName }}
                   </div>
                   <div class="emp-meta">
                     <span><i class="fas fa-id-badge"></i> {{ claim.employeeCode }}</span>
@@ -152,11 +151,7 @@
                 <div class="claim-card__main">
                   <div class="claim-date">
                     <i class="far fa-calendar-alt"></i>
-                    <span
-                      >{{ dateUtil.formatDateToBE(claim.treatmentDateFrom, 'DD/MM/YYYY') }} –
-                      {{ dateUtil.formatDateToBE(claim.treatmentDateTo, 'DD/MM/YYYY') }}</span
-                    >
-                    <span class="claim-days">{{ claim.treatmentDays }} วัน</span>
+                    <span>{{ dateUtil.formatDateToBE(claim.claimDate, 'DD/MM/YYYY') }}</span>
                   </div>
                   <div class="claim-hospital">
                     <i class="fas fa-hospital-alt"></i>
@@ -178,27 +173,6 @@
                   }
                 </div>
               </div>
-
-              @if (claim.typeTotalLimit > 0) {
-                <div class="claim-card__budget">
-                  <div class="budget-row">
-                    <span class="budget-label">วงเงิน {{ claim.expenseTypeCode }}</span>
-                    <span class="budget-remaining"
-                      >คงเหลือ ฿{{ claim.typeRemainingAmount | number: '1.0-0' }}</span
-                    >
-                  </div>
-                  <div class="budget-bar">
-                    <div
-                      class="budget-bar__used"
-                      [style.width.%]="(claim.typeUsedAmount / claim.typeTotalLimit) * 100"
-                    ></div>
-                  </div>
-                  <div class="budget-meta">
-                    <span>ใช้ไป ฿{{ claim.typeUsedAmount | number: '1.2-2' }}</span>
-                    <span>วงเงินทั้งหมด ฿{{ claim.typeTotalLimit | number: '1.2-2' }}</span>
-                  </div>
-                </div>
-              }
 
               <div class="claim-card__footer">
                 <span class="claim-id">{{ req.requestNo }}</span>
@@ -260,13 +234,11 @@
           <thead>
             <tr>
               <th>พนักงาน</th>
-              <th>ประเภท</th>
-              <th>วันที่รักษา</th>
-              <th>สถานพยาบาล</th>
-              <th>โรค</th>
+              <th class="text-left">ประเภท</th>
+              <th>วันที่เบิก</th>
+              <th class="text-left">รายละเอียดการรักษา</th>
               <th class="text-right">ยอดเงิน</th>
               <th>สถานะ</th>
-              <th>เอกสาร</th>
               <th>จัดการ</th>
             </tr>
           </thead>
@@ -286,20 +258,28 @@
                         />
                         <span class="checkmark"></span>
                       </label>
-                      <img
-                        class="emp-avatar"
-                        [src]="claim.employeeImageUrl"
-                        [alt]="(claim.employeeName ?? claim.employeeCode) + ' photo'"
-                        title="รูปพนักงาน"
-                        (error)="onImgError($event)"
-                      />
-                      <div>
-                        <div class="emp-name">{{ claim.employeeName ?? claim.employeeCode }}</div>
+                      <div
+                        class="emp-avatar clickable"
+                        role="button"
+                        tabindex="0"
+                        title="คลิกดูรูปขนาดใหญ่"
+                        (click)="openProfileImage(req)"
+                        (keydown.enter)="openProfileImage(req)"
+                      >
+                        <img
+                          [src]="req.employeeImageUrl"
+                          [alt]="claim.employeeName"
+                          (error)="onImgError($event)"
+                        />
+                        <i class="fas fa-user-circle fallback-icon"></i>
+                      </div>
+                      <div class="emp-text">
+                        <div class="emp-name">{{ claim.employeeName }}</div>
                         <div class="emp-meta">{{ claim.employeeCode }}</div>
                       </div>
                     </div>
                   </td>
-                  <td>
+                  <td class="text-left">
                     <div class="type-badge">
                       <span class="type-name">{{ claim.expenseTypeName }}</span>
                     </div>
@@ -308,12 +288,20 @@
                     </div>
                   </td>
                   <td>
-                    {{ dateUtil.formatDateToBE(claim.treatmentDateFrom, 'DD/MM/YYYY') }} –
-                    {{ dateUtil.formatDateToBE(claim.treatmentDateTo, 'DD/MM/YYYY') }}
-                    <span class="sub-text">{{ claim.treatmentDays }} วัน</span>
+                    {{ dateUtil.formatDateToBE(claim.claimDate, 'DD/MM/YYYY') }}
                   </td>
-                  <td>{{ claim.hospitalName }}</td>
-                  <td>{{ claim.diseaseName }}</td>
+                  <td class="text-left">
+                    <div class="treatment-details">
+                      <div><i class="fas fa-hospital-alt"></i> {{ claim.hospitalName }}</div>
+                      <div><i class="fas fa-virus"></i> {{ claim.diseaseName }}</div>
+                      @if (claim.attachments.length) {
+                        <button type="button" (click)="openPreview(claim)">
+                          <i class="fas fa-file"></i>
+                          <span class="file-count">{{ claim.attachments.length }} ไฟล์</span>
+                        </button>
+                      }
+                    </div>
+                  </td>
                   <td class="text-right">
                     <div class="amount-cell">
                       <div class="amount-main" [class.is-approved]="claim.approvedAmount > 0">
@@ -322,35 +310,12 @@
                         }
                         ฿{{ claim.requestedAmount | number: '1.2-2' }}
                       </div>
-                      @if (claim.typeTotalLimit > 0) {
-                        <div class="budget-section">
-                          <div class="budget-bar">
-                            <div
-                              class="budget-bar__used"
-                              [style.width.%]="(claim.typeUsedAmount / claim.typeTotalLimit) * 100"
-                            ></div>
-                          </div>
-                          <div class="budget-text">
-                            {{ claim.typeUsedAmount | number: '1.0-0' }} /
-                            {{ claim.typeTotalLimit | number: '1.0-0' }}
-                          </div>
-                        </div>
-                      }
                     </div>
                   </td>
                   <td>
                     <span class="status-badge" [ngStyle]="getStatusClass(req.status)">
                       {{ req.rawStatus | statusLabel }}
                     </span>
-                  </td>
-                  <td class="text-center">
-                    @if (claim.attachments.length) {
-                      <button class="btn-attach" (click)="openPreview(claim)">
-                        <i class="fas fa-file-alt"></i> {{ claim.attachments.length }}
-                      </button>
-                    } @else {
-                      -
-                    }
                   </td>
                   <td>
                     <div class="table-actions">
@@ -394,7 +359,7 @@
               }
             } @empty {
               <tr>
-                <td colspan="9">
+                <td colspan="7">
                   <app-empty-state
                     title="ไม่พบรายการ"
                     description="ไม่พบรายการที่ตรงกับเงื่อนไขการค้นหา"

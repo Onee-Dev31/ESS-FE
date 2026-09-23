@@ -12,7 +12,7 @@ import { ActivatedRoute } from '@angular/router';
 import { ApprovalDetailModalComponent } from '../../components/modals/approval-detail-modal/approval-detail-modal';
 import { FilePreviewModalComponent } from '../../components/modals/file-preview-modal/file-preview-modal';
 import { ApprovalItem } from '../../interfaces/approval.interface';
-import { MedicalClaim } from '../../interfaces/medical.interface';
+import { MedicalApproveClaim } from '../../interfaces/medical.interface';
 import { MedicalService } from '../../services/medical.service';
 import { DateUtilityService } from '../../services/date-utility.service';
 import { ExportService } from '../../services/export';
@@ -32,6 +32,7 @@ import { StatusUtil } from '../../utils/status.util';
 import { NzInputModule } from 'ng-zorro-antd/input';
 import { PaginationComponent } from '../../components/shared/pagination/pagination';
 import { AuthService } from '../../services/auth.service';
+import { environment } from '../../../environments/environment';
 
 /** หน้าจัดการรายการอนุมัติค่ารักษาพยาบาล */
 @Component({
@@ -117,15 +118,12 @@ export class ApprovalMedicalComponent implements OnInit {
     }
 
     this.medicalApiService
-      .getClaims({
-        from_month: this.fromMonth() + 1,
-        from_year: isNaN(fromYear) ? undefined : fromYear,
-        to_month: this.toMonth() + 1,
-        to_year: isNaN(toYear) ? undefined : toYear,
-        keyword,
+      .getApprovalClaims({
+        employee_code: this.authService.userData().CODEMPID,
       })
       .subscribe({
         next: (res) => {
+          console.log(res);
           const mapped = res.data.map((c) => this.mapClaimToApproval(c));
           this.approvals.set(mapped);
           this.listing.currentPage.set(0);
@@ -152,25 +150,28 @@ export class ApprovalMedicalComponent implements OnInit {
       });
   }
 
-  private mapClaimToApproval(claim: MedicalClaim): ApprovalItem {
+  private mapClaimToApproval(claim: MedicalApproveClaim): ApprovalItem {
+    const effectiveStatus = claim.approverStepStatus ?? claim.status ?? 'pending';
+
     return {
-      requestId: claim.claimId,
-      requestNo: claim.voucherNo ?? `#${claim.claimId}`,
+      requestId: claim.claimID,
+      requestNo: claim.voucherNo ?? `#${claim.claimID}`,
       requestDate: claim.claimDate,
       requestBy: {
-        name: claim.employeeName ?? claim.employeeCode,
+        name: claim.employeeName,
         employeeId: claim.employeeCode,
-        department: claim.departmentName ?? '-',
-        company: claim.companyName ?? '-',
+        department: claim.departmentName,
+        company: claim.companyName,
       },
       requestType: 'ค่ารักษาพยาบาล',
-      typeId: claim.expenseTypeId,
+      typeId: 0,
       requestDetail: `${claim.expenseTypeName} — ${claim.diseaseName} (${claim.hospitalName})`,
       remark: claim.remark || '',
       amount: claim.requestedAmount,
-      status: this.mapClaimStatus(claim.status),
-      rawStatus: claim.status,
+      status: this.mapClaimStatus(effectiveStatus),
+      rawStatus: effectiveStatus,
       type: 'medical',
+      employeeImageUrl: `${environment.employeeImageUrl}/${encodeURIComponent(claim.employeeCode)}.jpg`,
       originalData: claim,
     };
   }
@@ -250,7 +251,7 @@ export class ApprovalMedicalComponent implements OnInit {
     return StatusUtil.getStatusBadgeClaims(status.toLowerCase());
   }
 
-  openPreview(claim: MedicalClaim) {
+  openPreview(claim: MedicalApproveClaim) {
     if (!claim.attachments?.length) return;
     this.previewFiles.set(
       claim.attachments.map((a) => ({
@@ -272,11 +273,11 @@ export class ApprovalMedicalComponent implements OnInit {
     if (avatar) avatar.classList.add('img-error');
   }
 
-  openProfileImage(claim: MedicalClaim) {
-    if (!claim.employeeImageUrl) return;
+  openProfileImage(item: ApprovalItem) {
+    if (!item.employeeImageUrl) return;
     this.profileLightbox.set({
-      url: claim.employeeImageUrl,
-      name: claim.employeeName ?? claim.employeeCode,
+      url: item.employeeImageUrl,
+      name: item.requestBy.name,
     });
   }
 
@@ -284,9 +285,9 @@ export class ApprovalMedicalComponent implements OnInit {
     this.profileLightbox.set(null);
   }
 
-  getMedicalClaim(item: ApprovalItem): MedicalClaim | null {
-    return (item.originalData as MedicalClaim)?.claimId != null
-      ? (item.originalData as MedicalClaim)
+  getMedicalClaim(item: ApprovalItem): MedicalApproveClaim | null {
+    return (item.originalData as MedicalApproveClaim)?.claimID != null
+      ? (item.originalData as MedicalApproveClaim)
       : null;
   }
 

@@ -26,6 +26,7 @@ export interface ApprovalItem {
     position?: string;
     phone?: string;
     profileImage?: string;
+    codeEmp?: string;
   };
   requestType: 'ค่าเบี้ยเลี้ยง' | 'ค่ารถ' | 'ค่าแท็กซี่' | 'ค่ารักษาพยาบาล' | 'IT Request';
   typeId: number;

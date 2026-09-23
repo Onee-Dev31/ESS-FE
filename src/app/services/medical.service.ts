@@ -13,6 +13,7 @@ import {
   MedicalClaimsResponse,
   MedicalClaimResponse,
   MedicalStatusesResponse,
+  MedicalApproveClaimsResponse,
 } from '../interfaces/medical.interface';
 export type {
   Hospital,
@@ -24,6 +25,7 @@ export type {
   MedicalClaimsResponse,
   MedicalClaimResponse,
   MedicalStatusesResponse,
+  MedicalApproveClaimsResponse,
 };
 
 @Injectable({ providedIn: 'root' })
@@ -240,6 +242,15 @@ export class MedicalService {
       params: p,
       responseType: 'blob',
       // context: new HttpContext().set(SKIP_ERROR_TOAST, true),
+    });
+  }
+
+  getApprovalClaims(params: { employee_code?: string }): Observable<MedicalApproveClaimsResponse> {
+    let p = new HttpParams();
+    if (params.employee_code?.trim()) p = p.set('empno', params.employee_code);
+    if (params.employee_code?.trim()) p = p.set('status', 'ALL');
+    return this._http.get<MedicalApproveClaimsResponse>(`${this.baseUrl}/medical/approvals`, {
+      params: p,
     });
   }
 }
