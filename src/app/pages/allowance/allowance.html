@@ -153,6 +153,7 @@
         <table class="modern-table">
           <thead>
             <tr>
+              <th class="col-view"></th>
               <!-- <th>ประเภท</th> -->
               <th class="col-item">รายการ</th>
               <th class="col-amount">ยอดเงิน</th>
@@ -165,6 +166,18 @@
           <tbody>
             @for (claim of comps.paginatedData(); track claim.id) {
               <tr>
+                <td class="text-center col-view">
+                  <button
+                    type="button"
+                    class="act-btn act-view"
+                    (click)="viewRequest(claim)"
+                    title="ดูรายละเอียด"
+                    aria-label="ดูรายละเอียด"
+                  >
+                    <i class="far fa-eye"></i>
+                  </button>
+                </td>
+
                 <!-- รายการ -->
                 <td class="col-item">
                   <div class="request-no">
@@ -203,15 +216,6 @@
                 </td>
                 <td class="col-actions" (click)="$event.stopPropagation()">
                   <div class="action-btns">
-                    <button
-                      type="button"
-                      class="act-btn act-view"
-                      (click)="viewRequest(claim)"
-                      title="ดูรายละเอียด"
-                      aria-label="ดูรายละเอียด"
-                    >
-                      <i class="far fa-eye"></i>
-                    </button>
                     @if (isEditableClaim(claim.status)) {
                       <button
                         type="button"
@@ -235,7 +239,7 @@
               </tr>
             } @empty {
               <tr>
-                <td colspan="5">
+                <td colspan="6">
                   <app-empty-state
                     title="ไม่พบรายการ"
                     description="ไม่พบรายการที่ตรงกับเงื่อนไขการค้นหา"

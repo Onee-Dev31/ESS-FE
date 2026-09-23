@@ -27,6 +27,8 @@ import { NzDatePickerModule } from 'ng-zorro-antd/date-picker';
 import { en_US, NzI18nService } from 'ng-zorro-antd/i18n';
 import dayjs from 'dayjs';
 import { NzSelectModule } from 'ng-zorro-antd/select';
+import { ApprovalItem } from '../../interfaces/approval.interface';
+import { ApprovalDetailModalComponent } from '../../components/modals/approval-detail-modal/approval-detail-modal';
 
 /** ข้อความ fallback ของ popup เงื่อนไข (ใช้ก่อน API ตอบกลับ หรือถ้าเรียก API ไม่สำเร็จ) */
 const DEFAULT_POLICY_TEXTS: Record<string, string> = {
@@ -59,6 +61,7 @@ const DEFAULT_POLICY_TEXTS: Record<string, string> = {
     NzIconModule,
     NzDatePickerModule,
     NzSelectModule,
+    ApprovalDetailModalComponent,
   ],
   templateUrl: './vehicle.html',
   styleUrl: './vehicle.scss',
@@ -103,6 +106,7 @@ export class VehicleComponent implements OnInit {
 
   selectedRequestId = '';
   selectedRequest: any = null;
+  selectedDetailItem = signal<ApprovalItem | null>(null);
 
   allRequests = signal<any[]>([]);
   listing = createListingState();
@@ -289,6 +293,53 @@ export class VehicleComponent implements OnInit {
     this.selectedRequestId = '';
     this.selectedRequest = '';
     this.loadData();
+  }
+
+  viewRequest(claim: any) {
+    const user = this.authservice.userData() ?? {};
+    const claimId = Number(claim.claimId ?? claim.id);
+
+    this.selectedDetailItem.set({
+      requestId: claimId,
+      requestNo: claim.claimNo ?? claim.voucherNo ?? `#${claimId}`,
+      requestDate: claim.claimDate ?? claim.createDate,
+      requestBy: {
+        name: claim.employeeName ?? user.NAMETH ?? user.NAMEENG ?? claim.employeeCode ?? '-',
+        employeeId: claim.employeeCode ?? user.CODEMPID ?? '-',
+        department: claim.departmentName ?? user.DEPARTMENT ?? '-',
+        company: claim.companyName ?? user.COMPANY_NAME ?? '-',
+        profileImage: claim.employeeImageUrl ?? undefined,
+      },
+      requestType: 'ค่ารถ',
+      typeId: claim.typeId ?? 0,
+      requestDetail: `จำนวน ${claim.details?.length ?? claim.items?.length ?? 0} วัน`,
+      remark: claim.remark ?? '',
+      amount: claim.amount ?? claim.totalAmount ?? 0,
+      status: this.toApprovalStatus(claim.status),
+      rawStatus: claim.status ?? '',
+      type: 'vehicle',
+      originalData: {
+        ...claim,
+        claimID: claim.claimID ?? claim.claimId ?? claim.id,
+      },
+    });
+  }
+
+  closeDetail() {
+    this.selectedDetailItem.set(null);
+  }
+
+  private toApprovalStatus(status: string): 'Pending' | 'Approved' | 'Rejected' | 'Referred Back' {
+    switch (status?.trim().toLowerCase().replace(/[_-]+/g, ' ')) {
+      case 'approved':
+        return 'Approved';
+      case 'rejected':
+        return 'Rejected';
+      case 'referred back':
+        return 'Referred Back';
+      default:
+        return 'Pending';
+    }
   }
 
   clearFilters() {
