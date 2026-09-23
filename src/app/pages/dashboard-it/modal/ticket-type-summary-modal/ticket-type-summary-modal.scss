@@ -1,0 +1,58 @@
+@use '../../../../../styles/variables' as *;
+
+.summary-content {
+  display: grid;
+  gap: 22px;
+  padding: 6px 0 10px;
+}
+
+.summary-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding-bottom: 18px;
+  border-bottom: 1px solid var(--border-toolbar);
+}
+
+.summary-label,
+.section-title {
+  color: var(--text-muted);
+  font-size: $font-size-label;
+}
+
+.summary-value {
+  color: var(--text);
+}
+
+.summary-section {
+  display: grid;
+  gap: 10px;
+}
+
+.section-title {
+  font-weight: 600;
+}
+
+.section-value {
+  color: var(--text);
+  font-size: $font-size-label;
+  font-weight: 600;
+}
+
+.summary-list {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding-left: 22px;
+  color: var(--text);
+  font-size: $font-size-label;
+
+  li::marker {
+    color: var(--primary);
+  }
+}
+
+.empty-text {
+  color: var(--text-muted);
+}

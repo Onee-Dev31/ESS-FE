@@ -1,0 +1,51 @@
+<app-modal-shell
+  title="สรุปประเภทคำขอ"
+  size="sm"
+  [showClose]="true"
+  [mobileFullscreen]="true"
+  (closeModal)="closeModal.emit()"
+>
+  <div class="summary-content">
+    <div class="summary-row">
+      <span class="summary-label">ประเภทคำขอ</span>
+      <strong class="summary-value">{{ ticket.ticketType || '-' }}</strong>
+    </div>
+
+    @if (ticketTypeId === 2) {
+      <div class="summary-section">
+        <div class="section-title">หมวดหมู่ปัญหา</div>
+        <div class="section-value">{{ problemCategory }}</div>
+      </div>
+      <div class="summary-section">
+        <div class="section-title">ปัญหา</div>
+        <div class="section-value">{{ problemSource }}</div>
+      </div>
+    } @else if (ticketTypeId === 3) {
+      <div class="summary-section">
+        <div class="section-title">ระบบพื้นฐาน</div>
+        <ul class="summary-list">
+          @for (service of basicServices; track service.service_type_id ?? service.id) {
+            <li>{{ serviceName(service) }}</li>
+          } @empty {
+            <li class="empty-text">-</li>
+          }
+        </ul>
+      </div>
+      <div class="summary-section">
+        <div class="section-title">ระบบเฉพาะ</div>
+        <ul class="summary-list">
+          @for (service of specificServices; track service.service_type_id ?? service.id) {
+            <li>{{ serviceName(service) }}</li>
+          } @empty {
+            <li class="empty-text">-</li>
+          }
+        </ul>
+      </div>
+    } @else {
+      <div class="summary-section">
+        <div class="section-title">ประเภทค่าใช้จ่าย</div>
+        <div class="section-value">{{ repairCostLabel }}</div>
+      </div>
+    }
+  </div>
+</app-modal-shell>
