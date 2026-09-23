@@ -696,7 +696,28 @@
 }
 
 .btn-edit-sm,
-.btn-icon.edit,
+.btn-icon.edit {
+  width: 40px;
+  height: 40px;
+  min-width: 40px;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--warning);
+  background: var(--bg-card);
+  border: 1px solid var(--warning);
+  border-radius: 10px;
+  cursor: pointer;
+
+  &:hover {
+    color: var(--warning);
+    border-color: var(--warning);
+    background: color-mix(in srgb, var(--warning) 8%, var(--bg-card));
+    box-shadow: 0 3px 8px color-mix(in srgb, var(--warning) 18%, transparent);
+  }
+}
+
 .btn-icon.view {
   @include btn-secondary;
   padding: 8px 12px;
@@ -706,12 +727,19 @@
 
 .btn-delete-sm,
 .btn-icon.delete {
-  @include btn-outline;
-  padding: 8px 12px;
+  width: 40px;
+  height: 40px;
+  min-width: 40px;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   font-size: 0.875rem;
-  height: 36px;
   color: var(--danger);
-  border-color: var(--danger);
+  background: var(--bg-card);
+  border: 1px solid var(--danger);
+  border-radius: 10px;
+  cursor: pointer;
 
   &:hover {
     background: rgba(239, 68, 68, 0.05);

@@ -74,6 +74,12 @@ export class VehicleFormComponent implements OnInit, OnChanges {
   MODE_EDIT: boolean = false;
   isLoading = true;
 
+  get isFormEditable(): boolean {
+    if (!this.MODE_EDIT) return true;
+
+    return ['pending', 'new', 'referred back'].includes(this.normalizeStatus(this.requests?.status));
+  }
+
   ngOnInit(): void {
     this.masterDataService.getDateConfig().subscribe((config) => {
       this.thaiMonths = config.months;
@@ -268,6 +274,8 @@ export class VehicleFormComponent implements OnInit, OnChanges {
     if (this.MODE_EDIT) {
       const payload = {
         claim_id: this.requests.claimId,
+        employee_code: this.authservice.userData().CODEMPID,
+        resubmit: this.normalizeStatus(this.requests?.status) === 'referred back',
         details: selectedLogs,
       };
       this.swalService.confirm('ยืนยันการแก้ไขการเบิก').then((result) => {
@@ -367,5 +375,9 @@ export class VehicleFormComponent implements OnInit, OnChanges {
         });
       }
     });
+  }
+
+  private normalizeStatus(status: string | null | undefined): string {
+    return status?.trim().toLowerCase().replace(/[_-]+/g, ' ') ?? '';
   }
 }

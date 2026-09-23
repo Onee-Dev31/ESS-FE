@@ -53,7 +53,13 @@
       <section class="filter-controls" *ngIf="MODE_EDIT">
         <div class="alert-delete" *ngIf="isDelete()">
           <i class="fa-solid fa-triangle-exclamation"></i>
-          รายการที่ยกเลิก {{ isDelete() }} รายการ จะถูกลบถาวรเมื่อกด "ลบรายการเบิกทั้งหมด"
+          รายการที่ยกเลิก {{ isDelete() }} รายการ จะถูกลบถาวรเมื่อกด "{{
+            !MODE_EDIT
+              ? 'ยืนยันการเบิก'
+              : hasDelete()
+                ? 'ลบรายการเบิกทั้งหมด'
+                : 'ยืนยันการแก้ไขการเบิก'
+          }}"
         </div>
 
         <div class="display-order">
@@ -98,7 +104,7 @@
               [(ngModel)]="log.selected"
               (change)="onToggleCheck(log)"
               class="card-checkbox"
-              [disabled]="log.isDuplicate"
+              [disabled]="log.isDuplicate || !isFormEditable"
               title="เลือกรายการ"
               aria-label="เลือกรายการ"
             />
@@ -132,14 +138,14 @@
               placeholder="ระบุรายละเอียด..."
               [class.is-invalid]="log.selected && !log.description"
               (ngModelChange)="onInputChange(log)"
-              [disabled]="log.isDuplicate"
+              [disabled]="log.isDuplicate || !isFormEditable"
             />
           </div>
         </div>
       </div>
     </main>
 
-    <div class="form-actions">
+    <div class="form-actions" *ngIf="isFormEditable">
       <button class="btn-submit" (click)="onSubmit()" [disabled]="hasInvalid()">
         <i class="fas fa-check"></i>
         {{
