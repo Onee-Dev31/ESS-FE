@@ -76,15 +76,22 @@ export class SettingHrWelfare implements OnInit {
 
   ngOnInit(): void {
     this.loadRows();
+    this.refreshUsedHrCodes();
     this.loadCompanies();
     this.loadHrList();
     this.loadWelfareTypes();
   }
 
+  /** ค้นหาฝั่ง server ตาม filter bar ปัจจุบัน (ค้นหา/HR/ประเภทสวัสดิการ/บริษัท) */
   loadRows(): void {
     this.isLoading.set(true);
     this.masterDataService
-      .getWelfareResponsibilities()
+      .searchWelfareResponsibilities({
+        search: this.searchText().trim() || undefined,
+        hrCodeEmp: this.filterHrCode() ?? undefined,
+        welfareCode: this.filterWelfareType() ?? undefined,
+        companyCode: this.filterCompany() ?? undefined,
+      })
       .pipe(
         catchError(() => {
           this.swalService.error('โหลดข้อมูลไม่สำเร็จ', 'ไม่สามารถดึงข้อมูลผู้รับผิดชอบสวัสดิการได้');
@@ -162,33 +169,7 @@ export class SettingHrWelfare implements OnInit {
       });
   }
 
-  readonly filteredRows = computed(() => {
-    const text = this.searchText().trim().toLowerCase();
-    const hrCode = this.filterHrCode();
-    const welfareType = this.filterWelfareType();
-    const company = this.filterCompany();
-
-    return this.rows().filter((row) => {
-      if (hrCode && row.hrCodeEmp !== hrCode) return false;
-      if (welfareType && !row.welfareCodes.some((c) => this.welfarePartOf(c) === welfareType))
-        return false;
-      if (company && !row.welfareCodes.some((c) => this.companyPartOf(c) === company)) return false;
-      if (text) {
-        const haystack = [
-          row.hrName,
-          ...row.welfareCodes.map((c) => this.welfareNameByCode(c)),
-          ...this.companyCodesOfRow(row),
-          row.remark ?? '',
-        ]
-          .join(' ')
-          .toLowerCase();
-        if (!haystack.includes(text)) return false;
-      }
-      return true;
-    });
-  });
-
-  readonly totalItems = computed(() => this.filteredRows().length);
+  readonly totalItems = computed(() => this.rows().length);
 
   readonly totalPages = computed(() => Math.max(1, Math.ceil(this.totalItems() / this.pageSize())));
 
@@ -196,19 +177,35 @@ export class SettingHrWelfare implements OnInit {
 
   readonly paginatedRows = computed(() => {
     const start = this.currentPage() * this.pageSize();
-    return this.filteredRows().slice(start, start + this.pageSize());
+    return this.rows().slice(start, start + this.pageSize());
   });
+
+  /** HR ที่มีแถวอยู่แล้ว (ไม่ผูกกับ filter ที่กำลังใช้ค้นหาอยู่) — กันเลือกซ้ำตอนเพิ่มใหม่ */
+  readonly usedHrCodes = signal<Set<string>>(new Set());
 
   /** ตัวเลือก HR ในโมดัล — โหมดเพิ่ม: ตัด HR ที่มีแถวอยู่แล้วออก (กันแถวซ้ำคนเดิม, ต้องแก้ไขแถวเดิมแทน)
    * โหมดแก้ไข: เห็นเต็มลิสต์ตามปกติ (มีแค่ตัวเองอยู่แล้วในฟอร์ม) */
   readonly modalHrOptions = computed(() => {
     if (this.editingId() !== null) return this.hrList();
-    const usedCodes = new Set(this.rows().map((r) => r.hrCodeEmp));
+    const usedCodes = this.usedHrCodes();
     return this.hrList().filter((hr) => !usedCodes.has(hr.code));
   });
 
+  private refreshUsedHrCodes(): void {
+    this.masterDataService
+      .searchWelfareResponsibilities({})
+      .pipe(
+        catchError(() => of({ success: false, data: [] as HrWelfareResponsibility[] })),
+        takeUntilDestroyed(this.destroyRef),
+      )
+      .subscribe((res) => {
+        this.usedHrCodes.set(new Set(res.data.map((r) => r.hrCodeEmp)));
+      });
+  }
+
   applyFilter(): void {
     this.currentPage.set(0);
+    this.loadRows();
   }
 
   clearFilter(): void {
@@ -217,6 +214,7 @@ export class SettingHrWelfare implements OnInit {
     this.filterWelfareType.set(null);
     this.filterCompany.set(null);
     this.currentPage.set(0);
+    this.loadRows();
   }
 
   goToPage(page: number): void {
@@ -430,6 +428,7 @@ export class SettingHrWelfare implements OnInit {
         }
         this.isModalOpen.set(false);
         this.loadRows();
+        this.refreshUsedHrCodes();
         this.swalService.success(
           editingId === null
             ? 'เพิ่มผู้รับผิดชอบสวัสดิการสำเร็จ'
@@ -464,6 +463,7 @@ export class SettingHrWelfare implements OnInit {
           return;
         }
         this.loadRows();
+        this.refreshUsedHrCodes();
         this.swalService.success('ลบผู้รับผิดชอบสวัสดิการสำเร็จ');
 
         const maxPage = this.totalPages() - 1;

@@ -19,6 +19,7 @@ import {
   GetWelfareResponsibilityResponse,
   SaveWelfareResponsibilityItem,
   SaveWelfareResponsibilityResponse,
+  SearchWelfareResponsibilityParams,
 } from '../interfaces/hr-welfare.interface';
 import { CompanyWelfarePayload } from '../interfaces/welfare.interface';
 export interface ClaimType {
@@ -180,6 +181,22 @@ export class MasterDataService {
   getWelfareResponsibilities(): Observable<GetWelfareResponsibilityResponse> {
     return this._http.get<GetWelfareResponsibilityResponse>(
       `${this.baseUrl}/welfare/responsibility`,
+    );
+  }
+
+  /** GET api/welfare/responsibility/search — filter ฝั่ง server (search/hrCodeEmp/welfareCode/companyCode),
+   * ไม่ใส่ filter เลย = คืนทุกคนเหมือน getWelfareResponsibilities() */
+  searchWelfareResponsibilities(
+    filters: SearchWelfareResponsibilityParams,
+  ): Observable<GetWelfareResponsibilityResponse> {
+    let params = new HttpParams();
+    if (filters.search) params = params.set('search', filters.search);
+    if (filters.hrCodeEmp) params = params.set('hrCodeEmp', filters.hrCodeEmp);
+    if (filters.welfareCode) params = params.set('welfareCode', filters.welfareCode);
+    if (filters.companyCode) params = params.set('companyCode', filters.companyCode);
+    return this._http.get<GetWelfareResponsibilityResponse>(
+      `${this.baseUrl}/welfare/responsibility/search`,
+      { params },
     );
   }
 

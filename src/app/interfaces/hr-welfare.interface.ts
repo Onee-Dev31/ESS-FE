@@ -10,7 +10,10 @@ export interface HrWelfareResponsibility {
   hrCodeEmp: string;
   adUser: string;
   hrName: string;
+  email: string;
   welfareCodes: string[];
+  /** ชื่อไทยพร้อม prefix บริษัท คู่ตำแหน่งกับ welfareCodes เช่น "[OTD] ค่ารักษาพยาบาล" — มาจาก /search เท่านั้น */
+  welfare?: string[];
   remark: string | null;
   createdBy: string;
   createdDate: string;
@@ -21,6 +24,14 @@ export interface HrWelfareResponsibility {
 export interface GetWelfareResponsibilityResponse {
   success: boolean;
   data: HrWelfareResponsibility[];
+}
+
+/** Query params ของ GET api/welfare/responsibility/search — ไม่ใส่ตัวไหนเลย = คืนทุกคน */
+export interface SearchWelfareResponsibilityParams {
+  search?: string;
+  hrCodeEmp?: string;
+  welfareCode?: string;
+  companyCode?: string;
 }
 
 /** POST body item for api/welfare/responsibility.
