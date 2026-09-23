@@ -39,10 +39,12 @@
               [ngModel]="listing.filterStatus()"
               (ngModelChange)="listing.filterStatus.set($event)"
             >
-              <nz-option nzLabel="ทั้งหมด" nzValue="" />
-              <nz-option nzLabel="กำลังดำเนินการ" nzValue="Pending" />
-              <nz-option nzLabel="ส่งกลับแก้ไข" nzValue="Referred Back" />
-              <nz-option nzLabel="อนุมัติแล้ว" nzValue="Approved" />
+              <nz-option nzLabel="All" nzValue="" />
+              <nz-option nzLabel="New" nzValue="New" />
+              <nz-option nzLabel="Under Approval" nzValue="Under Approval" />
+              <nz-option nzLabel="Approved" nzValue="Approved" />
+              <nz-option nzLabel="Referred Back" nzValue="Referred Back" />
+              <nz-option nzLabel="Rejected" nzValue="Rejected" />
             </nz-select>
           </div>
         </div>
