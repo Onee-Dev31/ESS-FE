@@ -175,7 +175,9 @@ export class ChangeTicketTypeModal implements OnChanges, OnDestroy {
   }
 
   selectType(ticketTypeId: number): void {
-    if (this.isTypeChangeLocked || (ticketTypeId === 3 && !this.isViaEmail)) return;
+    console.log(ticketTypeId);
+    if (this.isTypeChangeLocked) return;
+    // if (this.isTypeChangeLocked || (ticketTypeId === 3 && !this.isViaEmail)) return;
     if (this.selectedTypeId === 1) {
       this.lastRepairCostType = this.repairCostType;
     }
@@ -299,7 +301,8 @@ export class ChangeTicketTypeModal implements OnChanges, OnDestroy {
 
   get canSubmit(): boolean {
     if (this.saving) return false;
-    if (this.isTypeChangeLocked || (this.selectedTypeId === 3 && !this.isViaEmail)) return false;
+    if (this.isTypeChangeLocked) return false;
+    // if (this.isTypeChangeLocked || (this.selectedTypeId === 3 && !this.isViaEmail)) return false;
     if (!this.hasTypeChanged && !this.hasRepairCostChanged && !this.hasProblemDetailsChanged)
       return false;
     if (

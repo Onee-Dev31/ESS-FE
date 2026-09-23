@@ -643,9 +643,7 @@ export class TicketWorkspaceComponent implements OnInit, OnChanges {
       next: (res) => {
         const rows: TeamGroupOption[] = Array.isArray(res) ? res : (res?.data ?? []);
         this.teamGroups.set(
-          rows
-            .filter((group) => group.is_active)
-            .sort((a, b) => a.sort_order - b.sort_order),
+          rows.filter((group) => group.is_active).sort((a, b) => a.sort_order - b.sort_order),
         );
       },
       error: () => this.teamGroups.set([]),
@@ -1591,9 +1589,7 @@ export class TicketWorkspaceComponent implements OnInit, OnChanges {
         myTicket: this.myTicket ? this.authService.userData().AD_USER : null,
         dateFrom,
         dateTo,
-        assignGroupId: this.selectedTeamGroupId
-          ? String(this.selectedTeamGroupId)
-          : undefined,
+        assignGroupId: this.selectedTeamGroupId ? String(this.selectedTeamGroupId) : undefined,
       })
       .pipe(
         finalize(() => {
@@ -2267,10 +2263,10 @@ export class TicketWorkspaceComponent implements OnInit, OnChanges {
       );
       return;
     }
-    if (data.ticketTypeId === 3 && ticket?.viaEmail !== true) {
-      this.swalService.warning('ขอใช้บริการสามารถเลือกได้เฉพาะ Ticket ที่มาจาก Email');
-      return;
-    }
+    // if (data.ticketTypeId === 3 && ticket?.viaEmail !== true) {
+    //   this.swalService.warning('ขอใช้บริการสามารถเลือกได้เฉพาะ Ticket ที่มาจาก Email');
+    //   return;
+    // }
 
     const hasTypeChanged =
       Number(data.ticketTypeId) !== Number(ticket.ticketTypeId ?? ticket.ticket_type_id);
