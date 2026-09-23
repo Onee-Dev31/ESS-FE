@@ -309,6 +309,13 @@ $border-color: var(--border-color);
       }
     }
 
+    th.col-view,
+    td.col-view {
+      width: 56px;
+      min-width: 56px;
+      text-align: center;
+    }
+
     .type-badge {
       display: inline-flex;
       align-items: center;
@@ -399,7 +406,7 @@ $border-color: var(--border-color);
   .modal-overlay {
     @include modal-overlay-styles;
 
-    .modal-container {
+    .modal-container.form-modal-container {
       height: min(760px, 90vh);
 
       @include mobile {

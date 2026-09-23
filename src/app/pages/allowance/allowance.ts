@@ -17,6 +17,7 @@ import { AuthService } from '../../services/auth.service';
 import {
   AllowanceRequest,
   AllowanceItem,
+  MealAllowanceApprovalStep,
   MealAllowanceClaim,
   MealAllowanceRate,
 } from '../../interfaces/allowance.interface';
@@ -43,6 +44,8 @@ import { NzDatePickerModule } from 'ng-zorro-antd/date-picker';
 import { en_US, NzI18nService } from 'ng-zorro-antd/i18n';
 import dayjs from 'dayjs';
 import { AllowanceService } from '../../services/allowance.service';
+import { ApprovalItem } from '../../interfaces/approval.interface';
+import { ApprovalDetailModalComponent } from '../../components/modals/approval-detail-modal/approval-detail-modal';
 
 interface FlatAllowanceRow extends AllowanceItem {
   requestId: string;
@@ -69,6 +72,7 @@ interface FlatAllowanceRow extends AllowanceItem {
     NzInputModule,
     NzIconModule,
     NzDatePickerModule,
+    ApprovalDetailModalComponent,
   ],
   templateUrl: './allowance.html',
   styleUrl: './allowance.scss',
@@ -93,6 +97,7 @@ export class AllowanceComponent implements OnInit {
   rates = signal<MealAllowanceRate[]>([]);
   selectedRequestId = '';
   selectedRequest: any = null;
+  selectedDetailItem = signal<ApprovalItem | null>(null);
 
   allRequests = signal<any[]>([]);
   listing = createListingState();
@@ -162,6 +167,8 @@ export class AllowanceComponent implements OnInit {
   private dataFromApi(res: any) {
     const items = res.data ?? [];
     this.allRequests.set(this.mapApiData(items));
+
+    // สำหรับกดจาก noti /allowance?voucherNo=A2609#0013
     if (this.pendingOpenVoucherNo) {
       const match = this.allRequests().find((r) => r.claimNo === this.pendingOpenVoucherNo);
       if (match) {
@@ -175,30 +182,89 @@ export class AllowanceComponent implements OnInit {
     this.listing.currentPage.set((res.pagination.page ?? 1) - 1);
   }
 
-  private mapApiData(items: any[]): any[] {
-    // console.log('items >> ', items);
-    return items.map((claim: any) => ({
-      id: claim.claimId,
-      claimNo: claim.voucherNo,
+  private mapApiData(items: MealAllowanceClaim[] | null | undefined): any[] {
+    return (items ?? []).map((item) => ({
+      ...item,
+      id: Number(item.claimId ?? 0),
+      claimId: Number(item.claimId ?? 0),
+      claimNo: item.voucherNo ?? '',
       typeId: 0,
-      createDate: claim.createdAt?.split('T')[0] ?? claim.claimDate,
-      status: claim.status,
-      amount: claim.totalAmount,
-      items: (claim.details ?? []).map((d: any) => ({
-        date: d.work_date?.split('T')[0] ?? '',
-        timeIn: d.actual_checkin ?? '',
-        timeOut: d.actual_checkout ?? '',
-        description: d.description ?? '',
-        hours: d.extra_hours ?? 0,
-        amount: d.rate_amount ?? 0,
+      createDate: item.createdAt?.split('T')[0] ?? item.claimDate ?? '',
+      status: this.mapStatus(item.status, item.approvalSteps),
+      amount: Number(item.totalAmount ?? 0),
+      items: (item.details ?? []).map((detail) => ({
+        date: detail.work_date?.split('T')[0] ?? '',
+        timeIn: detail.actual_checkin ?? '',
+        timeOut: detail.actual_checkout ?? '',
+        description: detail.description ?? '',
+        hours: Number(detail.extra_hours ?? 0),
+        amount: Number(detail.rate_amount ?? 0),
         selected: false,
       })),
-
-      ...claim,
+      rejectedAt:
+        item.rejectedAt ??
+        (item as any).rejected_at ??
+        (item as any).rejectedDate ??
+        (item as any).rejected_date ??
+        (item as any).statusUpdatedAt ??
+        (item as any).status_updated_at ??
+        item.updatedAt ??
+        (item as any).updated_at ??
+        null,
     }));
   }
 
-  openModal(claimId?: string) {
+  private mapStatus(
+    status: string | null | undefined,
+    approvalSteps: MealAllowanceApprovalStep[] = [],
+  ): string {
+    if (!status) return '';
+
+    const normalizedStatus = status.trim().toLowerCase().replace(/[_-]+/g, ' ');
+    let displayStatus: string;
+
+    if (normalizedStatus === 'pending') {
+      displayStatus = 'New';
+    } else if (normalizedStatus === 'referred back') {
+      displayStatus = 'Referred Back';
+    } else {
+      displayStatus = normalizedStatus.charAt(0).toUpperCase() + normalizedStatus.slice(1);
+    }
+
+    if (this.isApprovalInProgress(normalizedStatus, approvalSteps)) {
+      return 'Under Approval';
+    }
+
+    return displayStatus;
+  }
+
+  private isApprovalInProgress(
+    status: string,
+    approvalSteps: MealAllowanceApprovalStep[],
+  ): boolean {
+    if (status !== 'pending' || !approvalSteps?.length) return false;
+
+    const stepsByNumber = new Map<number, MealAllowanceApprovalStep[]>();
+    for (const step of approvalSteps) {
+      const stepNo = Number(step.step_no);
+      if (!Number.isFinite(stepNo)) continue;
+      const approvers = stepsByNumber.get(stepNo) ?? [];
+      approvers.push(step);
+      stepsByNumber.set(stepNo, approvers);
+    }
+
+    const steps = [...stepsByNumber.values()];
+    if (!steps.length) return false;
+
+    const isStepApproved = (approvers: MealAllowanceApprovalStep[]) =>
+      approvers.some((step) => step.status?.trim().toLowerCase() === 'approved');
+    const hasApprovedStep = steps.some(isStepApproved);
+    const areAllStepsApproved = steps.every(isStepApproved);
+
+    return hasApprovedStep && !areAllStepsApproved;
+  }
+
+  openModal(claimId?: number) {
     if (claimId) {
       const result = this.allRequests().find((item) => item.id === claimId);
       this.selectedRequest = result;
@@ -207,8 +273,55 @@ export class AllowanceComponent implements OnInit {
     this.isModalOpen = true;
   }
 
-  editRequest(targetId: string) {
+  editRequest(targetId: number) {
     this.openModal(targetId);
+  }
+
+  viewRequest(claim: any) {
+    const user = this.authService.userData() ?? {};
+    const claimId = Number(claim.claimId ?? claim.id);
+
+    this.selectedDetailItem.set({
+      requestId: claimId,
+      requestNo: claim.claimNo ?? claim.voucherNo ?? `#${claimId}`,
+      requestDate: claim.claimDate ?? claim.createDate,
+      requestBy: {
+        name: claim.employeeName ?? user.NAMETH ?? user.NAMEENG ?? claim.employeeCode ?? '-',
+        employeeId: claim.employeeCode ?? user.CODEMPID ?? '-',
+        department: claim.departmentName ?? user.DEPARTMENT ?? '-',
+        company: claim.companyName ?? user.COMPANY_NAME ?? '-',
+        profileImage: claim.employeeImageUrl ?? undefined,
+      },
+      requestType: 'ค่าเบี้ยเลี้ยง',
+      typeId: claim.typeId ?? 0,
+      requestDetail: `จำนวน ${claim.items?.length ?? claim.details?.length ?? 0} รายการ`,
+      remark: claim.remark ?? '',
+      amount: claim.amount ?? claim.totalAmount ?? 0,
+      status: this.toApprovalStatus(claim.status),
+      rawStatus: claim.status ?? '',
+      type: 'allowance',
+      originalData: {
+        ...claim,
+        claimID: claim.claimID ?? claim.claimId ?? claim.id,
+      },
+    });
+  }
+
+  closeDetail() {
+    this.selectedDetailItem.set(null);
+  }
+
+  private toApprovalStatus(status: string): 'Pending' | 'Approved' | 'Rejected' | 'Referred Back' {
+    switch (status?.trim().toLowerCase().replace(/[_-]+/g, ' ')) {
+      case 'approved':
+        return 'Approved';
+      case 'rejected':
+        return 'Rejected';
+      case 'referred back':
+        return 'Referred Back';
+      default:
+        return 'Pending';
+    }
   }
 
   deleteRequest(claim: any) {
@@ -269,6 +382,15 @@ export class AllowanceComponent implements OnInit {
   }
   getStatusClass(status: string) {
     return StatusUtil.getStatusBadgeClaims(status.toLowerCase());
+  }
+
+  isEditableClaim(status: string): boolean {
+    const normalizedStatus = status?.trim().toLowerCase().replace(/[_-]+/g, ' ');
+    return ['pending', 'new', 'referred back'].includes(normalizedStatus);
+  }
+
+  isRejectedClaim(status: string): boolean {
+    return status?.trim().toLowerCase() === 'rejected';
   }
 
   setPageSize(size: number) {

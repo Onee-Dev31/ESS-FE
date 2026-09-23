@@ -110,8 +110,12 @@ export class ItServiceService {
     return this._http.get(`${this.baseUrl}/Master/service-types`);
   }
 
+  getTeamGroups(): Observable<any> {
+    return this._http.get(`${this.baseUrl}/Master/team-groups`);
+  }
+
   getAssignItDropdown(): Observable<any> {
-    return this._http.get(`${this.baseUrl}/Master/assign-dropdown?groupIds=1%2C2%2C3`);
+    return this._http.get(`${this.baseUrl}/Master/assign-dropdown?groupIds=1%2C2%2C3`); // 1,2,3
   }
 
   getOpenFor({
@@ -154,6 +158,7 @@ export class ItServiceService {
     myTicket?: string | null;
     dateFrom?: string;
     dateTo?: string;
+    assignGroupId?: string;
   }): Observable<any> {
     const queryParams: any = {};
 
@@ -170,6 +175,7 @@ export class ItServiceService {
     if (params.myTicket) queryParams.myTicket = params.myTicket;
     if (params.dateFrom) queryParams.dateFrom = params.dateFrom;
     if (params.dateTo) queryParams.dateTo = params.dateTo;
+    if (params.assignGroupId) queryParams.assignGroupId = params.assignGroupId;
 
     // console.log('params >>> ', queryParams);
 

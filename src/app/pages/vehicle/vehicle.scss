@@ -353,10 +353,11 @@
   .modern-table {
     @include modern-table;
 
-    tbody {
-      tr {
-        cursor: pointer;
-      }
+    th.col-view,
+    td.col-view {
+      width: 56px;
+      min-width: 56px;
+      text-align: center;
     }
 
     .type-badge {
@@ -695,7 +696,8 @@
 }
 
 .btn-edit-sm,
-.btn-icon.edit {
+.btn-icon.edit,
+.btn-icon.view {
   @include btn-secondary;
   padding: 8px 12px;
   font-size: 0.875rem;

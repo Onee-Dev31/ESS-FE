@@ -376,10 +376,10 @@ app-empty-state {
   display: none;
   grid-template-columns: repeat(3, 1fr);
 
-  @include large-tablet {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-  }
+  // @include tablet {
+  //   display: grid;
+  //   grid-template-columns: repeat(2, 1fr);
+  // }
 
   @include tablet {
     display: grid;
@@ -582,13 +582,59 @@ app-empty-state {
   display: block;
   overflow-x: auto;
 
-  @include large-tablet {
+  @include tablet {
     display: none;
   }
 }
 
 .modern-table {
   @include modern-table;
+
+  .col-type {
+    width: 190px;
+    min-width: 190px;
+  }
+
+  .col-treatment-date {
+    min-width: 175px;
+  }
+
+  .col-treatment-detail {
+    width: 28%;
+    min-width: 220px;
+  }
+
+  .col-amount {
+    min-width: 110px;
+  }
+
+  .col-status {
+    min-width: 150px;
+  }
+
+  .col-row-actions {
+    width: 140px;
+    min-width: 140px;
+  }
+
+  .col-view {
+    width: 56px;
+    min-width: 56px;
+    text-align: center;
+  }
+
+  @include large-tablet {
+    th,
+    td {
+      padding-right: 14px;
+      padding-left: 14px;
+    }
+
+    .col-type {
+      width: 180px;
+      min-width: 180px;
+    }
+  }
 
   .type-badge {
     display: inline-flex;
@@ -619,6 +665,28 @@ app-empty-state {
     padding: 6px 8px;
     border-radius: 10px;
   }
+}
+
+.treatment-date-range {
+  display: block;
+  margin-bottom: 6px;
+  white-space: nowrap;
+}
+
+.status-cell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  gap: 6px;
+  text-align: center;
+}
+
+.status-date {
+  color: var(--text-muted);
+  font-size: $font-size-hint;
+  white-space: nowrap;
 }
 
 .col-id {
@@ -697,7 +765,8 @@ app-empty-state {
   min-width: 160px;
 
   &__hospital,
-  &__disease {
+  &__disease,
+  &__attachment {
     display: flex;
     align-items: center;
     gap: 7px;
@@ -719,6 +788,14 @@ app-empty-state {
   &__disease {
     color: var(--text-sub);
     font-size: $font-size-hint;
+  }
+
+  &__attachment {
+    justify-content: flex-start;
+
+    .btn-attach {
+      padding: 2px 8px;
+    }
   }
 }
 

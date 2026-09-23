@@ -79,7 +79,7 @@
         <app-skeleton type="card" [rows]="3"></app-skeleton>
       } @else {
         @for (claim of comps.paginatedData(); track trackByRowId($index, claim)) {
-          <div class="claim-card" (click)="openModal(claim.id)" title="คลิกเพื่อดูรายละเอียด">
+          <div class="claim-card" (click)="viewRequest(claim)" title="คลิกเพื่อดูรายละเอียด">
             <div class="claim-card__header">
               <div class="claim-card__type-badge">
                 <span class="ticket-no"><i class="fa-solid fa-taxi"></i> เบิกค่าพาหนะ Taxi</span>
@@ -162,6 +162,7 @@
         <table class="modern-table">
           <thead>
             <tr>
+              <th class="col-view"></th>
               <!-- <th>ประเภท</th> -->
               <th class="claim-count-column">จำนวนรายการ</th>
               <th>รายละเอียดการเบิก</th>
@@ -177,6 +178,12 @@
           <tbody>
             @for (claim of comps.paginatedData(); track trackByRowId($index, claim)) {
               <tr>
+                <td class="text-center col-view">
+                  <button class="btn-icon view" (click)="viewRequest(claim)" title="ดูรายละเอียด">
+                    <i class="far fa-eye"></i>
+                  </button>
+                </td>
+
                 <!-- ประเภท -->
                 <!-- <td>
               <div class="type-badge">
@@ -259,20 +266,12 @@
                         <i class="far fa-trash-alt"></i>
                       </button>
                     </div>
-                  } @else {
-                    <button
-                      class="btn-icon view"
-                      (click)="openModal(claim.id)"
-                      title="ดูรายละเอียด"
-                    >
-                      <i class="far fa-eye"></i>
-                    </button>
                   }
                 </td>
               </tr>
             } @empty {
               <tr>
-                <td colspan="8">
+                <td colspan="9">
                   <app-empty-state
                     title="ไม่พบรายการ"
                     description="ไม่พบรายการที่ตรงกับเงื่อนไขการค้นหา"
@@ -306,9 +305,28 @@
 
   @if (isModalOpen()) {
     <div class="modal-overlay">
-      <div class="modal-container">
+      <div class="modal-container form-modal-container">
         <app-vehicle-taxi-form-v2 [requests]="selectedRequest" (onClose)="closeModal()">
         </app-vehicle-taxi-form-v2>
+      </div>
+    </div>
+  }
+
+  @if (selectedDetailItem(); as item) {
+    <div class="modal-overlay">
+      <div class="modal-container">
+        @defer {
+          <app-approval-detail-modal
+            [approvalItem]="item"
+            [showActions]="false"
+            [showRequesterInfo]="false"
+            (onClose)="closeDetail()"
+          />
+        } @loading {
+          <div class="p-4 text-center">
+            <i class="fas fa-spinner fa-spin fa-2x text-primary p-4"></i>
+          </div>
+        }
       </div>
     </div>
   }

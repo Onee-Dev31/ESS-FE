@@ -34,6 +34,7 @@ export class StatusUtil {
   private static statusMap: Record<string, string> = {
     new: 'new',
     pending: 'progress',
+    'under approval': 'progress',
     approved: 'closed',
     rejected: 'rejected',
     'referred back': 'referred-back',

@@ -111,7 +111,7 @@ export class ApprovalDetailModalComponent implements OnInit {
     if (!status) return 0;
     if (status === 'new') return 1;
     if (status === 'referred back') return 1;
-    if (status === 'pending') return 2;
+    if (status === 'pending' || status === 'under approval') return 2;
     if (status === 'rejected') return 3;
     if (status === 'approved') return 4;
     return 1;

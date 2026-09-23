@@ -34,7 +34,10 @@
             class="progress-line-fill"
             [class.rejected-line]="isRejected()"
             [style.width.%]="
-              Math.min((Math.max(0, currentStepIndex() - 1) / (steps().length - 1)) * 80, 80)
+              Math.min(
+                (Math.max(0, currentStepIndex() - 1) / (steps().length - 1)) * (200 / 3),
+                200 / 3
+              )
             "
           ></div>
 
@@ -84,6 +87,23 @@
               </div>
             </div>
           </div>
+          @if (
+            approvalItem.type === 'medical' &&
+            isReferredBack() &&
+            medicalDetail()?.rejectionReason
+          ) {
+            <div class="referral-reason-card">
+              <div class="referral-reason-card__icon">
+                <i class="fas fa-rotate-left"></i>
+              </div>
+              <div class="referral-reason-card__content">
+                <span class="referral-reason-card__label">เหตุผลที่ส่งกลับ</span>
+                <span class="referral-reason-card__value">
+                  {{ medicalDetail().rejectionReason }}
+                </span>
+              </div>
+            </div>
+          }
         </div>
 
         @if (medicalDetail()) {
@@ -153,7 +173,7 @@
         }
 
         @if (allowanceDetail()) {
-          <div class="medical-info-grid">
+          <div class="medical-info-grid allowance-info-grid">
             @for (step of groupedSteps(); track step.stepNo) {
               <div class="med-info-item">
                 <label><i class="fas fa-user-check"></i> Approve Step {{ step.stepNo }}</label>

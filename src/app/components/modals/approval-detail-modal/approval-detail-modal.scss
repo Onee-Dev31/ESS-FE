@@ -189,8 +189,8 @@
           .progress-line-bg {
             position: absolute;
             top: 24px;
-            left: 10%;
-            right: 10%;
+            left: calc(100% / 6);
+            right: calc(100% / 6);
             height: 4px;
             background: $border-color;
             border-radius: 2px;
@@ -204,7 +204,7 @@
           .progress-line-fill {
             position: absolute;
             top: 24px;
-            left: 10%;
+            left: calc(100% / 6);
             height: 4px;
             background: linear-gradient(
               90deg,
@@ -215,7 +215,7 @@
             z-index: 1;
             transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
             box-shadow: 0 0 8px rgba(var(--green), 0.3);
-            max-width: 80%;
+            max-width: calc(100% * 2 / 3);
 
             @media (max-width: 991px) {
               top: 18px;
@@ -568,6 +568,51 @@
         .s-value.text-success {
           color: var(--green);
         }
+
+      }
+
+      .referral-reason-card {
+        grid-column: 1 / -1;
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+        padding: 12px 14px;
+        border: 1px solid color-mix(in srgb, var(--warning) 28%, transparent);
+        border-radius: 10px;
+        background: color-mix(in srgb, var(--warning) 7%, var(--bg-card));
+
+        &__icon {
+          display: grid;
+          place-items: center;
+          flex: 0 0 30px;
+          width: 30px;
+          height: 30px;
+          border-radius: 50%;
+          color: var(--warning);
+          background: color-mix(in srgb, var(--warning) 15%, transparent);
+        }
+
+        &__content {
+          display: flex;
+          flex-direction: column;
+          min-width: 0;
+          gap: 3px;
+        }
+
+        &__label {
+          color: var(--warning);
+          font-size: $font-size-hint;
+          font-weight: 700;
+        }
+
+        &__value {
+          color: var(--text);
+          font-size: $font-size-label;
+          font-weight: 500;
+          line-height: 1.5;
+          white-space: pre-wrap;
+          overflow-wrap: anywhere;
+        }
       }
     }
 
@@ -581,6 +626,14 @@
       background: var(--bg-table-head);
       border-radius: 12px;
       border: 1px solid var(--border-toolbar);
+
+      &.allowance-info-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+
+        @media (max-width: 900px) {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+      }
 
       @media (max-width: 640px) {
         grid-template-columns: 1fr;
