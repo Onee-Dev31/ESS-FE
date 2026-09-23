@@ -265,7 +265,7 @@ export class ApprovalVehicleComponent {
         department: claim.departmentName ?? '-',
         company: claim.companyName ?? '-',
       },
-      requestType: 'ค่าเบี้ยเลี้ยง',
+      requestType: 'ค่ารถ',
       typeId: claim.expenseTypeId,
       requestDetail: `${claim.expenseTypeName} — ${claim.diseaseName} (${claim.hospitalName})`,
       claimStatus: claim.status,
