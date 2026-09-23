@@ -177,6 +177,10 @@ export class VehicleFormComponent implements OnInit, OnChanges {
     return selectedLogs.length;
   }
 
+  eligibleCount(): number {
+    return this.logs.length;
+  }
+
   totalClaims(): string {
     const selectedLogs = this.logs.filter((log) => log.selected);
     const total = selectedLogs.reduce((sum, log) => sum + (log.amount || 0), 0);

@@ -83,6 +83,10 @@
         </div>
       </section>
 
+      <div class="eligible-summary" aria-live="polite" *ngIf="!MODE_EDIT">
+        รายการที่เบิกได้ <strong>{{ eligibleCount() }}</strong> รายการ
+      </div>
+
       @if (logs.length === 0) {
         <div class="empty-row">
           <i class="fas fa-calendar-times"></i>

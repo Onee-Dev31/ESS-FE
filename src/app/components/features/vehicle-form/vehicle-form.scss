@@ -301,6 +301,27 @@ $col-desc: auto;
   text-align: center;
 }
 
+.eligible-summary {
+  align-self: flex-end;
+  margin: 0 0 12px;
+  padding: 5px 10px;
+  color: var(--primary);
+  background: color-mix(in srgb, var(--primary) 10%, transparent);
+  border-radius: 999px;
+  white-space: nowrap;
+
+  strong {
+    font-size: $font-size-body;
+    font-weight: 800;
+  }
+
+  @include mobile {
+    width: 100%;
+    align-self: stretch;
+    text-align: center;
+  }
+}
+
 // ==========================================
 // Table Styles (from _table.scss)
 // ==========================================
