@@ -67,6 +67,7 @@ export class SettingHrWelfare implements OnInit {
   readonly isSaving = signal(false);
   readonly hasSubmitted = signal(false);
   readonly editingId = signal<number | null>(null);
+  private editingRow: HrWelfareResponsibility | null = null;
   readonly deletingId = signal<number | null>(null);
   form: HrWelfareFormValue = emptyForm();
 
@@ -297,6 +298,7 @@ export class SettingHrWelfare implements OnInit {
 
   openCreate(): void {
     this.editingId.set(null);
+    this.editingRow = null;
     this.hasSubmitted.set(false);
     this.form = emptyForm();
     this.isModalOpen.set(true);
@@ -304,10 +306,11 @@ export class SettingHrWelfare implements OnInit {
 
   openEdit(row: HrWelfareResponsibility): void {
     this.editingId.set(row.id);
+    this.editingRow = row;
     this.hasSubmitted.set(false);
     this.form = {
       hrCodes: [row.hrCodeEmp],
-      welfareTypes: Array.from(new Set(row.welfareCodes.map((c) => this.welfarePartOf(c)))),
+      welfareTypes: this.welfareTypesOfRow(row),
       companies: this.companyCodesOfRow(row),
       note: row.remark ?? '',
     };
@@ -332,15 +335,51 @@ export class SettingHrWelfare implements OnInit {
     return user?.CODEMPID ?? user?.AD_USER ?? '';
   }
 
-  // cross-join บริษัท x ประเภทที่เลือกในฟอร์ม เป็น "CompanyCode-WelfareCode" คั่นด้วย comma
+  // เพิ่มใหม่: cross-join ทุกบริษัท x ทุกประเภทที่เลือก
+  // แก้ไข: คงคู่เดิมที่ยังเลือกอยู่ไว้ (ตัดคู่ที่ uncheck ออก) แล้วจับคู่เฉพาะ "บริษัทใหม่" x
+  // "ประเภทใหม่" ที่เพิ่งเพิ่มเข้ามาเท่านั้น — ไม่ cross กับของเดิม กันเพิ่มคู่ที่ไม่ได้ตั้งใจ
   private buildWelfareCodes(): string {
-    const pairs: string[] = [];
-    for (const company of this.form.companies) {
-      for (const welfareType of this.form.welfareTypes) {
-        pairs.push(`${company}-${welfareType}`);
+    const originalRow = this.editingRow;
+    if (!originalRow) {
+      const pairs: string[] = [];
+      for (const company of this.form.companies) {
+        for (const welfareType of this.form.welfareTypes) {
+          pairs.push(`${company}-${welfareType}`);
+        }
+      }
+      return pairs.join(',');
+    }
+
+    const originalCompanies = this.companyCodesOfRow(originalRow);
+    const originalWelfareTypes = this.welfareTypesOfRow(originalRow);
+
+    const kept = originalRow.welfareCodes.filter((pair) => {
+      const company = this.companyPartOf(pair);
+      const welfareType = this.welfarePartOf(pair);
+      return this.form.companies.includes(company) && this.form.welfareTypes.includes(welfareType);
+    });
+
+    const newCompanies = this.form.companies.filter((c) => !originalCompanies.includes(c));
+    const newWelfareTypes = this.form.welfareTypes.filter((w) => !originalWelfareTypes.includes(w));
+
+    // เพิ่มบริษัทใหม่กับประเภทใหม่พร้อมกัน -> cross เฉพาะใหม่ x ใหม่
+    // เพิ่มแค่ฝั่งเดียว -> cross ฝั่งที่เพิ่มกับ "ทุก" รายการที่เลือกอยู่ของอีกฝั่ง
+    let companiesToAdd = newCompanies;
+    let welfareTypesToAdd = newWelfareTypes;
+    if (newCompanies.length > 0 && newWelfareTypes.length === 0) {
+      welfareTypesToAdd = this.form.welfareTypes;
+    } else if (newWelfareTypes.length > 0 && newCompanies.length === 0) {
+      companiesToAdd = this.form.companies;
+    }
+
+    const added: string[] = [];
+    for (const company of companiesToAdd) {
+      for (const welfareType of welfareTypesToAdd) {
+        added.push(`${company}-${welfareType}`);
       }
     }
-    return pairs.join(',');
+
+    return Array.from(new Set([...kept, ...added])).join(',');
   }
 
   async save(): Promise<void> {
