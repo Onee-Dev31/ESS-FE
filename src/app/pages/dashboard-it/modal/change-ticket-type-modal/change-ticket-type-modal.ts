@@ -16,6 +16,7 @@ import { ModalShellComponent } from '../../../../components/shared/modal-shell/m
 import { IT_ATTACHMENT_FILE_CONFIG } from '../../../../constants/it-attachment-file.constant';
 import { SwalService } from '../../../../services/swal.service';
 import { ItServiceService } from '../../../../services/it-service.service';
+import { AuthService } from '../../../../services/auth.service';
 import {
   FilePreviewItem,
   FilePreviewModalComponent,
@@ -45,6 +46,7 @@ export class ChangeTicketTypeModal implements OnChanges, OnDestroy {
 
   private readonly swalService = inject(SwalService);
   private readonly itService = inject(ItServiceService);
+  private readonly authService = inject(AuthService);
   readonly categories = signal<{ id: number; sub_category_name: string; display_order?: number }[]>(
     [],
   );
@@ -54,12 +56,25 @@ export class ChangeTicketTypeModal implements OnChanges, OnDestroy {
   problemSource: 'user' | 'system' | null = null;
   readonly fileConfig = IT_ATTACHMENT_FILE_CONFIG;
 
-  readonly ticketTypes = [
-    { id: 2, label: 'แจ้งปัญหา' },
-    // ตอน DEPLOY PROD ยังไม่ให้มีแจ้งซ่อม และ ขอใช้บริการ
+  get ticketTypes(): { id: number; label: string }[] {
+    const types = [{ id: 2, label: 'แจ้งปัญหา' }];
+
     // { id: 1, label: 'แจ้งซ่อม' },
-    // { id: 3, label: 'ขอใช้บริการ' },
-  ];
+    if (this.canAccessAdditionalTicketTypes) {
+      types.push({ id: 3, label: 'ขอใช้บริการ' });
+    }
+
+    return types;
+  }
+
+  private get canAccessAdditionalTicketTypes(): boolean {
+    const employeeCode = String(this.authService.userData()?.CODEMPID ?? '')
+      .trim()
+      .toUpperCase();
+    return (
+      employeeCode === 'OTD01125' || employeeCode === 'OTD01128' || employeeCode === 'OTD01050'
+    );
+  }
 
   get isViaEmail(): boolean {
     return this.ticket?.viaEmail === true;
@@ -82,6 +97,7 @@ export class ChangeTicketTypeModal implements OnChanges, OnDestroy {
   }
 
   get availableTicketTypes(): typeof this.ticketTypes {
+    if (this.canAccessAdditionalTicketTypes) return this.ticketTypes;
     return this.isViaEmail ? this.ticketTypes : this.ticketTypes.filter((type) => type.id !== 3);
   }
 
@@ -321,7 +337,8 @@ export class ChangeTicketTypeModal implements OnChanges, OnDestroy {
       ticketTypeId: this.selectedTypeId,
       subCategoryId: this.selectedTypeId === 2 ? this.selectedCategory : null,
       problemSource: this.selectedTypeId === 2 ? this.problemSource : null,
-      subCategoryName: this.categories().find((category) => category.id === this.selectedCategory)?.sub_category_name,
+      subCategoryName: this.categories().find((category) => category.id === this.selectedCategory)
+        ?.sub_category_name,
       ...(this.selectedTypeId === 1 && { repairCostType: this.repairCostType! }),
       reason: this.reason.trim(),
       attachments: this.attachments,
