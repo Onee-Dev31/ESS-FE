@@ -66,7 +66,7 @@ $status-cancelled-text: var(--text-table-head);
 @mixin mobile-cards-view {
   display: none;
 
-  @include large-tablet {
+  @include tablet {
     display: flex !important;
     flex-direction: column;
     gap: 16px;
@@ -325,7 +325,7 @@ $status-cancelled-text: var(--text-table-head);
     display: block;
     overflow-x: auto;
 
-    @include large-tablet {
+    @include tablet {
       display: none;
     }
   }
@@ -343,7 +343,7 @@ $status-cancelled-text: var(--text-table-head);
     // display: grid;
     // grid-template-columns: repeat(4, 1fr);
 
-    @include large-tablet {
+    @include tablet {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
     }
@@ -520,10 +520,76 @@ $status-cancelled-text: var(--text-table-head);
   // ==================== TABLE SECTION ====================
   .modern-table {
     @include modern-table;
+    table-layout: fixed;
+
+    th.col-item,
+    td.col-item {
+      width: 30%;
+      text-align: left !important;
+    }
+
+    th.col-amount,
+    td.col-amount {
+      width: 18%;
+      text-align: right !important;
+      white-space: nowrap;
+    }
+
+    th.col-status,
+    td.col-status {
+      width: 18%;
+      text-align: center !important;
+    }
+
+    th.col-created-date,
+    td.col-created-date {
+      width: 20%;
+      text-align: center !important;
+    }
+
+    th.col-actions,
+    td.col-actions {
+      width: 14%;
+      min-width: 132px;
+      text-align: center;
+    }
+
+    td.col-item {
+      .request-no,
+      .nested-items {
+        width: 100%;
+        text-align: left;
+        align-items: flex-start;
+      }
+    }
+
+    td.col-amount .amount-cell {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      text-align: right;
+    }
+
+    .status-cell {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      gap: 6px;
+      text-align: center;
+    }
+
+    .status-date {
+      color: var(--text-muted);
+      font-size: $font-size-hint;
+      white-space: nowrap;
+    }
 
     tbody {
       tr {
-        cursor: pointer;
+        cursor: default;
       }
     }
 
@@ -870,7 +936,9 @@ $status-cancelled-text: var(--text-table-head);
 
   ::ng-deep .custom-range-picker.ant-picker:not(.ant-picker-focused):hover,
   ::ng-deep
-    nz-input-wrapper.form-input.ant-input-affix-wrapper:not(.ant-input-affix-wrapper-focused):hover {
+    nz-input-wrapper.form-input.ant-input-affix-wrapper:not(
+      .ant-input-affix-wrapper-focused
+    ):hover {
     border-color: var(--text-muted) !important;
     box-shadow: none !important;
   }
@@ -902,20 +970,42 @@ $status-cancelled-text: var(--text-table-head);
 
 .btn-edit-sm,
 .btn-icon.edit {
-  @include btn-secondary;
-  padding: 8px 12px;
-  font-size: 0.875rem;
-  height: 36px;
+  width: 40px;
+  height: 40px;
+  min-width: 40px;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--warning);
+  background: var(--bg-card);
+  border: 1px solid var(--warning);
+  border-radius: 10px;
+  cursor: pointer;
+
+  &:hover {
+    color: var(--warning);
+    border-color: var(--warning);
+    background: color-mix(in srgb, var(--warning) 8%, var(--bg-card));
+    box-shadow: 0 3px 8px color-mix(in srgb, var(--warning) 18%, transparent);
+  }
 }
 
 .btn-delete-sm,
 .btn-icon.delete {
-  @include btn-outline;
-  padding: 8px 12px;
+  width: 40px;
+  height: 40px;
+  min-width: 40px;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   font-size: 0.875rem;
-  height: 36px;
   color: var(--danger);
-  border-color: var(--danger);
+  background: var(--bg-card);
+  border: 1px solid var(--danger);
+  border-radius: 10px;
+  cursor: pointer;
 
   &:hover {
     background: rgba(239, 68, 68, 0.05);
@@ -946,6 +1036,41 @@ $status-cancelled-text: var(--text-table-head);
   display: flex;
   gap: 6px;
   justify-content: center;
+}
+
+.act-btn {
+  width: 40px;
+  height: 40px;
+  min-width: 40px;
+  padding: 0;
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 13px;
+  transition:
+    background 0.15s,
+    color 0.15s,
+    box-shadow 0.15s,
+    transform 0.1s;
+
+  &.act-view {
+    color: var(--text-sub);
+    background: var(--bg-card);
+
+    &:hover {
+      color: var(--primary);
+      background: var(--bg-card);
+      border-color: var(--primary);
+      box-shadow: 0 3px 8px rgba(59, 130, 246, 0.12);
+    }
+  }
+
+  &:active {
+    transform: scale(0.92);
+  }
 }
 
 // ============================================

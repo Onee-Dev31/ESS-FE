@@ -170,7 +170,7 @@
         }
 
         @if (allowanceDetail()) {
-          <div class="medical-info-grid">
+          <div class="medical-info-grid allowance-info-grid">
             @for (step of groupedSteps(); track step.stepNo) {
               <div class="med-info-item">
                 <label><i class="fas fa-user-check"></i> Approve Step {{ step.stepNo }}</label>

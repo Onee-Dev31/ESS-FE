@@ -142,6 +142,16 @@ export interface MealAllowanceClaimDetail {
   description: string;
 }
 
+export interface MealAllowanceApprovalStep {
+  step_no: number;
+  approver_emp_no: string;
+  approver_name: string;
+  status: string;
+  acted_by: string | null;
+  acted_at: string | null;
+  remark: string | null;
+}
+
 export interface MealAllowanceClaim {
   claimId: number;
   voucherNo: string;
@@ -150,6 +160,9 @@ export interface MealAllowanceClaim {
   claimDate: string;
   status: string;
   createdAt: string;
+  updatedAt?: string | null;
+  rejectedAt?: string | null;
+  approvalSteps?: MealAllowanceApprovalStep[];
   details: MealAllowanceClaimDetail[];
 }
 
