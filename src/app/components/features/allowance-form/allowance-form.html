@@ -77,7 +77,15 @@
         <section class="filter-controls" *ngIf="MODE_EDIT && isFormEditable">
           <div class="alert-delete" *ngIf="isDelete()">
             <i class="fa-solid fa-triangle-exclamation"></i>
-            รายการที่ยกเลิก {{ isDelete() }} รายการ จะถูกลบถาวรเมื่อกด "ลบรายการเบิกทั้งหมด"
+            รายการที่ยกเลิก {{ isDelete() }} รายการ จะถูกลบถาวรเมื่อกด "{{
+              !MODE_EDIT
+                ? 'ยืนยันการเบิก'
+                : hasDelete()
+                  ? 'ลบรายการเบิกทั้งหมด'
+                  : requests?.status === 'Referred Back'
+                    ? 'ส่งกลับเพื่ออนุมัติ'
+                    : 'ยืนยันการแก้ไขการเบิก'
+            }}"
           </div>
 
           <div class="display-order">

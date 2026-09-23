@@ -29,6 +29,7 @@ import dayjs from 'dayjs';
 import { NzSelectModule } from 'ng-zorro-antd/select';
 import { ApprovalItem } from '../../interfaces/approval.interface';
 import { ApprovalDetailModalComponent } from '../../components/modals/approval-detail-modal/approval-detail-modal';
+import { VehicleApprovalStep, VehicleClaim } from '../../interfaces/transport.interface';
 
 /** ข้อความ fallback ของ popup เงื่อนไข (ใช้ก่อน API ตอบกลับ หรือถ้าเรียก API ไม่สำเร็จ) */
 const DEFAULT_POLICY_TEXTS: Record<string, string> = {
@@ -229,16 +230,48 @@ export class VehicleComponent implements OnInit {
     this.listing.currentPage.set((res.pagination.page ?? 1) - 1);
   }
 
-  private mapApiData(items: any[]): any[] {
+  private mapApiData(items: VehicleClaim[]): any[] {
     // console.log("items >> ", items)
-    return items.map((item: any) => ({
+    return items.map((item) => ({
+      ...item,
       id: item.claimId,
       claimNo: item.voucherNo,
       createDate: item.claimDate,
-      status: item.status,
+      status: this.mapStatus(item.status, item.approvals ?? []),
       amount: item.totalAmount,
-      ...item,
     }));
+  }
+
+  private mapStatus(
+    status: string | null | undefined,
+    approvals: VehicleApprovalStep[] = [],
+  ): string {
+    if (!status) return '';
+
+    const normalizedStatus = this.normalizeStatus(status);
+    let displayStatus: string;
+
+    if (normalizedStatus === 'pending') {
+      displayStatus = 'New';
+    } else if (normalizedStatus === 'referred back') {
+      displayStatus = 'Referred Back';
+    } else {
+      displayStatus = normalizedStatus.charAt(0).toUpperCase() + normalizedStatus.slice(1);
+    }
+
+    if (this.isApprovalInProgress(normalizedStatus, approvals)) {
+      return 'Under Approval';
+    }
+
+    return displayStatus;
+  }
+
+  private isApprovalInProgress(status: string, approvals: VehicleApprovalStep[]): boolean {
+    if (!['pending', 'new'].includes(status) || !approvals?.length) return false;
+
+    return approvals.some((step) =>
+      ['approved', 'approve'].includes(this.normalizeStatus(step.status)),
+    );
   }
 
   async deleteRequest(claim: any) {
@@ -362,6 +395,14 @@ export class VehicleComponent implements OnInit {
 
   getStatusClass(status: string) {
     return StatusUtil.getStatusBadgeClaims(status.toLowerCase());
+  }
+
+  isEditableClaim(status: string): boolean {
+    return ['pending', 'new', 'referred back'].includes(this.normalizeStatus(status));
+  }
+
+  private normalizeStatus(status: string | null | undefined): string {
+    return status?.trim().toLowerCase().replace(/[_-]+/g, ' ') ?? '';
   }
 
   setPageSize(size: number) {

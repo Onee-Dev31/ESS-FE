@@ -25,3 +25,24 @@ export interface VehicleRequest {
   items: RequestItem[];
   requester?: Requester;
 }
+
+export interface VehicleApprovalStep {
+  stepNo: number;
+  approverEmpNo: string;
+  approverName: string;
+  status: string;
+  actedBy: string | null;
+  actedAt: string | null;
+  remark: string | null;
+}
+
+export interface VehicleClaim {
+  claimId: number;
+  voucherNo: string;
+  employeeCode: string;
+  totalAmount: number;
+  claimDate: string;
+  status: string;
+  approvals: VehicleApprovalStep[];
+  details: any[];
+}
