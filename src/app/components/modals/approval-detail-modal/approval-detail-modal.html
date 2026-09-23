@@ -104,6 +104,22 @@
               </div>
             </div>
           }
+          @if (
+            approvalItem.type !== 'medical' &&
+            referredBackAction() &&
+            getReferredBackReason(referredBackAction().remark);
+            as reason
+          ) {
+            <div class="referral-reason-card">
+              <div class="referral-reason-card__icon">
+                <i class="fas fa-rotate-left"></i>
+              </div>
+              <div class="referral-reason-card__content">
+                <span class="referral-reason-card__label">เหตุผลที่ส่งกลับ</span>
+                <span class="referral-reason-card__value">{{ reason }}</span>
+              </div>
+            </div>
+          }
         </div>
 
         @if (medicalDetail()) {
@@ -183,6 +199,8 @@
                     <div class="approver-done">
                       @if (step.acted.status === 'approved') {
                         <i class="fas fa-check-circle text-success"></i>
+                      } @else if (step.isReferredBack) {
+                        <i class="fas fa-rotate-left text-warning"></i>
                       } @else {
                         <i class="fas fa-times-circle text-danger"></i>
                       }
@@ -268,6 +286,8 @@
                     <div class="approver-done">
                       @if (step.acted.status === 'approved') {
                         <i class="fas fa-check-circle text-success"></i>
+                      } @else if (step.isReferredBack) {
+                        <i class="fas fa-rotate-left text-warning"></i>
                       } @else {
                         <i class="fas fa-times-circle text-danger"></i>
                       }

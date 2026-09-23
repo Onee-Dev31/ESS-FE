@@ -168,12 +168,25 @@ export class ApprovalDetailModalComponent implements OnInit {
     });
 
     return Array.from(map.entries()).map(([stepNo, approvers]) => {
-      const approved = approvers.find((a) => a.status === 'approved');
-      const rejected = approvers.find((a) => a.status === 'rejected');
-      const acted = approved ?? rejected ?? null;
+      const statusOf = (approver: any) => String(approver.status ?? '').trim().toLowerCase();
+      const approved = approvers.find((a) => statusOf(a) === 'approved');
+      const rejected = approvers.find((a) => statusOf(a) === 'rejected');
+      const referredBack = approvers.find(
+        (a) =>
+          ['cancelled', 'canceled'].includes(statusOf(a)) &&
+          String(a.acted_by ?? '').trim().toUpperCase() ===
+            String(a.approver_emp_no ?? '').trim().toUpperCase(),
+      );
+      const acted = approved ?? rejected ?? referredBack ?? null;
 
-      return { stepNo, approvers, acted };
+      return { stepNo, approvers, acted, isReferredBack: acted === referredBack };
     });
+  }
+
+  getReferredBackReason(remark: unknown): string {
+    return String(remark ?? '')
+      .replace(/^ส่งกลับแก้ไข\s*:\s*/i, '')
+      .trim();
   }
 
   groupedSteps = computed(() => {
@@ -185,6 +198,10 @@ export class ApprovalDetailModalComponent implements OnInit {
 
     return [];
   });
+
+  referredBackAction = computed(
+    () => this.groupedSteps().find((step) => step.isReferredBack)?.acted ?? null,
+  );
   // groupedSteps = computed(() => {
   //   const steps = this.allowanceDetail().approvalSteps;
   //   const map = new Map<number, any[]>();
@@ -354,7 +371,7 @@ export class ApprovalDetailModalComponent implements OnInit {
   }
 
   /** ยืนยันการดำเนินการ (อนุมัติ/ปฏิเสธ) พร้อมตรวจสอบว่ามีการระบุเหตุผลหรือไม่ */
-  confirmAction() {
+  async confirmAction(): Promise<void> {
     const item = this.approvalItem;
     const action = this.actionType();
     const reason = this.reasonText();
@@ -364,6 +381,35 @@ export class ApprovalDetailModalComponent implements OnInit {
       this.toastService.warning('กรุณาระบุเหตุผลการไม่อนุมัติ/ยกเลิกเพื่อความชัดเจน');
       return;
     }
+
+    const confirmationText: Record<
+      'Approved' | 'Rejected' | 'Referred Back',
+      { title: string; text: string; confirmButtonText: string }
+    > = {
+      Approved: {
+        title: 'ยืนยันการอนุมัติ?',
+        text: 'เมื่อตกลงแล้ว ระบบจะดำเนินการอนุมัติรายการนี้',
+        confirmButtonText: 'อนุมัติ',
+      },
+      Rejected: {
+        title: 'ยืนยันการไม่อนุมัติ?',
+        text: 'เมื่อตกลงแล้ว ระบบจะไม่อนุมัติรายการนี้ตามเหตุผลที่ระบุ',
+        confirmButtonText: 'ไม่อนุมัติ',
+      },
+      'Referred Back': {
+        title: 'ยืนยันการส่งกลับแก้ไข?',
+        text: 'เมื่อตกลงแล้ว ระบบจะส่งรายการกลับให้ผู้ขอแก้ไขตามเหตุผลที่ระบุ',
+        confirmButtonText: 'ส่งกลับแก้ไข',
+      },
+    };
+    const confirmation = confirmationText[action];
+    const result = await this.swalService.confirm(confirmation.title, confirmation.text, undefined, {
+      confirmButtonText: confirmation.confirmButtonText,
+      cancelButtonText: 'กลับไปตรวจสอบ',
+      focusCancel: true,
+    });
+
+    if (!result.isConfirmed) return;
 
     this.swalService.loading('กำลังบันทึกข้อมูล...');
     switch (item.type) {

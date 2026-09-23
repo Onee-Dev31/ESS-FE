@@ -689,12 +689,17 @@
           color: var(--red);
         }
 
+        .text-warning {
+          color: var(--warning);
+        }
+
         .text-muted {
           color: var(--text-muted);
           font-weight: 400;
           font-size: 0.75rem;
         }
       }
+
     }
 
     // Info requester

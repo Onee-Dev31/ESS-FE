@@ -28,7 +28,7 @@
             <div class="inputs-row">
               <nz-select
                 [(ngModel)]="selectedMonthIndex"
-                (ngModelChange)="generateCalendar()"
+                (ngModelChange)="onPeriodChange()"
                 class="form-input filter-select"
                 title="เลือกเดือน"
                 aria-label="เลือกเดือน"
@@ -39,7 +39,7 @@
               </nz-select>
               <nz-select
                 [(ngModel)]="selectedYearBE"
-                (ngModelChange)="generateCalendar()"
+                (ngModelChange)="onPeriodChange()"
                 class="form-input filter-select"
                 title="เลือกปี"
                 aria-label="เลือกปี"
@@ -74,7 +74,7 @@
         </div>
 
         <!-- update -->
-        <section class="filter-controls" *ngIf="MODE_EDIT && requests.status === 'Referred Back'">
+        <section class="filter-controls" *ngIf="MODE_EDIT && isFormEditable">
           <div class="alert-delete" *ngIf="isDelete()">
             <i class="fa-solid fa-triangle-exclamation"></i>
             รายการที่ยกเลิก {{ isDelete() }} รายการ จะถูกลบถาวรเมื่อกด "ลบรายการเบิกทั้งหมด"
@@ -97,7 +97,7 @@
           </div>
         </section>
         <!-- view only -->
-        <section class="filter-controls" *ngIf="MODE_EDIT && requests.status !== 'Referred Back'">
+        <section class="filter-controls" *ngIf="MODE_EDIT && !isFormEditable">
           <div class="alert-delete" *ngIf="isDelete()">
             <i class="fa-solid fa-triangle-exclamation"></i>
             รายการที่ยกเลิก {{ isDelete() }} รายการ จะถูกลบถาวรเมื่อกด "ลบรายการเบิกทั้งหมด"
@@ -127,6 +127,9 @@
         <div class="legend-item legend-traditional">
           <span class="legend-code">T</span>
           <span>วันหยุดประเพณี</span>
+        </div>
+        <div class="eligible-summary" aria-live="polite">
+          รายการที่เบิกได้ <strong>{{ eligibleCount() }}</strong> รายการ
         </div>
       </div>
 
@@ -208,7 +211,7 @@
                       class="card-checkbox"
                       [(ngModel)]="log.selected"
                       (change)="onToggleCheck(log, descInput)"
-                      [disabled]="!log.isEligible"
+                      [disabled]="!log.isEligible || !isFormEditable"
                     />
                   </label>
                 </td>
@@ -258,6 +261,7 @@
                       placeholder="ระบุรายละเอียด..."
                       [class.is-invalid]="log.selected && !log.description"
                       (ngModelChange)="onInputChange(log)"
+                      [readonly]="!isFormEditable || !log.isEligible"
                     />
                   </div>
                 </td>
@@ -311,7 +315,7 @@
                 <label class="sr-only-label">
                   <span class="sr-only">เลือกวันที่ {{ log.date }}</span>
                   <input
-                    *ngIf="!MODE_EDIT || requests.status === 'Referred Back'"
+                    *ngIf="isFormEditable"
                     type="checkbox"
                     [(ngModel)]="log.selected"
                     (change)="onToggleCheck(log, cardDescInput)"
@@ -346,7 +350,7 @@
               <div class="card-input-section">
                 <label
                   >รายละเอียดการเบิก
-                  @if (log.selected && requests?.status === 'Referred Back') {
+                  @if (log.selected && isFormEditable) {
                     <span class="required">*</span>
                   }
                 </label>
@@ -358,9 +362,7 @@
                   placeholder="ระบุรายละเอียด..."
                   [class.is-invalid]="log.selected && !log.description"
                   (ngModelChange)="onInputChange(log)"
-                  [readonly]="
-                    (MODE_EDIT && requests?.status !== 'Referred Back') || !log.isEligible
-                  "
+                  [readonly]="!isFormEditable || !log.isEligible"
                 />
               </div>
             </div>
@@ -369,7 +371,7 @@
       </div>
     </main>
 
-    <div class="form-actions" *ngIf="requests?.status === 'Referred Back' || !requests">
+    <div class="form-actions" *ngIf="isFormEditable">
       <button class="btn-submit" (click)="onSubmit()" [disabled]="hasInvalid()">
         <i class="fas fa-check"></i>
         {{

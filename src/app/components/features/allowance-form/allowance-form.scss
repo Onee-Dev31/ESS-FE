@@ -371,6 +371,20 @@
     background: var(--status-warning-bg);
   }
 
+  .eligible-summary {
+    margin-left: auto;
+    padding: 5px 10px;
+    color: var(--primary);
+    background: color-mix(in srgb, var(--primary) 10%, transparent);
+    border-radius: 999px;
+    white-space: nowrap;
+
+    strong {
+      font-size: $font-size-body;
+      font-weight: 800;
+    }
+  }
+
   @include mobile {
     align-items: flex-start;
     gap: 8px 12px;
@@ -381,6 +395,12 @@
       padding-bottom: 6px;
       border-right: 0;
       border-bottom: 1px solid var(--border-color);
+    }
+
+    .eligible-summary {
+      width: 100%;
+      margin-left: 0;
+      text-align: center;
     }
   }
 }

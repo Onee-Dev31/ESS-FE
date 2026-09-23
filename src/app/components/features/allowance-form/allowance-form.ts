@@ -66,12 +66,21 @@ export class AllowanceFormComponent implements OnInit, OnChanges {
   years = [this.currentYearBE - 1, this.currentYearBE, this.currentYearBE + 1];
   selectedMonthIndex: number = new Date().getMonth(); // 0-based
   selectedYearBE: number = this.currentYearBE;
+  private loadedMonthIndex: number = this.selectedMonthIndex;
+  private loadedYearBE: number = this.selectedYearBE;
   totalAmount: number = 0;
   totalHoursStr: string = '0.00';
   logs: AllowanceItem[] = [];
 
   MODE_EDIT: boolean = false;
   isLoading = true;
+
+  get isFormEditable(): boolean {
+    if (!this.MODE_EDIT) return true;
+
+    const status = this.requests?.status?.trim().toLowerCase().replace(/[_-]+/g, ' ');
+    return ['pending', 'new', 'referred back'].includes(status);
+  }
 
   get referredBackReason(): string {
     const raw = this.requests?.approvals_json;
@@ -111,6 +120,39 @@ export class AllowanceFormComponent implements OnInit, OnChanges {
   }
 
   loadData() {
+    this.generateCalendar();
+  }
+
+  async onPeriodChange(): Promise<void> {
+    if (
+      this.selectedMonthIndex === this.loadedMonthIndex &&
+      this.selectedYearBE === this.loadedYearBE
+    ) {
+      return;
+    }
+
+    if (this.logs.some((log) => log.selected)) {
+      const result = await this.swalService.confirm(
+        'เปลี่ยนช่วงเวลาที่ต้องการเบิก?',
+        'รายการที่เลือกและข้อมูลที่กรอกไว้จะถูกล้าง จากนั้นระบบจะแสดงข้อมูลตามเดือนและปีที่เลือกใหม่',
+        undefined,
+        {
+          confirmButtonText: 'เปลี่ยนช่วงเวลา',
+          cancelButtonText: 'กลับไปแก้ไข',
+          focusCancel: true,
+        },
+      );
+
+      if (!result.isConfirmed) {
+        this.selectedMonthIndex = this.loadedMonthIndex;
+        this.selectedYearBE = this.loadedYearBE;
+        this.cdr.detectChanges();
+        return;
+      }
+    }
+
+    this.loadedMonthIndex = this.selectedMonthIndex;
+    this.loadedYearBE = this.selectedYearBE;
     this.generateCalendar();
   }
 
@@ -213,6 +255,10 @@ export class AllowanceFormComponent implements OnInit, OnChanges {
     const selectedLogs = this.logs.filter((log) => log.selected);
     const total = selectedLogs.reduce((sum, log) => sum + (log.amount || 0), 0);
     return total.toLocaleString('en-US') + '.-';
+  }
+
+  eligibleCount(): number {
+    return this.logs.filter((log) => log.isEligible).length;
   }
 
   hasDelete(): boolean {
@@ -329,7 +375,7 @@ export class AllowanceFormComponent implements OnInit, OnChanges {
     this.totalHoursStr = `${hours}.${minutes.toString().padStart(2, '0')}`;
   }
 
-  onSubmit() {
+  async onSubmit(): Promise<void> {
     const selectedLogs = this.logs.filter((l) => l.selected);
 
     if (this.MODE_EDIT && selectedLogs.length === 0) {
@@ -388,6 +434,19 @@ export class AllowanceFormComponent implements OnInit, OnChanges {
         });
       return;
     }
+
+    const confirmation = await this.swalService.confirm(
+      'ยืนยันการเบิก?',
+      'กรุณาตรวจสอบรายการและรายละเอียดให้ถูกต้องก่อนยืนยันการเบิก',
+      undefined,
+      {
+        confirmButtonText: 'ยืนยันการเบิก',
+        cancelButtonText: 'กลับไปตรวจสอบ',
+        focusCancel: true,
+      },
+    );
+
+    if (!confirmation.isConfirmed) return;
 
     this.swalService.loading('กำลังบันทึกข้อมูล...');
     this.allowanceService

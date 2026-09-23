@@ -56,7 +56,15 @@ export class SwalService {
     title: string,
     text?: string,
     html?: string,
-    options?: Pick<SweetAlertOptions, 'confirmButtonText' | 'focusCancel' | 'customClass' | 'iconHtml' | 'reverseButtons'>,
+    options?: Pick<
+      SweetAlertOptions,
+      | 'confirmButtonText'
+      | 'cancelButtonText'
+      | 'focusCancel'
+      | 'customClass'
+      | 'iconHtml'
+      | 'reverseButtons'
+    >,
   ) {
     return Swal.fire({
       icon: 'question',
