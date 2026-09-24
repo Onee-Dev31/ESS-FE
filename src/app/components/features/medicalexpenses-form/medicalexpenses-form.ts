@@ -71,6 +71,7 @@ export class MedicalexpensesForm implements OnInit, OnDestroy {
 
   claimTypes: ClaimType[] = [];
   private expenseTypesRaw: MedicalExpenseTypeWithBalance[] = [];
+  private editingExpenseTypeId: number | null = null;
 
   selectedClaimType = signal<string>('');
   claimTypeHighlight = signal<boolean>(false);
@@ -179,9 +180,11 @@ export class MedicalexpensesForm implements OnInit, OnDestroy {
     const hasBackendEligibility =
       typeof type.isSelectable === 'boolean' || typeof type.eligibilityMessage === 'string';
     const blockedByProbation = type.eligibleAfterProbation && probationStatus !== 'passed';
-    const disabled = hasBackendEligibility
-      ? type.isSelectable === false
-      : type.remainingAmount <= 0 || blockedByProbation;
+    const isEditingOriginalType = this.isEditMode() && this.editingExpenseTypeId === type.typeId;
+    const disabled =
+      type.remainingAmount <= 0 ||
+      (!isEditingOriginalType &&
+        (type.isSelectable === false || (!hasBackendEligibility && blockedByProbation)));
     const disabledReason = disabled
       ? backendMessage ||
         (blockedByProbation
@@ -651,7 +654,34 @@ export class MedicalexpensesForm implements OnInit, OnDestroy {
   }
 
   private normalizeLookupText(value: string | null | undefined): string {
-    return String(value ?? '').trim().toLocaleLowerCase('th-TH');
+    return String(value ?? '')
+      .trim()
+      .toLocaleLowerCase('th-TH');
+  }
+
+  private restoreCurrentClaimBalance(expenseTypeId: number, requestedAmount: number): void {
+    const typeIndex = this.expenseTypesRaw.findIndex((type) => type.typeId === expenseTypeId);
+    if (typeIndex < 0 || !Number.isFinite(requestedAmount) || requestedAmount <= 0) return;
+
+    const currentType = this.expenseTypesRaw[typeIndex];
+    const affectedIndexes = new Set([typeIndex]);
+    const currentCode = currentType.code.toUpperCase();
+    const usesOpdBalance = currentType.isSubOfOpd || ['DENTAL', 'VISION'].includes(currentCode);
+
+    if (usesOpdBalance) {
+      const opdIndex = this.expenseTypesRaw.findIndex((type) => type.code.toUpperCase() === 'OPD');
+      if (opdIndex >= 0) affectedIndexes.add(opdIndex);
+    }
+
+    this.expenseTypesRaw = this.expenseTypesRaw.map((type, index) =>
+      affectedIndexes.has(index)
+        ? {
+            ...type,
+            remainingAmount: Number(type.remainingAmount || 0) + requestedAmount,
+          }
+        : type,
+    );
+    this.claimTypes = this.expenseTypesRaw.map((type) => this.mapExpenseType(type));
   }
 
   loadRequestData() {
@@ -662,7 +692,8 @@ export class MedicalexpensesForm implements OnInit, OnDestroy {
           if (res.success && res.data) {
             const claim = res.data;
             this.isEditMode.set(true);
-            this.currentDate.set(this.dateUtil.formatDateToThaiMonth(new Date(claim.createdAt)));
+            this.editingExpenseTypeId = claim.expenseTypeId;
+            this.currentDate.set(this.dateUtil.formatDateToBE(claim.createdAt, 'DD/MM/YYYY'));
 
             this.hospital.set(claim.hospitalName);
             this.selectedHospitalObj.set({
@@ -693,12 +724,14 @@ export class MedicalexpensesForm implements OnInit, OnDestroy {
               totalCount: 1,
             });
 
+            this.restoreCurrentClaimBalance(claim.expenseTypeId, Number(claim.requestedAmount));
             const matchedType = this.expenseTypesRaw.find((t) => t.typeId === claim.expenseTypeId);
             if (matchedType) this.selectedClaimType.set(matchedType.code.toLowerCase());
 
             this.startDate.set(claim.treatmentDateFrom.split('T')[0]);
             this.endDate.set(claim.treatmentDateTo.split('T')[0]);
             this.amount = claim.requestedAmount.toString();
+            this.validateAmountAgainstSelectedClaimType();
             this.remark.set(claim.remark ?? '');
 
             this.attachments.set(
@@ -712,20 +745,26 @@ export class MedicalexpensesForm implements OnInit, OnDestroy {
             this.removedAttachmentIds.set([]);
           } else {
             this.isEditMode.set(false);
-            this.currentDate.set(this.dateUtil.formatDateToThaiMonth(dayjs().toDate()));
+            this.editingExpenseTypeId = null;
+            this.currentDate.set(
+              this.dateUtil.formatDateToBE(dayjs().toISOString(), 'DD/MM/YYYY'),
+            );
             this.resetDates();
           }
           this.isLoading.set(false);
         },
         error: () => {
           this.isEditMode.set(false);
-          this.currentDate.set(this.dateUtil.formatDateToThaiMonth(dayjs().toDate()));
+          this.editingExpenseTypeId = null;
+          this.currentDate.set(
+            this.dateUtil.formatDateToBE(dayjs().toISOString(), 'DD/MM/YYYY'),
+          );
           this.resetDates();
           this.isLoading.set(false);
         },
       });
     } else {
-      this.currentDate.set(this.dateUtil.formatDateToThaiMonth(dayjs().toDate()));
+      this.currentDate.set(this.dateUtil.formatDateToBE(dayjs().toISOString(), 'DD/MM/YYYY'));
       this.resetDates();
       this.isLoading.set(false);
     }
@@ -1099,7 +1138,9 @@ export class MedicalexpensesForm implements OnInit, OnDestroy {
         : null;
   }
 
-  isRequiredInvalid(field: 'claimType' | 'hospital' | 'disease' | 'startDate' | 'endDate' | 'amount'): boolean {
+  isRequiredInvalid(
+    field: 'claimType' | 'hospital' | 'disease' | 'startDate' | 'endDate' | 'amount',
+  ): boolean {
     if (!this.showRequiredErrors()) return false;
 
     switch (field) {
