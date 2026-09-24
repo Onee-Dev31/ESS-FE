@@ -136,14 +136,16 @@
                   <strong>เหตุผล:</strong>
                   {{ request.reason }}
                   @if (request.attachments.length > 0) {
-                    <button
-                      class="attachment-link"
-                      type="button"
-                      (click)="openPreview(request.attachments)"
-                    >
-                      <i class="fas fa-paperclip"></i> เอกสารแนบ
-                      {{ request.attachments.length }} ไฟล์
-                    </button>
+                    <div class="attachment-file">
+                      <i class="fas fa-file"></i>
+                      <button
+                        class="attachment-link"
+                        type="button"
+                        (click)="openPreview(request.attachments)"
+                      >
+                        {{ request.attachments.length }} ไฟล์
+                      </button>
+                    </div>
                   }
                 </div>
 
@@ -180,6 +182,8 @@
           <table class="modern-table">
             <thead>
               <tr>
+                <th class="view-column"></th>
+                <th class="request-column">เลขที่คำขอ</th>
                 <th class="request-column">วันที่ทำรายการ</th>
                 <th class="date-column">ตั้งแต่วันที่</th>
                 <th class="date-column">ถึงวันที่</th>
@@ -203,9 +207,22 @@
                   [id]="'timeoff-request-' + request.request_id"
                   [class.highlight]="highlightedRequestId() === request.request_id"
                 >
+                  <td class="view-column">
+                    <button
+                      class="btn-icon view"
+                      type="button"
+                      title="ดูรายละเอียด"
+                      aria-label="ดูรายละเอียด"
+                      (click)="openForm(request, true)"
+                    >
+                      <i class="far fa-eye"></i>
+                    </button>
+                  </td>
                   <td class="request-meta-cell">
-                    <span class="created-at">{{ formatCreatedAt(getCreatedAt(request)) }}</span>
                     <strong class="leave-number">{{ getLeaveNumber(request) }}</strong>
+                  </td>
+                  <td class="created-at-cell">
+                    {{ formatCreatedAt(getCreatedAt(request)) }}
                   </td>
                   <td class="date-value">
                     {{ dateUtil.formatDateToBE(request.startDate, 'DD/MM/YYYY') }}
@@ -239,17 +256,19 @@
                   <td class="reason-cell">
                     <div>{{ request.reason || '-' }}</div>
                     @if (request.attachments.length > 0) {
-                      <button
-                        class="attachment-link"
-                        type="button"
-                        (click)="openPreview(request.attachments)"
-                      >
-                        <i class="fas fa-paperclip"></i> เอกสารแนบ
-                        {{ request.attachments.length }} ไฟล์
-                      </button>
+                      <div class="attachment-file">
+                        <i class="fas fa-file"></i>
+                        <button
+                          class="attachment-link"
+                          type="button"
+                          (click)="openPreview(request.attachments)"
+                        >
+                          {{ request.attachments.length }} ไฟล์
+                        </button>
+                      </div>
                     }
                   </td>
-                  <td>
+                  <td class="status-cell">
                     <span class="status-badge" [ngClass]="statusMeta.className">
                       {{ statusMeta.label }}
                     </span>
@@ -263,14 +282,6 @@
                         <button class="btn-icon delete" title="ลบ" (click)="deleteRequest(request)">
                           <i class="far fa-trash-alt"></i>
                         </button>
-                      } @else {
-                        <button
-                          class="btn-icon view"
-                          title="ดูรายละเอียด"
-                          (click)="openForm(request)"
-                        >
-                          <i class="far fa-eye"></i>
-                        </button>
                       }
                     </div>
                   </td>
@@ -279,7 +290,7 @@
             } @empty {
               <tbody>
                 <tr>
-                  <td colspan="9" class="no-data-cell">
+                  <td colspan="11" class="no-data-cell">
                     <app-empty-state
                       title="ไม่พบรายการ"
                       description="ไม่พบรายการที่ตรงกับเงื่อนไขการค้นหา"
@@ -321,6 +332,7 @@
         <app-time-off-form
           [requestStatus]="selectedRequestStatus()"
           [request]="selectedRequest()"
+          [viewOnly]="isViewOnly()"
           (onClose)="closeForm()"
         ></app-time-off-form>
       } @loading {

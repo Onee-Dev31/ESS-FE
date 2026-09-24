@@ -10,6 +10,7 @@ import {
   ChangeDetectorRef,
   SimpleChanges,
   NgZone,
+  ElementRef,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -74,11 +75,13 @@ export class TimeOffForm implements OnInit {
   private dateUtil = inject(DateUtilityService);
   private dialogService = inject(DialogService);
   private swalService = inject(SwalService);
+  private elementRef: ElementRef<HTMLElement> = inject(ElementRef);
 
   @Input() initialLeaveTypeId: string = '';
   @Input() requestStatus: string = 'NEW';
   @Input() request: TimeOffRequest | null = null;
   @Input() selectedDate: string = '';
+  @Input() viewOnly = false;
   @Output() onClose = new EventEmitter<void>();
 
   currentDate = signal<string>('');
@@ -92,8 +95,17 @@ export class TimeOffForm implements OnInit {
   leavePeriod = signal<string>('full-day');
   shiftStartTime = signal<Date | null>(this.timeFromMinutes(9 * 60));
   shiftEndTime = signal<Date | null>(this.timeFromMinutes(18 * 60));
-  leaveDays = signal<number | null>(1);
-  leaveDaysInput = signal('1');
+  leaveDays = signal<number | null>(null);
+  leaveDaysInput = signal('');
+  invalidFields = signal({
+    leaveType: false,
+    startDate: false,
+    endDate: false,
+    leaveDays: false,
+    startTime: false,
+    endTime: false,
+    reason: false,
+  });
 
   startDatePickerValue = computed<Date | null>(() => this.toPickerDate(this.startDate()));
   endDatePickerValue = computed<Date | null>(() => this.toPickerDate(this.endDate()));
@@ -253,6 +265,7 @@ export class TimeOffForm implements OnInit {
     const leaveType = this.leaveTypes.find((type) => type.id === id);
     if (!leaveType || this.isLeaveTypeUnavailable(leaveType)) return;
     this.selectedLeaveType.set(id);
+    this.clearInvalidField('leaveType');
     if (this.isFullDayOnlyLeaveType()) {
       this.leavePeriod.set('full-day');
       this.shiftStartTime.set(this.timeFromMinutes(this.shiftStartMinutes()));
@@ -295,6 +308,28 @@ export class TimeOffForm implements OnInit {
     this.setLeaveDays(
       availableDays !== undefined && Number(value) > availableDays ? availableDays : Number(value),
     );
+    if (Number(value) > 0) this.clearInvalidField('leaveDays');
+  }
+
+  clearInvalidField(
+    field:
+      | 'leaveType'
+      | 'startDate'
+      | 'endDate'
+      | 'leaveDays'
+      | 'startTime'
+      | 'endTime'
+      | 'reason',
+  ): void {
+    if (!this.invalidFields()[field]) return;
+    this.invalidFields.update((fields) => ({ ...fields, [field]: false }));
+  }
+
+  private scrollToFirstInvalidField(): void {
+    requestAnimationFrame(() => {
+      const invalidField = this.elementRef.nativeElement.querySelector<HTMLElement>('.field-invalid');
+      invalidField?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    });
   }
 
   private setLeaveDays(value: number | null): void {
@@ -340,12 +375,14 @@ export class TimeOffForm implements OnInit {
   onStartDatePickerChange(value: Date | null) {
     if (!value) return;
     this.startDate.set(dayjs(value).format('YYYY-MM-DD'));
+    this.clearInvalidField('startDate');
     this.onStartDateChange();
   }
 
   onEndDatePickerChange(value: Date | null) {
     if (!value) return;
     this.endDate.set(dayjs(value).format('YYYY-MM-DD'));
+    this.clearInvalidField('endDate');
   }
 
   disableEndDate = (date: Date): boolean => {
@@ -444,40 +481,61 @@ export class TimeOffForm implements OnInit {
   }
 
   async save() {
+    this.invalidFields.set({
+      leaveType: !this.selectedLeaveType(),
+      startDate: !this.startDate(),
+      endDate: !this.endDate(),
+      leaveDays: this.leaveDays() == null,
+      startTime: !this.shiftStartTime(),
+      endTime: !this.shiftEndTime(),
+      reason: !this.reason().trim(),
+    });
+    this.scrollToFirstInvalidField();
+
     if (!this.selectedLeaveType()) {
-      this.toastService.warning('กรุณาเลือกประเภทการลาก่อนดำเนินการต่อ');
+      await this.swalService.warning('ข้อมูลไม่ครบถ้วน', 'กรุณาเลือกประเภทการลา');
       return;
     }
 
     if (!this.startDate() || !this.endDate()) {
-      this.toastService.warning('กรุณาระบุวันที่ลา');
+      await this.swalService.warning('ข้อมูลไม่ครบถ้วน', 'กรุณาระบุวันที่ลา');
       return;
     }
 
     if (!this.dateUtil.isValidDateRange(this.startDate(), this.endDate())) {
-      this.toastService.warning('วันที่เริ่มต้นต้องไม่มากกว่าวันที่สิ้นสุด');
+      this.invalidFields.update((fields) => ({ ...fields, startDate: true, endDate: true }));
+      await this.swalService.warning('ข้อมูลไม่ถูกต้อง', 'วันที่เริ่มต้นต้องไม่มากกว่าวันที่สิ้นสุด');
       return;
     }
 
-    const leaveDays = Number(this.leaveDays());
+    const rawLeaveDays = this.leaveDays();
+    if (rawLeaveDays == null) {
+      await this.swalService.warning('ข้อมูลไม่ครบถ้วน', 'กรุณาระบุจำนวนวันลา');
+      return;
+    }
+
+    const leaveDays = Number(rawLeaveDays);
     if (!Number.isFinite(leaveDays) || leaveDays <= 0) {
-      this.toastService.warning('กรุณาระบุจำนวนวันลาให้มากกว่า 0');
+      this.invalidFields.update((fields) => ({ ...fields, leaveDays: true }));
+      await this.swalService.warning('ข้อมูลไม่ถูกต้อง', 'กรุณาระบุจำนวนวันลาให้มากกว่า 0');
       return;
     }
     if (this.isFullDayOnlyLeaveType() && !Number.isInteger(leaveDays)) {
-      this.toastService.warning('ประเภทการลานี้ระบุได้เฉพาะจำนวนวันเต็ม');
+      this.invalidFields.update((fields) => ({ ...fields, leaveDays: true }));
+      await this.swalService.warning('ข้อมูลไม่ถูกต้อง', 'ประเภทการลานี้ระบุได้เฉพาะจำนวนวันเต็ม');
       return;
     }
     const availableDays = this.getSelectedLeaveTypeAvailableDays();
     if (availableDays !== undefined && leaveDays > availableDays) {
-      this.toastService.warning(`จำนวนวันลาต้องไม่เกินสิทธิ์ที่ใช้ได้ ${availableDays} วัน`);
+      this.invalidFields.update((fields) => ({ ...fields, leaveDays: true }));
+      await this.swalService.warning('ข้อมูลไม่ถูกต้อง', `จำนวนวันลาต้องไม่เกินสิทธิ์ที่ใช้ได้ ${availableDays} วัน`);
       return;
     }
 
     const startTime = this.shiftStartTime();
     const endTime = this.shiftEndTime();
     if (!startTime || !endTime) {
-      this.toastService.warning('กรุณาระบุเวลาเริ่มต้นและเวลาสิ้นสุด');
+      await this.swalService.warning('ข้อมูลไม่ครบถ้วน', 'กรุณาระบุเวลาเริ่มต้นและเวลาสิ้นสุด');
       return;
     }
     if (
@@ -486,18 +544,19 @@ export class TimeOffForm implements OnInit {
       endTime.getHours() * 60 + endTime.getMinutes() <=
         startTime.getHours() * 60 + startTime.getMinutes()
     ) {
-      this.toastService.warning('เวลาสิ้นสุดต้องมากกว่าเวลาเริ่มต้น');
+      this.invalidFields.update((fields) => ({ ...fields, startTime: true, endTime: true }));
+      await this.swalService.warning('ข้อมูลไม่ถูกต้อง', 'เวลาสิ้นสุดต้องมากกว่าเวลาเริ่มต้น');
       return;
     }
 
-    if (!this.reason()) {
-      this.toastService.warning('กรุณาระบุเหตุผลการลา');
+    if (!this.reason().trim()) {
+      await this.swalService.warning('ข้อมูลไม่ครบถ้วน', 'กรุณาระบุเหตุผลการลา');
       return;
     }
 
     const employeeCode = this.getEmployeeCodeFromStorage();
     if (!employeeCode) {
-      this.toastService.warning('ไม่พบรหัสพนักงาน กรุณาเข้าสู่ระบบใหม่');
+      await this.swalService.warning('ไม่พบข้อมูลพนักงาน', 'กรุณาเข้าสู่ระบบใหม่');
       return;
     }
 
@@ -569,6 +628,7 @@ export class TimeOffForm implements OnInit {
   }
 
   isEditableRequest(): boolean {
+    if (this.viewOnly) return false;
     const status = this.normalizeStatus(this.requestStatus);
     return ['NEW', 'SENDBACK', 'SEND_BACK', 'REFERRED_BACK'].includes(status);
   }

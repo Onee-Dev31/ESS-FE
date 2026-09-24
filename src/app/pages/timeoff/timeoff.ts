@@ -85,6 +85,7 @@ export class TimeoffComponent implements OnInit {
   isFormOpen = signal<boolean>(false);
   selectedRequestStatus = signal<string>('คำขอใหม่');
   selectedRequest = signal<TimeOffRequest | null>(null);
+  isViewOnly = signal(false);
 
   listing = createListingState();
   readonly currentFilterYear = new Date().getFullYear();
@@ -337,15 +338,17 @@ export class TimeoffComponent implements OnInit {
   }
 
   /** เปิดฟอร์มสำหรับยื่นคำขอลาใหม่ */
-  openForm(request?: TimeOffRequest) {
+  openForm(request?: TimeOffRequest, viewOnly = false) {
     this.selectedRequest.set(request ?? null);
     this.selectedRequestStatus.set(request?.status ?? 'NEW');
+    this.isViewOnly.set(viewOnly);
     this.isFormOpen.set(true);
   }
 
   closeForm() {
     this.isFormOpen.set(false);
     this.selectedRequest.set(null);
+    this.isViewOnly.set(false);
     this.loadRequests();
   }
 
