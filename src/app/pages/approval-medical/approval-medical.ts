@@ -15,7 +15,6 @@ import { ApprovalItem } from '../../interfaces/approval.interface';
 import { MedicalApproveClaim } from '../../interfaces/medical.interface';
 import { MedicalService } from '../../services/medical.service';
 import { DateUtilityService } from '../../services/date-utility.service';
-import { ExportService } from '../../services/export';
 import { ToastService } from '../../services/toast';
 import { LoadingService } from '../../services/loading';
 import { ErrorService } from '../../services/error';
@@ -62,7 +61,6 @@ export class ApprovalMedicalComponent implements OnInit {
   private authService = inject(AuthService);
   private route = inject(ActivatedRoute);
   dateUtil = inject(DateUtilityService);
-  private exportService = inject(ExportService);
   private toastService = inject(ToastService);
   private loadingService = inject(LoadingService);
   private errorService = inject(ErrorService);
@@ -74,7 +72,6 @@ export class ApprovalMedicalComponent implements OnInit {
 
   approvals = signal<ApprovalItem[]>([]);
   selectedItems = signal<Set<number>>(new Set());
-  showExportMenu = signal<boolean>(false);
 
   listing = createListingState();
   Comps = createListingComputeds(this.approvals, this.listing);
@@ -311,26 +308,8 @@ export class ApprovalMedicalComponent implements OnInit {
     this.listing.currentPage.set(0);
   }
 
-  toggleExportMenu() {
-    this.showExportMenu.set(!this.showExportMenu());
-  }
-
-  async exportPDF() {
-    this.showExportMenu.set(false);
-    this.loadingService.start('export');
-    try {
-      await this.exportService.exportToPDF('approvals-table', 'approvals');
-      this.toastService.success('Export PDF สำเร็จ');
-    } catch (error) {
-      this.errorService.handle(error, { component: 'Approvals', action: 'export-pdf' });
-    } finally {
-      this.loadingService.stop('export');
-    }
-  }
-
   async exportExcel() {
     // console.log(this.selectedItems());
-    this.showExportMenu.set(false);
     this.loadingService.start('export');
 
     const adUser = this.authService.currentUser() || '';
@@ -382,19 +361,6 @@ export class ApprovalMedicalComponent implements OnInit {
         this.loadingService.stop('export');
       },
     });
-  }
-
-  print() {
-    this.showExportMenu.set(false);
-    this.loadingService.start('export');
-    try {
-      this.exportService.printElement('approvals-table');
-      this.toastService.success('เปิดหน้าพิมพ์แล้ว');
-    } catch (error) {
-      this.errorService.handle(error, { component: 'Approvals', action: 'print' });
-    } finally {
-      this.loadingService.stop('export');
-    }
   }
 
   get currentTabItems() {
