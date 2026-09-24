@@ -197,6 +197,10 @@ export class ApprovalDetailModalComponent implements OnChanges {
     const isRequester = this.mode === 'requester';
 
     switch (this.normalizedStatus()) {
+      case 'new':
+        return isRequester
+          ? { label: 'New', className: 'new' }
+          : { label: 'pending', className: 'under-approval' };
       case 'approved':
         return { label: isRequester ? 'Approved' : 'approved', className: 'approved' };
       case 'referred back':
@@ -466,7 +470,7 @@ export class ApprovalDetailModalComponent implements OnChanges {
       return;
     }
 
-    this.taxiDetail.set(claim);
+    this.taxiDetail.set(claim); //ใช้ค่าจาก GetTaxiClaimsForApprover เลย
 
     const empCode = claim.employeeCode;
     if (empCode) {

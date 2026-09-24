@@ -316,9 +316,6 @@
                       <span class="status-badge" [ngStyle]="getStatusClass(req.status)">
                         {{ req.status | statusLabel }}
                       </span>
-                      @if (req.isWaitingHrApproval) {
-                        <span class="waiting-hr-status">รอ HR อนุมัติ</span>
-                      }
                     </div>
                   </td>
                   <td>

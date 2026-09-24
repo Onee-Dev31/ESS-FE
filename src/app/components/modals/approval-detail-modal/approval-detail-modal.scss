@@ -432,6 +432,11 @@
         background: #fff0df;
       }
 
+      &.new {
+        color: var(--primary);
+        background: var(--status-new-bg);
+      }
+
       &.approved {
         color: #0f9d58;
         background: #dff5ed;

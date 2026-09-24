@@ -159,12 +159,11 @@ export class ApprovalTaxiComponent implements OnInit {
     const voucherNo = claim.voucherNo ?? claim.voucher_no;
     const claimDate = claim.claimDate ?? claim.claim_date;
     const employeeCode = claim.employeeCode ?? claim.employee_code;
-    const employeeName = claim.NAMETHAI ?? claim.employee_name;
-    const departmentName = claim.departmentName ?? claim.department_name;
+    const employeeName = claim.firstname + ' ' + claim.lastname;
+    const departmentName = claim.department;
     const companyName = claim.companyName ?? claim.company_name;
     const totalAmount = claim.totalAmount ?? claim.total_amount ?? 0;
     const backendStatus = this.mapClaimStatus(claim.status);
-    const isWaitingHrApproval = displayStatus === 'Approved' && backendStatus === 'Pending';
     const employeeImageUrl = employeeCode
       ? `https://empimg.oneeclick.co:8048/employeeimage/${encodeURIComponent(employeeCode)}.jpg`
       : '';
@@ -198,7 +197,7 @@ export class ApprovalTaxiComponent implements OnInit {
       requestNo: voucherNo ?? `#${claimId}`,
       requestDate: claimDate,
       requestBy: {
-        name: employeeName ?? employeeCode,
+        name: employeeName,
         employeeId: employeeCode,
         department: departmentName ?? '-',
         company: companyName ?? '-',
@@ -209,9 +208,8 @@ export class ApprovalTaxiComponent implements OnInit {
       remark: claim.remark ?? claim.rejection_reason ?? '',
       amount: totalAmount,
       status: displayStatus ?? backendStatus,
-      rawStatus: (isWaitingHrApproval ? 'Approved' : backendStatus).toLowerCase(),
-      claimStatus: (isWaitingHrApproval ? 'Pending' : backendStatus).toLowerCase(),
-      isWaitingHrApproval,
+      rawStatus: backendStatus.toLowerCase(),
+      claimStatus: backendStatus.toLowerCase(),
       type: 'taxi',
       employeeImageUrl,
       originalData: {
