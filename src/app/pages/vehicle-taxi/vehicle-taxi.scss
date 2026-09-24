@@ -753,12 +753,22 @@ $border-color: var(--border-color);
 }
 
 .btn-edit-sm,
-.btn-icon.edit,
+.btn-icon.edit {
+  @include btn-secondary;
+  padding: 8px 12px;
+  font-size: 0.875rem;
+  height: 36px;
+  color: var(--success);
+  border: 1px solid var(--success);
+}
+
 .btn-icon.view {
   @include btn-secondary;
   padding: 8px 12px;
   font-size: 0.875rem;
   height: 36px;
+  color: var(--primary);
+  border-color: var(--primary);
 }
 
 .btn-delete-sm,

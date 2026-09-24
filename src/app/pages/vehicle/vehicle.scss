@@ -704,17 +704,17 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  color: var(--warning);
+  color: var(--success);
   background: var(--bg-card);
-  border: 1px solid var(--warning);
+  border: 1px solid var(--success);
   border-radius: 10px;
   cursor: pointer;
 
   &:hover {
-    color: var(--warning);
-    border-color: var(--warning);
-    background: color-mix(in srgb, var(--warning) 8%, var(--bg-card));
-    box-shadow: 0 3px 8px color-mix(in srgb, var(--warning) 18%, transparent);
+    color: var(--success);
+    border-color: var(--success);
+    background: color-mix(in srgb, var(--success) 8%, var(--bg-card));
+    box-shadow: 0 3px 8px color-mix(in srgb, var(--success) 18%, transparent);
   }
 }
 
@@ -723,6 +723,8 @@
   padding: 8px 12px;
   font-size: 0.875rem;
   height: 36px;
+  color: var(--primary);
+  border-color: var(--primary);
 }
 
 .btn-delete-sm,
