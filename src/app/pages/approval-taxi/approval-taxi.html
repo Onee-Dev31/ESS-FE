@@ -1,23 +1,6 @@
 <div class="approvals-wrapper">
   <app-page-header [title]="pageTitle()">
     <div class="utility-btns">
-      <div class="export-dropdown">
-        <button type="button" class="btn-outline" (click)="toggleExportMenu()">
-          <i class="fas fa-download mr-1"></i> <span class="btn-text">Export</span>
-          <i class="fas fa-chevron-down ml-1"></i>
-        </button>
-        <div class="dropdown-menu" [class.show]="showExportMenu()">
-          <button type="button" class="dropdown-item" (click)="exportPDF()">
-            <i class="fas fa-file-pdf text-danger"></i> Export PDF
-          </button>
-          <button type="button" class="dropdown-item" (click)="exportExcel()">
-            <i class="fas fa-file-excel text-success"></i> Export Excel
-          </button>
-          <button type="button" class="dropdown-item" (click)="print()">
-            <i class="fas fa-print text-secondary"></i> Print
-          </button>
-        </div>
-      </div>
       <button type="button" class="btn-outline" (click)="refresh()" [disabled]="isRefreshing()">
         <i [class]="isRefreshing() ? 'fas fa-spinner fa-spin mr-1' : 'fas fa-sync-alt mr-1'"></i>
         <span class="btn-text">Refresh</span>
@@ -51,31 +34,20 @@
           </button>
         }
       </div>
-    </div>
 
-    <div class="bulk-toolbar">
-      <label class="checkbox-custom">
-        <input
-          type="checkbox"
-          [checked]="isAllSelected()"
-          [indeterminate]="isSomeSelected()"
-          (change)="toggleSelectAll($event)"
-        />
-        <span class="checkmark"></span>
-        <span class="toolbar-label">
-          {{ isSomeSelected() || isAllSelected() ? 'ยกเลิกการเลือก' : 'เลือกทั้งหมด' }}
-        </span>
-      </label>
-
-      @if (selectedItems().size > 0) {
-        <div class="toolbar-divider"></div>
-
-        <button class="toolbar-btn btn-export" (click)="exportExcel()">
-          <i class="fas fa-file-excel"></i> Export Excel
-        </button>
-
-        <span class="selected-count">เลือก {{ selectedItems().size }} รายการ</span>
-      }
+      <div class="status-filter">
+        <nz-select
+          class="status-select"
+          [ngModel]="listing.filterStatus()"
+          (ngModelChange)="setActiveTab($event)"
+          aria-label="Filter approval status"
+          nzShowArrow
+        >
+          @for (tab of taxiTabs; track tab) {
+            <nz-option [nzValue]="tab" [nzLabel]="tab + ' (' + getTabCount(tab) + ')'"></nz-option>
+          }
+        </nz-select>
+      </div>
     </div>
 
     <div class="claim-cards-grid">
@@ -88,15 +60,6 @@
             <div class="claim-card">
               <div class="claim-card__header">
                 <div class="claim-card__type-badge">
-                  <label class="checkbox-custom">
-                    <input
-                      type="checkbox"
-                      aria-label="เลือกรายการ"
-                      [checked]="isChecked(req.requestId)"
-                      (change)="toggleSelect(req.requestId, $any($event.target).checked)"
-                    />
-                    <span class="checkmark"></span>
-                  </label>
                   <i class="fa-solid fa-taxi"></i>{{ req.requestNo }}
                 </div>
                 <div class="claim-card__actions">
@@ -257,15 +220,6 @@
                 <tr>
                   <td>
                     <div class="emp-cell">
-                      <label class="checkbox-custom">
-                        <input
-                          type="checkbox"
-                          aria-label="เลือกรายการ"
-                          [checked]="isChecked(req.requestId)"
-                          (change)="toggleSelect(req.requestId, $any($event.target).checked)"
-                        />
-                        <span class="checkmark"></span>
-                      </label>
                       <img
                         class="emp-avatar"
                         [src]="req.employeeImageUrl"

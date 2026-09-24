@@ -15,7 +15,6 @@ import { ApprovalItem } from '../../interfaces/approval.interface';
 import { MedicalApproveClaim } from '../../interfaces/medical.interface';
 import { MedicalService } from '../../services/medical.service';
 import { DateUtilityService } from '../../services/date-utility.service';
-import { ExportService } from '../../services/export';
 import { ToastService } from '../../services/toast';
 import { LoadingService } from '../../services/loading';
 import { ErrorService } from '../../services/error';
@@ -30,6 +29,7 @@ import dayjs from 'dayjs';
 import { MONTHS_TH } from '../../constants/date.constant';
 import { StatusUtil } from '../../utils/status.util';
 import { NzInputModule } from 'ng-zorro-antd/input';
+import { NzSelectModule } from 'ng-zorro-antd/select';
 import { PaginationComponent } from '../../components/shared/pagination/pagination';
 import { AuthService } from '../../services/auth.service';
 import { environment } from '../../../environments/environment';
@@ -48,6 +48,7 @@ import { environment } from '../../../environments/environment';
     EmptyStateComponent,
     StatusLabelPipe,
     NzInputModule,
+    NzSelectModule,
     PaginationComponent,
   ],
   animations: [listAnimation],
@@ -60,7 +61,6 @@ export class ApprovalMedicalComponent implements OnInit {
   private authService = inject(AuthService);
   private route = inject(ActivatedRoute);
   dateUtil = inject(DateUtilityService);
-  private exportService = inject(ExportService);
   private toastService = inject(ToastService);
   private loadingService = inject(LoadingService);
   private errorService = inject(ErrorService);
@@ -72,7 +72,6 @@ export class ApprovalMedicalComponent implements OnInit {
 
   approvals = signal<ApprovalItem[]>([]);
   selectedItems = signal<Set<number>>(new Set());
-  showExportMenu = signal<boolean>(false);
 
   listing = createListingState();
   Comps = createListingComputeds(this.approvals, this.listing);
@@ -163,7 +162,8 @@ export class ApprovalMedicalComponent implements OnInit {
       requestNo: claim.voucherNo ?? `#${claim.claimID}`,
       requestDate: claim.claimDate,
       requestBy: {
-        name: claim.employeeName,
+        name: claim.employeeFirstName + ' ' + claim.employeeLastName,
+        // name: claim.employeeName,
         employeeId: claim.employeeCode,
         department: claim.departmentName,
         company: claim.companyName,
@@ -192,6 +192,58 @@ export class ApprovalMedicalComponent implements OnInit {
       default:
         return 'Pending';
     }
+  }
+
+  getHrActionName(claim: MedicalApproveClaim): string {
+    const source = claim as any;
+    const targetStatus = String(claim.approverStepStatus ?? claim.status ?? '')
+      .trim()
+      .toLowerCase();
+    if (!['approved', 'rejected', 'referred_back', 'referred back'].includes(targetStatus)) {
+      return '';
+    }
+
+    const steps: any[] = source.approvalSteps ?? source.approval_steps ?? [];
+    const actionStep = [...steps]
+      .filter((step) => {
+        const stepStatus = String(step.status ?? '').trim().toLowerCase();
+        const sameStatus =
+          stepStatus === targetStatus ||
+          (targetStatus.startsWith('referred') && ['cancelled', 'canceled'].includes(stepStatus));
+        return sameStatus && !!(step.acted_at ?? step.actedAt);
+      })
+      .sort((a, b) => {
+        const timeDiff =
+          new Date(b.acted_at ?? b.actedAt).getTime() -
+          new Date(a.acted_at ?? a.actedAt).getTime();
+        return timeDiff || Number(b.step_no ?? b.stepNo ?? 0) - Number(a.step_no ?? a.stepNo ?? 0);
+      })[0];
+
+    if (actionStep) {
+      const firstName = actionStep.approver_first_name ?? actionStep.approverFirstName ?? '';
+      const nickname = actionStep.approver_nickname ?? actionStep.approverNickname ?? '';
+      const displayName =
+        actionStep.acted_by_name ??
+        actionStep.actedByName ??
+        actionStep.approver_name ??
+        actionStep.approverName;
+      if (displayName) return String(displayName);
+
+      const composedName = [firstName, nickname ? `(${nickname})` : '']
+        .filter(Boolean)
+        .join(' ');
+      return composedName || actionStep.acted_by || actionStep.actedBy || '';
+    }
+
+    return (
+      source.hrApproverName ??
+      source.actionedByName ??
+      source.approvedByName ??
+      source.reviewedByName ??
+      source.approvedBy ??
+      source.reviewedBy ??
+      ''
+    );
   }
 
   refresh() {
@@ -309,26 +361,8 @@ export class ApprovalMedicalComponent implements OnInit {
     this.listing.currentPage.set(0);
   }
 
-  toggleExportMenu() {
-    this.showExportMenu.set(!this.showExportMenu());
-  }
-
-  async exportPDF() {
-    this.showExportMenu.set(false);
-    this.loadingService.start('export');
-    try {
-      await this.exportService.exportToPDF('approvals-table', 'approvals');
-      this.toastService.success('Export PDF สำเร็จ');
-    } catch (error) {
-      this.errorService.handle(error, { component: 'Approvals', action: 'export-pdf' });
-    } finally {
-      this.loadingService.stop('export');
-    }
-  }
-
   async exportExcel() {
     // console.log(this.selectedItems());
-    this.showExportMenu.set(false);
     this.loadingService.start('export');
 
     const adUser = this.authService.currentUser() || '';
@@ -380,19 +414,6 @@ export class ApprovalMedicalComponent implements OnInit {
         this.loadingService.stop('export');
       },
     });
-  }
-
-  print() {
-    this.showExportMenu.set(false);
-    this.loadingService.start('export');
-    try {
-      this.exportService.printElement('approvals-table');
-      this.toastService.success('เปิดหน้าพิมพ์แล้ว');
-    } catch (error) {
-      this.errorService.handle(error, { component: 'Approvals', action: 'print' });
-    } finally {
-      this.loadingService.stop('export');
-    }
   }
 
   get currentTabItems() {

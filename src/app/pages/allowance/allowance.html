@@ -89,6 +89,25 @@
                 <span class="status-badge" [ngStyle]="getStatusClass(claim.status)">
                   {{ claim.status | statusLabel }}
                 </span>
+              </div>
+            </div>
+
+            <div class="claim-card__body">
+              <div class="claim-card__main">จำนวน {{ claim.items.length }} รายการ</div>
+
+              <div class="claim-card__amount">
+                <span class="amount-label">ขอเบิก</span>
+                <span class="amount-value">฿{{ claim.amount | number: '1.2-2' }}</span>
+                <!-- @if (claim.approvedAmount > 0) {
+            <span class="amount-approved">อนุมัติ ฿{{ claim.approvedAmount | number:'1.2-2' }}</span>
+            } -->
+              </div>
+            </div>
+            <div class="claim-card__footer">
+              <span class="claim-date-created">{{
+                dateUtil.formatDateToBE(claim.createDate, 'DD MMM YYYY')
+              }}</span>
+              <div class="claim-card__footer-actions">
                 <button
                   type="button"
                   class="act-btn act-view"
@@ -117,23 +136,6 @@
                   </button>
                 }
               </div>
-            </div>
-
-            <div class="claim-card__body">
-              <div class="claim-card__main">จำนวน {{ claim.items.length }} รายการ</div>
-
-              <div class="claim-card__amount">
-                <span class="amount-label">ขอเบิก</span>
-                <span class="amount-value">฿{{ claim.amount | number: '1.2-2' }}</span>
-                <!-- @if (claim.approvedAmount > 0) {
-            <span class="amount-approved">อนุมัติ ฿{{ claim.approvedAmount | number:'1.2-2' }}</span>
-            } -->
-              </div>
-            </div>
-            <div class="claim-card__footer">
-              <span class="claim-date-created">{{
-                dateUtil.formatDateToBE(claim.createDate, 'DD MMMM YYYY')
-              }}</span>
             </div>
           </div>
         } @empty {
@@ -212,7 +214,7 @@
                 <!-- ข้อมูลเพิ่มเติม -->
                 <td class="col-created-date">
                   <div class="sub-text">
-                    {{ dateUtil.formatDateToBE(claim.createDate, 'DD MMM YYYY') }}
+                    {{ dateUtil.formatDateToBE(claim.createDate, 'DD MMMM YYYY') }}
                   </div>
                 </td>
                 <td class="col-actions" (click)="$event.stopPropagation()">

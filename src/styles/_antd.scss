@@ -328,6 +328,9 @@ nz-range-picker {
   background-color: var(--input-bg);
   border-radius: 10px !important;
   width: 300px;
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
 }
 
 /* input text */

@@ -54,12 +54,6 @@ $border: var(--border);
   }
 }
 
-@mixin tablet {
-  @media (max-width: 1024px) {
-    @content;
-  }
-}
-
 // Content Card Mixin
 @mixin content-card {
   background: var(--bg-card);
@@ -568,6 +562,7 @@ $border: var(--border);
   .export-button {
     display: inline-flex;
     align-items: center;
+    justify-content: center;
     gap: 7px;
     height: 36px;
     padding: 0 14px;
@@ -590,6 +585,16 @@ $border: var(--border);
     &:disabled {
       opacity: 0.5;
       cursor: not-allowed;
+    }
+
+    @include mobile {
+      width: 40px;
+      height: 40px;
+      padding: 0;
+
+      .export-text {
+        display: none;
+      }
     }
   }
 
@@ -681,6 +686,10 @@ $border: var(--border);
       width: 100%;
     }
 
+    @include mobile {
+      display: none;
+    }
+
     .tab-item {
       padding: 8px 16px;
       border-radius: 8px;
@@ -721,6 +730,8 @@ $border: var(--border);
       }
     }
   }
+
+  @include mobile-status-select;
 
   // ==================== SEARCH BOX ====================
   .search-box {
@@ -1169,6 +1180,16 @@ $border: var(--border);
 
     .btn-text {
       line-height: 1;
+    }
+
+    @include mobile {
+      width: 40px;
+      height: 40px;
+      padding: 0;
+
+      i {
+        margin: 0 !important;
+      }
     }
 
     &:hover {

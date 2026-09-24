@@ -41,6 +41,23 @@
             </button>
           }
         </div>
+
+        <div class="status-filter">
+          <nz-select
+            class="status-select"
+            [ngModel]="listing.filterStatus()"
+            (ngModelChange)="setActiveTab($event)"
+            aria-label="Filter approval status"
+            nzShowArrow
+          >
+            @for (tab of tabs; track tab.value) {
+              <nz-option
+                [nzValue]="tab.value"
+                [nzLabel]="tab.label + ' (' + getTabCount(tab.value) + ')'"
+              ></nz-option>
+            }
+          </nz-select>
+        </div>
       </div>
 
       <div class="approval-list">

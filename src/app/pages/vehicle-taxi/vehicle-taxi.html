@@ -90,22 +90,6 @@
                 <span class="status-badge" [ngStyle]="getStatusClass(claim.status)">
                   {{ claim.status | statusLabel }}
                 </span>
-                @if (isEditableClaim(claim.status)) {
-                  <button
-                    class="btn-icon edit"
-                    (click)="$event.stopPropagation(); openModal(claim.id)"
-                    title="แก้ไข"
-                  >
-                    <i class="far fa-edit"></i>
-                  </button>
-                  <button
-                    class="btn-icon delete"
-                    (click)="$event.stopPropagation(); deleteRequest(claim)"
-                    title="ลบ"
-                  >
-                    <i class="far fa-trash-alt"></i>
-                  </button>
-                }
               </div>
             </div>
             <div class="claim-card__body">
@@ -141,8 +125,33 @@
             </div>
             <div class="claim-card__footer">
               <span class="claim-date-created">{{
-                dateUtil.formatDateToBE(claim.createDate, 'DD MMMM YYYY')
+                dateUtil.formatDateToBE(claim.createDate, 'DD MMM YYYY')
               }}</span>
+              <div class="claim-card__footer-actions">
+                <button
+                  class="btn-icon view"
+                  (click)="$event.stopPropagation(); viewRequest(claim)"
+                  title="ดูรายละเอียด"
+                >
+                  <i class="far fa-eye"></i>
+                </button>
+                @if (isEditableClaim(claim.status)) {
+                  <button
+                    class="btn-icon edit"
+                    (click)="$event.stopPropagation(); openModal(claim.id)"
+                    title="แก้ไข"
+                  >
+                    <i class="far fa-edit"></i>
+                  </button>
+                  <button
+                    class="btn-icon delete"
+                    (click)="$event.stopPropagation(); deleteRequest(claim)"
+                    title="ลบ"
+                  >
+                    <i class="far fa-trash-alt"></i>
+                  </button>
+                }
+              </div>
             </div>
           </div>
         } @empty {

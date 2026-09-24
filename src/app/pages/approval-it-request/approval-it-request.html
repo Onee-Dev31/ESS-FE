@@ -15,7 +15,7 @@
           (click)="exportExcel()"
         >
           <i class="fas fa-file-excel"></i>
-          Export Excel
+          <span class="export-text">Export Excel</span>
         </button>
         <button class="btn-outline" (click)="refresh()">
           <i class="fas fa-sync-alt mr-1"></i> <span class="btn-text">Refresh</span>
@@ -67,6 +67,20 @@
               {{ tab }} <span class="badge">{{ getTabCount(tab) }}</span>
             </button>
           }
+        </div>
+
+        <div class="status-filter">
+          <nz-select
+            class="status-select"
+            [ngModel]="listing.filterStatus()"
+            (ngModelChange)="setActiveTab($event)"
+            aria-label="Filter approval status"
+            nzShowArrow
+          >
+            @for (tab of tabs; track tab) {
+              <nz-option [nzValue]="tab" [nzLabel]="tab + ' (' + getTabCount(tab) + ')'"></nz-option>
+            }
+          </nz-select>
         </div>
       </div>
 

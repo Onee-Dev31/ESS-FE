@@ -36,7 +36,7 @@
         <h4 class="section-heading">1. เลือกประเภทการลา</h4>
         <div class="leave-type-select-responsive">
           <label>ประเภทการลา</label>
-          <div class="responsive-select-wrapper">
+          <div class="responsive-select-wrapper" [class.field-invalid]="invalidFields().leaveType">
             @if (isEditableRequest()) {
               <nz-select
                 class="responsive-antd-select"
@@ -78,7 +78,7 @@
             }
           </div>
         </div>
-        <div class="leave-type-grid">
+        <div class="leave-type-grid" [class.field-invalid]="invalidFields().leaveType">
           <div
             class="leave-type-card"
             *ngFor="let type of leaveTypes"
@@ -169,7 +169,7 @@
         }
 
         <div class="details-grid">
-          <div class="input-field-group left-half">
+          <div class="input-field-group left-half" [class.field-invalid]="invalidFields().startDate">
             <label>ตั้งแต่วันที่ <span class="required">*</span></label>
             @if (isEditableRequest()) {
               <nz-date-picker
@@ -189,7 +189,7 @@
           </div>
 
           @if (!isFullDayOnlyLeaveType()) {
-            <div class="input-field-group left-half">
+            <div class="input-field-group left-half" [class.field-invalid]="invalidFields().startTime">
               <label>ตั้งแต่เวลา</label>
               @if (isEditableRequest()) {
                 <nz-time-picker
@@ -198,7 +198,7 @@
                   [nzMinuteStep]="30"
                   nzPlaceHolder="เลือกเวลาเริ่ม"
                   [ngModel]="shiftStartTime()"
-                  (ngModelChange)="shiftStartTime.set($event)"
+                  (ngModelChange)="shiftStartTime.set($event); clearInvalidField('startTime')"
                 />
               } @else {
                 <div class="input-field readonly-display-field">
@@ -208,7 +208,7 @@
             </div>
           }
 
-          <div class="input-field-group left-half">
+          <div class="input-field-group left-half" [class.field-invalid]="invalidFields().endDate">
             <label>ถึงวันที่ <span class="required">*</span></label>
             @if (isEditableRequest()) {
               <nz-date-picker
@@ -229,7 +229,7 @@
           </div>
 
           @if (!isFullDayOnlyLeaveType()) {
-            <div class="input-field-group left-half">
+            <div class="input-field-group left-half" [class.field-invalid]="invalidFields().endTime">
               <label>ถึงเวลา</label>
               @if (isEditableRequest()) {
                 <nz-time-picker
@@ -238,7 +238,7 @@
                   [nzMinuteStep]="30"
                   nzPlaceHolder="เลือกเวลาสิ้นสุด"
                   [ngModel]="shiftEndTime()"
-                  (ngModelChange)="shiftEndTime.set($event)"
+                  (ngModelChange)="shiftEndTime.set($event); clearInvalidField('endTime')"
                 />
               } @else {
                 <div class="input-field readonly-display-field">
@@ -248,7 +248,7 @@
             </div>
           }
 
-          <div class="leave-days-summary">
+          <div class="leave-days-summary" [class.field-invalid]="invalidFields().leaveDays">
             <div class="leave-days-icon"><i class="fas fa-calculator"></i></div>
             <div class="leave-days-copy">
               <span class="leave-days-label">จำนวนวันลา</span>
@@ -271,15 +271,15 @@
           </div>
         </div>
 
-        <div class="input-field-group full-width mt-4">
-          <label>เหตุผลการลา</label>
+        <div class="input-field-group full-width mt-4" [class.field-invalid]="invalidFields().reason">
+          <label>เหตุผลการลา <span class="required">*</span></label>
           @if (isEditableRequest()) {
             <textarea
               class="custom-form-control"
               rows="3"
               placeholder="ระบุเหตุผลการลา..."
               [ngModel]="reason()"
-              (ngModelChange)="reason.set($event)"
+              (ngModelChange)="reason.set($event); clearInvalidField('reason')"
             ></textarea>
           } @else {
             <div class="custom-form-control readonly-display-field readonly-reason">

@@ -121,6 +121,9 @@
   }
 }
 
+@include mobile-status-select;
+
+
 .approval-list {
   display: flex;
   flex-direction: column;
@@ -597,6 +600,10 @@
   .approval-controls,
   .approval-list {
     padding: 10px;
+  }
+
+  .status-tabs {
+    display: none;
   }
 
   .compact-summary {

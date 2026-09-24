@@ -1,23 +1,15 @@
 <div class="approvals-wrapper">
   <app-page-header [title]="pageTitle()">
     <div class="utility-btns">
-      <div class="export-dropdown">
-        <button type="button" class="btn-outline" (click)="toggleExportMenu()">
-          <i class="fas fa-download mr-1"></i> <span class="btn-text">Export</span>
-          <i class="fas fa-chevron-down ml-1"></i>
-        </button>
-        <div class="dropdown-menu" [class.show]="showExportMenu()">
-          <button type="button" class="dropdown-item" (click)="exportPDF()">
-            <i class="fas fa-file-pdf text-danger"></i> Export PDF
-          </button>
-          <button type="button" class="dropdown-item" (click)="exportExcel()">
-            <i class="fas fa-file-excel text-success"></i> Export Excel
-          </button>
-          <button type="button" class="dropdown-item" (click)="print()">
-            <i class="fas fa-print text-secondary"></i> Print
-          </button>
-        </div>
-      </div>
+      <button
+        type="button"
+        class="export-button"
+        [disabled]="isExporting() || listing.totalItems() === 0"
+        (click)="exportExcel()"
+      >
+        <i class="fas fa-file-excel"></i>
+        <span class="export-text">Export Excel</span>
+      </button>
       <button type="button" class="btn-outline" (click)="refresh()" [disabled]="isRefreshing()">
         <i [class]="isRefreshing() ? 'fas fa-spinner fa-spin mr-1' : 'fas fa-sync-alt mr-1'"></i>
         <span class="btn-text">Refresh</span>
@@ -50,6 +42,20 @@
             {{ tab }} <span class="badge">{{ getTabCount(tab) }}</span>
           </button>
         }
+      </div>
+
+      <div class="status-filter">
+        <nz-select
+          class="status-select"
+          [ngModel]="listing.filterStatus()"
+          (ngModelChange)="setActiveTab($event)"
+          aria-label="Filter approval status"
+          nzShowArrow
+        >
+          @for (tab of medicalTabs; track tab) {
+            <nz-option [nzValue]="tab" [nzLabel]="tab + ' (' + getTabCount(tab) + ')'"></nz-option>
+          }
+        </nz-select>
       </div>
     </div>
 
@@ -112,6 +118,11 @@
                   <span class="status-badge" [ngStyle]="getStatusClass(req.status)">
                     {{ req.rawStatus | statusLabel }}
                   </span>
+                  @if (getHrActionName(claim); as actionName) {
+                    <small class="status-action-by">
+                      <i class="fas fa-user-check"></i> {{ actionName }}
+                    </small>
+                  }
                 </div>
               </div>
 
@@ -274,7 +285,9 @@
                         <i class="fas fa-user-circle fallback-icon"></i>
                       </div>
                       <div class="emp-text">
-                        <div class="emp-name">{{ claim.employeeName }}</div>
+                        <div class="emp-name">
+                          {{ claim.employeeFirstName + ' ' + claim.employeeLastName }}
+                        </div>
                         <div class="emp-meta">{{ claim.employeeCode }}</div>
                       </div>
                     </div>
@@ -313,9 +326,16 @@
                     </div>
                   </td>
                   <td>
-                    <span class="status-badge" [ngStyle]="getStatusClass(req.status)">
-                      {{ req.rawStatus | statusLabel }}
-                    </span>
+                    <div class="status-cell">
+                      <span class="status-badge" [ngStyle]="getStatusClass(req.status)">
+                        {{ req.rawStatus | statusLabel }}
+                      </span>
+                      @if (getHrActionName(claim); as actionName) {
+                        <small class="status-action-by">
+                          <i class="fas fa-user-check"></i> {{ actionName }}
+                        </small>
+                      }
+                    </div>
                   </td>
                   <td>
                     <div class="table-actions">

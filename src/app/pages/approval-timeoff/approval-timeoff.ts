@@ -34,6 +34,7 @@ import {
   ApprovalStepState,
   ApprovalStepsComponent,
 } from '../../components/shared/approval-steps/approval-steps';
+import { NzSelectModule } from 'ng-zorro-antd/select';
 
 type ApprovalFilter = '' | 'Pending' | 'Approved' | 'Rejected' | 'Sendback';
 
@@ -49,6 +50,7 @@ type ApprovalFilter = '' | 'Pending' | 'Approved' | 'Rejected' | 'Sendback';
     EmptyStateComponent,
     PaginationComponent,
     FilePreviewModalComponent,
+    NzSelectModule,
   ],
   templateUrl: './approval-timeoff.html',
   styleUrl: './approval-timeoff.scss',

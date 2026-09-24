@@ -374,7 +374,7 @@ $status-cancelled-text: var(--text-table-head);
   // ==================== TABLE STYLES ====================
   .modern-table {
     @include modern-table;
-    min-width: 1180px;
+    min-width: 1320px;
     table-layout: fixed;
 
     thead th,
@@ -395,8 +395,13 @@ $status-cancelled-text: var(--text-table-head);
       animation: timeoff-request-highlight 8s ease-out forwards;
     }
 
+    .view-column {
+      width: 64px;
+      text-align: center;
+    }
+
     .request-column {
-      width: 150px;
+      width: 135px;
     }
 
     .date-column {
@@ -419,6 +424,7 @@ $status-cancelled-text: var(--text-table-head);
 
     .status-column {
       width: 200px;
+      text-align: center !important;
     }
 
     .actions-column {
@@ -439,11 +445,18 @@ $status-cancelled-text: var(--text-table-head);
       }
 
       .leave-number {
-        margin-top: 4px;
+        margin-top: 0;
         color: var(--primary);
-        font-size: $font-size-body;
+        font-size: $font-size-label;
         font-weight: 500;
+        white-space: nowrap;
       }
+    }
+
+    .created-at-cell {
+      color: var(--text-sub);
+      font-size: $font-size-label;
+      white-space: nowrap;
     }
 
     .date-value,
@@ -508,6 +521,14 @@ $status-cancelled-text: var(--text-table-head);
       color: var(--text-sub);
       line-height: 1.5;
     }
+
+    .status-cell {
+      text-align: center !important;
+
+      .status-badge {
+        margin-inline: auto;
+      }
+    }
   }
 
   // ==================== MOBILE CARD VIEW ====================
@@ -569,41 +590,77 @@ $status-cancelled-text: var(--text-table-head);
   gap: 6px;
 }
 
-.attachment-link {
+.attachment-file {
   display: flex;
+  align-items: center;
+  gap: 7px;
+  margin-top: 6px;
+
+  > i {
+    width: 14px;
+    flex: 0 0 14px;
+    color: var(--text-muted);
+    text-align: center;
+  }
+}
+
+.attachment-link {
+  display: inline-flex;
   width: fit-content;
   align-items: center;
-  gap: 6px;
-  margin-top: 7px;
-  padding: 0;
+  padding: 4px 8px;
   border: 0;
-  background: transparent;
-  color: var(--primary);
+  border-radius: 8px;
+  background: var(--border-toolbar);
+  color: var(--text-sub);
   font: inherit;
   font-size: $font-size-label;
+  line-height: 1.2;
   cursor: pointer;
 
   &:hover {
-    text-decoration: underline;
+    color: var(--primary);
+    background: var(--status-new-bg);
   }
 }
 
 .btn-icon {
   &.edit,
-  &.view {
-    @include btn-secondary;
+  &.view,
+  &.delete {
     width: 36px;
     height: 36px;
+    min-width: 36px;
     padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     font-size: 0.875rem;
+    background: var(--bg-card);
+    border: 1px solid;
+    border-radius: 10px;
+    cursor: pointer;
+  }
+
+  &.view {
+    color: var(--primary);
+    border-color: var(--primary);
+
+    &:hover {
+      background: color-mix(in srgb, var(--primary) 8%, var(--bg-card));
+    }
+  }
+
+  &.edit {
+    color: var(--success);
+    border-color: var(--success);
+
+    &:hover {
+      background: color-mix(in srgb, var(--success) 8%, var(--bg-card));
+    }
   }
 
   &.delete {
-    @include btn-outline;
-    width: 36px;
-    height: 36px;
-    padding: 0;
-    font-size: 0.875rem;
     color: var(--danger);
     border-color: var(--danger);
 
