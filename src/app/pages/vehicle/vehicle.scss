@@ -193,7 +193,7 @@
     display: block;
     overflow-x: auto;
 
-    @include large-tablet {
+    @include tablet {
       display: none;
     }
   }
@@ -211,7 +211,7 @@
     // display: grid;
     // grid-template-columns: repeat(4, 1fr);
 
-    @include large-tablet {
+    @include tablet {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
     }

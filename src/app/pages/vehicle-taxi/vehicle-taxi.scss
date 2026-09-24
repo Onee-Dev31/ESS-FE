@@ -81,7 +81,7 @@ $border-color: var(--border-color);
     display: block;
     overflow-x: auto;
 
-    @include large-tablet {
+    @include tablet {
       display: none;
     }
   }
@@ -99,7 +99,7 @@ $border-color: var(--border-color);
     // display: grid;
     // grid-template-columns: repeat(4, 1fr);
 
-    @include large-tablet {
+    @include tablet {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
     }
