@@ -392,6 +392,7 @@
       @defer {
         <app-approval-detail-modal
           [approvalItem]="selectedItem()!"
+          mode="approver"
           [initialAction]="initialAction()"
           (onClose)="closeModal()"
           (onStatusUpdated)="onStatusUpdated()"

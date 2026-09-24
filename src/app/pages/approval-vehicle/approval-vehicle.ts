@@ -260,7 +260,8 @@ export class ApprovalVehicleComponent {
       requestNo: claim.voucherNo ?? `#${claim.claimID}`,
       requestDate: claim.submittedAt,
       requestBy: {
-        name: claim.employeeName ?? claim.employeeCode,
+        name: claim.employeeFirstName + ' ' + claim.employeeLastName,
+        // name: claim.employeeName ?? claim.employeeCode,
         employeeId: claim.employeeCode,
         department: claim.departmentName ?? '-',
         company: claim.companyName ?? '-',
@@ -306,7 +307,6 @@ export class ApprovalVehicleComponent {
     }
     this.vehicleService.getApprovals(adUser, autoOpenVoucherNo).subscribe({
       next: (res) => {
-        // console.log(res);
         this.approvals.set(res.data.map((c: any) => this.mapClaimToApproval(c)));
         this.listing.currentPage.set(0);
         this.loadingService.stop('approvals-list');

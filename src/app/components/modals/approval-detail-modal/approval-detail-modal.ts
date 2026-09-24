@@ -6,19 +6,18 @@ import {
   signal,
   computed,
   inject,
-  OnInit,
+  OnChanges,
+  SimpleChanges,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ToastService } from '../../../services/toast';
 import { FilePreviewModalComponent } from '../file-preview-modal/file-preview-modal';
-import { StatusLabelPipe } from '../../../pipes/status-label.pipe';
 import { UnifiedItem, ApprovalItem } from '../../../interfaces/approval.interface';
 import { MedicalApproveClaim, MedicalClaim } from '../../../interfaces/medical.interface';
 import { REQUEST_STATUS } from '../../../constants/request-status.constant';
 import { StatusUtil } from '../../../utils/status.util';
 import { ApprovalsHelperService } from '../../../services/approvals-helper.service';
-import { modalAnimation, fadeIn } from '../../../animations/animations';
 import { ApprovalService } from '../../../services/approval.service';
 import { AuthService } from '../../../services/auth.service';
 import { SwalService } from '../../../services/swal.service';
@@ -36,16 +35,24 @@ interface PreviewFile {
   date: string;
 }
 
+export type ApprovalDetailMode = 'requester' | 'approver';
+
+interface ApprovalProgressStep {
+  label: string;
+  id: number;
+  icon: string;
+  actedAt?: string | null;
+}
+
 /** Component แสดงรายละเอียดรายการขออนุมัติ และจัดการการอนุมัติ/ตีกลับ (Modal Detail) */
 @Component({
   selector: 'app-approval-detail-modal',
   standalone: true,
-  imports: [CommonModule, FormsModule, FilePreviewModalComponent, StatusLabelPipe],
-  animations: [modalAnimation, fadeIn],
+  imports: [CommonModule, FormsModule, FilePreviewModalComponent],
   templateUrl: './approval-detail-modal.html',
   styleUrl: './approval-detail-modal.scss',
 })
-export class ApprovalDetailModalComponent implements OnInit {
+export class ApprovalDetailModalComponent implements OnChanges {
   private approvalsHelper = inject(ApprovalsHelperService);
   private toastService = inject(ToastService);
   private approvelService = inject(ApprovalService);
@@ -58,8 +65,10 @@ export class ApprovalDetailModalComponent implements OnInit {
   private swalService = inject(SwalService);
   private fileConverter = inject(FileConverterService);
   dateUtil = inject(DateUtilityService);
+  private detailLoadVersion = 0;
 
   @Input({ required: true }) approvalItem!: ApprovalItem;
+  @Input() mode: ApprovalDetailMode = 'requester';
   @Input() initialAction: 'Approved' | 'Rejected' | 'Referred Back' | null = null;
   @Input() showActions = true;
   @Input() showRequesterInfo = true;
@@ -77,6 +86,7 @@ export class ApprovalDetailModalComponent implements OnInit {
   currentDetailItems = signal<UnifiedItem[]>([]);
   currentDetailType = signal<string | null>(null);
   detailedStatus = signal<string>('');
+  isDetailLoading = signal(true);
 
   medicalDetail = signal<any>(null);
   allowanceDetail = signal<any>(null);
@@ -90,31 +100,91 @@ export class ApprovalDetailModalComponent implements OnInit {
       .replace(/[_-]+/g, ' '),
   );
 
-  steps = computed(() => {
-    const status = this.normalizedStatus();
-    const isRejected = status === 'rejected';
-
+  private summarySteps(): ApprovalProgressStep[] {
     return [
       { label: 'คำร้องใหม่', id: 1, icon: 'fas fa-user-check' },
       { label: 'อยู่ระหว่างการอนุมัติ', id: 2, icon: 'fas fa-users-cog' },
       {
-        label: isRejected ? 'ไม่ผ่านการอนุมัติ' : 'อนุมัติแล้ว',
+        label: 'อนุมัติแล้ว',
         id: 3,
-        icon: isRejected ? 'fas fa-times-circle' : 'fa-solid fa-stamp',
+        icon: 'fa-solid fa-stamp',
+      },
+    ];
+  }
+
+  steps = computed<ApprovalProgressStep[]>(() => {
+    const groupedSteps = this.buildGroupedSteps(this.getApprovalStepRows());
+
+    if (this.mode === 'requester' || !groupedSteps.length) {
+      return this.summarySteps();
+    }
+
+    const approverSteps = groupedSteps.map((step, index) => ({
+      id: index + 2,
+      label: (step.acted ? [step.acted] : step.approvers)
+        .map(
+          (approver: any) => approver.approver_first_name + ' (' + approver.approver_nickname + ')',
+        )
+        .join('\n'),
+      icon: step.isReferredBack
+        ? 'fas fa-rotate-left'
+        : step.acted?.status?.toLowerCase() === 'rejected'
+          ? 'fas fa-times'
+          : step.acted
+            ? 'fas fa-user-check'
+            : 'fas fa-user-clock',
+      actedAt: step.acted?.acted_at ?? null,
+    }));
+
+    return [
+      { label: 'คำร้องใหม่', id: 1, icon: 'fas fa-file-circle-plus' },
+      ...approverSteps,
+      {
+        label: 'อนุมัติแล้ว',
+        id: approverSteps.length + 2,
+        icon: 'fa-solid fa-stamp',
       },
     ];
   });
 
   currentStepIndex = computed(() => {
     const status = this.normalizedStatus();
+    const steps = this.steps();
 
     if (!status) return 0;
     if (status === 'new') return 1;
-    if (status === 'referred back') return 1;
-    if (status === 'pending' || status === 'under approval') return 2;
-    if (status === 'rejected') return 3;
-    if (status === 'approved') return 4;
+    if (status === 'referred back') {
+      const referredBackIndex = this.buildGroupedSteps(this.getApprovalStepRows()).findIndex(
+        (step) => step.isReferredBack,
+      );
+      return this.mode === 'approver' && referredBackIndex >= 0 ? referredBackIndex + 2 : 1;
+    }
+    if (status === 'pending' || status === 'under approval') {
+      if (this.mode === 'approver') {
+        const firstPendingIndex = this.buildGroupedSteps(this.getApprovalStepRows()).findIndex(
+          (step) => !step.acted,
+        );
+        return firstPendingIndex >= 0 ? firstPendingIndex + 2 : Math.max(2, steps.length - 1);
+      }
+      return 2;
+    }
+    if (status === 'rejected') {
+      const rejectedIndex = this.buildGroupedSteps(this.getApprovalStepRows()).findIndex(
+        (step) => step.acted?.status?.toLowerCase() === 'rejected',
+      );
+      return this.mode === 'approver' && rejectedIndex >= 0 ? rejectedIndex + 2 : steps.length;
+    }
+    if (status === 'approved') return steps.length + 1;
     return 1;
+  });
+
+  progressLineInset = computed(() => 50 / this.steps().length);
+
+  progressLineWidth = computed(() => {
+    const stepCount = this.steps().length;
+    if (stepCount <= 1) return 0;
+    const completedIntervals = Math.max(0, this.currentStepIndex() - 1);
+    return Math.min(completedIntervals, stepCount - 1) * (100 / stepCount);
   });
 
   isRejected = computed(() => {
@@ -122,6 +192,31 @@ export class ApprovalDetailModalComponent implements OnInit {
   });
 
   isReferredBack = computed(() => this.normalizedStatus() === 'referred back');
+
+  statusPill = computed(() => {
+    const isRequester = this.mode === 'requester';
+
+    switch (this.normalizedStatus()) {
+      case 'new':
+        return isRequester
+          ? { label: 'New', className: 'new' }
+          : { label: 'pending', className: 'under-approval' };
+      case 'approved':
+        return { label: isRequester ? 'Approved' : 'approved', className: 'approved' };
+      case 'referred back':
+        return {
+          label: isRequester ? 'Referred Back' : 'referred back',
+          className: 'referred-back',
+        };
+      case 'rejected':
+        return { label: isRequester ? 'Rejected' : 'rejected', className: 'rejected' };
+      default:
+        return {
+          label: isRequester ? 'Under approval' : 'pending',
+          className: 'under-approval',
+        };
+    }
+  });
 
   getDisplayStatus(): string {
     const status = this.detailedStatus() || this.approvalItem.rawStatus;
@@ -150,12 +245,36 @@ export class ApprovalDetailModalComponent implements OnInit {
     this.currentDetailItems().reduce((sum, item) => sum + item.amount, 0),
   );
 
-  ngOnInit() {
-    this.loadDetails();
-    if (this.initialAction) {
-      this.isActionConfirm.set(true);
-      this.actionType.set(this.initialAction);
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['approvalItem']?.currentValue) {
+      const loadVersion = ++this.detailLoadVersion;
+      this.resetDetailState();
+      this.loadDetails(loadVersion);
+      return;
     }
+
+    if (changes['initialAction']) {
+      this.isActionConfirm.set(!!this.initialAction);
+      this.actionType.set(this.initialAction);
+      this.reasonText.set('');
+    }
+  }
+
+  private resetDetailState(): void {
+    this.modalActiveTab.set('Items');
+    this.isActionConfirm.set(!!this.initialAction);
+    this.actionType.set(this.initialAction);
+    this.reasonText.set('');
+    this.currentDetailItems.set([]);
+    this.currentDetailType.set(null);
+    this.detailedStatus.set('');
+    this.isDetailLoading.set(true);
+    this.medicalDetail.set(null);
+    this.allowanceDetail.set(null);
+    this.vehicleDetail.set(null);
+    this.taxiDetail.set(null);
+    this.isPreviewModalOpen.set(false);
+    this.previewFiles.set([]);
   }
 
   private buildGroupedSteps(steps: any[]) {
@@ -190,6 +309,17 @@ export class ApprovalDetailModalComponent implements OnInit {
     });
   }
 
+  private getApprovalStepRows(): any[] {
+    const detail =
+      this.allowanceDetail() ??
+      this.vehicleDetail() ??
+      this.taxiDetail() ??
+      this.medicalDetail() ??
+      this.approvalItem?.originalData;
+
+    return detail?.approvalSteps ?? detail?.approval_steps ?? [];
+  }
+
   getReferredBackReason(remark: unknown): string {
     return String(remark ?? '')
       .replace(/^ส่งกลับแก้ไข\s*:\s*/i, '')
@@ -197,150 +327,156 @@ export class ApprovalDetailModalComponent implements OnInit {
   }
 
   groupedSteps = computed(() => {
-    const type = this.approvalItem.type;
-
-    if (type === 'allowance') return this.buildGroupedSteps(this.allowanceDetail()?.approvalSteps);
-    if (type === 'vehicle') return this.buildGroupedSteps(this.vehicleDetail()?.approvalSteps);
-    if (type === 'taxi') return this.buildGroupedSteps(this.taxiDetail()?.approvalSteps);
-
-    return [];
+    return this.buildGroupedSteps(this.getApprovalStepRows());
   });
 
   referredBackAction = computed(
     () => this.groupedSteps().find((step) => step.isReferredBack)?.acted ?? null,
   );
-  // groupedSteps = computed(() => {
-  //   const steps = this.allowanceDetail().approvalSteps;
-  //   const map = new Map<number, any[]>();
-
-  //   steps.forEach((s: any) => {
-  //     if (!map.has(s.step_no)) map.set(s.step_no, []);
-  //     map.get(s.step_no)!.push(s);
-  //   });
-
-  //   return Array.from(map.entries()).map(([stepNo, approvers]) => {
-  //     const approved = approvers.find((a) => a.status === 'approved');
-  //     const rejected = approvers.find((a) => a.status === 'rejected');
-  //     const acted = approved ?? rejected ?? null;
-
-  //     return { stepNo, approvers, acted };
-  //   });
-  // });
 
   /** โหลดข้อมูลรายละเอียดเพิ่มเติมตามประเภทของคำขอ */
-  loadDetails() {
+  loadDetails(loadVersion = this.detailLoadVersion) {
     const item = this.approvalItem;
-    if (!item?.type) return;
+    if (!item?.type) {
+      this.finishDetailLoad(loadVersion);
+      return;
+    }
 
     this.currentDetailType.set(item.type);
 
     switch (item.type) {
       case 'medical':
-        this.loadMedicalDetail(item);
+        this.loadMedicalDetail(item, loadVersion);
         break;
       case 'allowance':
-        this.loadAllowanceDetail(item);
+        this.loadAllowanceDetail(item, loadVersion);
         break;
       case 'vehicle':
-        this.loadVehicleDetail(item);
+        this.loadVehicleDetail(item, loadVersion);
         break;
       case 'taxi':
-        this.loadTaxiDetail(item);
+        this.loadTaxiDetail(item, loadVersion);
         break;
       default:
-        this.loadFallbackDetail(item);
+        this.loadFallbackDetail(item, loadVersion);
     }
   }
 
-  private loadMedicalDetail(item: ApprovalItem) {
+  private finishDetailLoad(loadVersion: number): void {
+    if (loadVersion === this.detailLoadVersion) {
+      this.isDetailLoading.set(false);
+    }
+  }
+
+  private loadMedicalDetail(item: ApprovalItem, loadVersion: number) {
     console.log('loadMedicalDetail', item);
     const claim = item.originalData as MedicalApproveClaim | MedicalClaim;
     if (!claim || (!('claimID' in claim) && !('claimId' in claim))) {
-      this.loadFallbackDetail(item);
+      this.loadFallbackDetail(item, loadVersion);
       return;
     }
 
     this.medicalDetail.set(claim);
     this.detailedStatus.set(claim.status);
+    this.finishDetailLoad(loadVersion);
   }
 
-  private loadAllowanceDetail(item: ApprovalItem) {
-    console.log('loadAllowanceDetail', item);
+  private loadAllowanceDetail(item: ApprovalItem, loadVersion: number) {
     const claim = item.originalData as any;
     if (claim?.claimID == null) {
-      this.loadFallbackDetail(item);
+      this.loadFallbackDetail(item, loadVersion);
       return;
     }
 
-    this.approvalAllowanceService.getClaimById(item.requestId).subscribe((res) => {
-      if (!res) return;
-      const data = res.data ?? res;
-      this.allowanceDetail.set(data);
+    this.approvalAllowanceService.getClaimById(item.requestId).subscribe({
+      next: (res) => {
+        if (loadVersion !== this.detailLoadVersion) return;
+        if (!res) {
+          this.finishDetailLoad(loadVersion);
+          return;
+        }
+        const data = res.data ?? res;
+        console.log(`[Allowance] getClaimById(${item.requestId})`, data);
+        this.allowanceDetail.set(data);
+        this.finishDetailLoad(loadVersion);
 
-      const empCode = data.employeeCode ?? (item.originalData as any)?.employeeCode;
-      if (empCode) {
-        this.empAdService.getEmployeeDetails(empCode).subscribe({
-          next: (emp) => {
-            if (!emp) return;
-            this.allowanceDetail.update((prev) => ({
-              ...prev,
-              departmentName: emp.DEPARTMENT ?? emp.department ?? prev?.departmentName ?? null,
-              companyName: emp.COMPANY_NAME ?? emp.company_name ?? prev?.companyName ?? null,
-            }));
-          },
-          error: () => {},
-        });
-      }
+        const empCode = data.employeeCode ?? (item.originalData as any)?.employeeCode;
+        if (empCode) {
+          this.empAdService.getEmployeeDetails(empCode).subscribe({
+            next: (emp) => {
+              if (loadVersion !== this.detailLoadVersion) return;
+              if (!emp) return;
+              this.allowanceDetail.update((prev) => ({
+                ...prev,
+                departmentName: emp.DEPARTMENT ?? emp.department ?? prev?.departmentName ?? null,
+                companyName: emp.COMPANY_NAME ?? emp.company_name ?? prev?.companyName ?? null,
+              }));
+            },
+            error: () => {},
+          });
+        }
+      },
+      error: () => this.finishDetailLoad(loadVersion),
     });
 
     this.detailedStatus.set((item.claimStatus || item.rawStatus).toLowerCase());
   }
 
-  private loadVehicleDetail(item: ApprovalItem) {
-    console.log('loadVehicleDetail', item);
+  private loadVehicleDetail(item: ApprovalItem, loadVersion: number) {
     const claim = item.originalData as any;
     if (claim?.claimID == null) {
-      this.loadFallbackDetail(item);
+      this.loadFallbackDetail(item, loadVersion);
       return;
     }
 
-    this.vehicleService.getClaimById(item.requestId).subscribe((res) => {
-      if (!res) return;
-      const data = res.data ?? res;
-      this.vehicleDetail.set(data);
+    this.vehicleService.getClaimById(item.requestId).subscribe({
+      next: (res) => {
+        if (loadVersion !== this.detailLoadVersion) return;
+        if (!res) {
+          this.finishDetailLoad(loadVersion);
+          return;
+        }
+        const data = res.data ?? res;
+        console.log(`[vehicle] getClaimById(${item.requestId})`, data, item);
+        this.vehicleDetail.set(data);
+        this.finishDetailLoad(loadVersion);
 
-      const empCode = data.employeeCode ?? (item.originalData as any)?.employeeCode;
-      if (empCode) {
-        this.empAdService.getEmployeeDetails(empCode).subscribe({
-          next: (emp) => {
-            if (!emp) return;
-            this.vehicleDetail.update((prev) => ({
-              ...prev,
-              departmentName: emp.DEPARTMENT ?? emp.department ?? prev?.departmentName ?? null,
-              companyName: emp.COMPANY_NAME ?? emp.company_name ?? prev?.companyName ?? null,
-            }));
-          },
-          error: () => {},
-        });
-      }
+        const empCode = data.employeeCode ?? (item.originalData as any)?.employeeCode;
+        if (empCode) {
+          this.empAdService.getEmployeeDetails(empCode).subscribe({
+            next: (emp) => {
+              if (loadVersion !== this.detailLoadVersion) return;
+              if (!emp) return;
+              this.vehicleDetail.update((prev) => ({
+                ...prev,
+                departmentName: emp.DEPARTMENT ?? emp.department ?? prev?.departmentName ?? null,
+                companyName: emp.COMPANY_NAME ?? emp.company_name ?? prev?.companyName ?? null,
+              }));
+            },
+            error: () => {},
+          });
+        }
+      },
+      error: () => this.finishDetailLoad(loadVersion),
     });
 
     this.detailedStatus.set((item.claimStatus || item.rawStatus).toLowerCase());
   }
 
-  private loadTaxiDetail(item: ApprovalItem) {
+  private loadTaxiDetail(item: ApprovalItem, loadVersion: number) {
     const claim = item.originalData as any;
     if (claim?.claimId == null) {
-      this.loadFallbackDetail(item);
+      this.loadFallbackDetail(item, loadVersion);
       return;
     }
 
-    this.taxiDetail.set(claim);
+    this.taxiDetail.set(claim); //ใช้ค่าจาก GetTaxiClaimsForApprover เลย
 
     const empCode = claim.employeeCode;
     if (empCode) {
       this.empAdService.getEmployeeDetails(empCode).subscribe({
         next: (emp) => {
+          if (loadVersion !== this.detailLoadVersion) return;
           if (!emp) return;
           this.taxiDetail.update((prev) => ({
             ...prev,
@@ -353,15 +489,22 @@ export class ApprovalDetailModalComponent implements OnInit {
     }
 
     this.detailedStatus.set((item.claimStatus || item.rawStatus || '').toLowerCase());
+    this.finishDetailLoad(loadVersion);
   }
 
-  private loadFallbackDetail(item: ApprovalItem) {
+  private loadFallbackDetail(item: ApprovalItem, loadVersion = this.detailLoadVersion) {
     console.log(item);
     const service = this.approvalsHelper.getServiceByType(item.type || 'transport');
-    service.getRequestById(item.requestNo).subscribe((data) => {
-      if (!data) return;
-      this.detailedStatus.set(data.status);
-      this.currentDetailItems.set((data.items || []) as UnifiedItem[]);
+    service.getRequestById(item.requestNo).subscribe({
+      next: (data) => {
+        if (loadVersion !== this.detailLoadVersion) return;
+        if (data) {
+          this.detailedStatus.set(data.status);
+          this.currentDetailItems.set((data.items || []) as UnifiedItem[]);
+        }
+        this.finishDetailLoad(loadVersion);
+      },
+      error: () => this.finishDetailLoad(loadVersion),
     });
   }
 
