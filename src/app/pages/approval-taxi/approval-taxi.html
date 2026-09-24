@@ -242,7 +242,7 @@
             <tr>
               <th>พนักงาน</th>
               <th>จำนวนรายการ</th>
-              <th>รายละเอียดการเบิก</th>
+              <!-- <th>รายละเอียดการเบิก</th> -->
               <th>จากที่ไหน</th>
               <th>ไปที่ไหน</th>
               <th class="text-right">ยอดเงิน</th>
@@ -285,13 +285,13 @@
                     </div>
                     <div class="claim-items-count">{{ claim.items.length }} รายการ</div>
                   </td>
-                  <td class="trip-details-cell">
+                  <!-- <td class="trip-details-cell">
                     @for (item of claim.items; track $index) {
                       <div class="trip-field-row" [title]="item.description || '-'">
                         {{ item.description || '-' }}
                       </div>
                     }
-                  </td>
+                  </td> -->
                   <td class="trip-location-cell">
                     @for (item of claim.items; track $index) {
                       <div class="trip-field-row" [title]="item.locationFrom || '-'">
