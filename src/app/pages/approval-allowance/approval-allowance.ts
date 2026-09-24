@@ -91,13 +91,14 @@ export class ApprovalAllowanceComponent implements OnInit {
   ngOnInit() {
     this.route.queryParams.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((params) => {
       const voucherNo = params['voucherNo'] || params['ticketNumber'];
-      if (voucherNo || params['_t']) {
+      const claimId = params['claimId'];
+      if (voucherNo || claimId || params['_t']) {
         this.listing.filterStatus.set('Pending');
         this.listing.searchText.set('');
         this.listing.currentPage.set(0);
       }
       this.linkedVoucherNo.set(voucherNo ?? null);
-      this.loadAllowanceClaims(voucherNo);
+      this.loadAllowanceClaims(voucherNo, claimId);
     });
   }
 
@@ -340,7 +341,7 @@ export class ApprovalAllowanceComponent implements OnInit {
   }
 
   // GET
-  /** โหลดข้อมูลค่ารักษาพยาบาลจาก API */
+  /** โหลดข้อมูลค่ารักษาพยาบาลจาก API — คลิกจาก toast (claimId/voucherNo) แล้วเปิด detail อัตโนมัติ */
   loadAllowanceClaims(autoOpenVoucherNo?: string, autoOpenClaimId?: string) {
     const adUser = this.authService.currentUser() || '';
     if (!this.initialized) {
@@ -350,12 +351,23 @@ export class ApprovalAllowanceComponent implements OnInit {
     }
     this.approvalAllowanceService.getApprovals(adUser, autoOpenVoucherNo).subscribe({
       next: (res) => {
-        this.approvals.set(res.data.map((c: any) => this.mapClaimToApproval(c)));
+        const mapped = res.data.map((c: any) => this.mapClaimToApproval(c));
+        this.approvals.set(mapped);
         if (res.summary) this.summary.set(res.summary);
         this.listing.currentPage.set(0);
         this.loadingService.stop('approvals-list');
         this.isRefreshing.set(false);
         this.initialized = true;
+
+        if (autoOpenClaimId) {
+          const target = mapped.find(
+            (item: ApprovalItem) => String(item.requestId) === String(autoOpenClaimId),
+          );
+          if (target) this.viewDetail(target);
+        } else if (autoOpenVoucherNo) {
+          const target = mapped.find((item: ApprovalItem) => item.requestNo === autoOpenVoucherNo);
+          if (target) this.viewDetail(target);
+        }
       },
       error: (error) => {
         this.loadingService.stop('approvals-list');

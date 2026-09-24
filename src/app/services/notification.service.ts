@@ -381,6 +381,8 @@ export class NotificationService {
         this.toText(
           record?.ticket_number ??
             record?.ticketNumber ??
+            payloadData?.['voucherNo'] ??
+            payloadData?.['voucher_no'] ??
             payloadData?.['ticketNumber'] ??
             payloadData?.['ticket_number'],
         ) ?? null;
@@ -500,12 +502,43 @@ export class NotificationService {
     const roleText = `${this.authService.userRole() ?? ''},${input.recipientRole}`.toLowerCase();
     const typeText = `${input.notificationType} ${input.targetType}`.toLowerCase();
 
-    if (input.notificationType === 'allowance_email') {
-      const isApprover = [...this.approverRoles].some((role) => roleText.includes(role));
+    if (
+      input.notificationType === 'allowance_email' ||
+      input.notificationType.startsWith('allowance_') ||
+      input.targetType === 'allowance'
+    ) {
+      // allowance_create/resubmit/approved_next = ส่งหาผู้อนุมัติ, allowance_referred_back/
+      // approved/rejected = ส่งกลับหาผู้ยื่นเบิกเอง — ใช้ notificationType ตัดสินโดยตรงก่อน
+      // (แม่นกว่า recipientRole/role ผู้ใช้ที่ล็อกอินอยู่ เพราะถ้า backend ยังไม่ tag recipientRole
+      // มาด้วย คนที่ role อนุมัติได้อยู่แล้ว เช่น supervisor จะโดน fallback ส่งไปหน้า approvals-allowance
+      // ผิด ทั้งที่ noti นี้ส่งมาในฐานะผู้ยื่นเบิกเอง)
+      const approverFacingAllowanceTypes = new Set([
+        'allowance_create',
+        'allowance_resubmit',
+        'allowance_approved_next',
+      ]);
+      const employeeFacingAllowanceTypes = new Set([
+        'allowance_referred_back',
+        'allowance_approved',
+        'allowance_rejected',
+      ]);
+      let isApprover: boolean;
+      if (approverFacingAllowanceTypes.has(input.notificationType)) {
+        isApprover = true;
+      } else if (employeeFacingAllowanceTypes.has(input.notificationType)) {
+        isApprover = false;
+      } else {
+        // allowance_email (เก่า) หรือ type อื่นที่ไม่รู้จัก — fallback แบบเดิม
+        const recipientRoleText = input.recipientRole.toLowerCase();
+        isApprover = recipientRoleText
+          ? recipientRoleText.includes('approver')
+          : [...this.approverRoles].some((role) => roleText.includes(role));
+      }
       return {
         route: isApprover ? '/approvals-allowance' : '/allowance',
         queryParams: {
           voucherNo: input.ticketNumber ?? undefined,
+          claimId: input.targetId ?? undefined,
           _t: Date.now(),
         },
       };

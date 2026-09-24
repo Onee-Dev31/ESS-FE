@@ -169,11 +169,13 @@ export class AllowanceComponent implements OnInit {
     this.allRequests.set(this.mapApiData(items));
 
     // สำหรับกดจาก noti /allowance?voucherNo=A2609#0013
+    // ถูกส่งกลับแก้ไข (referred back) เปิดฟอร์มแก้ไขเลย ส่วนอนุมัติ/ปฏิเสธ (สถานะสุดท้าย) เปิดแค่ดูรายละเอียด
     if (this.pendingOpenVoucherNo) {
       const match = this.allRequests().find((r) => r.claimNo === this.pendingOpenVoucherNo);
       if (match) {
         this.pendingOpenVoucherNo = null;
-        this.openModal(match.id);
+        if (this.isEditableClaim(match.status)) this.editRequest(match.id);
+        else this.viewRequest(match);
       }
     }
 
