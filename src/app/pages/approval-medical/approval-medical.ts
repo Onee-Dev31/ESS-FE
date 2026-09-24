@@ -162,7 +162,8 @@ export class ApprovalMedicalComponent implements OnInit {
       requestNo: claim.voucherNo ?? `#${claim.claimID}`,
       requestDate: claim.claimDate,
       requestBy: {
-        name: claim.employeeName,
+        name: claim.employeeFirstName + ' ' + claim.employeeLastName,
+        // name: claim.employeeName,
         employeeId: claim.employeeCode,
         department: claim.departmentName,
         company: claim.companyName,
@@ -191,6 +192,58 @@ export class ApprovalMedicalComponent implements OnInit {
       default:
         return 'Pending';
     }
+  }
+
+  getHrActionName(claim: MedicalApproveClaim): string {
+    const source = claim as any;
+    const targetStatus = String(claim.approverStepStatus ?? claim.status ?? '')
+      .trim()
+      .toLowerCase();
+    if (!['approved', 'rejected', 'referred_back', 'referred back'].includes(targetStatus)) {
+      return '';
+    }
+
+    const steps: any[] = source.approvalSteps ?? source.approval_steps ?? [];
+    const actionStep = [...steps]
+      .filter((step) => {
+        const stepStatus = String(step.status ?? '').trim().toLowerCase();
+        const sameStatus =
+          stepStatus === targetStatus ||
+          (targetStatus.startsWith('referred') && ['cancelled', 'canceled'].includes(stepStatus));
+        return sameStatus && !!(step.acted_at ?? step.actedAt);
+      })
+      .sort((a, b) => {
+        const timeDiff =
+          new Date(b.acted_at ?? b.actedAt).getTime() -
+          new Date(a.acted_at ?? a.actedAt).getTime();
+        return timeDiff || Number(b.step_no ?? b.stepNo ?? 0) - Number(a.step_no ?? a.stepNo ?? 0);
+      })[0];
+
+    if (actionStep) {
+      const firstName = actionStep.approver_first_name ?? actionStep.approverFirstName ?? '';
+      const nickname = actionStep.approver_nickname ?? actionStep.approverNickname ?? '';
+      const displayName =
+        actionStep.acted_by_name ??
+        actionStep.actedByName ??
+        actionStep.approver_name ??
+        actionStep.approverName;
+      if (displayName) return String(displayName);
+
+      const composedName = [firstName, nickname ? `(${nickname})` : '']
+        .filter(Boolean)
+        .join(' ');
+      return composedName || actionStep.acted_by || actionStep.actedBy || '';
+    }
+
+    return (
+      source.hrApproverName ??
+      source.actionedByName ??
+      source.approvedByName ??
+      source.reviewedByName ??
+      source.approvedBy ??
+      source.reviewedBy ??
+      ''
+    );
   }
 
   refresh() {

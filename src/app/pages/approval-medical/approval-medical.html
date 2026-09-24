@@ -118,6 +118,11 @@
                   <span class="status-badge" [ngStyle]="getStatusClass(req.status)">
                     {{ req.rawStatus | statusLabel }}
                   </span>
+                  @if (getHrActionName(claim); as actionName) {
+                    <small class="status-action-by">
+                      <i class="fas fa-user-check"></i> {{ actionName }}
+                    </small>
+                  }
                 </div>
               </div>
 
@@ -280,7 +285,9 @@
                         <i class="fas fa-user-circle fallback-icon"></i>
                       </div>
                       <div class="emp-text">
-                        <div class="emp-name">{{ claim.employeeName }}</div>
+                        <div class="emp-name">
+                          {{ claim.employeeFirstName + ' ' + claim.employeeLastName }}
+                        </div>
                         <div class="emp-meta">{{ claim.employeeCode }}</div>
                       </div>
                     </div>
@@ -319,9 +326,16 @@
                     </div>
                   </td>
                   <td>
-                    <span class="status-badge" [ngStyle]="getStatusClass(req.status)">
-                      {{ req.rawStatus | statusLabel }}
-                    </span>
+                    <div class="status-cell">
+                      <span class="status-badge" [ngStyle]="getStatusClass(req.status)">
+                        {{ req.rawStatus | statusLabel }}
+                      </span>
+                      @if (getHrActionName(claim); as actionName) {
+                        <small class="status-action-by">
+                          <i class="fas fa-user-check"></i> {{ actionName }}
+                        </small>
+                      }
+                    </div>
                   </td>
                   <td>
                     <div class="table-actions">

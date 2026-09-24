@@ -1530,6 +1530,23 @@ app-empty-state {
   }
 }
 
+.status-cell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+}
+
+.status-action-by {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--text-muted);
+  font-size: 0.68rem;
+  font-weight: 400;
+  white-space: nowrap;
+}
+
 .modal-overlay {
   @include modal-overlay-styles;
 }

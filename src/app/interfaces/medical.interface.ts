@@ -181,6 +181,9 @@ export interface MedicalApproveClaim {
   claimDate: string;
   employeeCode: string;
   employeeName: string;
+  employeeFirstName: string;
+  employeeLastName: string;
+  employeeNickname: string;
   departmentName: string;
   companyName: string;
   expenseTypeName: string;
