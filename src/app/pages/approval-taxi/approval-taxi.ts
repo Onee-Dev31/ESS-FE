@@ -7,8 +7,6 @@ import { FilePreviewModalComponent } from '../../components/modals/file-preview-
 import { ApprovalItem } from '../../interfaces/approval.interface';
 import { TaxiService } from '../../services/taxi.service';
 import { DateUtilityService } from '../../services/date-utility.service';
-import { ExportService } from '../../services/export';
-import { ToastService } from '../../services/toast';
 import { LoadingService } from '../../services/loading';
 import { ErrorService } from '../../services/error';
 import { APPROVAL_STATUS_TABS } from '../../config/constants';
@@ -20,6 +18,7 @@ import { StatusLabelPipe } from '../../pipes/status-label.pipe';
 import { listAnimation } from '../../animations/animations';
 import { StatusUtil } from '../../utils/status.util';
 import { NzInputModule } from 'ng-zorro-antd/input';
+import { NzSelectModule } from 'ng-zorro-antd/select';
 import { PaginationComponent } from '../../components/shared/pagination/pagination';
 import { AuthService } from '../../services/auth.service';
 
@@ -46,6 +45,7 @@ interface TaxiTripItem {
     EmptyStateComponent,
     StatusLabelPipe,
     NzInputModule,
+    NzSelectModule,
     PaginationComponent,
   ],
   animations: [listAnimation],
@@ -58,20 +58,15 @@ export class ApprovalTaxiComponent implements OnInit {
   private authService = inject(AuthService);
   private route = inject(ActivatedRoute);
   dateUtil = inject(DateUtilityService);
-  private exportService = inject(ExportService);
-  private toastService = inject(ToastService);
   private loadingService = inject(LoadingService);
   private errorService = inject(ErrorService);
 
   isLoading = this.loadingService.loading('approvals-list');
-  isExporting = this.loadingService.loading('export');
   isRefreshing = signal<boolean>(false);
   private initialized = false;
 
   approvals = signal<ApprovalItem[]>([]);
   statusCounts = signal<Record<string, number>>({});
-  selectedItems = signal<Set<number>>(new Set());
-  showExportMenu = signal<boolean>(false);
 
   listing = createListingState();
 
@@ -265,7 +260,6 @@ export class ApprovalTaxiComponent implements OnInit {
   setActiveTab(tab: string) {
     this.listing.filterStatus.set(tab);
     this.listing.currentPage.set(0);
-    this.selectedItems.set(new Set());
     this.loadTaxiClaims();
   }
 
@@ -366,108 +360,4 @@ export class ApprovalTaxiComponent implements OnInit {
     this.listing.currentPage.set(0);
   }
 
-  toggleExportMenu() {
-    this.showExportMenu.set(!this.showExportMenu());
-  }
-
-  async exportPDF() {
-    this.showExportMenu.set(false);
-    this.loadingService.start('export');
-    try {
-      await this.exportService.exportToPDF('approvals-table', 'approvals');
-      this.toastService.success('Export PDF สำเร็จ');
-    } catch (error) {
-      this.errorService.handle(error, { component: 'ApprovalsTaxi', action: 'export-pdf' });
-    } finally {
-      this.loadingService.stop('export');
-    }
-  }
-
-  async exportExcel() {
-    this.showExportMenu.set(false);
-    this.loadingService.start('export');
-    try {
-      const data = this.comps.paginatedData().map((item) => ({
-        requestNo: item.requestNo,
-        requestDate: item.requestDate,
-        requestBy: item.requestBy.name,
-        employeeId: item.requestBy.employeeId,
-        department: item.requestBy.department,
-        requestDetail: item.requestDetail,
-        amount: item.amount,
-        status: item.status,
-      }));
-
-      const columns = [
-        { header: 'เลขที่เอกสาร', key: 'requestNo', width: 15 },
-        { header: 'วันที่สร้าง', key: 'requestDate', width: 15 },
-        { header: 'ชื่อ-นามสกุล', key: 'requestBy', width: 20 },
-        { header: 'รหัสพนักงาน', key: 'employeeId', width: 15 },
-        { header: 'แผนก', key: 'department', width: 20 },
-        { header: 'รายละเอียด', key: 'requestDetail', width: 20 },
-        { header: 'จำนวนเงิน', key: 'amount', width: 15 },
-        { header: 'สถานะ', key: 'status', width: 15 },
-      ];
-
-      await this.exportService.exportToExcel(data, columns, 'approvals-taxi');
-      this.toastService.success('Export Excel สำเร็จ');
-      this.selectedItems.set(new Set());
-    } catch (error) {
-      this.errorService.handle(error, { component: 'ApprovalsTaxi', action: 'export-excel' });
-    } finally {
-      this.loadingService.stop('export');
-    }
-  }
-
-  print() {
-    this.showExportMenu.set(false);
-    this.loadingService.start('export');
-    try {
-      this.exportService.printElement('approvals-table');
-      this.toastService.success('เปิดหน้าพิมพ์แล้ว');
-    } catch (error) {
-      this.errorService.handle(error, { component: 'ApprovalsTaxi', action: 'print' });
-    } finally {
-      this.loadingService.stop('export');
-    }
-  }
-
-  get currentTabItems() {
-    return this.comps.filteredData();
-  }
-
-  isAllSelected() {
-    const current = this.currentTabItems;
-    return current.length > 0 && current.every((item) => this.selectedItems().has(item.requestId));
-  }
-
-  isSomeSelected() {
-    const current = this.currentTabItems;
-    return (
-      current.some((item) => this.selectedItems().has(item.requestId)) && !this.isAllSelected()
-    );
-  }
-
-  isChecked(requestId: number) {
-    return this.selectedItems().has(requestId);
-  }
-
-  toggleSelectAll(event: Event) {
-    const checked = (event.target as HTMLInputElement).checked;
-    const next = new Set(this.selectedItems());
-
-    this.currentTabItems.forEach((item) => {
-      if (checked) next.add(item.requestId);
-      else next.delete(item.requestId);
-    });
-
-    this.selectedItems.set(next);
-  }
-
-  toggleSelect(requestId: number, checked: boolean) {
-    const next = new Set(this.selectedItems());
-    if (checked) next.add(requestId);
-    else next.delete(requestId);
-    this.selectedItems.set(next);
-  }
 }
