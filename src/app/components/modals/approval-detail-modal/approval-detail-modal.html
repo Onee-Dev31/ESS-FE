@@ -230,15 +230,15 @@
             <div class="content-header">
               <h3>รายการเบิก ({{ allowanceDetail()?.details?.length }} รายการ)</h3>
             </div>
-            <div class="table-scroll">
-              <table class="modern-table">
+            <div class="table-scroll claim-detail-table-scroll">
+              <table class="modern-table claim-detail-table allowance-detail-table">
                 <thead>
                   <tr>
                     <th>วันที่</th>
                     <th>รหัสกะ</th>
-                    <th class="text-center">ประเภทวัน</th>
+                    <th>ประเภทวัน</th>
                     <th>เวลาเข้า - ออก</th>
-                    <th class="text-center">ชั่วโมง OT</th>
+                    <th>ชั่วโมง OT</th>
                     <th class="text-right">ยอดเงิน</th>
                     <th>หมายเหตุ</th>
                   </tr>
@@ -263,7 +263,7 @@
                         </span>
                       </td>
                       <td data-label="เวลาเข้า - ออก">
-                        {{ d.actual_checkin }} – {{ d.actual_checkout }}
+                        {{ formatTime(d.actual_checkin) }} – {{ formatTime(d.actual_checkout) }}
                       </td>
                       <td data-label="ชั่วโมง OT" class="text-center">{{ d.extra_hours }} ชม.</td>
                       <td data-label="ยอดเงิน" class="text-right">
@@ -315,8 +315,8 @@
             <div class="content-header">
               <h3>รายการเบิก ({{ vehicleDetail()?.details?.length }} รายการ)</h3>
             </div>
-            <div class="table-scroll">
-              <table class="modern-table">
+            <div class="table-scroll claim-detail-table-scroll">
+              <table class="modern-table claim-detail-table vehicle-detail-table">
                 <thead>
                   <tr>
                     <th>วันที่</th>
@@ -347,7 +347,7 @@
                         </span>
                       </td>
                       <td data-label="เวลาเข้า - ออก">
-                        {{ d.actual_checkin }} – {{ d.actual_checkout }}
+                        {{ formatTime(d.actual_checkin) }} – {{ formatTime(d.actual_checkout) }}
                       </td>
                       <td data-label="ยอดเงิน" class="text-right">
                         ฿{{ d.rate_amount | number: '1.2-2' }}

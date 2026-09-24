@@ -717,6 +717,13 @@ export class ApprovalDetailModalComponent implements OnChanges {
     this.isPreviewModalOpen.set(true);
   }
 
+  formatTime(value: string | null | undefined): string {
+    if (!value) return '-';
+
+    const time = value.match(/\d{1,2}:\d{2}/)?.[0];
+    return time ?? value;
+  }
+
   get isApproved(): boolean {
     return (this.medicalDetail()?.approvedAmount ?? 0) > 0;
   }
