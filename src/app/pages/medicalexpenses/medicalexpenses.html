@@ -180,7 +180,6 @@
             </div>
 
             <div class="claim-card__footer">
-              <span class="claim-id">#{{ claim.voucherNo ?? claim.claimId }}</span>
               <span class="claim-date-created">{{
                 dateUtil.formatDateToBE(claim.claimDate, 'DD MMMM YYYY')
               }}</span>
@@ -301,11 +300,7 @@
                 <td class="text-center col-row-actions" (click)="$event.stopPropagation()">
                   <div class="action-btns">
                     @if (isEditableClaim(claim.status)) {
-                      <button
-                        class="btn-icon edit"
-                        (click)="editRequest(claim)"
-                        title="แก้ไข"
-                      >
+                      <button class="btn-icon edit" (click)="editRequest(claim)" title="แก้ไข">
                         <i class="far fa-edit"></i>
                       </button>
                       <button class="btn-icon delete" (click)="deleteRequest(claim)" title="ลบ">

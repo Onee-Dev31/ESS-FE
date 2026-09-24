@@ -97,7 +97,7 @@
                     />
                     <span class="checkmark"></span>
                   </label>
-                  <i class="fa-solid fa-taxi"></i> เบิกค่าแท็กซี่
+                  <i class="fa-solid fa-taxi"></i>{{ req.requestNo }}
                 </div>
                 <div class="claim-card__actions">
                   @if (getAttachmentCount(claim) > 0) {
@@ -183,7 +183,6 @@
               </div>
 
               <div class="claim-card__footer">
-                <span class="claim-id">{{ req.requestNo }}</span>
                 <div class="claim-card__footer-actions">
                   <button
                     type="button"

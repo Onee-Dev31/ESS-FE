@@ -43,9 +43,12 @@
               [ngModel]="listing.filterStatus()"
               (ngModelChange)="listing.filterStatus.set($event)"
             >
-              <nz-option nzLabel="ทั้งหมด" nzValue="" />
-              <nz-option nzLabel="คำขอใหม่" nzValue="New" />
-              <nz-option nzLabel="อนุมัติแล้ว" nzValue="Approved" />
+              <nz-option nzLabel="All" nzValue="" />
+              <nz-option nzLabel="New" nzValue="New" />
+              <nz-option nzLabel="Under Approval" nzValue="Under Approval" />
+              <nz-option nzLabel="Approved" nzValue="Approved" />
+              <nz-option nzLabel="Referred Back" nzValue="Referred Back" />
+              <nz-option nzLabel="Rejected" nzValue="Rejected" />
             </nz-select>
           </div>
         </div>
@@ -85,7 +88,7 @@
           <div class="claim-card" (click)="viewRequest(claim)" title="คลิกเพื่อดูรายละเอียด">
             <div class="claim-card__header">
               <div class="claim-card__type-badge">
-                <i class="fa-solid fa-car-side"></i>เบิกค่าพาหนะ
+                <i class="fa-solid fa-car-side"></i>{{ claim.claimNo ?? claim.claimId }}
               </div>
               <div class="claim-card__actions">
                 <span class="status-badge" [ngStyle]="getStatusClass(claim.status)">
@@ -125,7 +128,6 @@
             </div>
 
             <div class="claim-card__footer">
-              <span class="claim-id">#{{ claim.claimNo ?? claim.claimId }}</span>
               <span class="claim-date-created">{{
                 dateUtil.formatDateToBE(claim.createDate, 'DD MMMM YYYY')
               }}</span>

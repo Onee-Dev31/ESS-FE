@@ -984,17 +984,17 @@ $status-cancelled-text: var(--text-table-head);
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  color: var(--warning);
+  color: var(--success);
   background: var(--bg-card);
-  border: 1px solid var(--warning);
+  border: 1px solid var(--success);
   border-radius: 10px;
   cursor: pointer;
 
   &:hover {
-    color: var(--warning);
-    border-color: var(--warning);
-    background: color-mix(in srgb, var(--warning) 8%, var(--bg-card));
-    box-shadow: 0 3px 8px color-mix(in srgb, var(--warning) 18%, transparent);
+    color: var(--success);
+    border-color: var(--success);
+    background: color-mix(in srgb, var(--success) 8%, var(--bg-card));
+    box-shadow: 0 3px 8px color-mix(in srgb, var(--success) 18%, transparent);
   }
 }
 
@@ -1064,8 +1064,9 @@ $status-cancelled-text: var(--text-table-head);
     transform 0.1s;
 
   &.act-view {
-    color: var(--text-sub);
+    color: var(--primary);
     background: var(--bg-card);
+    border-color: var(--primary);
 
     &:hover {
       color: var(--primary);
