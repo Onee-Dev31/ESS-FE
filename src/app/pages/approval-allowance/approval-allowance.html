@@ -63,7 +63,7 @@
             <div class="claim-card">
               <div class="claim-card__header">
                 <div class="claim-card__type-badge">
-                  <i class="fas fa-notes-medical"></i> {{ claim.expenseTypeName }}
+                  <i class="fas fa-notes-medical"></i> {{ req.requestNo }}
                 </div>
                 <div class="claim-card__actions">
                   <span class="status-badge" [ngStyle]="getStatusClass(req.status)">
@@ -158,7 +158,6 @@
               }
 
               <div class="claim-card__footer">
-                <span class="claim-id">{{ req.requestNo }}</span>
                 <div class="claim-card__footer-actions">
                   <button
                     type="button"

@@ -82,7 +82,9 @@
           <div class="claim-card" (click)="viewRequest(claim)" title="คลิกเพื่อดูรายละเอียด">
             <div class="claim-card__header">
               <div class="claim-card__type-badge">
-                <span class="ticket-no"><i class="fa-solid fa-taxi"></i> เบิกค่าพาหนะ Taxi</span>
+                <span class="ticket-no"
+                  ><i class="fa-solid fa-taxi"></i> {{ claim.claimNo ?? claim.claimId }}</span
+                >
               </div>
               <div class="claim-card__actions">
                 <span class="status-badge" [ngStyle]="getStatusClass(claim.status)">
@@ -138,7 +140,6 @@
               </div>
             </div>
             <div class="claim-card__footer">
-              <span class="claim-id">#{{ claim.claimNo ?? claim.claimId }}</span>
               <span class="claim-date-created">{{
                 dateUtil.formatDateToBE(claim.createDate, 'DD MMMM YYYY')
               }}</span>
