@@ -26,29 +26,29 @@
   </header>
 
   <main class="content-card">
-    <div class="approval-progress-bar">
+    <div class="approval-progress-bar" [class.is-loading]="isDetailLoading()">
       <div class="progress-stepper">
         <div class="stepper-points">
-          <div class="progress-line-bg"></div>
+          <div
+            class="progress-line-bg"
+            [style.left.%]="progressLineInset()"
+            [style.right.%]="progressLineInset()"
+          ></div>
           <div
             class="progress-line-fill"
             [class.rejected-line]="isRejected()"
-            [style.width.%]="
-              Math.min(
-                (Math.max(0, currentStepIndex() - 1) / (steps().length - 1)) * (200 / 3),
-                200 / 3
-              )
-            "
+            [class.referred-back-line]="isReferredBack()"
+            [style.left.%]="progressLineInset()"
+            [style.width.%]="progressLineWidth()"
           ></div>
 
           @for (step of steps(); track step.id) {
             <div
               class="progress-step"
-              class="progress-step"
-              [class.completed]="currentStepIndex() > step.id && !isRejected()"
+              [class.completed]="currentStepIndex() > step.id && !isRejected() && !isReferredBack()"
               [class.active]="currentStepIndex() === step.id && !isRejected()"
-              [class.rejected]="isRejected()"
-              [class.referred-back]="isReferredBack() && step.id === 1"
+              [class.rejected]="isRejected() && step.id <= currentStepIndex()"
+              [class.referred-back]="isReferredBack() && step.id <= currentStepIndex()"
             >
               <div class="step-icon-circle">
                 @if (currentStepIndex() > step.id) {
@@ -58,7 +58,14 @@
                 }
               </div>
 
-              <div class="step-label">{{ step.label }}</div>
+              <div class="step-label">
+                <span>{{ step.label }}</span>
+                @if (step.actedAt) {
+                  <small class="step-acted-at">
+                    {{ step.actedAt | date: 'dd/MM/yyyy HH:mm' }}
+                  </small>
+                }
+              </div>
             </div>
           }
         </div>
@@ -72,7 +79,10 @@
             <div class="s-data">
               <label>Status</label>
               <div class="s-value">
-                {{ detailedStatus() || approvalItem.rawStatus | statusLabel }}
+                <span class="status-pill" [ngClass]="statusPill().className">
+                  <span class="status-pill-dot"></span>
+                  {{ statusPill().label }}
+                </span>
               </div>
             </div>
           </div>
@@ -88,9 +98,7 @@
             </div>
           </div>
           @if (
-            approvalItem.type === 'medical' &&
-            isReferredBack() &&
-            medicalDetail()?.rejectionReason
+            approvalItem.type === 'medical' && isReferredBack() && medicalDetail()?.rejectionReason
           ) {
             <div class="referral-reason-card">
               <div class="referral-reason-card__icon">
@@ -106,8 +114,8 @@
           }
           @if (
             approvalItem.type !== 'medical' &&
-            referredBackAction() &&
-            getReferredBackReason(referredBackAction().remark);
+              referredBackAction() &&
+              getReferredBackReason(referredBackAction().remark);
             as reason
           ) {
             <div class="referral-reason-card">
@@ -186,13 +194,12 @@
         }
 
         @if (allowanceDetail()) {
-          <div class="medical-info-grid allowance-info-grid">
+          <!-- <div class="medical-info-grid allowance-info-grid">
             @for (step of groupedSteps(); track step.stepNo) {
               <div class="med-info-item">
                 <label><i class="fas fa-user-check"></i> Approve Step {{ step.stepNo }}</label>
                 <span>
                   @if (step.acted) {
-                    <!-- มีคนที่ approve หรือ reject แล้ว → แสดงคนนั้น -->
                     <div class="approver-done">
                       @if (step.acted.status === 'approved') {
                         <i class="fas fa-check-circle text-success"></i>
@@ -205,7 +212,6 @@
                       <span class="text-muted">{{ step.acted.acted_at | date: 'dd/MM/yyyy' }}</span>
                     </div>
                   } @else if (step.approvers.length > 1) {
-                    <!-- ยังไม่มีใด act → แสดงทุกคน -->
                     @for (a of step.approvers; track a.approver_emp_no) {
                       <div class="approver-done">
                         {{ a.approver_name }}
@@ -219,7 +225,7 @@
                 </span>
               </div>
             }
-          </div>
+          </div> -->
           @if (allowanceDetail()?.details?.length) {
             <div class="content-header">
               <h3>รายการเบิก ({{ allowanceDetail()?.details?.length }} รายการ)</h3>
@@ -229,7 +235,7 @@
                 <thead>
                   <tr>
                     <th>วันที่</th>
-                    <th>กะ</th>
+                    <th>รหัสกะ</th>
                     <th class="text-center">ประเภทวัน</th>
                     <th>เวลาเข้า - ออก</th>
                     <th class="text-center">ชั่วโมง OT</th>
@@ -243,7 +249,7 @@
                       <td data-label="วันที่">
                         {{ dateUtil.formatDateToBE(d.work_date, 'DD/MM/YYYY') }}
                       </td>
-                      <td data-label="กะ">
+                      <td data-label="รหัสกะ">
                         {{ d.shift_code }}
                         @if (d.scheduled_start && d.scheduled_end) {
                           <div class="shift-time-range">
@@ -273,13 +279,12 @@
         }
 
         @if (vehicleDetail()) {
-          <div class="medical-info-grid">
+          <!-- <div class="medical-info-grid">
             @for (step of groupedSteps(); track step.stepNo) {
               <div class="med-info-item">
                 <label><i class="fas fa-user-check"></i> Approve Step {{ step.stepNo }}</label>
                 <span>
                   @if (step.acted) {
-                    <!-- มีคนที่ approve หรือ reject แล้ว → แสดงคนนั้น -->
                     <div class="approver-done">
                       @if (step.acted.status === 'approved') {
                         <i class="fas fa-check-circle text-success"></i>
@@ -292,7 +297,6 @@
                       <span class="text-muted">{{ step.acted.acted_at | date: 'dd/MM/yyyy' }}</span>
                     </div>
                   } @else if (step.approvers.length > 1) {
-                    <!-- ยังไม่มีใด act → แสดงทุกคน -->
                     @for (a of step.approvers; track a.approver_emp_no) {
                       <div class="approver-done">
                         {{ a.approver_name }}
@@ -306,7 +310,7 @@
                 </span>
               </div>
             }
-          </div>
+          </div> -->
           @if (vehicleDetail()?.details?.length) {
             <div class="content-header">
               <h3>รายการเบิก ({{ vehicleDetail()?.details?.length }} รายการ)</h3>
@@ -316,10 +320,9 @@
                 <thead>
                   <tr>
                     <th>วันที่</th>
-                    <th>กะ</th>
+                    <th>รหัสกะ</th>
                     <th class="text-center">ประเภทวัน</th>
                     <th>เวลาเข้า - ออก</th>
-                    <th class="text-center">ชั่วโมง OT</th>
                     <th class="text-right">ยอดเงิน</th>
                     <th>หมายเหตุ</th>
                   </tr>
@@ -330,7 +333,7 @@
                       <td data-label="วันที่">
                         {{ dateUtil.formatDateToBE(d.work_date, 'DD/MM/YYYY') }}
                       </td>
-                      <td data-label="กะ">
+                      <td data-label="รหัสกะ">
                         {{ d.shift_code }}
                         @if (d.scheduled_start && d.scheduled_end) {
                           <div class="shift-time-range">
@@ -346,7 +349,6 @@
                       <td data-label="เวลาเข้า - ออก">
                         {{ d.actual_checkin }} – {{ d.actual_checkout }}
                       </td>
-                      <td data-label="ชั่วโมง OT" class="text-center">{{ d.extra_hours }} ชม.</td>
                       <td data-label="ยอดเงิน" class="text-right">
                         ฿{{ d.rate_amount | number: '1.2-2' }}
                       </td>
@@ -429,39 +431,39 @@
 
       @if (showRequesterInfo) {
         <div class="side-panel">
-        <h3 class="side-title">Requester Info</h3>
-        <div class="side-groups-row">
-          <div class="side-group">
-            <label>Name</label>
-            <div class="side-val">{{ approvalItem.requestBy.name }}</div>
-          </div>
-          <div class="side-group">
-            <label>Employee ID</label>
-            <div class="side-val">{{ approvalItem.requestBy.employeeId }}</div>
-          </div>
-          <div class="side-group">
-            <label>Department</label>
-            <div class="side-val">
-              {{
-                allowanceDetail()?.departmentName ||
-                  vehicleDetail()?.departmentName ||
-                  taxiDetail()?.departmentName ||
-                  approvalItem.requestBy.department
-              }}
+          <h3 class="side-title">Requester Info</h3>
+          <div class="side-groups-row">
+            <div class="side-group">
+              <label>Name</label>
+              <div class="side-val">{{ approvalItem.requestBy.name }}</div>
+            </div>
+            <div class="side-group">
+              <label>Employee ID</label>
+              <div class="side-val">{{ approvalItem.requestBy.employeeId }}</div>
+            </div>
+            <div class="side-group">
+              <label>Department</label>
+              <div class="side-val">
+                {{
+                  allowanceDetail()?.departmentName ||
+                    vehicleDetail()?.departmentName ||
+                    taxiDetail()?.departmentName ||
+                    approvalItem.requestBy.department
+                }}
+              </div>
+            </div>
+            <div class="side-group">
+              <label>Company</label>
+              <div class="side-val">
+                {{
+                  allowanceDetail()?.companyName ||
+                    vehicleDetail()?.companyName ||
+                    taxiDetail()?.companyName ||
+                    approvalItem.requestBy.company
+                }}
+              </div>
             </div>
           </div>
-          <div class="side-group">
-            <label>Company</label>
-            <div class="side-val">
-              {{
-                allowanceDetail()?.companyName ||
-                  vehicleDetail()?.companyName ||
-                  taxiDetail()?.companyName ||
-                  approvalItem.requestBy.company
-              }}
-            </div>
-          </div>
-        </div>
 
           <div class="side-divider"></div>
         </div>
