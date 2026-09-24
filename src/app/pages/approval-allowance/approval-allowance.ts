@@ -15,6 +15,7 @@ import { SkeletonComponent } from '../../components/shared/skeleton/skeleton';
 import { EmptyStateComponent } from '../../components/shared/empty-state/empty-state';
 import { StatusLabelPipe } from '../../pipes/status-label.pipe';
 import { NzInputModule } from 'ng-zorro-antd/input';
+import { NzSelectModule } from 'ng-zorro-antd/select';
 import { ApprovalItem } from '../../interfaces/approval.interface';
 import { createListingComputeds, createListingState } from '../../utils/listing.util';
 import dayjs from 'dayjs';
@@ -36,6 +37,7 @@ import { environment } from '../../../environments/environment';
     EmptyStateComponent,
     StatusLabelPipe,
     NzInputModule,
+    NzSelectModule,
   ],
   templateUrl: './approval-allowance.html',
   styleUrl: './approval-allowance.scss',

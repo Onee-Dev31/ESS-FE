@@ -329,6 +329,51 @@
   padding-right: 36px;
 }
 
+@mixin mobile-status-select {
+  .status-filter {
+    display: none;
+
+    @include mobile {
+      display: block;
+      width: 100%;
+    }
+  }
+
+  .status-select {
+    width: 100%;
+    height: 42px;
+    font-size: $font-size-label;
+    font-weight: 600;
+
+    ::ng-deep .ant-select-selector {
+      height: 42px;
+      border: 1px solid var(--border-table-head);
+      border-radius: 10px;
+      background: var(--bg-table-head);
+      color: var(--text);
+      align-items: center;
+      box-shadow: none;
+    }
+
+    ::ng-deep .ant-select-selection-item {
+      color: var(--text);
+      font-size: $font-size-label;
+      font-weight: 600;
+      line-height: 40px;
+    }
+
+    ::ng-deep .ant-select-arrow {
+      color: var(--text-muted);
+    }
+
+    &.ant-select-focused ::ng-deep .ant-select-selector,
+    &:hover ::ng-deep .ant-select-selector {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary) 12%, transparent);
+    }
+  }
+}
+
 // 5. Mobile Cards
 @mixin mobile-cards-view {
   display: none;

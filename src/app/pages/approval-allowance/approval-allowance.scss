@@ -102,6 +102,10 @@ $status-danger-text: var(--status-danger-text);
       width: 100%;
     }
 
+    @include mobile {
+      display: none;
+    }
+
     .tab-item {
       padding: 8px 16px;
       border-radius: 8px;
@@ -142,6 +146,8 @@ $status-danger-text: var(--status-danger-text);
       }
     }
   }
+
+  @include mobile-status-select;
 
   // ==================== SEARCH BOX ====================
   .search-box {

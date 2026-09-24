@@ -30,6 +30,7 @@ import dayjs from 'dayjs';
 import { MONTHS_TH } from '../../constants/date.constant';
 import { StatusUtil } from '../../utils/status.util';
 import { NzInputModule } from 'ng-zorro-antd/input';
+import { NzSelectModule } from 'ng-zorro-antd/select';
 import { PaginationComponent } from '../../components/shared/pagination/pagination';
 import { AuthService } from '../../services/auth.service';
 import { environment } from '../../../environments/environment';
@@ -48,6 +49,7 @@ import { environment } from '../../../environments/environment';
     EmptyStateComponent,
     StatusLabelPipe,
     NzInputModule,
+    NzSelectModule,
     PaginationComponent,
   ],
   animations: [listAnimation],
