@@ -1,6 +1,7 @@
 import { Component, OnInit, signal, computed, inject, Inject, PLATFORM_ID } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { ActivatedRoute } from '@angular/router';
 import { MedicalClaim } from '../../interfaces/medical.interface';
 import { ApprovalItem } from '../../interfaces/approval.interface';
 import { MedicalService } from '../../services/medical.service';
@@ -52,6 +53,7 @@ import { ApprovalDetailModalComponent } from '../../components/modals/approval-d
 export class MedicalexpensesComponent implements OnInit {
   private medicalService = inject(MedicalService);
   private authService = inject(AuthService);
+  private route = inject(ActivatedRoute);
   private loadingService = inject(LoadingService);
   private errorService = inject(ErrorService);
   private fileConverter = inject(FileConverterService);
@@ -167,10 +169,13 @@ export class MedicalexpensesComponent implements OnInit {
         );
       },
     });
-    this.loadData();
+    const claimIdParam = this.route.snapshot.queryParamMap.get('claimId');
+    const autoOpenClaimId = claimIdParam ? Number(claimIdParam) : undefined;
+    this.loadData(autoOpenClaimId);
   }
 
-  loadData() {
+  /** โหลดรายการเบิกค่ารักษาพยาบาล — ถ้ามี claimId (คลิกจาก toast) ให้เปิด detail อัตโนมัติ */
+  loadData(autoOpenClaimId?: number) {
     const employeeCode = this.authService.userData()?.CODEMPID ?? '';
     const status = this.listing.filterStatus() || undefined;
     const keyword = this.listing.searchText().trim() || undefined;
@@ -211,6 +216,15 @@ export class MedicalexpensesComponent implements OnInit {
         this.loadingService.stop('medical-list');
         this.isRefreshing.set(false);
         this.initialized = true;
+
+        if (autoOpenClaimId != null && !Number.isNaN(autoOpenClaimId)) {
+          const target = this.allClaims().find((claim) => claim.claimId === autoOpenClaimId);
+          // ถูกส่งกลับแก้ไข (referred back) ต้องเปิดฟอร์มแก้ไขเลย ส่วนอนุมัติ/ปฏิเสธ (สถานะสุดท้าย) เปิดแค่ดูรายละเอียด
+          if (target) {
+            if (this.isEditableClaim(target.status)) this.editRequest(target);
+            else this.viewRequest(target);
+          }
+        }
       },
       error: (error) => {
         this.loadingService.stop('medical-list');

@@ -102,11 +102,13 @@ export class ApprovalMedicalComponent implements OnInit {
 
   ngOnInit() {
     const voucherNo = this.route.snapshot.queryParamMap.get('voucherNo') || '';
-    this.loadMedicalClaims(voucherNo);
+    const claimIdParam = this.route.snapshot.queryParamMap.get('claimId');
+    const claimId = claimIdParam ? Number(claimIdParam) : undefined;
+    this.loadMedicalClaims(voucherNo, claimId);
   }
 
-  /** โหลดข้อมูลค่ารักษาพยาบาลจาก API */
-  loadMedicalClaims(autoOpenVoucherNo?: string) {
+  /** โหลดข้อมูลค่ารักษาพยาบาลจาก API — คลิกจาก toast (claimId) หรือ voucherNo แล้วเปิด detail อัตโนมัติ */
+  loadMedicalClaims(autoOpenVoucherNo?: string, autoOpenClaimId?: number) {
     const fromYear = parseInt(this.fromYear());
     const toYear = parseInt(this.toYear());
     const keyword = this.listing.searchText().trim() || undefined;
@@ -137,7 +139,10 @@ export class ApprovalMedicalComponent implements OnInit {
           this.isRefreshing.set(false);
           this.initialized = true;
 
-          if (autoOpenVoucherNo) {
+          if (autoOpenClaimId != null && !Number.isNaN(autoOpenClaimId)) {
+            const target = mapped.find((item) => item.requestId === autoOpenClaimId);
+            if (target) this.viewDetail(target);
+          } else if (autoOpenVoucherNo) {
             const target = mapped.find((item) => item.requestNo === autoOpenVoucherNo);
             if (target) this.viewDetail(target);
           }

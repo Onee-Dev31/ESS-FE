@@ -385,7 +385,10 @@ export class NotificationService {
             payloadData?.['ticket_number'],
         ) ?? null;
       const targetId = this.toNumber(
-        record?.target_id ?? record?.targetId ?? payloadData?.['requestId'],
+        record?.target_id ??
+          record?.targetId ??
+          payloadData?.['requestId'] ??
+          payloadData?.['claimId'],
       );
 
       const routeInfo = this.resolveRoute({
@@ -443,7 +446,9 @@ export class NotificationService {
       this.toText(item.notification_created_at ?? item.notificationCreatedAt) ??
       this.toText(item.recipient_created_at ?? item.recipientCreatedAt) ??
       null;
-    const targetId = this.toNumber(item['target_id'] ?? item['targetId'] ?? payload?.['requestId']);
+    const targetId = this.toNumber(
+      item['target_id'] ?? item['targetId'] ?? payload?.['requestId'] ?? payload?.['claimId'],
+    );
 
     const routeInfo = this.resolveRoute({
       notificationType: this.toText(item.notification_type ?? item.notificationType) ?? '',
@@ -513,6 +518,28 @@ export class NotificationService {
       return {
         route: '/resign-management/detail',
         queryParams: { _t: Date.now() },
+      };
+    }
+
+    if (input.notificationType === 'medical_claim_approval_request') {
+      return {
+        route: '/approvals-medical',
+        queryParams: {
+          claimId: input.targetId ?? undefined,
+          _t: Date.now(),
+        },
+      };
+    }
+
+    if (input.targetType === 'medical_claim') {
+      // medical_claim_approved / medical_claim_referred_back / medical_claim_rejected
+      // ส่งกลับหาผู้ยื่นเคลมเอง (ไม่ใช่ผู้อนุมัติ)
+      return {
+        route: '/medicalexpenses',
+        queryParams: {
+          claimId: input.targetId ?? undefined,
+          _t: Date.now(),
+        },
       };
     }
 
