@@ -409,6 +409,7 @@ app-empty-state {
     padding: 12px 16px;
     background: var(--bg-table-head);
     gap: 10px;
+    min-width: 0;
   }
 
   &__type-badge {
@@ -418,9 +419,14 @@ app-empty-state {
     display: flex;
     align-items: center;
     gap: 6px;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 
     i {
       font-size: 0.9rem;
+      flex-shrink: 0;
     }
   }
 
@@ -429,6 +435,12 @@ app-empty-state {
     align-items: center;
     gap: 8px;
     flex-shrink: 0;
+
+    .status-badge {
+      max-width: 128px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
   }
 
   &__body {
@@ -470,9 +482,34 @@ app-empty-state {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 8px 16px;
+    gap: 10px;
+    padding: 8px 12px 8px 16px;
     border-top: 1px solid var(--border-toolbar);
     background: var(--bg-table-head);
+
+    .claim-date-created {
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+  }
+
+  &__footer-actions {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-shrink: 0;
+
+    .btn-icon,
+    .act-btn {
+      width: 32px;
+      min-width: 32px;
+      height: 32px;
+      padding: 0;
+      font-size: 0.8rem;
+      border-radius: 9px;
+    }
   }
 }
 
