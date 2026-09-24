@@ -545,6 +545,43 @@ export class NotificationService {
     }
 
     if (
+      input.notificationType.startsWith('transport_claim_') ||
+      input.targetType === 'transport_claim'
+    ) {
+      // transport_claim_create/resubmit/approved_next = ส่งหาผู้อนุมัติ, transport_claim_referred_back/
+      // approved/rejected = ส่งกลับหาผู้ยื่นเบิกเอง (เหมือน allowance)
+      const approverFacingTransportTypes = new Set([
+        'transport_claim_create',
+        'transport_claim_resubmit',
+        'transport_claim_approved_next',
+      ]);
+      const employeeFacingTransportTypes = new Set([
+        'transport_claim_referred_back',
+        'transport_claim_approved',
+        'transport_claim_rejected',
+      ]);
+      let isApprover: boolean;
+      if (approverFacingTransportTypes.has(input.notificationType)) {
+        isApprover = true;
+      } else if (employeeFacingTransportTypes.has(input.notificationType)) {
+        isApprover = false;
+      } else {
+        const recipientRoleText = input.recipientRole.toLowerCase();
+        isApprover = recipientRoleText
+          ? recipientRoleText.includes('approver')
+          : [...this.approverRoles].some((role) => roleText.includes(role));
+      }
+      return {
+        route: isApprover ? '/approvals-velhicle' : '/vehicle',
+        queryParams: {
+          voucherNo: input.ticketNumber ?? undefined,
+          claimId: input.targetId ?? undefined,
+          _t: Date.now(),
+        },
+      };
+    }
+
+    if (
       input.notificationType === 'employee_resignation_bulk' ||
       input.targetType === 'employee_resignation'
     ) {

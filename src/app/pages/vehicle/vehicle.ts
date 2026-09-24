@@ -1,4 +1,6 @@
-import { Component, OnInit, signal, computed, inject } from '@angular/core';
+import { Component, OnInit, signal, computed, inject, DestroyRef } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { ActivatedRoute } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { TransportService, VehicleRequest } from '../../services/transport.service';
@@ -73,6 +75,8 @@ export class VehicleComponent implements OnInit {
   private toastService = inject(ToastService);
   private dialogService = inject(DialogService);
   private authservice = inject(AuthService);
+  private route = inject(ActivatedRoute);
+  private destroyRef = inject(DestroyRef);
   dateUtil = inject(DateUtilityService);
 
   private swalService = inject(SwalService);
@@ -131,8 +135,19 @@ export class VehicleComponent implements OnInit {
   );
   emptyIcon = computed(() => (this.hasActiveFilters() ? 'fas fa-search' : 'fas fa-car'));
 
+  private pendingOpenVoucherNo: string | null = null;
+
   ngOnInit() {
-    this.loadData();
+    this.route.queryParams.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((params) => {
+      const voucherNo = params['voucherNo'] || params['ticketNumber'];
+      if (voucherNo || params['_t']) {
+        this.pendingOpenVoucherNo = voucherNo ?? null;
+        this.listing.filterStatus.set('');
+        this.listing.searchText.set(voucherNo ?? '');
+        this.listing.currentPage.set(0);
+      }
+      this.loadData();
+    });
     this.getRates();
     this.getConditions();
     this.getPolicyTexts();
@@ -224,6 +239,17 @@ export class VehicleComponent implements OnInit {
     const items = res.data ?? [];
     // console.log(items)
     this.allRequests.set(this.mapApiData(items));
+
+    // สำหรับกดจาก noti /vehicle?voucherNo=...
+    // ถูกส่งกลับแก้ไข (referred back) เปิดฟอร์มแก้ไขเลย ส่วนอนุมัติ/ปฏิเสธ (สถานะสุดท้าย) เปิดแค่ดูรายละเอียด
+    if (this.pendingOpenVoucherNo) {
+      const match = this.allRequests().find((r) => r.claimNo === this.pendingOpenVoucherNo);
+      if (match) {
+        this.pendingOpenVoucherNo = null;
+        if (this.isEditableClaim(match.status)) this.openModal(match.id);
+        else this.viewRequest(match);
+      }
+    }
 
     this.listing.totalItems.set(res.pagination.total ?? 0);
     this.listing.totalPages.set(res.pagination.totalPages ?? 1);

@@ -1,4 +1,6 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, inject, OnInit, signal, DestroyRef } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { ActivatedRoute } from '@angular/router';
 import { DateUtilityService } from '../../services/date-utility.service';
 import { ExportService } from '../../services/export';
 import { ToastService } from '../../services/toast';
@@ -49,6 +51,8 @@ export class ApprovalVehicleComponent {
   private loadingService = inject(LoadingService);
   private errorService = inject(ErrorService);
   private authService = inject(AuthService);
+  private route = inject(ActivatedRoute);
+  private destroyRef = inject(DestroyRef);
 
   isLoading = this.loadingService.loading('approvals-list');
   isExporting = this.loadingService.loading('export');
@@ -79,7 +83,16 @@ export class ApprovalVehicleComponent {
   }
 
   ngOnInit() {
-    this.loadAllowanceClaims();
+    this.route.queryParams.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((params) => {
+      const voucherNo = params['voucherNo'] || params['ticketNumber'];
+      const claimId = params['claimId'];
+      if (voucherNo || claimId || params['_t']) {
+        this.listing.filterStatus.set('Pending');
+        this.listing.searchText.set('');
+        this.listing.currentPage.set(0);
+      }
+      this.loadAllowanceClaims(voucherNo, claimId);
+    });
   }
 
   refresh() {
@@ -297,7 +310,7 @@ export class ApprovalVehicleComponent {
   }
 
   // GET
-  /** โหลดข้อมูลค่ารักษาพยาบาลจาก API */
+  /** โหลดข้อมูลค่ารักษาพยาบาลจาก API — คลิกจาก toast (claimId/voucherNo) แล้วเปิด detail อัตโนมัติ */
   loadAllowanceClaims(autoOpenVoucherNo?: string, autoOpenClaimId?: string) {
     const adUser = this.authService.currentUser() || '';
     if (!this.initialized) {
@@ -307,11 +320,22 @@ export class ApprovalVehicleComponent {
     }
     this.vehicleService.getApprovals(adUser, autoOpenVoucherNo).subscribe({
       next: (res) => {
-        this.approvals.set(res.data.map((c: any) => this.mapClaimToApproval(c)));
+        const mapped = res.data.map((c: any) => this.mapClaimToApproval(c));
+        this.approvals.set(mapped);
         this.listing.currentPage.set(0);
         this.loadingService.stop('approvals-list');
         this.isRefreshing.set(false);
         this.initialized = true;
+
+        if (autoOpenClaimId) {
+          const target = mapped.find(
+            (item: ApprovalItem) => String(item.requestId) === String(autoOpenClaimId),
+          );
+          if (target) this.viewDetail(target);
+        } else if (autoOpenVoucherNo) {
+          const target = mapped.find((item: ApprovalItem) => item.requestNo === autoOpenVoucherNo);
+          if (target) this.viewDetail(target);
+        }
       },
       error: (error) => {
         this.loadingService.stop('approvals-list');
