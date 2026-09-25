@@ -108,9 +108,7 @@ export class FileUploadModal implements OnChanges {
   }
 
   getFileIcon(file: any): string {
-    const actualFile = file instanceof File ? file : file?.file instanceof File ? file.file : null;
-
-    const type = actualFile.type;
+    const type = file.type;
 
     if (type.includes('image')) return 'fas fa-file-image text-blue';
     if (type.includes('pdf')) return 'fas fa-file-pdf text-red';
