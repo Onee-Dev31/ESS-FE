@@ -342,7 +342,7 @@
           <button
             class="btn-upload-file"
             type="button"
-            [disabled]="isSaving()"
+            [disabled]="isSaving() || attachments().length >= FILE_CONFIG.maxFiles"
             (click)="triggerFileInput(fileInput)"
           >
             <i class="fas fa-file-upload"></i> Upload file
@@ -352,6 +352,7 @@
             type="file"
             class="hidden-input"
             title="เลือกไฟล์แนบ"
+            [accept]="acceptedFileTypes"
             (change)="onFileSelected($event)"
             multiple
           />
@@ -369,7 +370,7 @@
             <tbody>
               <tr *ngFor="let file of attachments(); let i = index">
                 <td class="text-center">{{ i + 1 }}</td>
-                <td class="clickable-file" (click)="openPreview(file)">
+                <td class="clickable-file" (click)="viewFile(file)">
                   <div class="file-name-container">
                     <i class="far fa-file-alt mr-2 text-primary"></i>
                     <span class="file-text">{{ file.name }}</span>
@@ -441,6 +442,7 @@
   <app-file-preview-modal
     *ngIf="isPreviewModalOpen()"
     [files]="previewFiles()"
+    [initialSelectedIndex]="previewSelectedIndex"
     (onClose)="closePreview()"
   >
   </app-file-preview-modal>

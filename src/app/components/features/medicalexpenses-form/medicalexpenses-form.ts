@@ -34,6 +34,21 @@ import { NzDatePickerModule } from 'ng-zorro-antd/date-picker';
 import { NzSelectModule } from 'ng-zorro-antd/select';
 import { SkeletonComponent } from '../../shared/skeleton/skeleton';
 import { CdkScrollable } from '@angular/cdk/scrolling';
+import { IT_ATTACHMENT_FILE_CONFIG } from '../../../constants/it-attachment-file.constant';
+import { FileConverterService } from '../../../services/file-converter';
+
+interface MedicalFormAttachment {
+  id: number;
+  attachmentId?: number;
+  name: string;
+  description: string;
+  size?: number;
+  file?: File;
+  filePath?: string;
+  fileUrl?: string;
+  fileType?: string;
+  createdAt?: string;
+}
 
 @Component({
   selector: 'app-medicalexpenses-form',
@@ -52,12 +67,18 @@ import { CdkScrollable } from '@angular/cdk/scrolling';
 })
 export class MedicalexpensesForm implements OnInit, OnDestroy {
   private static readonly PROBATION_DAYS = 119;
+  readonly FILE_CONFIG = IT_ATTACHMENT_FILE_CONFIG;
+  readonly acceptedFileTypes = [
+    ...this.FILE_CONFIG.allowedTypes,
+    ...this.FILE_CONFIG.allowedExtensions.map((extension) => `.${extension}`),
+  ].join(',');
 
   private authService = inject(AuthService);
   private dateUtil = inject(DateUtilityService);
   private medicalService = inject(MedicalService);
   private dialogService = inject(DialogService);
   private swalService = inject(SwalService);
+  private fileConverter = inject(FileConverterService);
 
   @Input() requestId: string = '';
   @Output() onClose = new EventEmitter<void>();
@@ -68,6 +89,7 @@ export class MedicalexpensesForm implements OnInit, OnDestroy {
   isEditMode = signal<boolean>(false);
   isPreviewModalOpen = signal<boolean>(false);
   previewFiles = signal<FilePreviewItem[]>([]);
+  previewSelectedIndex = 0;
 
   claimTypes: ClaimType[] = [];
   private expenseTypesRaw: MedicalExpenseTypeWithBalance[] = [];
@@ -139,9 +161,7 @@ export class MedicalexpensesForm implements OnInit, OnDestroy {
     return diff > 0 ? diff : 0;
   });
 
-  attachments = signal<
-    { id: number; attachmentId?: number; name: string; description: string; file?: File }[]
-  >([]);
+  attachments = signal<MedicalFormAttachment[]>([]);
   removedAttachmentIds = signal<number[]>([]);
   isSaving = signal<boolean>(false);
 
@@ -754,6 +774,11 @@ export class MedicalexpensesForm implements OnInit, OnDestroy {
                 attachmentId: a.attachmentId,
                 name: a.fileName,
                 description: a.remark ?? '',
+                size: a.fileSize,
+                filePath: a.filePath,
+                fileUrl: a.fileUrl,
+                fileType: a.fileType,
+                createdAt: a.createdAt,
               })),
             );
             this.removedAttachmentIds.set([]);
@@ -816,35 +841,125 @@ export class MedicalexpensesForm implements OnInit, OnDestroy {
 
   onFileSelected(event: Event) {
     const input = event.target as HTMLInputElement;
-    if (input.files && input.files.length > 0) {
-      const currentAttachments = this.attachments();
-      const newAttachments = Array.from(input.files).map((file: File, index) => ({
-        id: currentAttachments.length + index + 1,
+    if (input.files) this.addFiles(input.files);
+    input.value = '';
+  }
+
+  private addFiles(files: FileList): void {
+    if (!files.length) return;
+
+    const current = this.attachments();
+    const errorMap = new Map<string, string[]>();
+    const validFiles: File[] = [];
+    const addError = (reason: string, fileName?: string) => {
+      const fileNames = errorMap.get(reason) ?? [];
+      if (fileName) fileNames.push(fileName);
+      errorMap.set(reason, fileNames);
+    };
+
+    for (const file of Array.from(files)) {
+      // ตรวจประเภทไฟล์ก่อน หากไม่ผ่านจะไม่ตรวจเงื่อนไขอื่นของไฟล์นี้ต่อ
+      const extension = file.name.split('.').pop()?.toLowerCase() ?? '';
+      if (
+        !this.FILE_CONFIG.allowedTypes.includes(file.type) &&
+        !this.FILE_CONFIG.allowedExtensions.includes(extension)
+      ) {
+        addError('ประเภทไฟล์ไม่รองรับ', file.name);
+        continue;
+      }
+
+      if (file.size / (1024 * 1024) > this.FILE_CONFIG.maxSizeMB) {
+        addError(`ขนาดเกิน ${this.FILE_CONFIG.maxSizeMB} MB`, file.name);
+        continue;
+      }
+
+      if (current.length + validFiles.length >= this.FILE_CONFIG.maxFiles) {
+        addError(`อัปโหลดได้สูงสุด ${this.FILE_CONFIG.maxFiles} ไฟล์`);
+        continue;
+      }
+
+      validFiles.push(file);
+    }
+
+    if (errorMap.size) {
+      const html = Array.from(errorMap.entries())
+        .map(
+          ([reason, fileNames]) => `
+            <div style="margin-bottom:12px; text-align:center;">
+              <div style="font-weight:700;">${reason}</div>
+              ${
+                fileNames.length
+                  ? `<div style="margin-top:4px; color:#64748b;">${fileNames
+                      .map((name) => `• ${name}`)
+                      .join('<br>')}</div>`
+                  : ''
+              }
+            </div>`,
+        )
+        .join('');
+      void this.swalService.warning('', undefined, html);
+    }
+
+    if (validFiles.length) {
+      const nextId = Math.max(0, ...current.map((attachment) => attachment.id)) + 1;
+      const newAttachments: MedicalFormAttachment[] = validFiles.map((file, index) => ({
+        id: nextId + index,
         name: file.name,
         description: '',
+        size: file.size,
         file,
+        createdAt: dayjs().toISOString(),
       }));
-      this.attachments.update((current) => [...current, ...newAttachments]);
+      this.attachments.set([...current, ...newAttachments]);
     }
-    input.value = '';
   }
 
   close() {
     this.onClose.emit();
   }
 
-  openPreview(file: { name: string }) {
-    this.previewFiles.set([
-      {
-        fileName: file.name,
-        date: this.currentDate(),
-      },
-    ]);
+  viewFile(file: MedicalFormAttachment): void {
+    this.closePreview();
+    const previewableFiles = this.attachments().filter(
+      (item) => item.file || item.fileUrl || item.filePath,
+    );
+    if (!previewableFiles.length) {
+      void this.swalService.warning('ไม่สามารถเปิดดูไฟล์ได้', 'ไม่พบข้อมูลไฟล์สำหรับแสดงตัวอย่าง');
+      return;
+    }
+
+    this.previewSelectedIndex = Math.max(0, previewableFiles.indexOf(file));
+    this.previewFiles.set(
+      previewableFiles.map((item) => {
+        if (item.file) {
+          return {
+            fileName: item.name,
+            date: dayjs(item.createdAt).format('DD/MM/YYYY HH:mm'),
+            url: URL.createObjectURL(item.file),
+            type: item.file.type,
+            remark: item.description,
+          };
+        }
+
+        return this.fileConverter.buildPreviewFile({
+          ...item,
+          fileName: item.name,
+          type: item.fileType,
+          createdDate: item.createdAt,
+          remark: item.description,
+        });
+      }),
+    );
     this.isPreviewModalOpen.set(true);
   }
 
   closePreview() {
     this.isPreviewModalOpen.set(false);
+    for (const file of this.previewFiles()) {
+      if (file.url?.startsWith('blob:')) URL.revokeObjectURL(file.url);
+    }
+    this.previewFiles.set([]);
+    this.previewSelectedIndex = 0;
   }
 
   isValidSave() {
