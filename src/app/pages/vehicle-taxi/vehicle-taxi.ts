@@ -256,7 +256,7 @@ export class VehicleTaxiComponent implements OnInit {
             destination: fromName && toName ? `${fromName} → ${toName}` : fromName || toName,
             distance: 0,
             amount: d.rate_amount ?? 0,
-            attachedFile: attachments.length > 0 ? (attachments[0].file_url ?? null) : null,
+            attachments,
           };
         }),
         ...item,

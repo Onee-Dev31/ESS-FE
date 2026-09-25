@@ -17,6 +17,7 @@ import { FormsModule } from '@angular/forms';
 import { environment } from '../../../../../environments/environment';
 import { ModalShellComponent } from '../../../../components/shared/modal-shell/modal-shell';
 import { ItServiceService } from '../../../../services/it-service.service';
+import { AuthService } from '../../../../services/auth.service';
 
 @Component({
   selector: 'app-assign-modal',
@@ -57,12 +58,81 @@ export class AssignModal {
   selectedCategory: number | null = null;
   problemSource: 'user' | 'system' | null = null;
   private readonly itService = inject(ItServiceService);
+  private readonly authService = inject(AuthService);
   readonly categories = signal<{ id: number; sub_category_name: string; display_order?: number }[]>([]);
   readonly categoriesLoading = signal(false);
   readonly categoriesError = signal(false);
+  readonly mainServices = signal<any[]>([]);
+  readonly userSubOptions = signal<any[]>([]);
+  readonly systemSubOptions = signal<any[]>([]);
+  readonly servicesLoading = signal(false);
+  readonly servicesError = signal(false);
 
   ngOnInit(): void {
     this.loadCategories();
+    this.loadServiceTypes();
+  }
+
+  get canAccessAdditionalTicketTypes(): boolean {
+    const employeeCode = String(this.authService.userData()?.CODEMPID ?? '').trim().toUpperCase();
+    return ['OTD01125', 'OTD01128', 'OTD01050'].includes(employeeCode);
+  }
+
+  readonly canAccessRepairTicketType = !environment.production;
+
+  loadServiceTypes(): void {
+    this.servicesLoading.set(true);
+    this.servicesError.set(false);
+    this.itService.getServiceType().subscribe({
+      next: (res) => {
+        const selectedIds = new Set(
+          (this.ticket?.services ?? []).map((service: any) =>
+            Number(service.service_type_id ?? service.serviceTypeId ?? service.id),
+          ),
+        );
+        const mapOptions = (items: any[] = []) =>
+          items.map((item) => ({
+            ...item,
+            id: Number(item.id),
+            checked: selectedIds.has(Number(item.id)),
+          }));
+        this.mainServices.set(
+          mapOptions((res?.data?.mainServices ?? []).filter((item: any) => Number(item.id) !== 6)),
+        );
+        this.userSubOptions.set(mapOptions(res?.data?.userSubOptions));
+        this.systemSubOptions.set(mapOptions(res?.data?.systemSubOptions));
+        this.servicesLoading.set(false);
+      },
+      error: () => {
+        this.servicesLoading.set(false);
+        this.servicesError.set(true);
+      },
+    });
+  }
+
+  toggleService(id: number): void {
+    this.mainServices.update((items) =>
+      items.map((item) => (Number(item.id) === id ? { ...item, checked: !item.checked } : item)),
+    );
+    this.userSubOptions.update((items) =>
+      items.map((item) => ({ ...item, checked: this.isRequestUserSelected })),
+    );
+  }
+
+  toggleSystemService(id: number): void {
+    this.systemSubOptions.update((items) =>
+      items.map((item) => (Number(item.id) === id ? { ...item, checked: !item.checked } : item)),
+    );
+  }
+
+  get isRequestUserSelected(): boolean {
+    return this.mainServices().some((service) => Number(service.id) === 22 && service.checked);
+  }
+
+  private get selectedServiceTypeIds(): number[] {
+    return [...this.mainServices(), ...this.userSubOptions(), ...this.systemSubOptions()]
+      .filter((item) => item.checked)
+      .map((item) => Number(item.id));
   }
 
   loadCategories(): void {
@@ -96,6 +166,10 @@ export class AssignModal {
         !this.categoriesLoading() && !this.categoriesError() &&
         this.categories().some((category) => category.id === this.selectedCategory) &&
         (this.problemSource === 'user' || this.problemSource === 'system')
+      )) &&
+      (this.effectiveTicketTypeId !== 3 || (
+        !this.servicesLoading() && !this.servicesError() &&
+        [...this.mainServices(), ...this.systemSubOptions()].some((item) => item.checked)
       ));
   }
 
@@ -249,6 +323,7 @@ export class AssignModal {
       assignees: this.selectedAssigneeEmpCodes,
       ticketTypeId,
       subCategoryId: ticketTypeId === 2 ? this.selectedCategory : null,
+      serviceTypeIds: ticketTypeId === 3 ? this.selectedServiceTypeIds : [],
       problemSource: ticketTypeId === 2 ? this.problemSource : null,
       ticketId: this.ticketId,
       reason: this.reason.trim() || undefined,

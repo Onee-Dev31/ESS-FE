@@ -119,11 +119,17 @@ export interface LeaveApprovalRequest {
   status: string;
   created_at: string;
   approver1_code: string;
+  approver1_first_name: string;
+  approver1_last_name: string;
+  approver1_nickname: string;
   approver1_action: string | null;
   approver1_action_date: string | null;
   approver1_comment?: string | null;
   approver1_reason?: string | null;
   approver2_code: string | null;
+  approver2_first_name: string;
+  approver2_last_name: string;
+  approver2_nickname: string;
   approver2_action: string | null;
   approver2_action_date: string | null;
   approver2_comment?: string | null;

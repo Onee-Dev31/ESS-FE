@@ -1194,6 +1194,46 @@
   }
 }
 
+.taxi-attachment-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--text-muted);
+  font: inherit;
+  cursor: pointer;
+
+  i {
+    width: 14px;
+    flex: 0 0 14px;
+    color: var(--text-muted);
+    text-align: center;
+  }
+
+  span {
+    padding: 4px 8px;
+    border-radius: 8px;
+    background: var(--border-toolbar);
+    color: var(--text-sub);
+    font-size: $font-size-label;
+    line-height: 1.2;
+    white-space: nowrap;
+  }
+
+  &:hover span {
+    color: var(--primary);
+    background: var(--status-new-bg);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 3px;
+    border-radius: 4px;
+  }
+}
+
 // ── Day type badge ───────────────────────────────────────────
 .shift-time-range {
   font-size: 0.72rem;

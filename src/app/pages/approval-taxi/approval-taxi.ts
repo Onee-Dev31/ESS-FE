@@ -113,13 +113,11 @@ export class ApprovalTaxiComponent implements OnInit {
 
     this.taxiApiService.getTaxiClaimsForApprover(excuteBy, apiStatus).subscribe({
       next: (res) => {
-        console.log('Taxi claims loaded:', res);
         const claims = res.data ?? [];
         const details = Array.isArray(res.details ?? res.detail) ? (res.details ?? res.detail) : [];
         const mapped = claims.map((c: any) =>
           this.mapClaimToApproval(c, claims.length === 1 ? details : [], displayStatus),
         );
-        console.log('Mapped approvals:', mapped);
         this.approvals.set(mapped);
         this.statusCounts.set(
           (res.statusCounts ?? []).reduce((counts: Record<string, number>, item: any) => {
@@ -176,7 +174,6 @@ export class ApprovalTaxiComponent implements OnInit {
       const toName: string =
         d.other_to?.trim() || d.location_to_name || (d.location_to_id === 1 ? 'Office' : '');
       const rawAttachments: any[] = d.attachments ?? [];
-
       return {
         date: d.work_date ?? '',
         description: d.description ?? '',
@@ -190,6 +187,7 @@ export class ApprovalTaxiComponent implements OnInit {
                 fileName: a.fileName ?? a.file_name ?? '',
                 fileUrl: a.fileUrl ?? a.file_url ?? '',
                 fileType: a.fileType ?? a.file_type ?? '',
+                createdDate: a.created_at,
               },
         ),
       };

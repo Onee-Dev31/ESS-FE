@@ -401,6 +401,24 @@
   width: fit-content;
 }
 
+.service-group-label {
+  margin-top: 12px;
+  font-weight: 600;
+  color: var(--text);
+
+  &--spaced {
+    margin-top: 18px;
+  }
+}
+
+.basic-system {
+  margin-top: 12px;
+  padding: 12px 14px;
+  border-radius: 8px;
+  background: var(--bg-slate);
+  color: var(--text);
+}
+
 .assign-modal-body {
   flex: 1;
   overflow: hidden;

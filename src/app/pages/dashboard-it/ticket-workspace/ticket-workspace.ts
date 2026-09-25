@@ -1974,6 +1974,13 @@ export class TicketWorkspaceComponent implements OnInit, OnChanges {
         concatMap((res) => {
           if (!res?.success) return of(res);
           acknowledged = true;
+          if (Number(tag) === 3) {
+            return this.itServiceService.updateChangeSubCatService({
+              ticketID: Number(ticketId),
+              serviceTypeIDs: data.serviceTypeIds ?? [],
+              executeBy: this.authService.userData()?.AD_USER ?? '',
+            });
+          }
           return this.itServiceService
             .updateSubcatProblemby({
               ticketID: Number(ticketId),
@@ -2533,6 +2540,13 @@ export class TicketWorkspaceComponent implements OnInit, OnChanges {
         concatMap((res) => {
           if (!res?.success) return of(res);
           assigned = true;
+          if (Number(typeTicket) === 3) {
+            return this.itServiceService.updateChangeSubCatService({
+              ticketID: Number(ticketId),
+              serviceTypeIDs: data.serviceTypeIds ?? [],
+              executeBy: this.authService.userData()?.AD_USER ?? '',
+            });
+          }
           return this.itServiceService
             .updateSubcatProblemby({
               ticketID: Number(ticketId),

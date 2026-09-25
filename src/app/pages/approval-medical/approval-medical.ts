@@ -125,7 +125,6 @@ export class ApprovalMedicalComponent implements OnInit {
       })
       .subscribe({
         next: (res) => {
-          console.log(res);
           const mapped = res.data.map((c) => this.mapClaimToApproval(c));
           this.approvals.set(mapped);
           this.listing.currentPage.set(0);
@@ -369,7 +368,6 @@ export class ApprovalMedicalComponent implements OnInit {
   }
 
   async exportExcel() {
-    // console.log(this.selectedItems());
     this.loadingService.start('export');
 
     const adUser = this.authService.currentUser() || '';

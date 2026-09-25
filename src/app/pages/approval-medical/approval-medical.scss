@@ -566,10 +566,15 @@ $status-danger-text: var(--status-danger-text);
           background: var(--bg-slate);
           color: var(--text-sub);
           line-height: 1.2;
+          transition:
+            background 0.2s ease,
+            color 0.2s ease;
         }
 
-        &:hover .file-count {
-          background: var(--border-toolbar);
+        &:hover .file-count,
+        &:focus-visible .file-count {
+          color: var(--primary);
+          background: var(--status-new-bg);
         }
       }
     }

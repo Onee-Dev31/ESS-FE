@@ -176,19 +176,10 @@ export class ApprovalTimeoff implements OnInit {
 
     const currentYear = new Date().getFullYear();
     const status = this.listing.filterStatus() as ApprovalFilter;
-
-    console.log('[getApprovalsListByEmpCode] Request', {
-      approverCode,
-      status,
-      yearFrom: currentYear,
-      yearTo: currentYear,
-    });
-
     this.timeOffService
       .getApprovalsListByEmpCode(approverCode, status, currentYear, currentYear)
       .subscribe({
         next: (response) => {
-          console.log('[getApprovalsListByEmpCode] Response ', response);
           this.approvals.set(response.data);
           this.approvalCounts.set(response.counts);
           this.listing.currentPage.set(0);
@@ -276,7 +267,8 @@ export class ApprovalTimeoff implements OnInit {
       { label: 'คำขอใหม่', state: isCancelled ? 'cancelled' : 'completed' },
       {
         label: 'ผู้อนุมัติคนที่ 1',
-        approverCode: item.approver1_code?.trim() || undefined,
+        approverCode: `${item.approver1_first_name} (${item.approver1_nickname})` || undefined,
+        // approverCode: item.approver1_code?.trim() || undefined,
         actionReason: item.approver1_comment?.trim() || item.approver1_reason?.trim() || undefined,
         state: firstApproverState,
       },
@@ -285,7 +277,8 @@ export class ApprovalTimeoff implements OnInit {
     if (hasSecondApprover) {
       steps.push({
         label: 'ผู้อนุมัติคนที่ 2',
-        approverCode: item.approver2_code?.trim() || undefined,
+        approverCode: `${item.approver2_first_name} (${item.approver2_nickname})` || undefined,
+        // approverCode: item.approver2_code?.trim() || undefined,
         actionReason: item.approver2_comment?.trim() || item.approver2_reason?.trim() || undefined,
         state: isCancelled
           ? 'pending'
@@ -374,7 +367,6 @@ export class ApprovalTimeoff implements OnInit {
       status: action,
       comment,
     };
-    console.log(payload);
     this.timeOffService.approveLeaveRequestV2(payload).subscribe({
       next: () => {
         this.toastService.success('บันทึกผลการอนุมัติเรียบร้อย');
@@ -404,7 +396,6 @@ export class ApprovalTimeoff implements OnInit {
   }
 
   openAllAttachments(files: unknown[]): void {
-    console.log('openAllAttachments', files);
     if (!files?.length) return;
     this.previewFiles.set(this.fileConverter.buildPreviewFiles(files));
     this.isPreviewModalOpen.set(true);

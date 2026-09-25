@@ -279,17 +279,9 @@ export class VehicleTaxiFormV2Component implements OnInit, OnChanges {
 
         let hasAttachmentLoadError = false;
         const itemPromises = claimDetails.map(async (detail) => {
-          let attachedFiles: any[] = [];
-          if (detail.attachments.length) {
-            try {
-              attachedFiles = await this.fileConvertService.convertUrlsToFiles(detail.attachments);
-            } catch (error) {
-              // ไฟล์แนบโหลดไม่ได้ (เช่น ปัญหา CORS/URL ที่ฝั่งไฟล์เซิร์ฟเวอร์) ไม่ควรบล็อกไม่ให้
-              // เปิดฟอร์มแก้ไขทั้งใบ ให้ข้ามไฟล์แนบตัวนั้นไปแทน แล้วแจ้งเตือนแยกต่างหาก
-              console.error('โหลดไฟล์แนบไม่สำเร็จ:', error);
-              hasAttachmentLoadError = true;
-            }
-          }
+          const attachedFiles = detail.attachments.length
+            ? await this.fileConvertService.mapAttachmentMetadata(detail.attachments)
+            : [];
 
           return {
             clientId: this.createClientId(),
@@ -725,7 +717,9 @@ export class VehicleTaxiFormV2Component implements OnInit, OnChanges {
     if (this.isSubmitting) return;
 
     const selectedItems = this.items.filter((item) => item.selected);
+
     const empCode = this.authService.userData().CODEMPID;
+
     const details = selectedItems.map((item) => {
       const detail = {
         work_date: this.toDateKey(item.date),
@@ -736,35 +730,101 @@ export class VehicleTaxiFormV2Component implements OnInit, OnChanges {
         other_to: item.otherTo ?? '',
         rate_amount: Number(item.amount) || 0,
       } as Record<string, string | number>;
-      if (this.isEditMode && item.detailId != null) detail['detail_id'] = item.detailId;
+
+      if (this.isEditMode && item.detailId != null) {
+        detail['detail_id'] = item.detailId;
+      }
+
       return detail;
     });
 
-    const files: any[] = [];
-    const detail_indexes: number[] = [];
-
-    selectedItems.forEach((item, index) => {
-      if (item.attachedFiles?.length) {
-        item.attachedFiles.forEach((file) => {
-          files.push(file);
-          detail_indexes.push(index);
-        });
-      }
-    });
-
-    // สร้าง FormData
     const formData = new FormData();
 
-    files.forEach((file, i) => {
-      const actualFile = file instanceof File ? file : file?.file;
-      if (!actualFile) return; // skip ถ้าไม่มีไฟล์จริง
-      formData.append('files', actualFile);
-      formData.append('detail_indexes', detail_indexes[i].toString());
+    const keptAttachments: any[] = [];
+
+    selectedItems.forEach((item, detailIndex) => {
+      item.attachedFiles?.forEach((attachment: any) => {
+        // ไฟล์ใหม่
+        if (attachment instanceof File) {
+          formData.append('files', attachment);
+          formData.append('detail_indexes', detailIndex.toString());
+          return;
+        }
+
+        // ไฟล์ใหม่ที่ถูก wrap
+        if (attachment?.file instanceof File) {
+          formData.append('files', attachment.file);
+          formData.append('detail_indexes', detailIndex.toString());
+          return;
+        }
+
+        // ไฟล์เดิม
+        if (this.isEditMode && attachment.attachment_id) {
+          keptAttachments.push({
+            detail_index: detailIndex,
+            file_name: attachment.file_name ?? attachment.name,
+            file_path: attachment.file_path ?? attachment.filePath,
+            file_url: attachment.file_url ?? attachment.filePath,
+            file_type: attachment.file_type ?? attachment.type,
+            file_size: attachment.file_size ?? attachment.size,
+          });
+        }
+      });
     });
+
     details.forEach((detail) => {
       formData.append('details', JSON.stringify(detail));
     });
+
     formData.append('employee_code', empCode);
+
+    if (this.isEditMode) {
+      formData.append('kept_attachments', JSON.stringify(keptAttachments));
+    }
+
+    // const selectedItems = this.items.filter((item) => item.selected);
+    // const empCode = this.authService.userData().CODEMPID;
+    // const details = selectedItems.map((item) => {
+    //   const detail = {
+    //     work_date: this.toDateKey(item.date),
+    //     description: item.description ?? '',
+    //     location_from_id: item.locationFromId ?? 0,
+    //     location_to_id: item.locationToId ?? 0,
+    //     other_from: item.otherFrom ?? '',
+    //     other_to: item.otherTo ?? '',
+    //     rate_amount: Number(item.amount) || 0,
+    //   } as Record<string, string | number>;
+    //   if (this.isEditMode && item.detailId != null) detail['detail_id'] = item.detailId;
+    //   return detail;
+    // });
+
+    // console.log(this.items);
+
+    // const files: any[] = [];
+    // const detail_indexes: number[] = [];
+
+    // selectedItems.forEach((item, index) => {
+    //   if (item.attachedFiles?.length) {
+    //     item.attachedFiles.forEach((file) => {
+    //       files.push(file);
+    //       detail_indexes.push(index);
+    //     });
+    //   }
+    // });
+
+    // // สร้าง FormData
+    // const formData = new FormData();
+
+    // files.forEach((file, i) => {
+    //   const actualFile = file instanceof File ? file : file?.file;
+    //   if (!actualFile) return; // skip ถ้าไม่มีไฟล์จริง
+    //   formData.append('files', actualFile);
+    //   formData.append('detail_indexes', detail_indexes[i].toString());
+    // });
+    // details.forEach((detail) => {
+    //   formData.append('details', JSON.stringify(detail));
+    // });
+    // formData.append('employee_code', empCode);
 
     // console.log("formData", [...formData.entries()]);
 
