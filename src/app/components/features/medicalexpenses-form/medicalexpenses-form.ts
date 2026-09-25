@@ -159,6 +159,19 @@ export class MedicalexpensesForm implements OnInit, OnDestroy {
     return end.diff(start, 'day') + 1;
   });
 
+  private getEffectiveRemainingAmount(type: MedicalExpenseTypeWithBalance): number {
+    const typeRemaining = Number(type.remainingAmount || 0);
+    const code = type.code.toUpperCase();
+    const usesOpdBalance = type.isSubOfOpd || ['DENTAL', 'VISION'].includes(code);
+    if (!usesOpdBalance) return typeRemaining;
+
+    // ประเภทย่อยต้องตรวจทั้งวงเงินของตัวเองและวงเงิน OPD ที่ใช้ร่วมกัน
+    const opdType = this.expenseTypesRaw.find((item) => item.code.toUpperCase() === 'OPD');
+    if (!opdType) return typeRemaining;
+
+    return Math.min(typeRemaining, Number(opdType.remainingAmount || 0));
+  }
+
   private mapExpenseType(type: MedicalExpenseTypeWithBalance): ClaimType {
     const iconMap: Record<string, string> = {
       stethoscope: 'fas fa-stethoscope',
@@ -182,7 +195,7 @@ export class MedicalexpensesForm implements OnInit, OnDestroy {
     const blockedByProbation = type.eligibleAfterProbation && probationStatus !== 'passed';
     const isEditingOriginalType = this.isEditMode() && this.editingExpenseTypeId === type.typeId;
     const disabled =
-      type.remainingAmount <= 0 ||
+      this.getEffectiveRemainingAmount(type) <= 0 ||
       (!isEditingOriginalType &&
         (type.isSelectable === false || (!hasBackendEligibility && blockedByProbation)));
     const disabledReason = disabled
@@ -668,6 +681,7 @@ export class MedicalexpensesForm implements OnInit, OnDestroy {
     const currentCode = currentType.code.toUpperCase();
     const usesOpdBalance = currentType.isSubOfOpd || ['DENTAL', 'VISION'].includes(currentCode);
 
+    // โหมดแก้ไขได้รับยอดหลังหักรายการเดิมแล้ว จึงต้องคืนวงเงินของรายการเดิมก่อน
     if (usesOpdBalance) {
       const opdIndex = this.expenseTypesRaw.findIndex((type) => type.code.toUpperCase() === 'OPD');
       if (opdIndex >= 0) affectedIndexes.add(opdIndex);
@@ -1122,14 +1136,15 @@ export class MedicalexpensesForm implements OnInit, OnDestroy {
 
   private validateAmountAgainstSelectedClaimType(): void {
     const selectedId = this.selectedClaimType();
-    const claim = this.claimTypes.find((item) => item.id === selectedId);
+    const rawType = this.expenseTypesRaw.find((item) => item.code.toLowerCase() === selectedId);
 
-    if (!claim || !this.amount.trim()) {
+    if (!rawType || !this.amount.trim()) {
       this.amountError = null;
       return;
     }
 
-    const maxAmount = this.parseNumber(claim.amount || 0);
+    // ตรวจจากวงเงินที่เบิกได้จริง ไม่ใช่เฉพาะยอดคงเหลือที่แสดงบนการ์ด
+    const maxAmount = this.getEffectiveRemainingAmount(rawType);
     const numericValue = this.parseNumber(this.amount);
 
     this.amountError =
