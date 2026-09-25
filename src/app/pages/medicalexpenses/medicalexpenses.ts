@@ -1,7 +1,7 @@
 import { Component, OnInit, signal, computed, inject, Inject, PLATFORM_ID } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { MedicalClaim } from '../../interfaces/medical.interface';
 import { ApprovalItem } from '../../interfaces/approval.interface';
 import { MedicalService } from '../../services/medical.service';
@@ -54,6 +54,7 @@ export class MedicalexpensesComponent implements OnInit {
   private medicalService = inject(MedicalService);
   private authService = inject(AuthService);
   private route = inject(ActivatedRoute);
+  private router = inject(Router);
   private loadingService = inject(LoadingService);
   private errorService = inject(ErrorService);
   private fileConverter = inject(FileConverterService);
@@ -307,6 +308,7 @@ export class MedicalexpensesComponent implements OnInit {
 
   closeDetail() {
     this.selectedDetailItem.set(null);
+    this.clearAutoOpenQueryParams();
   }
 
   private toApprovalStatus(status: string): 'Pending' | 'Approved' | 'Rejected' | 'Referred Back' {
@@ -350,7 +352,14 @@ export class MedicalexpensesComponent implements OnInit {
   closeModal() {
     this.isModalOpen.set(false);
     this.selectedClaimId.set(null);
+    this.clearAutoOpenQueryParams();
     this.loadData();
+  }
+
+  /** เคลียร์ query string (claimId/_t) ที่ค้างจากตอนกดเข้ามาจาก toast noti */
+  private clearAutoOpenQueryParams() {
+    if (!Object.keys(this.route.snapshot.queryParams).length) return;
+    this.router.navigate([], { relativeTo: this.route, queryParams: {}, replaceUrl: true });
   }
 
   clearFilters() {

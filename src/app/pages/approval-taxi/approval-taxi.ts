@@ -1,7 +1,7 @@
 import { Component, signal, inject, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { ApprovalDetailModalComponent } from '../../components/modals/approval-detail-modal/approval-detail-modal';
 import { FilePreviewModalComponent } from '../../components/modals/file-preview-modal/file-preview-modal';
 import { ApprovalItem } from '../../interfaces/approval.interface';
@@ -57,6 +57,7 @@ export class ApprovalTaxiComponent implements OnInit {
   private taxiApiService = inject(TaxiService);
   private authService = inject(AuthService);
   private route = inject(ActivatedRoute);
+  private router = inject(Router);
   dateUtil = inject(DateUtilityService);
   private loadingService = inject(LoadingService);
   private errorService = inject(ErrorService);
@@ -89,11 +90,13 @@ export class ApprovalTaxiComponent implements OnInit {
 
   ngOnInit() {
     const voucherNo = this.route.snapshot.queryParamMap.get('voucherNo') || '';
-    this.loadTaxiClaims(voucherNo);
+    const claimIdParam = this.route.snapshot.queryParamMap.get('claimId');
+    const claimId = claimIdParam ? Number(claimIdParam) : undefined;
+    this.loadTaxiClaims(voucherNo, claimId);
   }
 
-  /** โหลดรายการคำขออนุมัติค่าแท็กซี่จาก API */
-  loadTaxiClaims(autoOpenVoucherNo?: string) {
+  /** โหลดรายการคำขออนุมัติค่าแท็กซี่จาก API — คลิกจาก toast (claimId) หรือ voucherNo แล้วเปิด detail อัตโนมัติ */
+  loadTaxiClaims(autoOpenVoucherNo?: string, autoOpenClaimId?: number) {
     const excuteBy = this.authService.userData()?.CODEMPID ?? '';
     const selectedStatus = this.listing.filterStatus();
     const hasHrRole = (this.authService.userRole() ?? '')
@@ -130,7 +133,12 @@ export class ApprovalTaxiComponent implements OnInit {
         this.isRefreshing.set(false);
         this.initialized = true;
 
-        if (autoOpenVoucherNo) {
+        if (autoOpenClaimId != null && !Number.isNaN(autoOpenClaimId)) {
+          const target = mapped.find(
+            (item: ApprovalItem) => Number(item.requestId) === autoOpenClaimId,
+          );
+          if (target) this.viewDetail(target);
+        } else if (autoOpenVoucherNo) {
           const target = mapped.find((item: ApprovalItem) => item.requestNo === autoOpenVoucherNo);
           if (target) this.viewDetail(target);
         }
@@ -289,7 +297,14 @@ export class ApprovalTaxiComponent implements OnInit {
     this.isModalOpen.set(false);
     this.selectedItem.set(null);
     this.initialAction.set(null);
+    this.clearAutoOpenQueryParams();
     this.loadTaxiClaims();
+  }
+
+  /** เคลียร์ query string (claimId/voucherNo/_t) ที่ค้างจากตอนกดเข้ามาจาก toast noti */
+  private clearAutoOpenQueryParams() {
+    if (!Object.keys(this.route.snapshot.queryParams).length) return;
+    this.router.navigate([], { relativeTo: this.route, queryParams: {}, replaceUrl: true });
   }
 
   onStatusUpdated() {

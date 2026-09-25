@@ -8,7 +8,7 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { ApprovalDetailModalComponent } from '../../components/modals/approval-detail-modal/approval-detail-modal';
 import { FilePreviewModalComponent } from '../../components/modals/file-preview-modal/file-preview-modal';
 import { ApprovalItem } from '../../interfaces/approval.interface';
@@ -60,6 +60,7 @@ export class ApprovalMedicalComponent implements OnInit {
   private medicalApiService = inject(MedicalService);
   private authService = inject(AuthService);
   private route = inject(ActivatedRoute);
+  private router = inject(Router);
   dateUtil = inject(DateUtilityService);
   private toastService = inject(ToastService);
   private loadingService = inject(LoadingService);
@@ -295,7 +296,14 @@ export class ApprovalMedicalComponent implements OnInit {
     this.isModalOpen.set(false);
     this.selectedItem.set(null);
     this.initialAction.set(null);
+    this.clearAutoOpenQueryParams();
     this.loadMedicalClaims();
+  }
+
+  /** เคลียร์ query string (claimId/voucherNo/_t) ที่ค้างจากตอนกดเข้ามาจาก toast noti */
+  private clearAutoOpenQueryParams() {
+    if (!Object.keys(this.route.snapshot.queryParams).length) return;
+    this.router.navigate([], { relativeTo: this.route, queryParams: {}, replaceUrl: true });
   }
 
   onStatusUpdated() {

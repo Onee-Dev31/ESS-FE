@@ -277,6 +277,7 @@ export class VehicleTaxiFormV2Component implements OnInit, OnChanges {
           originalTotalsByDate.set(date, (originalTotalsByDate.get(date) || 0) + amount);
         });
 
+        let hasAttachmentLoadError = false;
         const itemPromises = claimDetails.map(async (detail) => {
           const attachedFiles = detail.attachments.length
             ? await this.fileConvertService.mapAttachmentMetadata(detail.attachments)
@@ -329,6 +330,9 @@ export class VehicleTaxiFormV2Component implements OnInit, OnChanges {
               }
 
               this.isLoading = false;
+              if (hasAttachmentLoadError) {
+                this.toastService.warning('ไฟล์แนบบางรายการโหลดไม่สำเร็จ');
+              }
               this.cdr.markForCheck();
             });
           })

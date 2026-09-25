@@ -54,7 +54,13 @@ export class FileConverterService {
 
   // แปลงไฟล์เดียว
   async convertUrlToFile(fileData: any): Promise<ConvertedFile> {
-    const response = await fetch(fileData.FILE_DIR || fileData.file_url);
+    // attachments บาง endpoint (เช่น taxi-claim) ส่งมาเป็น string url ตรงๆ ไม่ใช่ object
+    // ต้อง normalize ก่อน ไม่งั้น fileData.FILE_DIR/.file_url จะเป็น undefined เสมอ
+    if (typeof fileData === 'string') {
+      fileData = { FILE_DIR: fileData, FILE_NAME: fileData.split('/').pop() || 'ไฟล์แนบ' };
+    }
+    const rawUrl = fileData.FILE_DIR || fileData.file_url;
+    const response = await fetch(this.toAbsoluteFileUrl(rawUrl, fileData.isNew));
     if (!response.ok)
       throw new Error('Failed to fetch file: ' + (fileData.FILE_NAME || fileData.file_name));
 
@@ -101,6 +107,31 @@ export class FileConverterService {
     return await Promise.all(fileArray.map((f) => this.convertUrlToFile(f)));
   }
 
+  // เติม host ให้ path ที่เป็น relative (เช่น /uploads-uat/claims-uat/xxx.jpg) ให้เป็น URL เต็ม
+  // ก่อนใช้งานจริง (แสดง preview หรือ fetch) ไม่งั้น browser จะ resolve relative ต่อจาก origin
+  // ของหน้าเว็บเอง (เช่น localhost:4200) แทนที่จะเป็น backend
+  private toAbsoluteFileUrl(url: string | undefined, isNew?: boolean): string {
+    if (!url || url.startsWith('http://') || url.startsWith('https://') || isNew) return url ?? '';
+
+    if (url.startsWith('/uploads-uat/tickets-uat')) {
+      url = url.replace('/uploads-uat/tickets-uat', '/ticket');
+    }
+
+    if (url.startsWith('/uploads-uat/claims-uat')) {
+      url = url.replace('/uploads-uat/claims-uat', '/claim');
+    }
+
+    if (url.startsWith('/uploads-uat/freelance-uat')) {
+      url = url.replace('/uploads-uat/freelance-uat', '/freelance');
+    }
+
+    if (url.startsWith('/uploads-uat/leave-uat')) {
+      url = url.replace('/uploads-uat/leave-uat', '/leave');
+    }
+
+    return this.FILE_URL + (url.startsWith('/') ? '' : '/') + url;
+  }
+
   buildPreviewFile(file: any) {
     // console.log(file);
     let url = file.filePath || file.file_path || file.fileUrl || file.file_url || file.url;
@@ -114,41 +145,8 @@ export class FileConverterService {
     }
 
     // console.log('buildPreviewFile (ก่อน) > ', url);
-    if (url && !url.startsWith('http://') && !url.startsWith('https://') && !file.isNew) {
-      // if (url.startsWith('/uploads/tickets')) {
-      //   url = url.replace('/uploads/tickets', '/ticket');
-      // }
-
-      // if (url.startsWith('/uploads/claims')) {
-      //   url = url.replace('/uploads/claims', '/claim');
-      // }
-
-      // if (url.startsWith('/uploads/freelance')) {
-      //   url = url.replace('/uploads/freelance', '/freelance');
-      // }
-
-      // if (url.startsWith('/uploads/leave')) {
-      //   url = url.replace('/uploads/leave', '/leave');
-      // }
-
-      //UAT
-      if (url.startsWith('/uploads-uat/tickets-uat')) {
-        url = url.replace('/uploads-uat/tickets-uat', '/ticket');
-      }
-
-      if (url.startsWith('/uploads-uat/claims-uat')) {
-        url = url.replace('/uploads-uat/claims-uat', '/claim');
-      }
-
-      if (url.startsWith('/uploads-uat/freelance-uat')) {
-        url = url.replace('/uploads-uat/freelance-uat', '/freelance');
-      }
-
-      if (url.startsWith('/uploads-uat/leave-uat')) {
-        url = url.replace('/uploads-uat/leave-uat', '/leave');
-      }
-
-      url = this.FILE_URL + (url.startsWith('/') ? '' : '/') + url;
+    if (url) {
+      url = this.toAbsoluteFileUrl(url, file.isNew);
     }
 
     // console.log('buildPreviewFile (หลัง)> ', url);
