@@ -30,8 +30,32 @@
             />
             <span>แจ้งปัญหา</span>
           </label>
+          @if (canAccessRepairTicketType) {
+            <label class="tag">
+              <input
+                type="radio"
+                name="tag"
+                [value]="1"
+                [(ngModel)]="selectedTag"
+                (ngModelChange)="onTagChange()"
+              />
+              <span>แจ้งซ่อม</span>
+            </label>
+          }
+          @if (canAccessAdditionalTicketTypes) {
+            <label class="tag">
+              <input
+                type="radio"
+                name="tag"
+                [value]="3"
+                [(ngModel)]="selectedTag"
+                (ngModelChange)="onTagChange()"
+              />
+              <span>ขอใช้บริการ</span>
+            </label>
+          }
           <!-- ตอน DEPLOY PROD ยังไม่ให้มีแจ้งซ่อม และ ขอใช้บริการ -->
-          <!-- <label class="tag">
+          <label class="tag">
             <input
               type="radio"
               name="tag"
@@ -41,7 +65,7 @@
             />
             <span>แจ้งซ่อม</span>
           </label>
-          @if (ticket?.viaEmail === true) {
+          <!-- @if (ticket?.viaEmail === true) {
             <label class="tag">
               <input
                 type="radio"
@@ -97,6 +121,55 @@
             <span>system</span>
           </label>
         </div>
+      </fieldset>
+    }
+
+    @if (effectiveTicketTypeId === 3) {
+      <fieldset class="problem-field">
+        <legend>ประเภทบริการ (Service Type) <span class="required">*</span></legend>
+        @if (servicesLoading()) {
+          <p role="status">กำลังโหลดประเภทบริการ...</p>
+        } @else if (servicesError()) {
+          <p role="alert">โหลดประเภทบริการไม่สำเร็จ</p>
+          <button type="button" class="modal-button" (click)="loadServiceTypes()">
+            <i class="fas fa-rotate-right"></i> ลองใหม่
+          </button>
+        } @else {
+          <div class="service-group-label">ระบบพื้นฐาน</div>
+          <div class="tag-group">
+            @for (service of mainServices(); track service.id) {
+              <label class="tag">
+                <input
+                  type="checkbox"
+                  [checked]="service.checked"
+                  (change)="toggleService(service.id)"
+                />
+                <span>{{ service.label }}</span>
+              </label>
+            }
+          </div>
+          @if (isRequestUserSelected) {
+            <div class="basic-system">
+              <strong>รายการระบบ:</strong>
+              @for (service of userSubOptions(); track service.id; let last = $last) {
+                <span>{{ service.label }}{{ !last ? ', ' : '' }}</span>
+              }
+            </div>
+          }
+          <div class="service-group-label service-group-label--spaced">ระบบเฉพาะ</div>
+          <div class="tag-group">
+            @for (service of systemSubOptions(); track service.id) {
+              <label class="tag">
+                <input
+                  type="checkbox"
+                  [checked]="service.checked"
+                  (change)="toggleSystemService(service.id)"
+                />
+                <span>{{ service.label }}</span>
+              </label>
+            }
+          </div>
+        }
       </fieldset>
     }
 

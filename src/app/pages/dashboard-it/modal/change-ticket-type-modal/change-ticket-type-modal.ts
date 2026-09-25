@@ -21,6 +21,7 @@ import {
   FilePreviewItem,
   FilePreviewModalComponent,
 } from '../../../../components/modals/file-preview-modal/file-preview-modal';
+import { environment } from '../../../../../environments/environment';
 
 @Component({
   selector: 'app-change-ticket-type-modal',
@@ -63,11 +64,11 @@ export class ChangeTicketTypeModal implements OnChanges, OnDestroy {
   readonly fileConfig = IT_ATTACHMENT_FILE_CONFIG;
 
   get ticketTypes(): { id: number; label: string }[] {
-    const types = [
-      { id: 2, label: 'แจ้งปัญหา' },
-      // ตอน DEPLOY PROD ยังไม่ให้มีแจ้งซ่อม และ ขอใช้บริการ
-      // { id: 1, label: 'แจ้งซ่อม' },
-    ];
+    const types = [{ id: 2, label: 'แจ้งปัญหา' }];
+
+    if (!environment.production) {
+      types.push({ id: 1, label: 'แจ้งซ่อม' });
+    }
 
     if (this.canAccessAdditionalTicketTypes) {
       types.push({ id: 3, label: 'ขอใช้บริการ' });
