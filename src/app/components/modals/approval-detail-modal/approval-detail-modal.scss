@@ -1094,9 +1094,6 @@
     border-bottom: 1px solid var(--border-color);
     transition: background 0.15s;
 
-    &:last-child {
-      border-bottom: none;
-    }
     &:hover {
       background: var(--bg-slate);
     }
@@ -1353,6 +1350,28 @@
       border-top: 1px solid var(--border-color) !important;
     }
   }
+
+  .taxi-detail-table tbody tr {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+
+    td:nth-child(1) { order: 1; }
+    td:nth-child(2) { order: 2; }
+    td:nth-child(3) { order: 4; }
+    td:nth-child(4) { order: 5; }
+    td:nth-child(5) {
+      order: 3;
+      align-items: flex-end;
+      color: var(--primary);
+      font-size: 0.9rem;
+      font-weight: 700;
+
+      &::before { text-align: right; }
+    }
+    td:nth-child(6) {
+      order: 6;
+      grid-column: auto;
+    }
+  }
 }
 
 @media (max-width: 480px) {
@@ -1378,5 +1397,16 @@
 
   .vehicle-detail-table tbody tr td:nth-child(5) {
     order: 2;
+  }
+
+  .taxi-detail-table tbody tr {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+
+    td:nth-child(1) { order: 1; }
+    td:nth-child(5) { order: 2; }
+    td:nth-child(2) { order: 3; }
+    td:nth-child(6) { order: 4; }
+    td:nth-child(3) { order: 5; }
+    td:nth-child(4) { order: 6; }
   }
 }
