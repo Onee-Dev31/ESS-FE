@@ -831,7 +831,24 @@ app-empty-state {
     justify-content: flex-start;
 
     .btn-attach {
-      padding: 2px 8px;
+      // padding: 2px 8px;
+      display: inline-flex;
+      width: fit-content;
+      align-items: center;
+      padding: 4px 8px;
+      border: 0;
+      border-radius: 8px;
+      background: var(--border-toolbar);
+      color: var(--text-sub);
+      font: inherit;
+      font-size: clamp(12px, 1vw, 14px);
+      line-height: 1.2;
+      cursor: pointer;
+    }
+
+    .btn-attach:hover {
+      color: var(--primary);
+      background: var(--status-new-bg);
     }
   }
 }

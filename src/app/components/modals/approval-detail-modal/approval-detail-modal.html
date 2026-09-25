@@ -409,13 +409,16 @@
                       </td>
                       <td data-label="เอกสาร">
                         @if (d.attachments?.length) {
-                          <button
-                            type="button"
-                            class="btn-view-all"
-                            (click)="openPreview(d.attachments)"
-                          >
-                            <i class="far fa-eye"></i> {{ d.attachments.length }}
-                          </button>
+                          <div class="attachment-file">
+                            <i class="fa-solid fa-file"></i>
+                            <button
+                              type="button"
+                              class="btn-view-all"
+                              (click)="openPreview(d.attachments)"
+                            >
+                              {{ d.attachments.length }} ไฟล์
+                            </button>
+                          </div>
                         } @else {
                           -
                         }
