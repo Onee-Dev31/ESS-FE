@@ -469,7 +469,6 @@ export class ApprovalDetailModalComponent implements OnChanges {
       this.loadFallbackDetail(item, loadVersion);
       return;
     }
-
     this.taxiDetail.set(claim); //ใช้ค่าจาก GetTaxiClaimsForApprover เลย
 
     const empCode = claim.employeeCode;
@@ -705,8 +704,9 @@ export class ApprovalDetailModalComponent implements OnChanges {
   }
 
   openPreview(att: any) {
+    console.log(att);
     if (!att) return;
-    this.previewFiles.set([this.fileConverter.buildPreviewFile(att)]);
+    this.previewFiles.set(this.fileConverter.buildPreviewFiles(att));
     this.isPreviewModalOpen.set(true);
   }
 

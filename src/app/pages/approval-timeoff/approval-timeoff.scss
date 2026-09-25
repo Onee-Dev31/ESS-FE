@@ -27,7 +27,7 @@
   padding: 24px;
   background: var(--bg-page);
   color: var(--text);
-  font-size: $font-size-body;
+  font-size: $font-size-label;
 }
 
 .btn-refresh {
@@ -122,7 +122,6 @@
 }
 
 @include mobile-status-select;
-
 
 .approval-list {
   display: flex;
@@ -236,7 +235,7 @@
   color: var(--primary);
 
   strong {
-    font-size: $font-size-title;
+    font-size: $font-size-body;
   }
 }
 
@@ -261,7 +260,7 @@
 
   strong {
     color: var(--text-header);
-    font-size: $font-size-body;
+    font-size: $font-size-label;
   }
 
   small {
@@ -292,7 +291,7 @@
   color: var(--primary);
 
   strong {
-    font-size: $font-size-title;
+    font-size: $font-size-body;
   }
 
   small {

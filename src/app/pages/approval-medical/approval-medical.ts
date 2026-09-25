@@ -124,7 +124,6 @@ export class ApprovalMedicalComponent implements OnInit {
       })
       .subscribe({
         next: (res) => {
-          console.log(res);
           const mapped = res.data.map((c) => this.mapClaimToApproval(c));
           this.approvals.set(mapped);
           this.listing.currentPage.set(0);
@@ -206,7 +205,9 @@ export class ApprovalMedicalComponent implements OnInit {
     const steps: any[] = source.approvalSteps ?? source.approval_steps ?? [];
     const actionStep = [...steps]
       .filter((step) => {
-        const stepStatus = String(step.status ?? '').trim().toLowerCase();
+        const stepStatus = String(step.status ?? '')
+          .trim()
+          .toLowerCase();
         const sameStatus =
           stepStatus === targetStatus ||
           (targetStatus.startsWith('referred') && ['cancelled', 'canceled'].includes(stepStatus));
@@ -214,8 +215,7 @@ export class ApprovalMedicalComponent implements OnInit {
       })
       .sort((a, b) => {
         const timeDiff =
-          new Date(b.acted_at ?? b.actedAt).getTime() -
-          new Date(a.acted_at ?? a.actedAt).getTime();
+          new Date(b.acted_at ?? b.actedAt).getTime() - new Date(a.acted_at ?? a.actedAt).getTime();
         return timeDiff || Number(b.step_no ?? b.stepNo ?? 0) - Number(a.step_no ?? a.stepNo ?? 0);
       })[0];
 
@@ -229,9 +229,7 @@ export class ApprovalMedicalComponent implements OnInit {
         actionStep.approverName;
       if (displayName) return String(displayName);
 
-      const composedName = [firstName, nickname ? `(${nickname})` : '']
-        .filter(Boolean)
-        .join(' ');
+      const composedName = [firstName, nickname ? `(${nickname})` : ''].filter(Boolean).join(' ');
       return composedName || actionStep.acted_by || actionStep.actedBy || '';
     }
 
@@ -362,7 +360,6 @@ export class ApprovalMedicalComponent implements OnInit {
   }
 
   async exportExcel() {
-    // console.log(this.selectedItems());
     this.loadingService.start('export');
 
     const adUser = this.authService.currentUser() || '';
