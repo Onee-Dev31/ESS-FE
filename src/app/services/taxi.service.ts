@@ -71,7 +71,10 @@ export class TaxiService extends BaseRequestService<TaxiRequest> {
   }
 
   deleteTaxiClaim(id: string, empCode: string): Observable<any> {
-    return this._http.delete(`${this.baseUrl}/taxi-claim/${id}?employee_code=${empCode}`);
+    // ไม่ให้ interceptor โชว์ toast ข้อความทั่วไปซ้ำ เพราะ component โชว์ message จริงจาก backend เองแล้ว
+    return this._http.delete(`${this.baseUrl}/taxi-claim/${id}?employee_code=${empCode}`, {
+      context: new HttpContext().set(SKIP_ERROR_TOAST, true),
+    });
   }
 
   getTaxiRequests(): Observable<TaxiRequest[]> {
