@@ -8,7 +8,7 @@ import {
   ChangeDetectionStrategy,
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AllowanceFormComponent } from '../../components/features/allowance-form/allowance-form';
@@ -84,6 +84,7 @@ export class AllowanceComponent implements OnInit {
   private swalService = inject(SwalService);
   private authService = inject(AuthService);
   private route = inject(ActivatedRoute);
+  private router = inject(Router);
   private destroyRef = inject(DestroyRef);
   dateUtil = inject(DateUtilityService);
   private loadingService = inject(LoadingService);
@@ -311,6 +312,7 @@ export class AllowanceComponent implements OnInit {
 
   closeDetail() {
     this.selectedDetailItem.set(null);
+    this.clearAutoOpenQueryParams();
   }
 
   private toApprovalStatus(status: string): 'Pending' | 'Approved' | 'Rejected' | 'Referred Back' {
@@ -359,7 +361,14 @@ export class AllowanceComponent implements OnInit {
   closeModal() {
     this.isModalOpen = false;
     this.selectedRequest = '';
+    this.clearAutoOpenQueryParams();
     this.loadData();
+  }
+
+  /** เคลียร์ query string (claimId/voucherNo/_t) ที่ค้างจากตอนกดเข้ามาจาก toast noti */
+  private clearAutoOpenQueryParams() {
+    if (!Object.keys(this.route.snapshot.queryParams).length) return;
+    this.router.navigate([], { relativeTo: this.route, queryParams: {}, replaceUrl: true });
   }
 
   clearFilters() {

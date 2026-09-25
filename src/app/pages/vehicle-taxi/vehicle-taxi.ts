@@ -1,4 +1,6 @@
-import { Component, OnInit, signal, computed, inject } from '@angular/core';
+import { Component, OnInit, signal, computed, inject, DestroyRef } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { ActivatedRoute, Router } from '@angular/router';
 
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -79,6 +81,9 @@ export class VehicleTaxiComponent implements OnInit {
   private errorService = inject(ErrorService);
   private authservice = inject(AuthService);
   private swalService = inject(SwalService);
+  private route = inject(ActivatedRoute);
+  private router = inject(Router);
+  private destroyRef = inject(DestroyRef);
   dateUtil = inject(DateUtilityService);
 
   isLoading = this.loadingService.loading('taxi-list');
@@ -122,8 +127,22 @@ export class VehicleTaxiComponent implements OnInit {
     this.loadData();
   }
 
+  private pendingOpenVoucherNo: string | null = null;
+  private pendingOpenClaimId: string | null = null;
+
   ngOnInit() {
-    this.loadData();
+    this.route.queryParams.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((params) => {
+      const voucherNo = params['voucherNo'] || params['ticketNumber'];
+      const claimId = params['claimId'];
+      if (voucherNo || claimId || params['_t']) {
+        this.pendingOpenVoucherNo = voucherNo ?? null;
+        this.pendingOpenClaimId = claimId ?? null;
+        this.listing.filterStatus.set('');
+        this.listing.searchText.set(voucherNo ?? '');
+        this.listing.currentPage.set(0);
+      }
+      this.loadData();
+    });
     this.getPolicyTexts();
     this.getConditions();
   }
@@ -186,6 +205,25 @@ export class VehicleTaxiComponent implements OnInit {
         this.loadingService.stop('taxi-list');
         const items = res.data ?? [];
         this.allRequests.set(this.mapApiData(items));
+
+        // สำหรับกดจาก noti /vehicle-taxi?claimId=... (taxi ไม่มี voucherNo ส่งมา มีแต่ claimId)
+        // ถูกส่งกลับแก้ไข (referred back) เปิดฟอร์มแก้ไขเลย ส่วนอนุมัติ/ปฏิเสธ (สถานะสุดท้าย) เปิดแค่ดูรายละเอียด
+        if (this.pendingOpenClaimId) {
+          const match = this.allRequests().find((r) => r.id === this.pendingOpenClaimId);
+          if (match) {
+            this.pendingOpenClaimId = null;
+            if (this.isEditableClaim(match.status)) this.openModal(match.id);
+            else this.viewRequest(match);
+          }
+        } else if (this.pendingOpenVoucherNo) {
+          const match = this.allRequests().find((r) => r.claimNo === this.pendingOpenVoucherNo);
+          if (match) {
+            this.pendingOpenVoucherNo = null;
+            if (this.isEditableClaim(match.status)) this.openModal(match.id);
+            else this.viewRequest(match);
+          }
+        }
+
         this.listing.totalItems.set(res.pagination?.total ?? 0);
         this.listing.totalPages.set(res.pagination?.totalPages ?? 1);
         this.listing.currentPage.set((res.pagination?.page ?? 1) - 1);
@@ -263,7 +301,7 @@ export class VehicleTaxiComponent implements OnInit {
 
             this.swalService.warning(
               'เกิดข้อผิดพลาด',
-              error?.message || 'ไม่สามารถติดต่อเซิร์ฟเวอร์ได้',
+              error?.error?.message || error?.message || 'ไม่สามารถติดต่อเซิร์ฟเวอร์ได้',
             );
           },
         });
@@ -289,7 +327,14 @@ export class VehicleTaxiComponent implements OnInit {
   closeModal() {
     this.isModalOpen.set(false);
     this.selectedRequest = '';
+    this.clearAutoOpenQueryParams();
     this.loadData();
+  }
+
+  /** เคลียร์ query string (claimId/voucherNo/_t) ที่ค้างจากตอนกดเข้ามาจาก toast noti */
+  private clearAutoOpenQueryParams() {
+    if (!Object.keys(this.route.snapshot.queryParams).length) return;
+    this.router.navigate([], { relativeTo: this.route, queryParams: {}, replaceUrl: true });
   }
 
   viewRequest(claim: any) {
@@ -324,6 +369,7 @@ export class VehicleTaxiComponent implements OnInit {
 
   closeDetail() {
     this.selectedDetailItem.set(null);
+    this.clearAutoOpenQueryParams();
   }
 
   private toApprovalStatus(status: string): 'Pending' | 'Approved' | 'Rejected' | 'Referred Back' {

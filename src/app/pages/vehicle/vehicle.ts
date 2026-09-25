@@ -1,6 +1,6 @@
 import { Component, OnInit, signal, computed, inject, DestroyRef } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { TransportService, VehicleRequest } from '../../services/transport.service';
@@ -76,6 +76,7 @@ export class VehicleComponent implements OnInit {
   private dialogService = inject(DialogService);
   private authservice = inject(AuthService);
   private route = inject(ActivatedRoute);
+  private router = inject(Router);
   private destroyRef = inject(DestroyRef);
   dateUtil = inject(DateUtilityService);
 
@@ -351,7 +352,14 @@ export class VehicleComponent implements OnInit {
     this.isModalOpen = false;
     this.selectedRequestId = '';
     this.selectedRequest = '';
+    this.clearAutoOpenQueryParams();
     this.loadData();
+  }
+
+  /** เคลียร์ query string (voucherNo/_t) ที่ค้างจากตอนกดเข้ามาจาก toast noti */
+  private clearAutoOpenQueryParams() {
+    if (!Object.keys(this.route.snapshot.queryParams).length) return;
+    this.router.navigate([], { relativeTo: this.route, queryParams: {}, replaceUrl: true });
   }
 
   viewRequest(claim: any) {
@@ -386,6 +394,7 @@ export class VehicleComponent implements OnInit {
 
   closeDetail() {
     this.selectedDetailItem.set(null);
+    this.clearAutoOpenQueryParams();
   }
 
   private toApprovalStatus(status: string): 'Pending' | 'Approved' | 'Rejected' | 'Referred Back' {

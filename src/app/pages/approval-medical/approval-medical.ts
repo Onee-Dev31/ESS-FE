@@ -8,7 +8,7 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { ApprovalDetailModalComponent } from '../../components/modals/approval-detail-modal/approval-detail-modal';
 import { FilePreviewModalComponent } from '../../components/modals/file-preview-modal/file-preview-modal';
 import { ApprovalItem } from '../../interfaces/approval.interface';
@@ -60,6 +60,7 @@ export class ApprovalMedicalComponent implements OnInit {
   private medicalApiService = inject(MedicalService);
   private authService = inject(AuthService);
   private route = inject(ActivatedRoute);
+  private router = inject(Router);
   dateUtil = inject(DateUtilityService);
   private toastService = inject(ToastService);
   private loadingService = inject(LoadingService);
@@ -206,7 +207,9 @@ export class ApprovalMedicalComponent implements OnInit {
     const steps: any[] = source.approvalSteps ?? source.approval_steps ?? [];
     const actionStep = [...steps]
       .filter((step) => {
-        const stepStatus = String(step.status ?? '').trim().toLowerCase();
+        const stepStatus = String(step.status ?? '')
+          .trim()
+          .toLowerCase();
         const sameStatus =
           stepStatus === targetStatus ||
           (targetStatus.startsWith('referred') && ['cancelled', 'canceled'].includes(stepStatus));
@@ -214,8 +217,7 @@ export class ApprovalMedicalComponent implements OnInit {
       })
       .sort((a, b) => {
         const timeDiff =
-          new Date(b.acted_at ?? b.actedAt).getTime() -
-          new Date(a.acted_at ?? a.actedAt).getTime();
+          new Date(b.acted_at ?? b.actedAt).getTime() - new Date(a.acted_at ?? a.actedAt).getTime();
         return timeDiff || Number(b.step_no ?? b.stepNo ?? 0) - Number(a.step_no ?? a.stepNo ?? 0);
       })[0];
 
@@ -229,9 +231,7 @@ export class ApprovalMedicalComponent implements OnInit {
         actionStep.approverName;
       if (displayName) return String(displayName);
 
-      const composedName = [firstName, nickname ? `(${nickname})` : '']
-        .filter(Boolean)
-        .join(' ');
+      const composedName = [firstName, nickname ? `(${nickname})` : ''].filter(Boolean).join(' ');
       return composedName || actionStep.acted_by || actionStep.actedBy || '';
     }
 
@@ -297,7 +297,14 @@ export class ApprovalMedicalComponent implements OnInit {
     this.isModalOpen.set(false);
     this.selectedItem.set(null);
     this.initialAction.set(null);
+    this.clearAutoOpenQueryParams();
     this.loadMedicalClaims();
+  }
+
+  /** เคลียร์ query string (claimId/voucherNo/_t) ที่ค้างจากตอนกดเข้ามาจาก toast noti */
+  private clearAutoOpenQueryParams() {
+    if (!Object.keys(this.route.snapshot.queryParams).length) return;
+    this.router.navigate([], { relativeTo: this.route, queryParams: {}, replaceUrl: true });
   }
 
   onStatusUpdated() {

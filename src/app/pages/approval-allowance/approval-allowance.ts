@@ -1,6 +1,6 @@
 import { Component, DestroyRef, inject, OnInit, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { DateUtilityService } from '../../services/date-utility.service';
 import { ExportService } from '../../services/export';
 import { ToastService } from '../../services/toast';
@@ -53,6 +53,7 @@ export class ApprovalAllowanceComponent implements OnInit {
   private errorService = inject(ErrorService);
   private authService = inject(AuthService);
   private route = inject(ActivatedRoute);
+  private router = inject(Router);
   private destroyRef = inject(DestroyRef);
 
   isLoading = this.loadingService.loading('approvals-list');
@@ -256,7 +257,14 @@ export class ApprovalAllowanceComponent implements OnInit {
     this.isModalOpen.set(false);
     this.selectedItem.set(null);
     this.initialAction.set(null);
+    this.clearAutoOpenQueryParams();
     this.loadAllowanceClaims();
+  }
+
+  /** เคลียร์ query string (claimId/voucherNo/_t) ที่ค้างจากตอนกดเข้ามาจาก toast noti */
+  private clearAutoOpenQueryParams() {
+    if (!Object.keys(this.route.snapshot.queryParams).length) return;
+    this.router.navigate([], { relativeTo: this.route, queryParams: {}, replaceUrl: true });
   }
 
   onStatusUpdated() {

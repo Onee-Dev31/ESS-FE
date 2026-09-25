@@ -277,10 +277,19 @@ export class VehicleTaxiFormV2Component implements OnInit, OnChanges {
           originalTotalsByDate.set(date, (originalTotalsByDate.get(date) || 0) + amount);
         });
 
+        let hasAttachmentLoadError = false;
         const itemPromises = claimDetails.map(async (detail) => {
-          const attachedFiles = detail.attachments.length
-            ? await this.fileConvertService.convertUrlsToFiles(detail.attachments)
-            : [];
+          let attachedFiles: any[] = [];
+          if (detail.attachments.length) {
+            try {
+              attachedFiles = await this.fileConvertService.convertUrlsToFiles(detail.attachments);
+            } catch (error) {
+              // ไฟล์แนบโหลดไม่ได้ (เช่น ปัญหา CORS/URL ที่ฝั่งไฟล์เซิร์ฟเวอร์) ไม่ควรบล็อกไม่ให้
+              // เปิดฟอร์มแก้ไขทั้งใบ ให้ข้ามไฟล์แนบตัวนั้นไปแทน แล้วแจ้งเตือนแยกต่างหาก
+              console.error('โหลดไฟล์แนบไม่สำเร็จ:', error);
+              hasAttachmentLoadError = true;
+            }
+          }
 
           return {
             clientId: this.createClientId(),
@@ -329,6 +338,9 @@ export class VehicleTaxiFormV2Component implements OnInit, OnChanges {
               }
 
               this.isLoading = false;
+              if (hasAttachmentLoadError) {
+                this.toastService.warning('ไฟล์แนบบางรายการโหลดไม่สำเร็จ');
+              }
               this.cdr.markForCheck();
             });
           })

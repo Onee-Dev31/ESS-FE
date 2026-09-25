@@ -581,6 +581,38 @@ export class NotificationService {
       };
     }
 
+    if (input.notificationType.startsWith('taxi_claim_') || input.targetType === 'taxi_claim') {
+      // taxi_claim_resubmit/approved_next = ส่งหาผู้อนุมัติเสมอ, taxi_claim_approved/rejected/
+      // referred_back = ส่งกลับหาผู้ยื่นเบิกเองเสมอ — แต่ taxi_claim_create backend ใช้ type
+      // เดียวกันยิงทั้ง 2 ฝั่ง (self-confirm ให้ผู้ยื่น + แจ้งผู้อนุมัติ) เดาจาก type ไม่ได้
+      // ต้องเช็ค recipientRole จริงๆ เท่านั้นสำหรับ type นี้
+      const approverFacingTaxiTypes = new Set(['taxi_claim_resubmit', 'taxi_claim_approved_next']);
+      const employeeFacingTaxiTypes = new Set([
+        'taxi_claim_approved',
+        'taxi_claim_rejected',
+        'taxi_claim_referred_back',
+      ]);
+      let isApprover: boolean;
+      if (approverFacingTaxiTypes.has(input.notificationType)) {
+        isApprover = true;
+      } else if (employeeFacingTaxiTypes.has(input.notificationType)) {
+        isApprover = false;
+      } else {
+        const recipientRoleText = input.recipientRole.toLowerCase();
+        isApprover = recipientRoleText
+          ? recipientRoleText.includes('approver')
+          : [...this.approverRoles].some((role) => roleText.includes(role));
+      }
+      return {
+        route: isApprover ? '/approvals-taxi' : '/vehicle-taxi',
+        queryParams: {
+          voucherNo: input.ticketNumber ?? undefined,
+          claimId: input.targetId ?? undefined,
+          _t: Date.now(),
+        },
+      };
+    }
+
     if (
       input.notificationType === 'employee_resignation_bulk' ||
       input.targetType === 'employee_resignation'
