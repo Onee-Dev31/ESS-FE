@@ -151,9 +151,7 @@
             </div>
             <div class="med-info-item">
               <label><i class="far fa-calendar-alt"></i> วันที่รักษา</label>
-              <span>
-                {{ dateUtil.formatDateToBE(medicalDetail()?.claimDate, 'DD/MM/YYYY') }}
-              </span>
+              <span>{{ getMedicalTreatmentDate() }}</span>
             </div>
             @if (medicalDetail().remark) {
               <div class="med-info-item med-info-full">

@@ -101,13 +101,14 @@ export class ApprovalDetailModalComponent implements OnChanges {
   );
 
   private summarySteps(): ApprovalProgressStep[] {
+    const isRejected = this.normalizedStatus() === 'rejected';
     return [
       { label: 'คำร้องใหม่', id: 1, icon: 'fas fa-user-check' },
       { label: 'อยู่ระหว่างการอนุมัติ', id: 2, icon: 'fas fa-users-cog' },
       {
-        label: 'อนุมัติแล้ว',
+        label: isRejected ? 'ไม่อนุมัติ' : 'อนุมัติแล้ว',
         id: 3,
-        icon: 'fa-solid fa-stamp',
+        icon: isRejected ? 'fas fa-times' : 'fa-solid fa-stamp',
       },
     ];
   }
@@ -140,9 +141,9 @@ export class ApprovalDetailModalComponent implements OnChanges {
       { label: 'คำร้องใหม่', id: 1, icon: 'fas fa-file-circle-plus' },
       ...approverSteps,
       {
-        label: 'อนุมัติแล้ว',
+        label: this.normalizedStatus() === 'rejected' ? 'ไม่อนุมัติ' : 'อนุมัติแล้ว',
         id: approverSteps.length + 2,
-        icon: 'fa-solid fa-stamp',
+        icon: this.normalizedStatus() === 'rejected' ? 'fas fa-times' : 'fa-solid fa-stamp',
       },
     ];
   });
@@ -745,6 +746,22 @@ export class ApprovalDetailModalComponent implements OnChanges {
     if (!claim?.attachments?.length) return;
     this.previewFiles.set(this.fileConverter.buildPreviewFiles(claim.attachments));
     this.isPreviewModalOpen.set(true);
+  }
+
+  getMedicalTreatmentDate(): string {
+    const detail = this.medicalDetail();
+    const dateFrom = detail?.treatmentDateFrom ?? detail?.treatment_date_from;
+    const dateTo = detail?.treatmentDateTo ?? detail?.treatment_date_to;
+    const formattedFrom = dateFrom
+      ? this.dateUtil.formatDateToBE(dateFrom, 'DD/MM/YYYY')
+      : '';
+    const formattedTo = dateTo ? this.dateUtil.formatDateToBE(dateTo, 'DD/MM/YYYY') : '';
+
+    if (!formattedFrom && !formattedTo) return '-';
+    if (!formattedFrom || !formattedTo || formattedFrom === formattedTo) {
+      return formattedFrom || formattedTo;
+    }
+    return `${formattedFrom} - ${formattedTo}`;
   }
 
   formatTime(value: string | null | undefined): string {
