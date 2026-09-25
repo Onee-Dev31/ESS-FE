@@ -52,8 +52,10 @@ export class ExportService {
     filename: string = 'export',
   ): Promise<void> {
     try {
-      const ExcelJS = await import('exceljs');
-      const { saveAs } = await import('file-saver');
+      const ExcelJSModule = await import('exceljs');
+      const ExcelJS = ExcelJSModule.default ?? ExcelJSModule;
+      const fileSaverModule = await import('file-saver');
+      const saveAs = fileSaverModule.saveAs ?? fileSaverModule.default;
 
       const workbook = new ExcelJS.Workbook();
       const worksheet = workbook.addWorksheet('Sheet1');
@@ -85,6 +87,11 @@ export class ExportService {
             left: { style: 'thin' },
             bottom: { style: 'thin' },
             right: { style: 'thin' },
+          };
+          cell.alignment = {
+            vertical: 'middle',
+            horizontal: row.number === 1 ? 'center' : 'left',
+            wrapText: true,
           };
         });
       });
@@ -167,8 +174,10 @@ export class ExportService {
         return;
       }
 
-      const ExcelJS = await import('exceljs');
-      const { saveAs } = await import('file-saver');
+      const ExcelJSModule = await import('exceljs');
+      const ExcelJS = ExcelJSModule.default ?? ExcelJSModule;
+      const fileSaverModule = await import('file-saver');
+      const saveAs = fileSaverModule.saveAs ?? fileSaverModule.default;
 
       const workbook = new ExcelJS.Workbook();
       const worksheet = workbook.addWorksheet('Sheet1');

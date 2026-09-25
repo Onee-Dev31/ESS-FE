@@ -77,7 +77,6 @@ export class ApprovalVehicleComponent {
   initialAction = signal<'Approved' | 'Rejected' | 'Referred Back' | null>(null);
 
   approvals = signal<any[]>([]);
-  showExportMenu = signal<boolean>(false);
   listing = createListingState();
   medicalTabs = APPROVAL_STATUS_TABS.filter((t) => t !== 'Referred Back');
 
@@ -112,36 +111,23 @@ export class ApprovalVehicleComponent {
       item.requestDetail.toLowerCase().includes(search);
     return matchStatus && matchSearch;
   });
-
-  toggleExportMenu() {
-    this.showExportMenu.set(!this.showExportMenu());
-  }
-
-  async exportPDF() {
-    this.showExportMenu.set(false);
-    this.loadingService.start('export');
-    try {
-      await this.exportService.exportToPDF('approvals-table', 'approvals');
-      this.toastService.success('Export PDF สำเร็จ');
-    } catch (error) {
-      this.errorService.handle(error, { component: 'Approvals', action: 'export-pdf' });
-    } finally {
-      this.loadingService.stop('export');
-    }
-  }
-
   async exportExcel() {
-    this.showExportMenu.set(false);
     this.loadingService.start('export');
     try {
-      const data = this.comps.paginatedData().map((item) => ({
+      const items = this.comps.filteredData();
+      if (!items.length) {
+        this.toastService.warning('ไม่พบข้อมูลสำหรับ Export Excel');
+        return;
+      }
+
+      const data = items.map((item) => ({
         requestNo: item.requestNo,
         requestDate: item.requestDate,
         requestBy: item.requestBy.name,
         employeeId: item.requestBy.employeeId,
         department: item.requestBy.department,
         requestType: item.requestType,
-        requestDetail: item.requestDetail,
+        requestDetail: this.formatClaimDetails(item),
         amount: item.amount,
         status: item.status,
       }));
@@ -156,7 +142,7 @@ export class ApprovalVehicleComponent {
         { header: 'สถานะ', key: 'status', width: 15 },
       ];
 
-      await this.exportService.exportToExcel(data, columns, 'approvals-medical');
+      await this.exportService.exportToExcel(data, columns, 'approvals-vehicle');
       this.toastService.success('Export Excel สำเร็จ');
     } catch (error) {
       this.errorService.handle(error, { component: 'Approvals', action: 'export-excel' });
@@ -165,17 +151,15 @@ export class ApprovalVehicleComponent {
     }
   }
 
-  print() {
-    this.showExportMenu.set(false);
-    this.loadingService.start('export');
-    try {
-      this.exportService.printElement('approvals-table');
-      this.toastService.success('เปิดหน้าพิมพ์แล้ว');
-    } catch (error) {
-      this.errorService.handle(error, { component: 'Approvals', action: 'print' });
-    } finally {
-      this.loadingService.stop('export');
-    }
+  private formatClaimDetails(item: ApprovalItem): string {
+    const claim = item.originalData as any;
+    const details = Array.isArray(claim?.details) ? claim.details : [];
+    if (!details.length) return item.requestDetail || '';
+
+    return details
+      .map((detail: any) => detail.description || '')
+      .filter(Boolean)
+      .join('\n');
   }
 
   // FUNCTION

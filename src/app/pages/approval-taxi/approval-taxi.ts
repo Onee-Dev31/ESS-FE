@@ -9,6 +9,8 @@ import { TaxiService } from '../../services/taxi.service';
 import { DateUtilityService } from '../../services/date-utility.service';
 import { LoadingService } from '../../services/loading';
 import { ErrorService } from '../../services/error';
+import { ExportService } from '../../services/export';
+import { ToastService } from '../../services/toast';
 import { APPROVAL_STATUS_TABS } from '../../config/constants';
 import { PageHeaderComponent } from '../../components/shared/page-header/page-header';
 import { SkeletonComponent } from '../../components/shared/skeleton/skeleton';
@@ -61,8 +63,11 @@ export class ApprovalTaxiComponent implements OnInit {
   dateUtil = inject(DateUtilityService);
   private loadingService = inject(LoadingService);
   private errorService = inject(ErrorService);
+  private exportService = inject(ExportService);
+  private toastService = inject(ToastService);
 
   isLoading = this.loadingService.loading('approvals-list');
+  isExporting = this.loadingService.loading('export');
   isRefreshing = signal<boolean>(false);
   private initialized = false;
 
@@ -262,6 +267,55 @@ export class ApprovalTaxiComponent implements OnInit {
       );
     return !!matchSearch;
   });
+
+  async exportExcel() {
+    this.loadingService.start('export');
+    try {
+      const items = this.comps.filteredData();
+      if (!items.length) {
+        this.toastService.warning('No data for Export Excel');
+        return;
+      }
+
+      const data = items.map((item) => {
+        const claim = this.getTaxiClaim(item);
+        const trips = (claim?.items as TaxiTripItem[] | undefined) ?? [];
+
+        return {
+          requestNo: item.requestNo,
+          requestDate: item.requestDate,
+          requestBy: item.requestBy.name,
+          employeeId: item.requestBy.employeeId,
+          department: item.requestBy.department,
+          requestType: item.requestType,
+          locationFrom: trips.map((trip) => trip.locationFrom || '-').join('\n'),
+          locationTo: trips.map((trip) => trip.locationTo || '-').join('\n'),
+          amount: item.amount,
+          status: item.status,
+        };
+      });
+
+      const columns = [
+        { header: 'เลขที่เอกสาร', key: 'requestNo', width: 18 },
+        { header: 'วันที่สร้าง', key: 'requestDate', width: 16 },
+        { header: 'รหัสพนักงาน', key: 'employeeId', width: 15 },
+        { header: 'ชื่อพนักงาน', key: 'requestBy', width: 24 },
+        { header: 'แผนก', key: 'department', width: 24 },
+        { header: 'ประเภท', key: 'requestType', width: 16 },
+        { header: 'จากที่ไหน', key: 'locationFrom', width: 24 },
+        { header: 'ไปที่ไหน', key: 'locationTo', width: 24 },
+        { header: 'จำนวนเงิน', key: 'amount', width: 14 },
+        { header: 'สถานะ', key: 'status', width: 14 },
+      ];
+
+      await this.exportService.exportToExcel(data, columns, 'approvals-taxi');
+      this.toastService.success('Export Excel success');
+    } catch (error) {
+      this.errorService.handle(error, { component: 'ApprovalsTaxi', action: 'export-excel' });
+    } finally {
+      this.loadingService.stop('export');
+    }
+  }
 
   setActiveTab(tab: string) {
     this.listing.filterStatus.set(tab);

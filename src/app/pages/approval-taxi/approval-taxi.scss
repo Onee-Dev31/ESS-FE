@@ -418,11 +418,53 @@ $status-danger-text: var(--status-danger-text);
   gap: 10px;
   align-items: center;
 
+  .export-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    gap: 7px;
+    height: 36px;
+    padding: 0 14px;
+    border: 0;
+    border-radius: 8px;
+    color: #fff;
+    background: #217346;
+    font-size: 0.875rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition:
+      opacity 0.2s,
+      transform 0.2s;
+
+    &:hover:not(:disabled) {
+      opacity: 0.9;
+      transform: translateY(-1px);
+    }
+
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    @include mobile {
+      width: 40px;
+      height: 40px;
+      padding: 0;
+
+      .export-text {
+        display: none;
+      }
+    }
+  }
+
   .btn-outline {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    padding: 8px 16px;
+    box-sizing: border-box;
+    height: 36px;
+    padding: 0 16px;
     background: var(--bg-card);
     border: 1px solid var(--border-table-head);
     border-radius: 10px;
@@ -478,7 +520,7 @@ $status-danger-text: var(--status-danger-text);
     }
 
     .btn-outline {
-      padding: 8px 12px;
+      padding: 0 12px;
 
       i {
         margin: 0;
