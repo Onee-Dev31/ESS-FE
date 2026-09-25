@@ -369,7 +369,7 @@ export class ApprovalDetailModalComponent implements OnChanges {
   }
 
   private loadMedicalDetail(item: ApprovalItem, loadVersion: number) {
-    console.log('loadMedicalDetail', item);
+    // console.log('loadMedicalDetail', item);
     const claim = item.originalData as MedicalApproveClaim | MedicalClaim;
     if (!claim || (!('claimID' in claim) && !('claimId' in claim))) {
       this.loadFallbackDetail(item, loadVersion);
@@ -396,7 +396,7 @@ export class ApprovalDetailModalComponent implements OnChanges {
           return;
         }
         const data = res.data ?? res;
-        console.log(`[Allowance] getClaimById(${item.requestId})`, data);
+        // console.log(`[Allowance] getClaimById(${item.requestId})`, data);
         this.allowanceDetail.set(data);
         this.finishDetailLoad(loadVersion);
 
@@ -437,7 +437,7 @@ export class ApprovalDetailModalComponent implements OnChanges {
           return;
         }
         const data = res.data ?? res;
-        console.log(`[vehicle] getClaimById(${item.requestId})`, data, item);
+        // console.log(`[vehicle] getClaimById(${item.requestId})`, data, item);
         this.vehicleDetail.set(data);
         this.finishDetailLoad(loadVersion);
 
@@ -469,7 +469,7 @@ export class ApprovalDetailModalComponent implements OnChanges {
       this.loadFallbackDetail(item, loadVersion);
       return;
     }
-    this.taxiDetail.set(claim); //ใช้ค่าจาก GetTaxiClaimsForApprover เลย
+    this.taxiDetail.set(claim); //ใช้ค่าจาก GetTaxiClaimsForApprover
 
     const empCode = claim.employeeCode;
     if (empCode) {
@@ -492,7 +492,6 @@ export class ApprovalDetailModalComponent implements OnChanges {
   }
 
   private loadFallbackDetail(item: ApprovalItem, loadVersion = this.detailLoadVersion) {
-    console.log(item);
     const service = this.approvalsHelper.getServiceByType(item.type || 'transport');
     service.getRequestById(item.requestNo).subscribe({
       next: (data) => {
@@ -590,7 +589,7 @@ export class ApprovalDetailModalComponent implements OnChanges {
     newStatus: 'Approved' | 'Rejected' | 'Referred Back',
     reason?: string,
   ) {
-    console.log(item, newStatus, reason);
+    console.log('ตกเงื่อนไข: ', item, newStatus, reason);
     // if (!item.type) return;
     // let statusCode = REQUEST_STATUS.WAITING_CHECK;
     // if (newStatus === 'Rejected') statusCode = REQUEST_STATUS.REJECTED;
@@ -649,7 +648,6 @@ export class ApprovalDetailModalComponent implements OnChanges {
       }),
     };
 
-    console.log('>>', item.requestId, payload);
     // TODO: เปลี่ยนเป็น VehicleService จริง
     this.vehicleService.updateStatusClaim(item.requestId, payload).subscribe({
       next: (res) => this.handleResponse(res),
@@ -704,7 +702,7 @@ export class ApprovalDetailModalComponent implements OnChanges {
   }
 
   openPreview(att: any) {
-    console.log(att);
+    // console.log(att);
     if (!att) return;
     this.previewFiles.set(this.fileConverter.buildPreviewFiles(att));
     this.isPreviewModalOpen.set(true);
