@@ -249,6 +249,67 @@ export class ApprovalTaxiComponent implements OnInit {
     }
   }
 
+  getHrActionName(claim: any): string {
+    const targetStatus = String(claim.approverStepStatus ?? claim.status ?? '')
+      .trim()
+      .toLowerCase();
+    if (!['approved', 'rejected', 'referred_back', 'referred back'].includes(targetStatus)) {
+      return '';
+    }
+
+    const steps: any[] = claim.approvalSteps ?? claim.approval_steps ?? [];
+    const actionStep = [...steps]
+      .filter((step) => {
+        const stepStatus = String(step.status ?? '').trim().toLowerCase();
+        const sameStatus =
+          stepStatus === targetStatus ||
+          (targetStatus.startsWith('referred') && ['cancelled', 'canceled'].includes(stepStatus));
+        const actedBy = step.acted_by ?? step.actedBy;
+        const approverEmpNo = step.approver_emp_no ?? step.approverEmpNo;
+
+        return (
+          sameStatus &&
+          actedBy &&
+          approverEmpNo &&
+          actedBy === approverEmpNo &&
+          !!(step.acted_at ?? step.actedAt)
+        );
+      })
+      .sort(
+        (a, b) =>
+          new Date(b.acted_at ?? b.actedAt).getTime() -
+          new Date(a.acted_at ?? a.actedAt).getTime(),
+      )[0];
+
+    if (actionStep) {
+      const firstName = actionStep.approver_first_name ?? actionStep.approverFirstName ?? '';
+      const nickname = actionStep.approver_nickname ?? actionStep.approverNickname ?? '';
+      const displayName =
+        actionStep.acted_by_name ??
+        actionStep.actedByName ??
+        actionStep.approver_name ??
+        actionStep.approverName;
+      if (displayName) return String(displayName);
+
+      return (
+        [firstName, nickname ? `(${nickname})` : ''].filter(Boolean).join(' ') ||
+        actionStep.acted_by ||
+        actionStep.actedBy ||
+        ''
+      );
+    }
+
+    return (
+      claim.hrApproverName ??
+      claim.actionedByName ??
+      claim.approvedByName ??
+      claim.reviewedByName ??
+      claim.approvedBy ??
+      claim.reviewedBy ??
+      ''
+    );
+  }
+
   refresh() {
     this.loadTaxiClaims();
   }

@@ -279,33 +279,65 @@ export class ApprovalDetailModalComponent implements OnChanges {
 
   private buildGroupedSteps(steps: any[]) {
     if (!steps?.length) return [];
+
     const map = new Map<number, any[]>();
 
     steps.forEach((s: any) => {
-      if (!map.has(s.step_no)) map.set(s.step_no, []);
-      map.get(s.step_no)!.push(s);
+      const stepNo = Number(s.step_no ?? s.stepNo);
+
+      if (!map.has(stepNo)) {
+        map.set(stepNo, []);
+      }
+
+      map.get(stepNo)!.push(s);
     });
 
     return Array.from(map.entries()).map(([stepNo, approvers]) => {
-      const statusOf = (approver: any) =>
-        String(approver.status ?? '')
+      const statusOf = (a: any) =>
+        String(a.status ?? '')
           .trim()
           .toLowerCase();
-      const approved = approvers.find((a) => statusOf(a) === 'approved');
-      const rejected = approvers.find((a) => statusOf(a) === 'rejected');
-      const referredBack = approvers.find(
-        (a) =>
-          ['cancelled', 'canceled'].includes(statusOf(a)) &&
-          String(a.acted_by ?? '')
-            .trim()
-            .toUpperCase() ===
-            String(a.approver_emp_no ?? '')
-              .trim()
-              .toUpperCase(),
-      );
-      const acted = approved ?? rejected ?? referredBack ?? null;
 
-      return { stepNo, approvers, acted, isReferredBack: acted === referredBack };
+      const empNoOf = (a: any) =>
+        String(a.approver_emp_no ?? a.approverEmpNo ?? '')
+          .trim()
+          .toUpperCase();
+
+      const actedByOf = (a: any) =>
+        String(a.acted_by ?? a.actedBy ?? '')
+          .trim()
+          .toUpperCase();
+
+      // คนที่ action จริงเท่านั้น
+      const actualActor = approvers.find((a) => !!actedByOf(a) && actedByOf(a) === empNoOf(a));
+
+      let acted: any = null;
+      let isReferredBack = false;
+
+      if (actualActor) {
+        const status = statusOf(actualActor);
+
+        if (status === 'approved') {
+          acted = actualActor;
+        } else if (status === 'rejected') {
+          acted = actualActor;
+        } else if (
+          status === 'cancelled' ||
+          status === 'canceled' ||
+          status === 'referred back' ||
+          status === 'referred_back'
+        ) {
+          acted = actualActor;
+          isReferredBack = true;
+        }
+      }
+
+      return {
+        stepNo,
+        approvers,
+        acted,
+        isReferredBack,
+      };
     });
   }
 

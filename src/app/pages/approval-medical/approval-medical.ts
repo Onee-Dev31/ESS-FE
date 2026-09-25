@@ -209,16 +209,17 @@ export class ApprovalMedicalComponent implements OnInit {
         const stepStatus = String(step.status ?? '')
           .trim()
           .toLowerCase();
+
         const sameStatus =
           stepStatus === targetStatus ||
           (targetStatus.startsWith('referred') && ['cancelled', 'canceled'].includes(stepStatus));
-        return sameStatus && !!(step.acted_at ?? step.actedAt);
+
+        const isActualActor =
+          step.acted_by && step.approver_emp_no && step.acted_by === step.approver_emp_no;
+
+        return sameStatus && isActualActor && !!step.acted_at;
       })
-      .sort((a, b) => {
-        const timeDiff =
-          new Date(b.acted_at ?? b.actedAt).getTime() - new Date(a.acted_at ?? a.actedAt).getTime();
-        return timeDiff || Number(b.step_no ?? b.stepNo ?? 0) - Number(a.step_no ?? a.stepNo ?? 0);
-      })[0];
+      .sort((a, b) => new Date(b.acted_at).getTime() - new Date(a.acted_at).getTime())[0];
 
     if (actionStep) {
       const firstName = actionStep.approver_first_name ?? actionStep.approverFirstName ?? '';

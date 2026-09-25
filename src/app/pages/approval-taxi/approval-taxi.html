@@ -85,6 +85,11 @@
                   <span class="status-badge" [ngStyle]="getStatusClass(req.status)">
                     {{ req.status | statusLabel }}
                   </span>
+                  @if (getHrActionName(claim); as actionName) {
+                    <small class="status-action-by">
+                      <i class="fas fa-user-check"></i> {{ actionName }}
+                    </small>
+                  }
                 </div>
               </div>
 
@@ -279,6 +284,11 @@
                       <span class="status-badge" [ngStyle]="getStatusClass(req.status)">
                         {{ req.status | statusLabel }}
                       </span>
+                      @if (getHrActionName(claim); as actionName) {
+                        <small class="status-action-by">
+                          <i class="fas fa-user-check"></i> {{ actionName }}
+                        </small>
+                      }
                     </div>
                   </td>
                   <td>

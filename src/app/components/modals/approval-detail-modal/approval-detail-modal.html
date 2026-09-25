@@ -182,12 +182,12 @@
             <div class="medical-info-grid">
               <div class="med-info-item">
                 <label><i class="fa-solid fa-paperclip"></i> เอกสารแนบ</label>
-                <span>
+                <div class="attachment-file">
+                  <i class="fa-solid fa-file"></i>
                   <div type="button" class="btn-view-all" (click)="openAllAttachments()">
-                    <i class="far fa-eye"></i>
-                    ดูไฟล์แนบ ({{ medicalDetail()?.attachments?.length }} ไฟล์)
+                    {{ medicalDetail()?.attachments?.length }} ไฟล์
                   </div>
-                </span>
+                </div>
               </div>
             </div>
           }
