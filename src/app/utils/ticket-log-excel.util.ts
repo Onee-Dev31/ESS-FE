@@ -38,6 +38,7 @@ export function exportTicketLogsToExcel(tickets: any[], fileName: string): void 
     Department: ticket.deptName ?? ticket.department_name ?? ticket.coscent ?? '-',
     Company: ticket.COMPANY_CODE ?? ticket.company_code ?? '-',
     'Service Type': ticket.name_th ?? ticket.ticket_type_name_th ?? '-',
+    ProblemBy: ticket.problem_by ?? '-',
     Status: ticket.IT_Status ?? ticket.status ?? '-',
     'Assigned To': getAssigneeNames(ticket) || '-',
     Updated: ticket.updated_at
@@ -54,6 +55,7 @@ export function exportTicketLogsToExcel(tickets: any[], fileName: string): void 
     { wch: 28 },
     { wch: 30 },
     { wch: 16 },
+    { wch: 24 },
     { wch: 24 },
     { wch: 18 },
     { wch: 35 },
