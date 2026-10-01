@@ -758,7 +758,15 @@ export class MedicalexpensesForm implements OnInit, OnDestroy {
               totalCount: 1,
             });
 
-            this.restoreCurrentClaimBalance(claim.expenseTypeId, Number(claim.requestedAmount));
+            const claimStatus = String(claim.status ?? '')
+              .trim()
+              .toLowerCase()
+              .replace(/[_-]+/g, ' ');
+
+            // Referred Back ใช้วงเงินที่ Backend คืนมาให้แล้ว จึงไม่บวกยอดรายการเดิมซ้ำ
+            if (claimStatus !== 'referred back') {
+              this.restoreCurrentClaimBalance(claim.expenseTypeId, Number(claim.requestedAmount));
+            }
             const matchedType = this.expenseTypesRaw.find((t) => t.typeId === claim.expenseTypeId);
             if (matchedType) this.selectedClaimType.set(matchedType.code.toLowerCase());
 
