@@ -171,7 +171,7 @@ export class ApprovalTaxiComponent implements OnInit {
     const totalAmount = claim.totalAmount ?? claim.total_amount ?? 0;
     const backendStatus = this.mapClaimStatus(claim.status);
     const employeeImageUrl = employeeCode
-      ? `https://empimg.oneeclick.co:8048/employeeimage/${encodeURIComponent(employeeCode)}.jpg`
+      ? `https://imgemp.oneeclick.co/employeeimage/${encodeURIComponent(employeeCode)}.jpg`
       : '';
     const items: TaxiTripItem[] = (claim.details ?? fallbackDetails).map((d: any) => {
       const fromName: string =
@@ -260,7 +260,9 @@ export class ApprovalTaxiComponent implements OnInit {
     const steps: any[] = claim.approvalSteps ?? claim.approval_steps ?? [];
     const actionStep = [...steps]
       .filter((step) => {
-        const stepStatus = String(step.status ?? '').trim().toLowerCase();
+        const stepStatus = String(step.status ?? '')
+          .trim()
+          .toLowerCase();
         const sameStatus =
           stepStatus === targetStatus ||
           (targetStatus.startsWith('referred') && ['cancelled', 'canceled'].includes(stepStatus));
@@ -277,8 +279,7 @@ export class ApprovalTaxiComponent implements OnInit {
       })
       .sort(
         (a, b) =>
-          new Date(b.acted_at ?? b.actedAt).getTime() -
-          new Date(a.acted_at ?? a.actedAt).getTime(),
+          new Date(b.acted_at ?? b.actedAt).getTime() - new Date(a.acted_at ?? a.actedAt).getTime(),
       )[0];
 
     if (actionStep) {

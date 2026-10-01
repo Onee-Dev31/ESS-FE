@@ -81,9 +81,7 @@
                   <button type="button" class="assignee-item" (click)="selectAssignee(assignee)">
                     <img
                       [src]="
-                        'https://empimg.oneeclick.co:8048/employeeimage/' +
-                        assignee.empCode +
-                        '.jpg'
+                        'https://imgemp.oneeclick.co/employeeimage/' + assignee.empCode + '.jpg'
                       "
                       alt=""
                     />
@@ -118,7 +116,7 @@
       </button>
       <div class="assignee-avatar">
         <app-avatar-preview-modal
-          [src]="'https://empimg.oneeclick.co:8048/employeeimage/' + assignee.empCode + '.jpg'"
+          [src]="'https://imgemp.oneeclick.co/employeeimage/' + assignee.empCode + '.jpg'"
           [name]="assignee.fullname || assignee.nickName"
         />
       </div>
