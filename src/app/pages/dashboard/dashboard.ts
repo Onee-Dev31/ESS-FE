@@ -570,6 +570,7 @@ export class DashboardComponent implements OnInit {
 
   getTeamCalendar() {
     const userData = this.authService.userData();
+    if (!userData?.CODEMPID) return;
 
     forkJoin({
       holidays: this.teamCalendarService.getHoliday(),

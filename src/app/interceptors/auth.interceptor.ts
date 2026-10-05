@@ -7,8 +7,11 @@ export const SKIP_AUTH = new HttpContextToken(() => false);
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const authService = inject(AuthService);
 
-  const raw = localStorage.getItem('allData');
-  const allData = raw ? JSON.parse(raw) : null;
+  if (req.context.get(SKIP_AUTH)) {
+    return next(req);
+  }
+
+  const allData = authService.allData();
   const token = allData?.accessToken || '';
 
   if (!token) {

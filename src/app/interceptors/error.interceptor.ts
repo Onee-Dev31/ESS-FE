@@ -6,6 +6,7 @@ import { Router } from '@angular/router';
 import { catchError, throwError } from 'rxjs';
 import { ToastService } from '../services/toast';
 import { AuthService } from '../services/auth.service';
+import { SKIP_AUTH } from './auth.interceptor';
 
 export const errorInterceptor: HttpInterceptorFn = (req, next) => {
   const toastService = inject(ToastService);
@@ -19,8 +20,8 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
       let errorMessage = 'เกิดข้อผิดพลาดในการเชื่อมต่อเซิร์ฟเวอร์';
       if (
         error.status === 401 &&
-        !req.url.includes('/auth/login') &&
-        !req.url.includes('/auth/qr/confirm')
+        !req.context.get(SKIP_AUTH) &&
+        !req.url.includes('/auth/login')
       ) {
         errorMessage = 'เซสชันหมดอายุ กรุณาเข้าสู่ระบบใหม่';
         authService.logout();

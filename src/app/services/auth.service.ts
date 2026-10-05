@@ -186,10 +186,7 @@ export class AuthService {
   }
 
   getAllowedPaths(): string[] {
-    const data = localStorage.getItem(STORAGE_KEYS.ALL_DATA);
-    if (!data) return [];
-
-    const parsed = JSON.parse(data);
+    const parsed = this.getAllData();
     const menus = parsed?.menus || [];
 
     return menus
@@ -219,6 +216,7 @@ export class AuthService {
         this._currentUser.set(res.adUser);
         this._userRole.set(res.permission?.Role);
         this._userData.set(res.employee);
+        this._allData.set(res);
       }),
       catchError(() => {
         // ถ้า 401 ไม่ต้องทำอะไรเลย

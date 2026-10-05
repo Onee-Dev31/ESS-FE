@@ -1,9 +1,11 @@
 import { inject } from '@angular/core';
 import { Router, CanActivateFn } from '@angular/router';
 import { AuthService } from '../services/auth.service';
-import { STORAGE_KEYS } from '../constants/storage.constants';
+import { authGuard } from './auth-guard';
 
 export const roleGuard: CanActivateFn = (route, state) => {
+  const session = authGuard(route, state);
+  if (session !== true) return session;
   const authService = inject(AuthService);
   const router = inject(Router);
 
@@ -30,14 +32,16 @@ export const roleGuard: CanActivateFn = (route, state) => {
 };
 
 export const menuGuard: CanActivateFn = (route, state) => {
+  const session = authGuard(route, state);
+  if (session !== true) return session;
   const authService = inject(AuthService);
   const router = inject(Router);
 
   const allowedPaths = authService.getAllowedPaths();
   const currentPath = route.routeConfig?.path?.split('/')[0];
-  const allData = JSON.parse(localStorage.getItem(STORAGE_KEYS.ALL_DATA) || '');
+  const allData = authService.allData();
 
-  const roles = allData.permission.Role?.split(',').map((r: string) => r.trim()) ?? [];
+  const roles = allData?.permission?.Role?.split(',').map((r: string) => r.trim()) ?? [];
 
   const pathExceptions: { grantPath: string; roles: string[]; allowedPaths: string[] }[] = [
     {
@@ -71,6 +75,5 @@ export const menuGuard: CanActivateFn = (route, state) => {
 
   // router.navigate(['/dashboard']);
   const firstPath = allowedPaths[0];
-  router.navigate([firstPath ? `/${firstPath}` : '/dashboard']);
-  return false;
+  return router.createUrlTree([firstPath ? `/${firstPath}` : '/dashboard']);
 };
