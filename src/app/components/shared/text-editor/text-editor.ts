@@ -59,7 +59,7 @@ export class TextEditorComponent implements OnChanges {
   private textEditorImageService = inject(TextEditorImageService);
 
   quillConfig = {
-    toolbar: [['bold', 'italic'], ['image']],
+    toolbar: [['bold', 'italic', 'underline'], [{ color: [] }, { background: [] }], ['image']],
 
     keyboard: {
       bindings: {
