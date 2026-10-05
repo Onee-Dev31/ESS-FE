@@ -782,7 +782,7 @@ export class TicketWorkspaceComponent implements OnInit, OnChanges {
               problemBy: ticket.problemBy,
               priority: ticket.priority,
               source: ticket.source,
-              createdDate: new Date(ticket.created_at).toISOString(),
+              createdDate: new Date(ticket.created_at).toISOString(), //แปลงเป็น UTC (z)
               elapsed_time: ticket.elapsed_time,
               // updatedDate: new Date(ticket.updated_at).toISOString(),
               requesterCode: ticket.requester_code,
@@ -817,8 +817,11 @@ export class TicketWorkspaceComponent implements OnInit, OnChanges {
               lastEmailSenderName: ticket.last_email_sender_name,
               lastEmailSenderCode: ticket.last_email_sender_code,
               lastEmailSenderNickname: ticket.last_email_sender_nickname,
-              lastEmailReceivedAt: ticket.last_email_received_at,
+              lastEmailReceivedAt: ticket.last_email_received_at
+                ? `${ticket.last_email_received_at}Z`
+                : null, //เป็น UTC อยู่แล้ว บวก Z
             };
+            console.log('TicketWorkspace selectTicket', { objectData });
             this.selectedTicket.set(objectData);
             if (previousTicketId !== objectData.ticketId) {
               this.clearChatDraft();

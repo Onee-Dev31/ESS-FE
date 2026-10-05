@@ -28,7 +28,12 @@ interface CcRecipient {
   nameEnglish: string;
 }
 
-interface GuideDocumentOption { id: number; name: string; fileUrl: string; isActive: boolean; }
+interface GuideDocumentOption {
+  id: number;
+  name: string;
+  fileUrl: string;
+  isActive: boolean;
+}
 
 @Component({
   selector: 'app-email-reply-modal',
@@ -61,7 +66,9 @@ export class EmailReplyModal implements OnInit {
   templateScope: 'GENERAL' | 'PERSONAL' = 'PERSONAL';
   templateBusy = signal(false);
   templateActionError = signal('');
-  readonly templateEditorModules = { toolbar: [['bold', 'italic', 'underline'], [{ list: 'ordered' }, { list: 'bullet' }], ['link']] };
+  readonly templateEditorModules = {
+    toolbar: [['bold', 'italic', 'underline'], [{ list: 'ordered' }, { list: 'bullet' }], ['link']],
+  };
   private readonly authService = inject(AuthService);
   private readonly destroyRef = inject(DestroyRef);
   quotedMessage = '';
@@ -106,6 +113,11 @@ export class EmailReplyModal implements OnInit {
     //   ? ` &lt;${this.escapeHtml(String(this.ticket.requesterEmail))}&gt;`
     //   : '';
     // const sentAt = this.ticket?.createdDate ? new Date(this.ticket.createdDate) : null;
+    console.log('EmailReplyModal ngOnInit', {
+      description,
+      originalDescription,
+      ticket: this.ticket,
+    });
     const hasEmailMessage = this.ticket?.hasEmailMessage === true;
 
     const senderNameValue = hasEmailMessage
@@ -128,6 +140,7 @@ export class EmailReplyModal implements OnInit {
     const senderDisplay = senderName ? `${senderName}${senderEmail}` : senderEmail || 'ผู้ส่ง';
 
     const sentAt = sentAtValue ? new Date(sentAtValue) : null;
+    console.log('EmailReplyModal ngOnInit', { senderName, senderEmail, sentAt, hasEmailMessage });
 
     let datePrefix = '';
 
@@ -457,7 +470,12 @@ export class EmailReplyModal implements OnInit {
   }
 
   selectTemplate(template: EmailReplyTemplateApi): void {
-    if (this.isSubmitting() || this.isConfirming() || this.templateBusy() || this.editingTemplateId !== null) {
+    if (
+      this.isSubmitting() ||
+      this.isConfirming() ||
+      this.templateBusy() ||
+      this.editingTemplateId !== null
+    ) {
       return;
     }
 
@@ -489,23 +507,42 @@ export class EmailReplyModal implements OnInit {
     if (!this.guideDocuments().length) this.loadGuideDocuments();
   }
 
-  closeGuideModal(): void { this.guideModalOpen = false; }
+  closeGuideModal(): void {
+    this.guideModalOpen = false;
+  }
 
   private loadGuideDocuments(): void {
     this.guideLoading.set(true);
-    this.itServiceService.getGuideDocuments().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
-      next: (res) => {
-        const rows = Array.isArray(res) ? res : (res?.data ?? []);
-        this.guideDocuments.set(rows.map((item: any) => ({ id: item.Id ?? item.id, name: item.Name ?? item.name, fileUrl: item.File_Url ?? item.fileUrl, isActive: item.IsActive ?? item.isActive })).filter((item: GuideDocumentOption) => item.isActive));
-        this.guideLoading.set(false);
-      },
-      error: () => { this.guideLoading.set(false); this.swalService.warning('โหลดเอกสารคู่มือไม่สำเร็จ'); },
-    });
+    this.itServiceService
+      .getGuideDocuments()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (res) => {
+          const rows = Array.isArray(res) ? res : (res?.data ?? []);
+          this.guideDocuments.set(
+            rows
+              .map((item: any) => ({
+                id: item.Id ?? item.id,
+                name: item.Name ?? item.name,
+                fileUrl: item.File_Url ?? item.fileUrl,
+                isActive: item.IsActive ?? item.isActive,
+              }))
+              .filter((item: GuideDocumentOption) => item.isActive),
+          );
+          this.guideLoading.set(false);
+        },
+        error: () => {
+          this.guideLoading.set(false);
+          this.swalService.warning('โหลดเอกสารคู่มือไม่สำเร็จ');
+        },
+      });
   }
 
   get filteredGuideDocuments(): GuideDocumentOption[] {
     const query = this.guideSearch.trim().toLowerCase();
-    return this.guideDocuments().filter(item => !query || `${item.name} ${item.fileUrl}`.toLowerCase().includes(query));
+    return this.guideDocuments().filter(
+      (item) => !query || `${item.name} ${item.fileUrl}`.toLowerCase().includes(query),
+    );
   }
 
   insertGuideDocument(document: GuideDocumentOption): void {
@@ -549,7 +586,8 @@ export class EmailReplyModal implements OnInit {
       Array.from(list.children).forEach((item, index) => {
         if (item.tagName.toLowerCase() !== 'li') return;
         const first = item.firstChild;
-        if (first?.nodeType === Node.TEXT_NODE && /^\s*\d+\.\s/.test(first.textContent ?? '')) return;
+        if (first?.nodeType === Node.TEXT_NODE && /^\s*\d+\.\s/.test(first.textContent ?? ''))
+          return;
         item.insertBefore(document.createTextNode(`${index + 1}. `), first ?? null);
       });
     });
@@ -586,17 +624,24 @@ export class EmailReplyModal implements OnInit {
   get validTemplateDraft(): boolean {
     const content = document.createElement('template');
     content.innerHTML = this.templateBody || '';
-    return !!this.templateTitle.trim() &&
-      (!!content.content.textContent?.trim() || !!content.content.querySelector('img'));
+    return (
+      !!this.templateTitle.trim() &&
+      (!!content.content.textContent?.trim() || !!content.content.querySelector('img'))
+    );
   }
 
   async saveTemplate(template: EmailReplyTemplateApi): Promise<void> {
-    if (this.templateBusy() || this.editingTemplateId !== template.Id || !this.validTemplateDraft) return;
+    if (this.templateBusy() || this.editingTemplateId !== template.Id || !this.validTemplateDraft)
+      return;
     const result = await this.swalService.confirm(
       'ยืนยันการแก้ไขเทมเพลต?',
       `ต้องการบันทึกการเปลี่ยนแปลง “${this.templateTitle.trim()}” ใช่หรือไม่`,
       undefined,
-      { confirmButtonText: 'บันทึก', focusCancel: true, customClass: { container: 'swal-over-modal' } },
+      {
+        confirmButtonText: 'บันทึก',
+        focusCancel: true,
+        customClass: { container: 'swal-over-modal' },
+      },
     );
     if (!result.isConfirmed) return;
     this.persistTemplate(template, true);
@@ -608,7 +653,11 @@ export class EmailReplyModal implements OnInit {
       'ยืนยันการเพิ่มเทมเพลต?',
       `ต้องการเพิ่ม “${this.templateTitle.trim()}” ใช่หรือไม่`,
       undefined,
-      { confirmButtonText: 'เพิ่มเทมเพลต', focusCancel: true, customClass: { container: 'swal-over-modal' } },
+      {
+        confirmButtonText: 'เพิ่มเทมเพลต',
+        focusCancel: true,
+        customClass: { container: 'swal-over-modal' },
+      },
     );
     if (!result.isConfirmed) return;
     this.persistTemplate(null, true);
@@ -618,8 +667,16 @@ export class EmailReplyModal implements OnInit {
     if (this.templateBusy() || this.editingTemplateId !== null) return;
     this.templateBusy.set(true);
     try {
-      const result = await this.swalService.confirm('ลบเทมเพลต?', `ต้องการลบ “${template.Title}” ใช่หรือไม่`, undefined,
-        { confirmButtonText: 'ลบเทมเพลต', focusCancel: true, customClass: { container: 'swal-over-modal' } });
+      const result = await this.swalService.confirm(
+        'ลบเทมเพลต?',
+        `ต้องการลบ “${template.Title}” ใช่หรือไม่`,
+        undefined,
+        {
+          confirmButtonText: 'ลบเทมเพลต',
+          focusCancel: true,
+          customClass: { container: 'swal-over-modal' },
+        },
+      );
       if (!result.isConfirmed) return;
     } catch {
       return;
@@ -639,29 +696,64 @@ export class EmailReplyModal implements OnInit {
     const body = isActive ? this.templateBody : template!.Body;
     this.templateBusy.set(true);
     this.templateActionError.set('');
-    this.itServiceService.manageEmailReplyTemplate({
-      id: template?.Id ?? 0, title, body,
-      scope: this.templateScope,
-      isActive, executeBy,
-    }).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
-      next: (res) => {
-        this.templateBusy.set(false);
-        if (res?.success === false || res?.isSuccess === false) {
-          this.templateActionError.set(res?.message || 'ดำเนินการไม่สำเร็จ กรุณาลองใหม่');
-          return;
-        }
-        const returned = res?.data ?? res?.template;
-        this.templates.update(items => template
-          ? (isActive ? items.map(item => item.Id === template.Id ? { ...item, Title: title, Body: body, Scope: this.templateScope, Update_By: this.templateScope === 'GENERAL' ? executeBy : item.Update_By } : item) : items.filter(item => item.Id !== template.Id))
-          : [{ Id: returned?.Id ?? returned?.id ?? Date.now(), Title: title, Body: body, Scope: this.templateScope, IsActive: true, Created_By: executeBy, Update_By: null, created_Date: new Date().toISOString(), Update_Date: null }, ...items]);
-        this.cancelTemplateEdit();
-        if (!isActive) this.expandedTemplateId = null;
-      },
-      error: () => {
-        this.templateBusy.set(false);
-        this.templateActionError.set(isActive ? 'บันทึกไม่สำเร็จ กรุณาลองใหม่' : 'ลบไม่สำเร็จ กรุณาลองใหม่');
-      },
-    });
+    this.itServiceService
+      .manageEmailReplyTemplate({
+        id: template?.Id ?? 0,
+        title,
+        body,
+        scope: this.templateScope,
+        isActive,
+        executeBy,
+      })
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (res) => {
+          this.templateBusy.set(false);
+          if (res?.success === false || res?.isSuccess === false) {
+            this.templateActionError.set(res?.message || 'ดำเนินการไม่สำเร็จ กรุณาลองใหม่');
+            return;
+          }
+          const returned = res?.data ?? res?.template;
+          this.templates.update((items) =>
+            template
+              ? isActive
+                ? items.map((item) =>
+                    item.Id === template.Id
+                      ? {
+                          ...item,
+                          Title: title,
+                          Body: body,
+                          Scope: this.templateScope,
+                          Update_By: this.templateScope === 'GENERAL' ? executeBy : item.Update_By,
+                        }
+                      : item,
+                  )
+                : items.filter((item) => item.Id !== template.Id)
+              : [
+                  {
+                    Id: returned?.Id ?? returned?.id ?? Date.now(),
+                    Title: title,
+                    Body: body,
+                    Scope: this.templateScope,
+                    IsActive: true,
+                    Created_By: executeBy,
+                    Update_By: null,
+                    created_Date: new Date().toISOString(),
+                    Update_Date: null,
+                  },
+                  ...items,
+                ],
+          );
+          this.cancelTemplateEdit();
+          if (!isActive) this.expandedTemplateId = null;
+        },
+        error: () => {
+          this.templateBusy.set(false);
+          this.templateActionError.set(
+            isActive ? 'บันทึกไม่สำเร็จ กรุณาลองใหม่' : 'ลบไม่สำเร็จ กรุณาลองใหม่',
+          );
+        },
+      });
   }
 
   onMessageChange(value: string | null): void {
@@ -740,7 +832,12 @@ export class EmailReplyModal implements OnInit {
           attachments: [],
         };
 
-        // console.log('submit email reply', payload);
+        // DEV LOCAL: Preview email อย่างเดียว ไม่ส่งจริง
+        if (!environment.production) {
+          this.previewEmail(payload);
+          this.isSubmitting.set(false);
+          return;
+        }
 
         this.submitModal.emit(payload);
         this.isSubmitting.set(false);
@@ -753,5 +850,135 @@ export class EmailReplyModal implements OnInit {
         );
       },
     });
+  }
+  private previewEmail(payload: any): void {
+    const previewWindow = window.open('', '_blank', 'width=900,height=800');
+
+    if (!previewWindow) {
+      this.swalService.warning('ไม่สามารถเปิด Preview ได้', 'กรุณาอนุญาต Pop-up สำหรับเว็บไซต์นี้');
+      return;
+    }
+
+    const to = (payload.to ?? []).map((x: string) => this.escapeHtml(x)).join(', ');
+    const cc = (payload.cc ?? []).map((x: string) => this.escapeHtml(x)).join(', ');
+
+    previewWindow.document.open();
+
+    previewWindow.document.write(`
+    <!doctype html>
+    <html lang="th">
+      <head>
+        <meta charset="UTF-8">
+
+        <title>Email Preview</title>
+
+        <style>
+          * {
+            box-sizing: border-box;
+          }
+
+          body {
+            margin: 0;
+            background: #f5f5f5;
+            font-family: Arial, "Noto Sans Thai", sans-serif;
+            color: #202124;
+          }
+
+          .page {
+            max-width: 900px;
+            margin: 32px auto;
+            background: #ffffff;
+            border: 1px solid #e0e0e0;
+            border-radius: 12px;
+            overflow: hidden;
+          }
+
+          .dev-banner {
+            padding: 10px 20px;
+            background: #fff3cd;
+            border-bottom: 1px solid #ffe69c;
+            font-size: 13px;
+            color: #664d03;
+          }
+
+          .header {
+            padding: 20px 24px;
+            border-bottom: 1px solid #eeeeee;
+          }
+
+          .row {
+            display: flex;
+            gap: 12px;
+            margin: 7px 0;
+            font-size: 14px;
+          }
+
+          .label {
+            width: 50px;
+            flex: 0 0 50px;
+            color: #5f6368;
+          }
+
+          .value {
+            word-break: break-word;
+          }
+
+          .content {
+            padding: 28px 32px 48px;
+            font-size: 15px;
+            line-height: 1.7;
+          }
+
+          blockquote {
+            margin: 16px 0;
+            padding-left: 16px;
+            border-left: 3px solid #dadce0;
+            color: #5f6368;
+          }
+
+          img {
+            max-width: 100%;
+            height: auto;
+          }
+
+          a {
+            color: #1a73e8;
+          }
+        </style>
+      </head>
+
+      <body>
+
+        <div class="page">
+
+          <div class="dev-banner">
+            DEV Preview — ไม่มีการส่งอีเมลจริง
+          </div>
+
+          <div class="header">
+
+            <div class="row">
+              <div class="label">To</div>
+              <div class="value">${to || '-'}</div>
+            </div>
+
+            <div class="row">
+              <div class="label">Cc</div>
+              <div class="value">${cc || '-'}</div>
+            </div>
+
+          </div>
+
+          <div class="content">
+            ${payload.message}
+          </div>
+
+        </div>
+
+      </body>
+    </html>
+  `);
+
+    previewWindow.document.close();
   }
 }
