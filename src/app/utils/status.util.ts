@@ -81,6 +81,7 @@ export class StatusColor {
     Denied: 'deny',
     Closed: 'closed',
     'Waiting you': 'waiting',
+    'Waiting Approval': 'progress',
     Rejected: 'rejected',
     'Re-Opened': 'reopen',
   };
