@@ -832,11 +832,9 @@ export class EmailReplyModal implements OnInit {
           attachments: [],
         };
 
-        // DEV LOCAL: Preview email อย่างเดียว ไม่ส่งจริง
+        // DEV LOCAL: Preview email ด้วย
         if (!environment.production) {
           this.previewEmail(payload);
-          this.isSubmitting.set(false);
-          return;
         }
 
         this.submitModal.emit(payload);
