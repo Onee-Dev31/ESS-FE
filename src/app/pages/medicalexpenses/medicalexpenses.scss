@@ -28,7 +28,7 @@ $border: var(--border);
   gap: 16px;
   margin: 16px 0;
 
-  @include large-tablet {
+  @include tablet {
     grid-template-columns: repeat(2, 1fr);
   }
 
