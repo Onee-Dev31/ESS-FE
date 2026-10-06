@@ -240,7 +240,7 @@ export class EmailReplyModal implements OnInit, OnDestroy {
 
     // HTML เดิมไม่ผ่าน Quill
     this.quotedMessage =
-      originalHeader + replyNoticeHtml + `<blockquote>${description}</blockquote>`;
+      replyNoticeHtml + originalHeader + `<blockquote>${description}</blockquote>`;
   }
 
   private loadRecipients(): void {
