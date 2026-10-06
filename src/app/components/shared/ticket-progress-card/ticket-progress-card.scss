@@ -115,6 +115,16 @@
   color: var(--text-muted);
   font-size: 12px;
 }
+
+.timeline-reason-content {
+  min-width: 0;
+  max-width: 100%;
+}
+
+:host ::ng-deep .timeline-reason-content {
+  p { margin: 0; }
+  img { max-width: 100%; height: auto; }
+}
 .timeline-assignee {
   display: flex;
   flex-wrap: wrap;

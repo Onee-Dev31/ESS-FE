@@ -71,7 +71,11 @@
               @if (step.reason?.trim()) {
                 <div class="timeline-reason">
                   <i class="fa-regular fa-comment-dots" aria-hidden="true"></i>
-                  {{ step.reason }}
+                  @if (isRichReason(step.reason)) {
+                    <div class="timeline-reason-content" [innerHTML]="step.reason | safeEmailHtml"></div>
+                  } @else {
+                    <span>{{ step.reason }}</span>
+                  }
                 </div>
               }
             </div>

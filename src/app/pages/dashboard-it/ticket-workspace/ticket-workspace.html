@@ -542,11 +542,8 @@
   }
 
   @if (IS_CLOSE_TICKET()) {
-    <app-deny-modal
+    <app-close-ticket-modal
       [ticket]="selectedTicket()"
-      title="เหตุผลในการปิดงาน"
-      placeholder="กรอกเหตุผลในการปิดงาน..."
-      validationMessage="กรุณากรอกเหตุผลในการปิดงาน"
       (closeModal)="closeCloseTicketModal()"
       (submitModal)="submitCloseTicket($event)"
     />

@@ -1109,6 +1109,7 @@ export class ItService implements OnInit {
   }
 
   getTicketStatus(ticket: any) {
+    console.log('getTicketStatus', ticket);
     if (
       (ticket.IT_Status === 'Assigned' &&
         ticket.user_status === 'Pending' &&
@@ -1119,6 +1120,8 @@ export class ItService implements OnInit {
       ticket.user_status === 'Referred_Back'
     ) {
       return 'Waiting you';
+    } else if (ticket.IT_Status === null && ticket.approval_status === 'New') {
+      return 'Waiting Approval';
     } else if (
       ticket.IT_Status === 'Assigned' &&
       ticket.user_status === 'Pending' &&
@@ -1210,7 +1213,7 @@ export class ItService implements OnInit {
       })
       .subscribe({
         next: (res) => {
-          // console.log(res);
+          console.log(res);
           this.Tickets.set(
             res.data.map((ticket: any) => ({
               ...ticket,
