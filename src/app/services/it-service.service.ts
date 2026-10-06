@@ -496,12 +496,31 @@ export class ItServiceService {
     payload: {
       message: string;
       replyAll: boolean;
+      attachments?: File[];
       executedBy: string;
       to?: string[];
       cc?: string[];
     },
   ): Observable<any> {
-    return this._http.post(`${this.baseUrl}/tickets/${id}/reply-email`, payload);
+    const formData = new FormData();
+
+    formData.append('Message', payload.message);
+    formData.append('ReplyAll', String(payload.replyAll));
+    formData.append('ExecutedBy', payload.executedBy);
+
+    payload.to?.forEach((email) => {
+      formData.append('To', email);
+    });
+
+    payload.cc?.forEach((email) => {
+      formData.append('Cc', email);
+    });
+
+    payload.attachments?.forEach((file) => {
+      formData.append('Files', file, file.name);
+    });
+
+    return this._http.post(`${this.baseUrl}/tickets/${id}/reply-email`, formData);
   }
 
   getReplyEmailRecipients(id: string | number): Observable<any> {

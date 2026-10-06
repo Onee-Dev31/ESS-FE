@@ -51,7 +51,10 @@ import { ITServiceRequestCombinedComponent } from '../../it-service-request-comb
 import { SwalService } from '../../../services/swal.service';
 import { tickets } from '../../../utils/it-dashboard-mock';
 import { AcknowledgeModal } from '../modal/acknowledge-modal/acknowledge-modal';
-import { EmailReplyModal } from '../modal/email-reply-modal/email-reply-modal';
+import {
+  EmailReplyModal,
+  EmailReplySubmission,
+} from '../modal/email-reply-modal/email-reply-modal';
 import { CloseTicketModal } from '../modal/close-ticket-modal/close-ticket-modal';
 import { DenyModal } from '../modal/deny-modal/deny-modal';
 import { ChangeTicketTypeModal } from '../modal/change-ticket-type-modal/change-ticket-type-modal';
@@ -930,15 +933,13 @@ export class TicketWorkspaceComponent implements OnInit, OnChanges {
     this.IS_EMAIL_REPLY_MODAL.set(false);
   }
 
-  submitEmailReply(data: any): void {
+  submitEmailReply(data: EmailReplySubmission): void {
     const executedBy = this.authService.currentUser() ?? this.authService.userData()?.AD_USER ?? '';
 
     if (!data?.id || !data?.message || !executedBy) {
       this.swalService.warning('ข้อมูลสำหรับตอบกลับอีเมลไม่ครบถ้วน');
       return;
     }
-
-    // console.log('submitEmailReply', data);
 
     this.IS_EMAIL_REPLY_MODAL.set(false);
     this.swalService.loading('กำลังส่งอีเมล...');
@@ -948,6 +949,7 @@ export class TicketWorkspaceComponent implements OnInit, OnChanges {
         to: data.to || [],
         cc: data.cc || [],
         replyAll: true,
+        attachments: (data.attachments ?? []).map((attachment) => attachment.file),
         executedBy,
       })
       .subscribe({

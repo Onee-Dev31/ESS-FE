@@ -1,5 +1,178 @@
 @use '../../../../../styles/variables' as *;
 
+.email-reply-modal,
+.email-reply-modal .modal-container,
+.email-reply-modal .modal-header,
+.email-reply-modal .modal-body,
+.email-reply-modal .modal-footer {
+  box-sizing: border-box;
+}
+
+.reply-attachments {
+  min-width: 0;
+  max-width: 100%;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border-color);
+  color: var(--text);
+
+  .attachment-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 8px;
+
+    label { margin-bottom: 0; }
+  }
+
+  .attachment-heading span,
+  .attachment-hint {
+    color: var(--text-muted);
+    font-size: 0.8rem;
+  }
+
+  button {
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    background: var(--bg-card);
+    color: var(--text);
+    cursor: pointer;
+
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+  }
+
+  .attachment-select {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+    min-height: 96px;
+    padding: 16px 12px;
+    border: 2px dashed #dce2e9;
+    border-radius: 12px;
+    background: #f8fafc;
+    color: var(--text);
+    font: inherit;
+    text-align: center;
+    transition: background 0.15s, border-color 0.15s;
+
+    &:hover:not(:disabled) {
+      background: #dcf2fb;
+      border-color: #2180ff;
+
+      .attachment-prompt i { color: #2180ff; }
+    }
+    &:focus-visible {
+      outline: 2px solid #2180ff;
+      outline-offset: 3px;
+    }
+  }
+  .attachment-prompt {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    font-size: 0.85rem;
+
+    i { color: #94a3b8; font-size: 24px; }
+  }
+  .attachment-hint {
+    display: flex;
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 5px;
+    color: #475569;
+    font-size: 0.625rem;
+  }
+  .attachment-badge {
+    box-sizing: border-box;
+    padding: 3px 6px;
+    border: 0;
+    border-radius: 3px;
+    background: #f1f5f9;
+    line-height: 1.4;
+    white-space: nowrap;
+  }
+  .reply-file-list {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+    list-style: none;
+    padding: 0;
+    margin: 12px 0 0;
+  }
+  .reply-file-list li {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+    min-height: 46px;
+    box-sizing: border-box;
+    padding: 0 12px 0 0;
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    background: var(--bg-body);
+
+    &:hover,
+    &:focus-within {
+      border-color: #2180ff;
+      background: var(--bg-card);
+    }
+  }
+  .attachment-preview {
+    display: flex;
+    align-items: center;
+    flex: 1;
+    gap: 8px;
+    min-width: 0;
+    min-height: 44px;
+    padding: 6px 0 6px 12px;
+    border: 0;
+    background: transparent;
+    text-align: left;
+    font: inherit;
+
+    &:focus-visible { outline: 2px solid #2180ff; outline-offset: -2px; }
+  }
+  .attachment-icon { flex-shrink: 0; color: #2180ff; font-size: 12px; }
+  .attachment-name {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: var(--text-muted);
+    font-size: 0.8rem;
+  }
+  .attachment-remove {
+    flex-shrink: 0;
+    width: 28px;
+    height: 28px;
+    border: 0;
+    background: transparent;
+    color: #94a3b8;
+
+    &:hover:not(:disabled) { background: rgba(148, 163, 184, 0.12); color: #64748b; }
+    &:focus-visible { outline: 2px solid #2180ff; outline-offset: 2px; }
+  }
+
+  @media (max-width: 400px) {
+    .reply-file-list { grid-template-columns: minmax(0, 1fr); }
+  }
+}
+
 .modal-overlay {
   position: fixed;
   inset: 0;

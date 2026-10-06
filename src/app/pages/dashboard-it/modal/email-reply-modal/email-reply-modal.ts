@@ -5,6 +5,7 @@ import {
   inject,
   Input,
   OnInit,
+  OnDestroy,
   Output,
   signal,
   ViewChild,
@@ -15,6 +16,22 @@ import { SwalService } from '../../../../services/swal.service';
 import { ItServiceService } from '../../../../services/it-service.service';
 import { MasterService } from '../../../../services/master.service';
 import { environment } from '../../../../../environments/environment';
+import { IT_ATTACHMENT_FILE_CONFIG } from '../../../../constants/it-attachment-file.constant';
+import { formatFileSize } from '../../../../utils/file-size.util';
+import { validateFiles } from '../../../../utils/file-validation.util';
+import {
+  FilePreviewItem,
+  FilePreviewModalComponent,
+} from '../../../../components/modals/file-preview-modal/file-preview-modal';
+import dayjs from 'dayjs';
+
+export interface EmailReplySubmission {
+  id: string | number;
+  message: string;
+  to: string[];
+  cc: string[];
+  attachments: { name: string; size: number; file: File }[];
+}
 
 interface CcRecipient {
   email: string;
@@ -27,17 +44,86 @@ interface CcRecipient {
 @Component({
   selector: 'app-email-reply-modal',
   standalone: true,
-  imports: [MessageComposer, FormsModule],
+  imports: [MessageComposer, FormsModule, FilePreviewModalComponent],
   templateUrl: './email-reply-modal.html',
   styleUrl: './email-reply-modal.scss',
 })
-export class EmailReplyModal implements OnInit {
+export class EmailReplyModal implements OnInit, OnDestroy {
   @ViewChild(MessageComposer) private textEditor!: MessageComposer;
   @Input() ticket: any;
-  @Output() submitModal = new EventEmitter<any>();
+  @Output() submitModal = new EventEmitter<EmailReplySubmission>();
   @Output() closeModal = new EventEmitter<void>();
 
   message = '';
+  attachments: { name: string; size: number; file: File }[] = [];
+  previewFiles = signal<FilePreviewItem[]>([]);
+
+  previewAttachment(attachment: { name: string; file: File }): void {
+    this.closePreview();
+    this.previewFiles.set([
+      {
+        fileName: attachment.name,
+        date: dayjs().format('DD/MM/YYYY HH:mm'),
+        url: URL.createObjectURL(attachment.file),
+        type: attachment.file.type,
+      },
+    ]);
+  }
+
+  closePreview(): void {
+    for (const file of this.previewFiles()) {
+      if (file.url) URL.revokeObjectURL(file.url);
+    }
+    this.previewFiles.set([]);
+  }
+
+  ngOnDestroy(): void {
+    this.closePreview();
+  }
+  readonly FILE_CONFIG = IT_ATTACHMENT_FILE_CONFIG;
+  readonly formatFileSize = formatFileSize;
+  readonly acceptedFiles = this.FILE_CONFIG.allowedExtensions.map((ext) => `.${ext}`).join(',');
+
+  onFileSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    this.addAttachments(Array.from(input.files ?? []));
+    input.value = '';
+  }
+
+  onAttachmentDragOver(event: DragEvent): void {
+    event.preventDefault();
+    if (event.dataTransfer) {
+      event.dataTransfer.dropEffect =
+        this.isSubmitting() ||
+        this.isConfirming() ||
+        this.attachments.length >= this.FILE_CONFIG.maxFiles
+          ? 'none'
+          : 'copy';
+    }
+  }
+
+  onAttachmentDrop(event: DragEvent): void {
+    event.preventDefault();
+    this.addAttachments(Array.from(event.dataTransfer?.files ?? []));
+  }
+
+  private addAttachments(files: File[]): void {
+    if (this.isSubmitting() || this.isConfirming()) return;
+    const { validFiles, errors } = validateFiles(files, this.FILE_CONFIG, this.attachments.length);
+    if (validFiles.length) {
+      this.attachments = [
+        ...this.attachments,
+        ...validFiles.map((file) => ({ name: file.name, size: file.size, file })),
+      ];
+    }
+    if (errors.length) this.swalService.warning('ไม่สามารถแนบไฟล์บางรายการได้', errors.join('\n'));
+  }
+
+  removeAttachment(index: number): void {
+    if (this.isSubmitting() || this.isConfirming()) return;
+    this.attachments = this.attachments.filter((_, fileIndex) => fileIndex !== index);
+  }
+
   quotedMessage = '';
   isSubmitting = signal(false);
   isConfirming = signal(false);
@@ -129,11 +215,16 @@ export class EmailReplyModal implements OnInit {
       datePrefix = `On ${date} at ${time}, `;
     }
 
-    const originalHeader = `
-    <p>
-      ${datePrefix}${senderDisplay} เขียนว่า:
-    </p>
-  `;
+    const hasStaffReplyMarker =
+      /-{5,}\s*[^|<>]+?\s*\|\s*\d{2}\/\d{2}\/\d{4}\s+\d{2}:\d{2}\s*-{5,}/.test(description);
+
+    const originalHeader = hasStaffReplyMarker
+      ? ''
+      : `
+      <p>
+        ${datePrefix}${senderDisplay} เขียนว่า:
+      </p>
+    `;
 
     const replyNoticeHtml = `
     <p
@@ -472,7 +563,7 @@ export class EmailReplyModal implements OnInit {
           message: fullMessage,
           to: this.to ? [this.to] : [],
           cc: this.cc,
-          attachments: [],
+          attachments: [...this.attachments],
         };
 
         // DEV LOCAL: Preview email ด้วย

@@ -118,6 +118,68 @@
 
       <label>ข้อความตอบกลับ <span>*</span></label>
       <app-message-composer [(message)]="message" [busy]="isSubmitting() || isConfirming()" />
+      <div class="reply-attachments">
+        <div class="attachment-heading">
+          <label for="reply-file-input"><i class="fa-solid fa-paperclip" aria-hidden="true"></i> แนบไฟล์</label>
+          <span>{{ attachments.length }} / {{ FILE_CONFIG.maxFiles }} ไฟล์</span>
+        </div>
+        <input
+          #fileInput
+          id="reply-file-input"
+          type="file"
+          hidden
+          multiple
+          [accept]="acceptedFiles"
+          [disabled]="isSubmitting() || isConfirming() || attachments.length >= FILE_CONFIG.maxFiles"
+          (change)="onFileSelected($event)"
+        />
+        <button
+          type="button"
+          class="attachment-select"
+          [disabled]="isSubmitting() || isConfirming() || attachments.length >= FILE_CONFIG.maxFiles"
+          (click)="fileInput.click()"
+          (dragover)="onAttachmentDragOver($event)"
+          (drop)="onAttachmentDrop($event)"
+          aria-describedby="reply-file-hint"
+        >
+          <span class="attachment-prompt">
+            <i class="fa-solid fa-cloud-arrow-up" aria-hidden="true"></i>
+            คลิกหรือลากไฟล์มาวางที่นี่
+          </span>
+          <span id="reply-file-hint" class="attachment-hint">
+            @for (extension of FILE_CONFIG.allowedExtensions; track extension) {
+              <span class="attachment-badge">{{ extension.toUpperCase() }}</span>
+            }
+            <span class="attachment-badge">สูงสุด {{ FILE_CONFIG.maxFiles }} ไฟล์</span>
+            <span class="attachment-badge">ไม่เกิน {{ FILE_CONFIG.maxSizeMB }} MB</span>
+          </span>
+        </button>
+        @if (attachments.length > 0) {
+          <ul class="reply-file-list">
+            @for (attachment of attachments; track attachment; let i = $index) {
+              <li>
+                <button
+                  type="button"
+                  class="attachment-preview"
+                  [attr.aria-label]="'ดูตัวอย่างไฟล์ ' + attachment.name"
+                  [title]="attachment.name + ' (' + formatFileSize(attachment.size) + ')'"
+                  (click)="previewAttachment(attachment)"
+                >
+                  <i class="fa-solid fa-file-lines attachment-icon" aria-hidden="true"></i>
+                  <span class="attachment-name">{{ attachment.name }}</span>
+                </button>
+                <button
+                  type="button"
+                  class="attachment-remove"
+                  [attr.aria-label]="'ลบไฟล์ ' + attachment.name"
+                  [disabled]="isSubmitting() || isConfirming()"
+                  (click)="removeAttachment(i)"
+                ><i class="fa-solid fa-xmark" aria-hidden="true"></i></button>
+              </li>
+            }
+          </ul>
+        }
+      </div>
       <!-- <div class="quoted-email" [innerHTML]="quotedMessage"></div> -->
     </div>
 
@@ -141,3 +203,7 @@
   </div>
 
 </div>
+
+@if (previewFiles().length > 0) {
+  <app-file-preview-modal [files]="previewFiles()" (onClose)="closePreview()" />
+}
