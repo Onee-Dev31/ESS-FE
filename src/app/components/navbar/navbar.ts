@@ -94,10 +94,12 @@ export class NavbarComponent {
 
     // Prime audio on first user interaction to satisfy browser autoplay policy
     const primeAudio = () => {
+      this.notifyAudio.muted = true;
       this.notifyAudio
         .play()
         .then(() => this.notifyAudio.pause())
-        .catch(() => {});
+        .catch(() => {})
+        .finally(() => (this.notifyAudio.muted = false));
       document.removeEventListener('click', primeAudio);
     };
     document.addEventListener('click', primeAudio, { once: true });
@@ -109,7 +111,7 @@ export class NavbarComponent {
       this.isBellHighlighted.set(true);
       window.setTimeout(() => this.isBellHighlighted.set(false), 2600);
 
-      if (!document.hidden) {
+      if (!document.hidden && !this.notificationService.isWithinLoginWarmup()) {
         this.notifyAudio.currentTime = 0;
         this.notifyAudio.play().catch(() => {});
       }

@@ -61,6 +61,7 @@ export class NotificationService {
   private lastToastTime = 0;
   private lastServerUnreadCount: number | null = null;
   private activeUserKey: string | null = null;
+  private sessionStartedAt = 0;
 
   constructor() {
     effect(() => {
@@ -76,6 +77,7 @@ export class NotificationService {
       }
 
       this.activeUserKey = adUser;
+      this.sessionStartedAt = Date.now();
       this.reset();
       this.refreshAll();
     });
@@ -158,6 +160,11 @@ export class NotificationService {
           this.refreshUnreadCount(true);
         }
       });
+  }
+
+  /** realtime event ที่มาช่วงแรกหลัง login มักเป็นของค้างที่ backend ส่งซ้ำ ไม่ควรเล่นเสียงเตือน */
+  isWithinLoginWarmup(): boolean {
+    return Date.now() - this.sessionStartedAt < 5000;
   }
 
   refreshAll() {
