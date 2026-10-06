@@ -52,6 +52,7 @@ import { SwalService } from '../../../services/swal.service';
 import { tickets } from '../../../utils/it-dashboard-mock';
 import { AcknowledgeModal } from '../modal/acknowledge-modal/acknowledge-modal';
 import { EmailReplyModal } from '../modal/email-reply-modal/email-reply-modal';
+import { CloseTicketModal } from '../modal/close-ticket-modal/close-ticket-modal';
 import { DenyModal } from '../modal/deny-modal/deny-modal';
 import { ChangeTicketTypeModal } from '../modal/change-ticket-type-modal/change-ticket-type-modal';
 import { TicketTypeSummaryModal } from '../modal/ticket-type-summary-modal/ticket-type-summary-modal';
@@ -106,6 +107,7 @@ interface TeamGroupOption {
     ITServiceRequestCombinedComponent,
     AcknowledgeModal,
     EmailReplyModal,
+    CloseTicketModal,
     DenyModal,
     ChangeTicketTypeModal,
     TicketTypeSummaryModal,
