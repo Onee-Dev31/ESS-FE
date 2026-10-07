@@ -278,7 +278,8 @@ export class DepartmentSetup implements OnInit {
           this.isSaving.set(false);
           this.swalService.success('บันทึกสำเร็จ');
           this.closeDrawer();
-          this.loadSetupList();
+          this.applyFilter();
+          // this.loadSetupList();
         },
         error: (err) => {
           this.isSaving.set(false);
