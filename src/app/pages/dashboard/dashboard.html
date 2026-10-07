@@ -1,4 +1,4 @@
-<div class="dashboard-wrapper" *ngIf="!isLoading; else loadingTpl">
+<div class="dashboard-wrapper">
   <header class="dashboard-header">
     <h1 class="page-title">Dashboards</h1>
   </header>
@@ -36,7 +36,7 @@
             </div>
 
             <div class="attendance-list-clean">
-              @for (item of attendanceList; track item.label) {
+              @for (item of attendanceList(); track item.label) {
                 <div class="att-clean-item">
                   <div class="att-label">{{ item.label }}</div>
                   <div class="att-value">{{ item.value }}</div>
@@ -519,10 +519,6 @@
     </app-tooltip-modal>
   }
 </div>
-
-<ng-template #loadingTpl>
-  <app-page-loader />
-</ng-template>
 
 @if (isFormOpen()) {
   <div class="modal-overlay">

@@ -26,7 +26,6 @@ import { TooltipModalComponent } from '../../components/modals/tooltip-modal/too
 import { TimeOffForm } from '../../components/features/time-off-form/time-off-form';
 import { AuthService } from '../../services/auth.service';
 import { SkeletonComponent } from '../../components/shared/skeleton/skeleton';
-import { PageLoaderComponent } from '../../components/shared/page-loader/page-loader';
 
 import dayjs from 'dayjs';
 import 'dayjs/locale/th';
@@ -36,7 +35,6 @@ import { catchError, forkJoin, map, Observable, of, tap } from 'rxjs';
 import { NgZone } from '@angular/core';
 import type { DatesSetArg, EventClickArg } from '@fullcalendar/core';
 import Swal from 'sweetalert2';
-import { color } from 'echarts';
 import { TaxiService } from '../../services/taxi.service';
 import { DateUtilityService } from '../../services/date-utility.service';
 import { ItAssetService } from '../../services/it-asset.service';
@@ -72,7 +70,6 @@ dayjs.locale('th');
     MedicalPolicyModalComponent,
     TooltipModalComponent,
     TimeOffForm,
-    PageLoaderComponent,
   ],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.scss',
@@ -121,7 +118,6 @@ export class DashboardComponent implements OnInit {
   userProfile = toSignal(this.userService.getUserProfile());
   medicalStats = toSignal(this.dashboardService.getMedicalStats());
 
-  isLoading = true;
   // pendingCount = toSignal(this.dashboardService.getGlobalPendingCount(), { initialValue: 0 });
   // medicalPendingCount = toSignal(this.dashboardService.getMedicalPendingCount(), {
   //   initialValue: 0,
@@ -132,8 +128,27 @@ export class DashboardComponent implements OnInit {
   performanceData = signal<any>(null);
   itAsset = signal<any>(null);
   oneeUser = signal<any>(null);
-  itStoryMap = signal<any>(null);
-  leaveStats = signal<any>([]);
+  attendanceList = signal<AttendanceItem[]>([]);
+
+  /** รวมข้อมูลบัญชี AD + อุปกรณ์ IT (แสดงได้ทันทีที่ API ใดตัวหนึ่งตอบกลับ) */
+  itStoryMap = computed(() => {
+    const assets = this.itAsset()?.data || [];
+    const user = this.oneeUser() || {};
+    return [
+      { label: 'Account เข้าเครื่องคอม, Email, Wifi', value: user.SamAccountName },
+      { label: 'password expire date', value: user.PasswordExpirationDate },
+      ...assets.map((item: any) => ({ label: item.Category, value: item.Model })),
+    ];
+  });
+
+  /** ข้อมูลการลา โดยใช้จำนวนวันจาก Team Calendar ถ้ามี */
+  leaveStats = computed(() => {
+    const attendance = this.attendanceList();
+    return (this.leavePolicyMaster() || []).map((item: any) => ({
+      ...item,
+      used_days: attendance.find((att) => att.label === item.leave_name_th)?.value || item.used_days,
+    }));
+  });
 
   toggleGrade(): void {
     this.showGrade = true;
@@ -257,7 +272,6 @@ export class DashboardComponent implements OnInit {
   //   ];
   // });
 
-  attendanceList: any[] = [];
   performanceList: PerformanceItem[] = [];
   specialDates: Record<string, { type: string; note?: string; code?: string }> = {};
   allHolidays: Array<{ id: any; date: string; name: string }> = [];
@@ -463,54 +477,15 @@ export class DashboardComponent implements OnInit {
   ngOnInit() {
     this.performanceList = this.dashboardService.getPerformanceList();
 
-    this.loadInitialData().subscribe({
-      next: ([
-        leaveDashboard,
-        performanceData,
-        itAsset,
-        oneeUser,
-        allowanceSummary,
-        vehicleSummary,
-        taxiSummary,
-      ]) => {
-        this.leavePolicyMaster.set(leaveDashboard);
-        this.performanceData.set(performanceData);
-        this.itAsset.set(itAsset);
-        this.oneeUser.set(oneeUser);
-        this.allowanceTotalAmount.set(allowanceSummary ?? 0);
-        this.vehicleTotalAmount.set(vehicleSummary ?? 0);
-        this.vehicleTaxiTotalAmount.set(taxiSummary ?? 0);
-
-        this.loadAfterData();
-        this.isLoading = false;
-        this.cdr.detectChanges();
-      },
-      error: (err) => {
-        this.isLoading = false;
-        this.router.navigate(['/welcome']);
-        console.error('Error loading initial data', err);
-      },
-    });
-  }
-
-  loadInitialData() {
-    const userAd = this.authService.userData().AD_USER.toLowerCase();
-    // 1
-    return forkJoin([
-      this.getLeaveDashboard(),
-      this.getPerformance(),
-      this.getItAssetByAduser(userAd),
-      this.getOneeuserByAduser(userAd),
-      this.loadAllowanceSummary(),
-      this.loadVehicleSummary(),
-      this.loadVehicleTaxiSummary(),
-    ]);
-  }
-
-  loadAfterData() {
-    // 2
-    this.mapLeave();
-    this.mapItStory();
+    // โหลดแต่ละส่วนแยกกัน ไม่ต้องรอ API ที่ช้าที่สุด
+    const userAd = this.authService.userData()?.AD_USER?.toLowerCase() ?? '';
+    this.getLeaveDashboard().subscribe((v) => this.leavePolicyMaster.set(v ?? []));
+    this.getPerformance().subscribe((v) => this.performanceData.set(v));
+    this.getItAssetByAduser(userAd).subscribe((v) => this.itAsset.set(v));
+    this.getOneeuserByAduser(userAd).subscribe((v) => this.oneeUser.set(v));
+    this.loadAllowanceSummary().subscribe((v) => this.allowanceTotalAmount.set(v ?? 0));
+    this.loadVehicleSummary().subscribe((v) => this.vehicleTotalAmount.set(v ?? 0));
+    this.loadVehicleTaxiSummary().subscribe((v) => this.vehicleTaxiTotalAmount.set(v ?? 0));
   }
 
   loadAllowanceSummary() {
@@ -659,11 +634,11 @@ export class DashboardComponent implements OnInit {
         }
       });
 
-      this.attendanceList =
+      this.attendanceList.set(
         Object.keys(leaveCounts).length > 0
-          ? Object.entries(leaveCounts).map(([label, count]) => ({ label, value: count }))
-          : // ? Object.entries(leaveCounts).map(([label, count]) => ({ label, value: `${count} วัน` }))
-            [{ label: 'ไม่มีรายการลาในปีนี้', value: '-' }];
+          ? Object.entries(leaveCounts).map(([label, count]) => ({ label, value: String(count) }))
+          : [{ label: 'ไม่มีรายการลาในปีนี้', value: '-' }],
+      );
 
       this.cdr.detectChanges();
     });
@@ -683,11 +658,23 @@ export class DashboardComponent implements OnInit {
   }
 
   getItAssetByAduser(adUser: string) {
-    return this.itAssetService.getEmployeeAssets(adUser);
+    if (!adUser) return of(null);
+    return this.itAssetService.getEmployeeAssets(adUser).pipe(
+      catchError((err) => {
+        console.error('Error loading IT assets', err);
+        return of(null);
+      }),
+    );
   }
 
   getOneeuserByAduser(adUser: string) {
-    return this.itAssetService.getOneeuserByAd(adUser);
+    if (!adUser) return of(null);
+    return this.itAssetService.getOneeuserByAd(adUser).pipe(
+      catchError((err) => {
+        console.error('Error loading AD user info', err);
+        return of(null);
+      }),
+    );
   }
 
   getLeaveDashboard() {
@@ -707,39 +694,6 @@ export class DashboardComponent implements OnInit {
           return of(null);
         }),
       );
-  }
-
-  mapLeave() {
-    const mapLeave = this.leavePolicyMaster().map((item: any) => {
-      return {
-        ...item,
-        used_days:
-          (this.attendanceList.find((att: any) => att.label === item.leave_name_th) || {}).value ||
-          item.used_days,
-      };
-    });
-    this.leaveStats.set(mapLeave);
-  }
-
-  mapItStory() {
-    const assets = this.itAsset().data || [];
-    const user = this.oneeUser() || [];
-    const map = [
-      {
-        label: 'Account เข้าเครื่องคอม, Email, Wifi',
-        value: user.SamAccountName,
-      },
-      {
-        label: 'password expire date',
-        value: user.PasswordExpirationDate,
-      },
-      ...assets.map((item: any) => ({
-        label: item.Category,
-        value: item.Model,
-      })),
-    ];
-
-    this.itStoryMap.set(map);
   }
 
   openTimeOffForm(leaveLabel: string) {
