@@ -1,3 +1,4 @@
+import { AttachmentUploadComponent } from '../../components/shared/attachment-upload/attachment-upload';
 import {
   Component,
   signal,
@@ -12,7 +13,6 @@ import {
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { PageHeaderComponent } from '../../components/shared/page-header/page-header';
 import { SwalService } from '../../services/swal.service';
 import { UserService, UserProfile } from '../../services/user.service';
 import { PhoneUtil } from '../../utils/phone.util';
@@ -32,12 +32,11 @@ import dayjs from 'dayjs';
 import { MasterDataService } from '../../services/master-data.service';
 import { NzModalModule } from 'ng-zorro-antd/modal';
 import { EmpAdForm } from '../dashboard-it/empployee-ad-management/emp-ad-form/emp-ad-form';
-import { IT_ATTACHMENT_FILE_CONFIG } from '../../constants/it-attachment-file.constant';
 import { PageLoaderComponent } from '../../components/shared/page-loader/page-loader';
+import { IT_ATTACHMENT_FILE_CONFIG } from '../../constants/it-attachment-file.constant';
 
 @Component({
   selector: 'app-it-service-request',
-  standalone: true,
   imports: [
     CommonModule,
     FormsModule,
@@ -47,6 +46,7 @@ import { PageLoaderComponent } from '../../components/shared/page-loader/page-lo
     NzModalModule,
     EmpAdForm,
     PageLoaderComponent,
+    AttachmentUploadComponent,
   ],
   templateUrl: './it-service-request.html',
   styleUrl: './it-service-request.scss',

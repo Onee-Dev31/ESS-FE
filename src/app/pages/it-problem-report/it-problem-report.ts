@@ -1,3 +1,4 @@
+import { AttachmentUploadComponent } from '../../components/shared/attachment-upload/attachment-upload';
 import {
   Component,
   signal,
@@ -46,6 +47,7 @@ interface CcEmployeeOption {
   selector: 'app-it-problem-report',
   standalone: true,
   imports: [
+    AttachmentUploadComponent,
     CommonModule,
     FormsModule,
     PageHeaderComponent,

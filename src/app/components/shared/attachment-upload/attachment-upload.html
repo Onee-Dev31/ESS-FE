@@ -1,0 +1,50 @@
+@if (attachments().length < config().maxFiles) {
+  <div
+    class="dropzone"
+    (click)="fileInput.click()"
+    (dragover)="$event.preventDefault()"
+    (drop)="filesDropped.emit($event)"
+  >
+    <p class="dropzone-text">
+      <i class="fas fa-cloud-upload-alt dropzone-icon"></i>คลิกหรือลากไฟล์มาวางที่นี่
+    </p>
+    <p class="dropzone-hint2">
+      @for (ext of config().allowedExtensions; track ext) {
+        <span>{{ ext.toUpperCase() }}</span>
+      }
+      <span>สูงสุด {{ config().maxFiles }} ไฟล์</span>
+      <span>ไม่เกิน {{ config().maxSizeMB }} MB</span>
+    </p>
+    <input
+      type="file"
+      #fileInput
+      style="display: none"
+      multiple
+      [accept]="'.' + config().allowedExtensions.join(',.')"
+      (change)="fileSelected.emit($event)"
+    />
+  </div>
+}
+
+@if (attachments().length > 0) {
+  <div class="file-list">
+    @for (file of attachments(); track file; let i = $index) {
+      <button
+        class="file-item"
+        type="button"
+        [title]="'ดูไฟล์ ' + file.name"
+        (click)="previewRequested.emit(i)"
+      >
+        <i class="fas fa-file-alt file-icon"></i>
+        <span class="file-name">{{ file.name }}</span>
+        <span
+          class="file-remove"
+          title="ลบไฟล์"
+          (click)="removeRequested.emit(i); $event.stopPropagation()"
+        >
+          <i class="fas fa-times"></i>
+        </span>
+      </button>
+    }
+  </div>
+}

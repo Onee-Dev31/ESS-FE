@@ -158,56 +158,16 @@
           <p class="field-hint">รองรับไฟล์รูปภาพ, PDF, และเอกสารทั่วไป</p>
         </div>
         <div class="field-input-col">
-          @if (problemFormData().attachments.length < FILE_CONFIG.maxFiles) {
-            <div
-              class="dropzone"
-              (click)="fileInput.click()"
-              (dragover)="onDragOver($event)"
-              (drop)="onDrop($event)"
-            >
-              <p class="dropzone-text">
-                <i class="fas fa-cloud-upload-alt dropzone-icon"></i>คลิกหรือลากไฟล์มาวางที่นี่
-              </p>
-              <p class="dropzone-hint2">
-                @for (ext of FILE_CONFIG.allowedExtensions; track ext) {
-                  <span>{{ ext.toUpperCase() }}</span>
-                }
-                <span>สูงสุด {{ FILE_CONFIG.maxFiles }} ไฟล์</span>
-                <span>ไม่เกิน {{ FILE_CONFIG.maxSizeMB }} MB</span>
-              </p>
-              <input
-                type="file"
-                #fileInput
-                style="display: none"
-                multiple
-                [accept]="'.' + FILE_CONFIG.allowedExtensions.join(',.')"
-                (change)="onFileSelected($event)"
-              />
-            </div>
-          }
-
-          @if (problemFormData().attachments.length > 0) {
-            <div class="file-list">
-              @for (file of problemFormData().attachments; track file.name; let i = $index) {
-                <button
-                  class="file-item"
-                  type="button"
-                  [title]="'ดูไฟล์ ' + file.name"
-                  (click)="viewFile(file, problemFormData().attachments)"
-                >
-                  <i class="fas fa-file-alt file-icon"></i>
-                  <span class="file-name">{{ file.name }}</span>
-                  <span
-                    class="file-remove"
-                    title="ลบไฟล์"
-                    (click)="removeAttachment(i); $event.stopPropagation()"
-                  >
-                    <i class="fas fa-times"></i>
-                  </span>
-                </button>
-              }
-            </div>
-          }
+          <app-attachment-upload
+            [attachments]="problemFormData().attachments"
+            [config]="FILE_CONFIG"
+            (fileSelected)="onFileSelected($event)"
+            (filesDropped)="onDrop($event)"
+            (previewRequested)="
+              viewFile(problemFormData().attachments[$event], problemFormData().attachments)
+            "
+            (removeRequested)="removeAttachment($event)"
+          />
         </div>
       </div>
 
