@@ -5,9 +5,18 @@ import {
   TechInfoService,
   StoredProcedureInfo,
 } from '../components/shared/tech-info/tech-info.service';
+import { AuthService } from '../services/auth.service';
+import { environment } from '../../environments/environment';
 
 export const techInfoInterceptor: HttpInterceptorFn = (req, next) => {
   const service = inject(TechInfoService);
+  const auth = inject(AuthService);
+
+
+  if (auth.isTech() && req.url.startsWith(environment.api_url)) {
+    req = req.clone({ setHeaders: { 'X-Tech-Info': '1' } });
+  }
+  
   const start = Date.now();
 
   const url = new URL(req.url, window.location.origin);
@@ -21,7 +30,6 @@ export const techInfoInterceptor: HttpInterceptorFn = (req, next) => {
       next: (event) => {
         if (event instanceof HttpResponse) {
           status = event.status;
-
           const spHeader = event.headers.get('X-Stored-Procedure');
           if (spHeader) {
             // X-SP-Tables: "sp1:table1|table2,sp2:table3|table4"
