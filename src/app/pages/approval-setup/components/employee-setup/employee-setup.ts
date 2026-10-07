@@ -17,7 +17,7 @@ interface ApprovalSetupEmployee {
   emp_code: string;
   emp_name: string;
   nickname: string | null;
-  numlvl: number;
+  // numlvl: number;
   Dept: string | null;
   Post: string | null;
 }
@@ -77,10 +77,12 @@ export class EmployeeSetup implements OnInit {
   employeeCompanyFilter = signal('');
   employeeDeptFilter = signal('');
   employeeSearchText = signal('');
+  appliedEmployeeCompany = signal('');
+  hasEmployeeSearch = signal(false);
   appliedEmployeeDept = signal('');
   appliedEmployeeSearchText = signal('');
   employeeOverrides = signal<EmployeeApprovalOverride[]>([]);
-  employeeDepartmentDefault = signal<ApprovalSetupRow | null>(null);
+  employeeDepartmentDefaults = signal<ApprovalSetupRow[]>([]);
   selectedEmployeeCodes = signal<Set<string>>(new Set());
   employeeBulkModalOpen = signal(false);
   employeeBulkRows = signal<BulkEmployeeOverrideRow[]>([]);
@@ -100,17 +102,31 @@ export class EmployeeSetup implements OnInit {
       .map((item) => ({ costCent: item.cost_cent, name: item.name_cost_cent }));
   });
 
+  private employeeDefaultsByCode = computed(() => {
+    const defaults = new Map<string, ApprovalSetupRow>();
+    this.employeeDepartmentDefaults().forEach((setup) => {
+      defaults.set(`${setup.companyCode}:${setup.costCent}`, setup);
+    });
+    const employees = new Map<string, ApprovalSetupRow>();
+    this.departmentItems().forEach((department) => {
+      (department.employees ?? []).forEach((employee) => {
+        const costCent = employee.Dept?.trim().slice(0, 5);
+        const setup = defaults.get(`${department.company_code}:${costCent}`);
+        if (setup) employees.set(employee.emp_code, setup);
+      });
+    });
+    return employees;
+  });
+
   empDisplayEmployees = computed(() => {
+    if (!this.hasEmployeeSearch()) return [];
+    const company = this.appliedEmployeeCompany();
     const costCent = this.appliedEmployeeDept();
-    if (!costCent) return [];
-
-    const department = this.departmentItems().find((item) => item.cost_cent === costCent);
-    if (!department) return [];
-
     const keyword = this.appliedEmployeeSearchText().toLowerCase().trim();
-    const employees = department.employees ?? [];
-
-    // console.log(employees);
+    const employees = this.departmentItems()
+      .filter((item) => !company || item.company_code === company)
+      .flatMap((item) => item.employees ?? [])
+      .filter((employee) => !costCent || employee.Dept?.trim().slice(0, 5) === costCent);
 
     if (!keyword) return employees;
 
@@ -169,64 +185,47 @@ export class EmployeeSetup implements OnInit {
 
   loadEmployeeList() {
     this.isEmployeeListLoading.set(true);
-    this.settingService.getDeptHeads().subscribe({
-      next: (res) => {
-        this.departmentItems.set(res?.data ?? []);
+    forkJoin({
+      departments: this.settingService.getDeptHeads(),
+      overrides: this.settingService.getEmpHeadOverrides(),
+      defaults: this.approvalService.getApprovalSetupList(),
+    }).subscribe({
+      next: ({ departments, overrides, defaults }) => {
+        this.departmentItems.set(departments?.data ?? []);
+        this.employeeOverrides.set(overrides?.data ?? []);
+        this.employeeDepartmentDefaults.set(
+          (defaults?.data ?? []).map((row: any) => this.mapSetupRow(row)),
+        );
         this.isEmployeeListLoading.set(false);
       },
-      error: () => this.isEmployeeListLoading.set(false),
+      error: () => {
+        this.isEmployeeListLoading.set(false);
+        this.swalService.error('เกิดข้อผิดพลาด', 'ไม่สามารถโหลดข้อมูลพนักงานและผู้อนุมัติได้');
+      },
     });
   }
 
   onEmployeeCompanyChange(companyCode: string) {
     this.employeeCompanyFilter.set(companyCode ?? '');
     this.employeeDeptFilter.set('');
-    this.appliedEmployeeDept.set('');
-    this.employeeOverrides.set([]);
-    this.employeeDepartmentDefault.set(null);
-    this.clearEmployeeSelection();
   }
 
   applyEmployeeFilter() {
-    const costCent = this.employeeDeptFilter();
-    this.appliedEmployeeDept.set(costCent);
+    this.appliedEmployeeCompany.set(this.employeeCompanyFilter());
+    this.appliedEmployeeDept.set(this.employeeDeptFilter());
     this.appliedEmployeeSearchText.set(this.employeeSearchText());
-    this.employeeOverrides.set([]);
-    this.employeeDepartmentDefault.set(null);
+    this.hasEmployeeSearch.set(true);
     this.clearEmployeeSelection();
-
-    if (!costCent) return;
-
-    this.isEmployeeListLoading.set(true);
-    forkJoin({
-      overrides: this.settingService.getEmpHeadOverrides(costCent),
-      departmentDefault: this.approvalService.getApprovalSetupByCostCenter(costCent),
-    }).subscribe({
-      next: ({ overrides, departmentDefault }) => {
-        console.log('[EmployeeSetup] Search API responses', { overrides, departmentDefault });
-        this.employeeOverrides.set(overrides?.data ?? []);
-        const rawDefault = Array.isArray(departmentDefault?.data)
-          ? departmentDefault.data[0]
-          : departmentDefault?.data;
-
-        this.employeeDepartmentDefault.set(rawDefault ? this.mapSetupRow(rawDefault) : null);
-        this.isEmployeeListLoading.set(false);
-      },
-      error: (error) => {
-        console.error(error);
-        this.isEmployeeListLoading.set(false);
-      },
-    });
   }
 
   clearEmployeeFilter() {
     this.employeeCompanyFilter.set('');
     this.employeeDeptFilter.set('');
     this.employeeSearchText.set('');
+    this.appliedEmployeeCompany.set('');
+    this.hasEmployeeSearch.set(false);
     this.appliedEmployeeDept.set('');
     this.appliedEmployeeSearchText.set('');
-    this.employeeOverrides.set([]);
-    this.employeeDepartmentDefault.set(null);
     this.clearEmployeeSelection();
   }
 
@@ -333,7 +332,7 @@ export class EmployeeSetup implements OnInit {
           `ตั้งค่าผู้อนุมัติให้พนักงาน ${employeeCodes.length} คนเรียบร้อยแล้ว`,
         );
         this.clearEmployeeSelection();
-        this.applyEmployeeFilter();
+        this.loadEmployeeList();
       },
       error: (error) => {
         this.isSavingEmployeeBulk.set(false);
@@ -357,31 +356,13 @@ export class EmployeeSetup implements OnInit {
       };
     }
 
-    const departmentDefault = this.employeeDepartmentDefault();
+    const departmentDefault = this.employeeDefaultsByCode().get(employeeCode);
     const empNo = level === 1 ? departmentDefault?.approve1EmpNo : departmentDefault?.approve2EmpNo;
     const empName =
       level === 1 ? departmentDefault?.approve1EmpName : departmentDefault?.approve2EmpName;
     const department =
       level === 1 ? departmentDefault?.approve1Dept : departmentDefault?.approve2Dept;
     const post = level === 1 ? departmentDefault?.approve1Post : departmentDefault?.approve2Post;
-
-    return empNo
-      ? {
-          empNo,
-          empName: empName ?? '',
-          department: department ?? '',
-          post: post ?? '',
-          isOverride: false,
-        }
-      : null;
-  }
-
-  getEmployeeDefaultApprover(level: 1 | 2): DisplayApprover | null {
-    const setup = this.employeeDepartmentDefault();
-    const empNo = level === 1 ? setup?.approve1EmpNo : setup?.approve2EmpNo;
-    const empName = level === 1 ? setup?.approve1EmpName : setup?.approve2EmpName;
-    const department = level === 1 ? setup?.approve1Dept : setup?.approve2Dept;
-    const post = level === 1 ? setup?.approve1Post : setup?.approve2Post;
 
     return empNo
       ? {

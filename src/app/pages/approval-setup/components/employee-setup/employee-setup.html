@@ -49,7 +49,7 @@
         <input
           class="field-input"
           type="text"
-          placeholder="ชื่อ-นามสกุล, ชื่อเล่น หรือรหัสพนักงาน..."
+          placeholder="ชื่อ, ชื่อเล่น, รหัสพนักงาน, แผนก, ตำแหน่ง"
           [ngModel]="employeeSearchText()"
           (ngModelChange)="employeeSearchText.set($event)"
           (keyup.enter)="applyEmployeeFilter()"
@@ -68,7 +68,7 @@
 <div class="employee-content-card">
   <div class="employee-card-title">
     รายชื่อพนักงาน
-    @if (appliedEmployeeDept()) {
+    @if (hasEmployeeSearch()) {
       <span>({{ empDisplayEmployees().length }} คน)</span>
     }
   </div>
@@ -90,10 +90,10 @@
 
   @if (isEmployeeListLoading()) {
     <app-skeleton type="table" [rows]="5"></app-skeleton>
-  } @else if (!appliedEmployeeDept()) {
+  } @else if (!hasEmployeeSearch()) {
     <div class="employee-empty">
       <i class="fas fa-filter"></i>
-      <span>กรุณาเลือกบริษัทและแผนกเพื่อแสดงรายชื่อพนักงาน</span>
+      <span>กด Search เพื่อแสดงรายชื่อพนักงาน</span>
     </div>
   } @else {
     <div class="employee-table-wrapper">
@@ -254,15 +254,7 @@
               <nz-select
                 nzShowSearch
                 nzAllowClear
-                [nzPlaceHolder]="
-                  getEmployeeDefaultApprover(row.level)?.empName
-                    ? 'Default: ' +
-                      getEmployeeDefaultApprover(row.level)?.empName +
-                      ' (' +
-                      getEmployeeDefaultApprover(row.level)?.empNo +
-                      ')'
-                    : '-- ไม่มีค่า Default --'
-                "
+                nzPlaceHolder="-- ใช้ Default ตามแผนกของพนักงานแต่ละคน --"
                 [ngModel]="row.headCode"
                 (ngModelChange)="updateEmployeeBulkRow(index, $event)"
               >

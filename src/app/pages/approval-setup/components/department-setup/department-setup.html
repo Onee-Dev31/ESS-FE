@@ -52,7 +52,7 @@
           [ngModel]="searchKeyword()"
           (ngModelChange)="searchKeyword.set($event)"
           (keyup.enter)="applyFilter()"
-          placeholder="ค้นหาแผนก, รหัส, ชื่อผู้อนุมัติ..."
+          placeholder="ค้นหาแผนก, รหัสผู้อนุมัติ, ชื่อผู้อนุมัติ..."
         />
       </label>
       <button type="button" class="btn-employee-search" (click)="applyFilter()">

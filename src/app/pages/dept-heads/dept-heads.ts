@@ -24,7 +24,7 @@ interface DeptEmployee {
   emp_code: string;
   emp_name: string;
   nickname: string | null;
-  numlvl: number;
+  // numlvl: number;
 }
 
 interface DeptHeadItem {
