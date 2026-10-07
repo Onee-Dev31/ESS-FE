@@ -26,12 +26,13 @@ import { TooltipModalComponent } from '../../components/modals/tooltip-modal/too
 import { TimeOffForm } from '../../components/features/time-off-form/time-off-form';
 import { AuthService } from '../../services/auth.service';
 import { SkeletonComponent } from '../../components/shared/skeleton/skeleton';
+import { PageLoaderComponent } from '../../components/shared/page-loader/page-loader';
 
 import dayjs from 'dayjs';
 import 'dayjs/locale/th';
 import { BUSINESS_CONFIG } from '../../constants/business.constant';
 import { TeamCalendarService } from '../../services/team-calendar.service';
-import { catchError, forkJoin, map, Observable, of, tap } from 'rxjs';
+import { catchError, finalize, forkJoin, map, Observable, of, tap } from 'rxjs';
 import { NgZone } from '@angular/core';
 import type { DatesSetArg, EventClickArg } from '@fullcalendar/core';
 import Swal from 'sweetalert2';
@@ -70,6 +71,7 @@ dayjs.locale('th');
     MedicalPolicyModalComponent,
     TooltipModalComponent,
     TimeOffForm,
+    PageLoaderComponent,
   ],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.scss',
@@ -117,6 +119,10 @@ export class DashboardComponent implements OnInit {
 
   userProfile = toSignal(this.userService.getUserProfile());
   medicalStats = toSignal(this.dashboardService.getMedicalStats());
+
+  /** จำนวน request ที่ยังโหลดไม่เสร็จ ใช้คุม page loader */
+  private pendingRequests = signal(0);
+  isLoading = computed(() => this.pendingRequests() > 0);
 
   // pendingCount = toSignal(this.dashboardService.getGlobalPendingCount(), { initialValue: 0 });
   // medicalPendingCount = toSignal(this.dashboardService.getMedicalPendingCount(), {
@@ -477,15 +483,21 @@ export class DashboardComponent implements OnInit {
   ngOnInit() {
     this.performanceList = this.dashboardService.getPerformanceList();
 
-    // โหลดแต่ละส่วนแยกกัน ไม่ต้องรอ API ที่ช้าที่สุด
+    // ยิงแต่ละ API แยกกัน (ทุกตัวมี catchError ตัวไหน error ไม่กระทบตัวอื่น)
     const userAd = this.authService.userData()?.AD_USER?.toLowerCase() ?? '';
-    this.getLeaveDashboard().subscribe((v) => this.leavePolicyMaster.set(v ?? []));
-    this.getPerformance().subscribe((v) => this.performanceData.set(v));
-    this.getItAssetByAduser(userAd).subscribe((v) => this.itAsset.set(v));
-    this.getOneeuserByAduser(userAd).subscribe((v) => this.oneeUser.set(v));
-    this.loadAllowanceSummary().subscribe((v) => this.allowanceTotalAmount.set(v ?? 0));
-    this.loadVehicleSummary().subscribe((v) => this.vehicleTotalAmount.set(v ?? 0));
-    this.loadVehicleTaxiSummary().subscribe((v) => this.vehicleTaxiTotalAmount.set(v ?? 0));
+    this.track(this.getLeaveDashboard(), (v) => this.leavePolicyMaster.set(v ?? []));
+    this.track(this.getPerformance(), (v) => this.performanceData.set(v));
+    this.track(this.getItAssetByAduser(userAd), (v) => this.itAsset.set(v));
+    this.track(this.getOneeuserByAduser(userAd), (v) => this.oneeUser.set(v));
+    this.track(this.loadAllowanceSummary(), (v) => this.allowanceTotalAmount.set(v ?? 0));
+    this.track(this.loadVehicleSummary(), (v) => this.vehicleTotalAmount.set(v ?? 0));
+    this.track(this.loadVehicleTaxiSummary(), (v) => this.vehicleTaxiTotalAmount.set(v ?? 0));
+  }
+
+  /** subscribe พร้อมนับ pending request เพื่อคุม page loader */
+  private track<T>(source$: Observable<T>, next: (value: T) => void) {
+    this.pendingRequests.update((n) => n + 1);
+    source$.pipe(finalize(() => this.pendingRequests.update((n) => n - 1))).subscribe(next);
   }
 
   loadAllowanceSummary() {
