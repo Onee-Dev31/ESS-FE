@@ -5,9 +5,17 @@ import {
   TechInfoService,
   StoredProcedureInfo,
 } from '../components/shared/tech-info/tech-info.service';
+import { AuthService } from '../services/auth.service';
+import { environment } from '../../environments/environment.uat';
 
 export const techInfoInterceptor: HttpInterceptorFn = (req, next) => {
   const service = inject(TechInfoService);
+  const auth = inject(AuthService);
+
+  if (auth.isTech() && req.url.startsWith(environment.api_url)) {
+    req = req.clone({ setHeaders: { 'X-Tech-Info': '1' } });
+  }
+
   const start = Date.now();
 
   const url = new URL(req.url, window.location.origin);
