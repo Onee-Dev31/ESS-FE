@@ -47,10 +47,10 @@ export class AcknowledgeModal {
     this.loadServiceTypes();
   }
 
-  get canAccessAdditionalTicketTypes(): boolean {
-    const employeeCode = String(this.authService.userData()?.CODEMPID ?? '').trim().toUpperCase();
-    return ['OTD01125', 'OTD01128', 'OTD01050'].includes(employeeCode);
-  }
+  // get canAccessAdditionalTicketTypes(): boolean {
+  //   const employeeCode = String(this.authService.userData()?.CODEMPID ?? '').trim().toUpperCase();
+  //   return ['OTD01125', 'OTD01128', 'OTD01050'].includes(employeeCode);
+  // }
 
   readonly canAccessRepairTicketType = !environment.production;
 

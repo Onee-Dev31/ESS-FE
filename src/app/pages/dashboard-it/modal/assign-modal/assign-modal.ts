@@ -59,7 +59,9 @@ export class AssignModal {
   problemSource: 'user' | 'system' | null = null;
   private readonly itService = inject(ItServiceService);
   private readonly authService = inject(AuthService);
-  readonly categories = signal<{ id: number; sub_category_name: string; display_order?: number }[]>([]);
+  readonly categories = signal<{ id: number; sub_category_name: string; display_order?: number }[]>(
+    [],
+  );
   readonly categoriesLoading = signal(false);
   readonly categoriesError = signal(false);
   readonly mainServices = signal<any[]>([]);
@@ -73,10 +75,10 @@ export class AssignModal {
     this.loadServiceTypes();
   }
 
-  get canAccessAdditionalTicketTypes(): boolean {
-    const employeeCode = String(this.authService.userData()?.CODEMPID ?? '').trim().toUpperCase();
-    return ['OTD01125', 'OTD01128', 'OTD01050'].includes(employeeCode);
-  }
+  // get canAccessAdditionalTicketTypes(): boolean {
+  //   const employeeCode = String(this.authService.userData()?.CODEMPID ?? '').trim().toUpperCase();
+  //   return ['OTD01125', 'OTD01128', 'OTD01050'].includes(employeeCode);
+  // }
 
   readonly canAccessRepairTicketType = !environment.production;
 
@@ -140,9 +142,11 @@ export class AssignModal {
     this.categoriesError.set(false);
     this.itService.getSubProblem().subscribe({
       next: (res) => {
-        this.categories.set([...(res.data ?? [])]
-          .map((category) => ({ ...category, id: Number(category.id) }))
-          .sort((a, b) => Number(a.display_order ?? 0) - Number(b.display_order ?? 0)));
+        this.categories.set(
+          [...(res.data ?? [])]
+            .map((category) => ({ ...category, id: Number(category.id) }))
+            .sort((a, b) => Number(a.display_order ?? 0) - Number(b.display_order ?? 0)),
+        );
         this.restoreCategory();
         this.categoriesLoading.set(false);
       },
@@ -154,32 +158,37 @@ export class AssignModal {
   }
 
   get effectiveTicketTypeId(): number {
-    return Number(this.isApproved
-      ? this.ticket?.ticketTypeId ?? this.ticket?.ticket_type_id
-      : this.selectedTag);
+    return Number(
+      this.isApproved
+        ? (this.ticket?.ticketTypeId ?? this.ticket?.ticket_type_id)
+        : this.selectedTag,
+    );
   }
 
   get canSubmit(): boolean {
-    return this.selectedAssigneeEmpCodes.length > 0 &&
+    return (
+      this.selectedAssigneeEmpCodes.length > 0 &&
       [1, 2, 3].includes(this.effectiveTicketTypeId) &&
-      (this.effectiveTicketTypeId !== 2 || (
-        !this.categoriesLoading() && !this.categoriesError() &&
-        this.categories().some((category) => category.id === this.selectedCategory) &&
-        (this.problemSource === 'user' || this.problemSource === 'system')
-      )) &&
-      (this.effectiveTicketTypeId !== 3 || (
-        !this.servicesLoading() && !this.servicesError() &&
-        [...this.mainServices(), ...this.systemSubOptions()].some((item) => item.checked)
-      ));
+      (this.effectiveTicketTypeId !== 2 ||
+        (!this.categoriesLoading() &&
+          !this.categoriesError() &&
+          this.categories().some((category) => category.id === this.selectedCategory) &&
+          (this.problemSource === 'user' || this.problemSource === 'system'))) &&
+      (this.effectiveTicketTypeId !== 3 ||
+        (!this.servicesLoading() &&
+          !this.servicesError() &&
+          [...this.mainServices(), ...this.systemSubOptions()].some((item) => item.checked)))
+    );
   }
 
   private restoreCategory(): void {
     if (this.effectiveTicketTypeId !== 2 || this.selectedCategory !== null) return;
     const id = Number(this.ticket?.subCategoryId ?? this.ticket?.sub_category_id);
     const name = this.ticket?.ticketCategory ?? this.ticket?.sub_category_name;
-    this.selectedCategory = this.categories().find((category) =>
-      id ? category.id === id : category.sub_category_name === name,
-    )?.id ?? null;
+    this.selectedCategory =
+      this.categories().find((category) =>
+        id ? category.id === id : category.sub_category_name === name,
+      )?.id ?? null;
   }
   originalTag: number | null = null;
   reason = '';
@@ -209,9 +218,13 @@ export class AssignModal {
       this.selectedTag = Number(this.ticket.ticketTypeId ?? this.ticket.ticket_type_id);
       this.originalTag = this.selectedTag;
       this.selectedCategory = null;
-      const source = String(this.ticket.problemBy ?? '').trim().toLowerCase();
-      this.problemSource = this.effectiveTicketTypeId === 2 &&
-        (source === 'user' || source === 'system') ? source : null;
+      const source = String(this.ticket.problemBy ?? '')
+        .trim()
+        .toLowerCase();
+      this.problemSource =
+        this.effectiveTicketTypeId === 2 && (source === 'user' || source === 'system')
+          ? source
+          : null;
       this.restoreCategory();
       this.reason = '';
       if (this.ticket.assignments) {

@@ -11,7 +11,7 @@
     @if (!problemDetailsOnly) {
       <div class="field-label">เลือกประเภทงาน<span>*</span></div>
       <div class="type-options">
-        @for (type of availableTicketTypes; track type.id) {
+        @for (type of ticketTypes; track type.id) {
           <button
             type="button"
             class="type-option"

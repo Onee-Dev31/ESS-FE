@@ -70,21 +70,21 @@ export class ChangeTicketTypeModal implements OnChanges, OnDestroy {
       types.push({ id: 1, label: 'แจ้งซ่อม' });
     }
 
-    if (this.canAccessAdditionalTicketTypes) {
-      types.push({ id: 3, label: 'ขอใช้บริการ' });
-    }
+    // if (this.canAccessAdditionalTicketTypes) {
+    types.push({ id: 3, label: 'ขอใช้บริการ' });
+    // }
 
     return types;
   }
 
-  private get canAccessAdditionalTicketTypes(): boolean {
-    const employeeCode = String(this.authService.userData()?.CODEMPID ?? '')
-      .trim()
-      .toUpperCase();
-    return (
-      employeeCode === 'OTD01125' || employeeCode === 'OTD01128' || employeeCode === 'OTD01050'
-    );
-  }
+  // private get canAccessAdditionalTicketTypes(): boolean {
+  //   const employeeCode = String(this.authService.userData()?.CODEMPID ?? '')
+  //     .trim()
+  //     .toUpperCase();
+  //   return (
+  //     employeeCode === 'OTD01125' || employeeCode === 'OTD01128' || employeeCode === 'OTD01050'
+  //   );
+  // }
 
   get isViaEmail(): boolean {
     return this.ticket?.viaEmail === true;
@@ -106,10 +106,10 @@ export class ChangeTicketTypeModal implements OnChanges, OnDestroy {
     return isApproved && (isApprovedServiceRequest || isApprovedPaidRepair);
   }
 
-  get availableTicketTypes(): typeof this.ticketTypes {
-    if (this.canAccessAdditionalTicketTypes) return this.ticketTypes;
-    return this.isViaEmail ? this.ticketTypes : this.ticketTypes.filter((type) => type.id !== 3);
-  }
+  // get availableTicketTypes(): typeof this.ticketTypes {
+  //   // if (this.canAccessAdditionalTicketTypes) return this.ticketTypes;
+  //   return this.isViaEmail ? this.ticketTypes : this.ticketTypes.filter((type) => type.id !== 3);
+  // }
 
   selectedTypeId = 2;
   originalTypeId = 2;

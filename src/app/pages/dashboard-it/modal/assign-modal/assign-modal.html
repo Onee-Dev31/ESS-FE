@@ -42,41 +42,18 @@
               <span>แจ้งซ่อม</span>
             </label>
           }
-          @if (canAccessAdditionalTicketTypes) {
-            <label class="tag">
-              <input
-                type="radio"
-                name="tag"
-                [value]="3"
-                [(ngModel)]="selectedTag"
-                (ngModelChange)="onTagChange()"
-              />
-              <span>ขอใช้บริการ</span>
-            </label>
-          }
-          <!-- ตอน DEPLOY PROD ยังไม่ให้มีแจ้งซ่อม และ ขอใช้บริการ -->
-          <!-- <label class="tag">
+          <!-- @if (canAccessAdditionalTicketTypes) { -->
+          <label class="tag">
             <input
               type="radio"
               name="tag"
-              [value]="1"
+              [value]="3"
               [(ngModel)]="selectedTag"
               (ngModelChange)="onTagChange()"
             />
-            <span>แจ้งซ่อม</span>
-          </label> -->
-          <!-- @if (ticket?.viaEmail === true) {
-            <label class="tag">
-              <input
-                type="radio"
-                name="tag"
-                [value]="3"
-                [(ngModel)]="selectedTag"
-                (ngModelChange)="onTagChange()"
-              />
-              <span>ขอใช้บริการ</span>
-            </label>
-          } -->
+            <span>ขอใช้บริการ</span>
+          </label>
+          <!-- } -->
         </div>
       }
     </div>
