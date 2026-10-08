@@ -78,7 +78,10 @@
             nzShowArrow
           >
             @for (tab of tabs; track tab) {
-              <nz-option [nzValue]="tab" [nzLabel]="tab + ' (' + getTabCount(tab) + ')'"></nz-option>
+              <nz-option
+                [nzValue]="tab"
+                [nzLabel]="tab + ' (' + getTabCount(tab) + ')'"
+              ></nz-option>
             }
           </nz-select>
         </div>
@@ -196,15 +199,21 @@
                     }
                   </div>
 
+                  @if (
+                    row.original.status === 'Approved' && row.original.originalData?.approval_by
+                  ) {
+                    <div class="status-time">by: {{ row.original.originalData.approval_by }}</div>
+                  }
                   <div
                     class="status-time"
                     *ngIf="
-                      row.original.originalData?.ApprovalDate && row.original.status != 'Pending'
+                      row.original.originalData?.approval_by_date &&
+                      row.original.status != 'Pending'
                     "
                   >
                     {{
                       dateUtil.formatDateToBE(
-                        row.original.originalData?.ApprovalDate,
+                        row.original.originalData?.approval_by_date,
                         'DD MMMM YYYY, HH:mm'
                       )
                     }}
@@ -276,6 +285,28 @@
                 <span class="label"><i class="fas fa-coins"></i> Amount</span>
                 <span class="value amount">{{ req.amount | number }}</span>
               </div>
+
+              @if (req.status === 'Approved') {
+                @if (req.originalData?.approval_by) {
+                  <div class="info-row">
+                    <span class="label">Approved by:</span>
+                    <span class="value">{{ req.originalData.approval_by }}</span>
+                  </div>
+                }
+                @if (req.originalData?.approval_by_date) {
+                  <div class="info-row">
+                    <span class="label">Approval date:</span>
+                    <span class="value">
+                      {{
+                        dateUtil.formatDateToBE(
+                          req.originalData.approval_by_date,
+                          'DD MMM YYYY HH:mm'
+                        )
+                      }}
+                    </span>
+                  </div>
+                }
+              }
 
               <div class="card-actions justify-end">
                 <button class="btn-icon-view" title="View Details" (click)="viewRequestDetail(req)">

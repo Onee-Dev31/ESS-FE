@@ -354,7 +354,9 @@ export class ApprovalItRequestComponent implements OnInit {
       typeId: 99,
       requestDetail: item.description || 'IT Service/Problem Request',
       amount: item.amount || 0,
-      status: this.approvalsHelper.mapStatus(item.status),
+      status: item.isPendingItDirectorApproval
+        ? 'Pending'
+        : this.approvalsHelper.mapStatus(item.approvalStatus ?? item.status),
       rawStatus: item.status || 'Pending',
       type: 'it-request',
       originalData: item,
