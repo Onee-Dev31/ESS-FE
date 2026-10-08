@@ -451,6 +451,8 @@ export class Report {
 
     const labels = chartData.map((x) => x.code);
 
+    console.log('buildCompanyBar', chartData, labels);
+
     this.companyBarOption = {
       grid: { left: 18, right: 18, top: 18, bottom: 26, containLabel: true },
 
@@ -477,9 +479,54 @@ export class Report {
         data: labels,
         axisTick: { show: false },
         axisLine: { show: false },
-        axisLabel: { fontWeight: 700, color: this.getCssVar('--text-header') || '#0f172a' },
+        axisLabel: {
+          interval: 0,
+          fontWeight: 700,
+          color: this.getCssVar('--text-header') || '#0f172a',
+          formatter: (value: string) => {
+            const style = value.length > 6 ? 'long' : value.length > 4 ? 'medium' : 'short';
+            return `{${style}|${value}}`;
+          },
+          rich: {
+            short: { fontSize: 12, fontWeight: 700 },
+            medium: { fontSize: 12, fontWeight: 700 },
+            long: { fontSize: 12, fontWeight: 700 },
+          },
+        },
         triggerEvent: true,
       },
+
+      media: [
+        {
+          query: { maxWidth: 480 },
+          option: {
+            tooltip: { show: false, axisPointer: { type: 'none' } },
+            series: [{ type: 'bar', emphasis: { disabled: true } }],
+            xAxis: {
+              axisLabel: {
+                rich: {
+                  medium: { fontSize: 10 },
+                  long: { fontSize: 8 },
+                },
+              },
+            },
+          },
+        },
+        {
+          option: {
+            tooltip: { show: true, axisPointer: { type: 'shadow' } },
+            series: [{ type: 'bar', emphasis: { disabled: false } }],
+            xAxis: {
+              axisLabel: {
+                rich: {
+                  medium: { fontSize: 12 },
+                  long: { fontSize: 12 },
+                },
+              },
+            },
+          },
+        },
+      ],
 
       yAxis: {
         type: 'value',
@@ -1002,8 +1049,39 @@ export class Report {
         data: labels,
         axisTick: { show: false },
         axisLine: { show: false },
-        axisLabel: { fontWeight: 700, color: textColor },
+        axisLabel: {
+          interval: 0,
+          width: 240,
+          overflow: 'truncate',
+          fontSize: 12,
+          lineHeight: 14,
+          fontWeight: 700,
+          color: textColor,
+        },
       },
+      media: [
+        {
+          query: { maxWidth: 480 },
+          option: {
+            grid: { left: 124, right: 36, containLabel: false },
+            tooltip: { show: false, axisPointer: { type: 'none' } },
+            series: [{ type: 'bar', emphasis: { disabled: true } }],
+            yAxis: {
+              axisLabel: { width: 110, overflow: 'break', fontSize: 10, lineHeight: 12 },
+            },
+          },
+        },
+        {
+          option: {
+            grid: { left: 16, right: 36, containLabel: true },
+            tooltip: { show: true, axisPointer: { type: 'shadow' } },
+            series: [{ type: 'bar', emphasis: { disabled: false } }],
+            yAxis: {
+              axisLabel: { width: 240, overflow: 'truncate', fontSize: 12, lineHeight: 14 },
+            },
+          },
+        },
+      ],
       series: [
         {
           type: 'bar',
