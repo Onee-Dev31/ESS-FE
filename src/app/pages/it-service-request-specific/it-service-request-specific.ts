@@ -28,7 +28,7 @@ import { formatText } from '../../utils/formatText';
 import { SettingService } from '../../services/setting.service';
 import { PageLoaderComponent } from '../../components/shared/page-loader/page-loader';
 
-type SpecificSystemKey = 'bms' | 'oracle' | 'onee' | 'onePortal';
+type SpecificSystemKey = 'bms' | 'oracle' | 'oneeapps' | 'oneportal'; // ระบบเฉพาะ
 
 interface OracleCompany {
   company: any;
@@ -103,8 +103,6 @@ export class ITServiceRequestSpecificComponent implements OnInit {
   private swalService = inject(SwalService);
   private masterService = inject(MasterDataService);
   private settingService = inject(SettingService);
-  private userService = inject(UserService);
-  private itServiceMock = inject(ItServiceMockService);
   private itServiceService = inject(ItServiceService);
   private route = inject(ActivatedRoute);
   private authService = inject(AuthService);
@@ -147,12 +145,14 @@ export class ITServiceRequestSpecificComponent implements OnInit {
 
   private nextSpecificPersonId = 1;
   specificPeople = signal<SpecificPersonRequest[]>([]);
-  specificSystemChoices: { key: SpecificSystemKey; label: string; icon: string }[] = [
-    { key: 'oracle', label: 'Oracle', icon: 'fa-database' },
-    { key: 'bms', label: 'BMS', icon: 'fa-briefcase' },
-    { key: 'onee', label: 'OneE Apps', icon: 'fa-layer-group' },
-    { key: 'onePortal', label: 'OneE Portal', icon: 'fa-globe' },
-  ];
+  readonly specificSystemKeys: SpecificSystemKey[] = ['oracle', 'bms', 'oneeapps', 'oneportal']; // ระบบเฉพาะ
+  readonly specificSystemChoices = computed(() =>
+    this.specificSystemKeys.flatMap((key) => {
+      const option = this.systemSubOptions().find((item) => item.value === key);
+      return option ? [{ key, label: option.label, icon: option.icon }] : [];
+    }),
+  );
+  readonly serviceTypesError = signal(false);
 
   oracleModules: any;
   oraclePermissions: any;
@@ -160,7 +160,7 @@ export class ITServiceRequestSpecificComponent implements OnInit {
   onePortalResponseTypes: any;
   onePortalRole: any;
   openForOptions_noFreelance = signal<any[]>([]);
-  private initialLoadsPending = signal(4);
+  private initialLoadsPending = signal(5);
   isPageLoading = computed(() => this.initialLoadsPending() > 0);
 
   private completeInitialLoad() {
@@ -168,6 +168,7 @@ export class ITServiceRequestSpecificComponent implements OnInit {
   }
 
   ngOnInit() {
+    this.getServiceType();
     this.getOpenFor();
     this.getCompanies();
     this.getDepartments();
@@ -207,6 +208,15 @@ export class ITServiceRequestSpecificComponent implements OnInit {
 
   onSpecificOpenForChange(person: any, value: any) {
     person.openFor = value;
+    if (!value?.value) {
+      for (const system of person.systems) {
+        this.resetSystemData(person, system);
+        this.clearSystemErrors(person, system);
+      }
+      person.systems = [];
+      this.touchSpecificPeople();
+      return;
+    }
     if (value) {
       delete person.errors?.['openFor'];
     }
@@ -223,7 +233,7 @@ export class ITServiceRequestSpecificComponent implements OnInit {
     // ไม่มี AD_USER => เอา BMS onee และ One Portal  ออก
     if (!hasAdUser && !isFreelance) {
       person.systems = person.systems.filter(
-        (system: string) => !['bms', 'onee', 'onePortal'].includes(system),
+        (system: string) => !['bms', 'oneeapps', 'oneportal'].includes(system),
       );
 
       // reset ค่า BMS
@@ -279,7 +289,7 @@ export class ITServiceRequestSpecificComponent implements OnInit {
       }
     }
 
-    if (person.systems.includes('onee')) {
+    if (person.systems.includes('oneeapps')) {
       this.autoSelectOneeSupervisor(person);
       this.validateOneeSupervisor(person.onee.supervisor, person);
     }
@@ -299,7 +309,17 @@ export class ITServiceRequestSpecificComponent implements OnInit {
     this.specificPeople.update((people) => people.filter((person) => person.id !== personId));
   }
 
+  isPersonSystemDisabled(person: SpecificPersonRequest, system: SpecificSystemKey): boolean {
+    if (!person.openFor?.value) return true;
+    return (
+      ['bms', 'oneportal', 'oneeapps'].includes(system) &&
+      !person.openFor.AD_USER &&
+      person.openFor.value !== '__FREELANCE__'
+    );
+  }
+
   togglePersonSystem(person: SpecificPersonRequest, system: SpecificSystemKey) {
+    if (this.isPersonSystemDisabled(person, system)) return;
     const exists = person.systems.includes(system);
 
     // console.log(person.systems);
@@ -316,7 +336,7 @@ export class ITServiceRequestSpecificComponent implements OnInit {
       if (system === 'oracle' && person.oracle.companies.length === 0) {
         this.addOracleCompany(person, false);
       }
-      if (system === 'onee') {
+      if (system === 'oneeapps') {
         this.autoSelectOneeSupervisor(person);
       }
     }
@@ -373,7 +393,7 @@ export class ITServiceRequestSpecificComponent implements OnInit {
     }
 
     this.specificPeople().forEach((person) => {
-      if (person.systems.includes('onee')) {
+      if (person.systems.includes('oneeapps')) {
         this.autoSelectOneeSupervisor(person);
         this.validateOneeSupervisor(person.onee.supervisor, person);
       }
@@ -540,8 +560,8 @@ export class ITServiceRequestSpecificComponent implements OnInit {
       systems: person.systems,
       bms: person.systems.includes('bms') ? person.bms : null,
       oracle: person.systems.includes('oracle') ? person.oracle : null,
-      onee: person.systems.includes('onee') ? person.onee : null,
-      onePortal: person.systems.includes('onePortal') ? person.onePortal : null,
+      onee: person.systems.includes('oneeapps') ? person.onee : null,
+      onePortal: person.systems.includes('oneportal') ? person.onePortal : null,
     }));
     // console.log(payload);
     const summary = this.buildRequestSummary(payload);
@@ -622,12 +642,12 @@ export class ITServiceRequestSpecificComponent implements OnInit {
       this.validateBmsCompanies(person);
       delete person.errors?.['bms_detail'];
     }
-    if (person.systems.includes('onee')) {
+    if (person.systems.includes('oneeapps')) {
       this.validateOneeCompanies(person);
       this.validateOneePermission(person.onee.permission, person);
       this.validateOneeSupervisor(person.onee.supervisor, person);
     }
-    if (person.systems.includes('onePortal')) {
+    if (person.systems.includes('oneportal')) {
       this.validateOnePortalCompanies(person);
       this.validateOnePortalRole(person.onePortal.role, person);
       this.validateOnePortalResponseType(person.onePortal.responseType, person);
@@ -657,7 +677,10 @@ export class ITServiceRequestSpecificComponent implements OnInit {
     const selectedServices = this.serviceOptions().filter((s) => s.checked);
 
     const userOptions = this.userSubOptions().filter((o) => o.checked);
-    const systemOptions = this.systemSubOptions().filter((o) => o.checked);
+    const selectedSystemKeys = new Set(this.specificPeople().flatMap((person) => person.systems));
+    const systemOptions = this.systemSubOptions().filter((option) =>
+      selectedSystemKeys.has(option.value),
+    );
 
     const formData = new FormData();
     formData.append('ticketTypeId', '3');
@@ -700,7 +723,7 @@ export class ITServiceRequestSpecificComponent implements OnInit {
       formData.append('serviceTypeIds', service.id.toString());
     });
 
-    // console.log('formData', [...formData.entries()]);
+    console.log('formData', [...formData.entries()]);
 
     this.swalService.loading('กำลังบันทึกข้อมูล...');
     this.itServiceService
@@ -971,7 +994,7 @@ export class ITServiceRequestSpecificComponent implements OnInit {
     // ONE PORTAL
     // =========================
 
-    if (person.systems.includes('onePortal')) {
+    if (person.systems.includes('oneportal')) {
       if (
         !person.onePortal.companies?.length ||
         !person.onePortal.role?.trim() ||
@@ -985,7 +1008,7 @@ export class ITServiceRequestSpecificComponent implements OnInit {
     // ONEE
     // =========================
 
-    if (person.systems.includes('onee')) {
+    if (person.systems.includes('oneeapps')) {
       if (
         !person.onee.companies?.length ||
         !person.onee.permission?.trim() ||
@@ -1047,7 +1070,7 @@ export class ITServiceRequestSpecificComponent implements OnInit {
   }
 
   getSpecificSystemLabel(system: SpecificSystemKey): string {
-    return this.specificSystemChoices.find((item) => item.key === system)?.label ?? system;
+    return this.specificSystemChoices().find((item) => item.key === system)?.label ?? system;
   }
 
   // NEW!
@@ -1072,7 +1095,7 @@ export class ITServiceRequestSpecificComponent implements OnInit {
         };
         break;
 
-      case 'onee':
+      case 'oneeapps':
         person.onee = {
           companies: [],
           permission: '',
@@ -1081,7 +1104,7 @@ export class ITServiceRequestSpecificComponent implements OnInit {
         };
         break;
 
-      case 'onePortal':
+      case 'oneportal':
         person.onePortal = {
           companies: [],
           role: '',
@@ -1246,7 +1269,7 @@ export class ITServiceRequestSpecificComponent implements OnInit {
         // ONE PORTAL
         // =========================
 
-        if (person.systems.includes('onePortal') && person.onePortal) {
+        if (person.systems.includes('oneportal') && person.onePortal) {
           html += `<h4>One Portal</h4><ul>`;
 
           person.onePortal.companies.forEach((company: any) => {
@@ -1268,7 +1291,7 @@ export class ITServiceRequestSpecificComponent implements OnInit {
         // ONEE
         // =========================
 
-        if (person.systems.includes('onee') && person.onee) {
+        if (person.systems.includes('oneeapps') && person.onee) {
           html += `<h4>OneE</h4><ul>`;
 
           person.onee.companies.forEach((company: any) => {
@@ -1538,13 +1561,41 @@ export class ITServiceRequestSpecificComponent implements OnInit {
     }
 
     Object.keys(person.errors).forEach((key) => {
-      if (key.startsWith(system)) {
+      const errorPrefix = system === 'oneeapps' ? 'onee' : system;
+      if (key.startsWith(errorPrefix)) {
         delete person.errors[key];
       }
     });
   }
 
   // MASTER
+  getServiceType(): void {
+    this.serviceTypesError.set(false);
+    this.itServiceService
+      .getServiceType()
+      .pipe(finalize(() => this.completeInitialLoad()))
+      .subscribe({
+        next: (res) => {
+          const options = res?.data?.systemSubOptions;
+          if (!Array.isArray(options)) {
+            this.systemSubOptions.set([]);
+            this.serviceTypesError.set(true);
+            return;
+          }
+          this.systemSubOptions.set(
+            options
+              .filter((item: any) => this.specificSystemKeys.includes(item.value))
+              .map((item: any) => ({ ...item, checked: false })),
+          );
+          this.serviceTypesError.set(this.systemSubOptions().length === 0);
+        },
+        error: () => {
+          this.systemSubOptions.set([]);
+          this.serviceTypesError.set(true);
+        },
+      });
+  }
+
   getMasterPermission() {
     this.masterService
       .MasterPermission()
