@@ -316,7 +316,7 @@ export class ItRepairRequestComponent implements OnInit {
       }
     });
 
-    console.log('formData', [...formData.entries()]);
+    // console.log('formData', [...formData.entries()]);
 
     this.swalService.loading('กำลังบันทึกข้อมูล...');
     this.itServiceService

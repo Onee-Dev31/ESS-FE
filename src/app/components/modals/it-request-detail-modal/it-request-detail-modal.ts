@@ -331,7 +331,7 @@ export class ItRequestDetailModal implements OnChanges {
           const raw = this.approvalItem.originalData;
           const codeEmpId = raw?.requester?.employeeId ?? '';
           const ticketId = this.approvalItem.requestId;
-          console.log('ticketId', ticketId, 'codeEmpId', codeEmpId);
+          // console.log('ticketId', ticketId, 'codeEmpId', codeEmpId);
           // if (command === 'Approved') {
           //   // this.signalrService.sendNewTicketNotification(this.approvalItem.requestNo);
           //   if (codeEmpId) {

@@ -103,7 +103,7 @@ export class ItRequestSignature implements OnInit, AfterViewInit, OnDestroy {
 
   ngOnInit() {
     this.ticketNumber = this.route.snapshot.queryParamMap.get('ticket') || '';
-    console.log('ticketNumber:', this.ticketNumber);
+    // console.log('ticketNumber:', this.ticketNumber);
   }
 
   ngAfterViewInit() {
@@ -146,7 +146,7 @@ export class ItRequestSignature implements OnInit, AfterViewInit, OnDestroy {
   loadTicket(ticketNumber: string) {
     this.ticketService.getTicket(ticketNumber).subscribe({
       next: (ticket) => {
-        console.log('ticket loaded:', ticket);
+        // console.log('ticket loaded:', ticket);
         if (ticket.NameApprover) {
           this.signerName.set(ticket.NameApprover);
         }
@@ -332,7 +332,7 @@ export class ItRequestSignature implements OnInit, AfterViewInit, OnDestroy {
     const base64 = this.getSignatureBase64();
     const ticketId = this.requestData()?.ticketId;
 
-    console.log('Submitting signature for ticketId:', this.requestData(), 'empId:', empId);
+    // console.log('Submitting signature for ticketId:', this.requestData(), 'empId:', empId);
 
     this.itServiceService
       .updateTicket(ticketId, formData)
@@ -434,7 +434,7 @@ export class ItRequestSignature implements OnInit, AfterViewInit, OnDestroy {
       this.ctx.drawImage(img, 0, 0, latestCanvas.width, latestCanvas.height);
       this.hasSignature.set(true);
 
-      console.log('signature drawn OK');
+      // console.log('signature drawn OK');
     };
 
     img.onerror = () => {

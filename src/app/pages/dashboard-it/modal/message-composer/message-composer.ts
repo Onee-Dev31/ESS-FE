@@ -94,7 +94,7 @@ export class MessageComposer implements OnInit {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (res) => {
-          console.log('getEmailReplyTemplates', res);
+          // console.log('getEmailReplyTemplates', res);
           const templates = Array.isArray(res) ? res : Array.isArray(res?.data) ? res.data : [];
 
           this.templates.set(templates);

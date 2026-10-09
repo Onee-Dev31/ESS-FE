@@ -826,7 +826,7 @@ export class TicketWorkspaceComponent implements OnInit, OnChanges {
                 ? `${ticket.last_email_received_at}Z`
                 : null, //เป็น UTC อยู่แล้ว บวก Z
             };
-            console.log('TicketWorkspace selectTicket', { objectData });
+            // console.log('TicketWorkspace selectTicket', { objectData });
             this.selectedTicket.set(objectData);
             if (previousTicketId !== objectData.ticketId) {
               this.clearChatDraft();
@@ -1727,7 +1727,7 @@ export class TicketWorkspaceComponent implements OnInit, OnChanges {
   getAssignItDropdown() {
     this.itServiceService.getAssignItDropdown().subscribe({
       next: (res) => {
-        console.log(res);
+        // console.log(res);
         const rows = res.data;
         const groupMap: Record<any, any> = {};
         const assigneeGroup: any = [];

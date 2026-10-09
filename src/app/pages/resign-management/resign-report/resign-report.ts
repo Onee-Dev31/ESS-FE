@@ -115,14 +115,14 @@ export class ResignReport {
     this.isItReport = this.route.snapshot.data['showAdInfo'] === true;
     this.isHrReport = !this.isItReport;
 
-    console.log('isItReport:', this.isItReport, 'isHrReport:', this.isHrReport);
+    // console.log('isItReport:', this.isItReport, 'isHrReport:', this.isHrReport);
   }
 
   ngOnInit() {
     this.route.queryParams.subscribe((params) => {
       this.type = params['type'] ?? 'fulltime';
       this.status = params['status'];
-      console.log(this.type, this.status); // fulltime / freelance
+      // console.log(this.type, this.status); // fulltime / freelance
 
       if (this.isItReport) {
         // IT = ปีปัจจุบัน

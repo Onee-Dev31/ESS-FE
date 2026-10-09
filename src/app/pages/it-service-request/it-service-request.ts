@@ -845,7 +845,6 @@ export class ITServiceRequestComponent implements OnInit {
   }
 
   onEmployeeFormSave(data: any) {
-    console.log(data);
     this.requestUserData = data;
 
     const requestUserDetail = `

@@ -86,7 +86,7 @@ export class SettingTimeoff implements OnInit {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (data) => {
-          console.log(data);
+          // console.log(data);
           this.leaveTypes.set(data.master ?? []);
           this.quotaRules.set(data.rules ?? []);
           const selectedCode = this.selectedLeaveCode();

@@ -265,7 +265,7 @@ export class VehicleTaxiComponent implements OnInit {
   }
 
   async deleteRequest(claim: any) {
-    console.log(claim);
+    // console.log(claim);
     this.swalService
       .confirm(
         'ยืนยันการลบรายการเบิกทั้งหมด?',

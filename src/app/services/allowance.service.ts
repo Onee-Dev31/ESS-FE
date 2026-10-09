@@ -82,7 +82,7 @@ export class AllowanceService {
    * POST api/meal-allowance/claim
    */
   createClaim(request: CreateClaimRequest): Observable<CreateClaimResponse> {
-    console.log(request);
+    // console.log(request);
     return this._http.post<CreateClaimResponse>(`${this.baseUrl}/meal-allowance/claim`, request);
   }
 
@@ -106,7 +106,7 @@ export class AllowanceService {
   }
 
   updateStatusClaim(claimId: number, body: any): Observable<any> {
-    console.log(claimId, body);
+    // console.log(claimId, body);
     return this._http.patch<any>(`${this.baseUrl}/meal-allowance/claims/${claimId}/review`, body);
   }
 

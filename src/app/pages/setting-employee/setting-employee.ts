@@ -170,7 +170,7 @@ export class SettingEmployee {
   }
 
   private mapApiData(items: any[]): any[] {
-    console.log('items >> ', items);
+    // console.log('items >> ', items);
     return items.map((item: any) => ({
       empCode: item.UserID,
       fullNameTh: item.FullNameThai,
@@ -267,7 +267,7 @@ export class SettingEmployee {
       ...(roles !== undefined ? { batchRoles: roles } : {}),
     };
 
-    console.log('payload', payload);
+    // console.log('payload', payload);
 
     return this.settingService.settingUserRole(payload);
   }
@@ -313,7 +313,7 @@ export class SettingEmployee {
   selectedSignatureEmp = signal<any>(null);
 
   openSignatureModal(emp: any) {
-    console.log(emp);
+    // console.log(emp);
     this.selectedSignatureEmp.set(emp);
 
     this.isSignatureModalOpen.set(true);

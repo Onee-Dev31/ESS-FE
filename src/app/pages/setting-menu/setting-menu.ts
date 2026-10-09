@@ -87,7 +87,7 @@ export class SettingMenu implements OnInit {
       createdBy: this.authService.currentUser()?.toLocaleLowerCase(),
     };
 
-    console.log(payload);
+    // console.log(payload);
 
     this.settingService.createMenu(payload).subscribe({
       next: (res) => {
@@ -118,7 +118,7 @@ export class SettingMenu implements OnInit {
         CanApprove: item.CanApprove,
       }));
 
-      console.log('payload:', newData[0].MenuID, payload);
+      // console.log('payload:', newData[0].MenuID, payload);
 
       this.settingService.updateMenuRolePermission(newData[0].MenuID, payload).subscribe({
         next: (res) => {

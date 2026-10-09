@@ -146,7 +146,6 @@ export class VehicleService {
     return `${this.FILE_BASE}${path.startsWith('/') ? '' : '/'}${path}`;
   }
   updateStatusClaim(claimId: number, body: any): Observable<any> {
-    console.log(claimId, body);
     return this._http.patch<any>(`${this.baseUrl}/transport-claim/claims/${claimId}/review`, body);
   }
 

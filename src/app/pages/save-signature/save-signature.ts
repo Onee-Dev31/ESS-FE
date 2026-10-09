@@ -104,7 +104,7 @@ export class SaveSignature implements OnInit, AfterViewInit, OnDestroy {
 
   private resizeCanvas() {
     const canvas = this.canvasRef?.nativeElement;
-    console.log(canvas);
+    // console.log(canvas);
     if (!canvas || !this.ctx) return;
     const imageData = this.ctx.getImageData(0, 0, canvas.width, canvas.height);
     canvas.width = canvas.offsetWidth;

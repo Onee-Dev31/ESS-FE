@@ -621,7 +621,7 @@ export class ResignDetail {
     const sizeR = this.resignListing.pageSize();
 
     this.fetchEmployeeByStatus('Resigned', pageR, sizeR).subscribe((res) => {
-      console.log('Resigned [EMP]>>', res.data.items);
+      // console.log('Resigned [EMP]>>', res.data.items);
       this.dataEmployeeResignFromApi(res);
       this.loadingService.stop('employee-list');
     });

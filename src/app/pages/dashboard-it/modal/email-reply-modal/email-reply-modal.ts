@@ -160,16 +160,11 @@ export class EmailReplyModal implements OnInit, OnDestroy {
     }
     const description = this.removePreviousReplyNotices(originalDescription);
 
-    // const senderName = this.escapeHtml(String(this.ticket?.requesterName || 'ผู้ส่ง'));
-    // const senderEmail = this.ticket?.requesterEmail
-    //   ? ` &lt;${this.escapeHtml(String(this.ticket.requesterEmail))}&gt;`
-    //   : '';
-    // const sentAt = this.ticket?.createdDate ? new Date(this.ticket.createdDate) : null;
-    console.log('EmailReplyModal ngOnInit', {
-      description,
-      originalDescription,
-      ticket: this.ticket,
-    });
+    // console.log('EmailReplyModal ngOnInit', {
+    //   description,
+    //   originalDescription,
+    //   ticket: this.ticket,
+    // });
     const hasEmailMessage = this.ticket?.hasEmailMessage === true;
 
     const senderNameValue = hasEmailMessage
@@ -192,7 +187,7 @@ export class EmailReplyModal implements OnInit, OnDestroy {
     const senderDisplay = senderName ? `${senderName}${senderEmail}` : senderEmail || 'ผู้ส่ง';
 
     const sentAt = sentAtValue ? new Date(sentAtValue) : null;
-    console.log('EmailReplyModal ngOnInit', { senderName, senderEmail, sentAt, hasEmailMessage });
+    // console.log('EmailReplyModal ngOnInit', { senderName, senderEmail, sentAt, hasEmailMessage });
 
     let datePrefix = '';
 
@@ -283,7 +278,7 @@ export class EmailReplyModal implements OnInit, OnDestroy {
         if (this.to === 'ไม่ระบุอีเมล') this.to = '';
         this.canEditTo = !this.to;
         this.cc = Array.isArray(res?.cc) ? res.cc : [];
-        console.log('loadRecipients', { to: this.to, cc: this.cc });
+        // console.log('loadRecipients', { to: this.to, cc: this.cc });
         // สั่ง render ทันทีตรงนี้ ก่อนที่ zone จะ tick ทับ ป้องกัน NG0100
         this.cdr.detectChanges();
       },

@@ -292,7 +292,7 @@ export class ApprovalItRequestComponent implements OnInit {
           const data = (response?.data ?? []).map((item: any) =>
             this.mapToApprovalItem(this.normalizeApiItem(item)),
           );
-          console.log(response, data);
+          // console.log(response, data);
           this.approvals.set(data);
           this.focusTicket(data, ticketId, ticketNumber, silent);
           if (!silent) this.loadingService.stop('approvals-it-list');

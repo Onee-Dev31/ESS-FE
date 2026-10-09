@@ -597,7 +597,7 @@ export class FreelanceFormComponent implements OnInit, OnChanges {
   previewFiles = signal<FilePreviewItem[]>([]);
 
   openPreview(file: any) {
-    console.log(file);
+    // console.log(file);
 
     let url = '';
 
@@ -607,7 +607,7 @@ export class FreelanceFormComponent implements OnInit, OnChanges {
       url = file.FileUrlFull || '';
     }
 
-    console.log(url);
+    // console.log(url);
 
     this.previewFiles.set([
       {

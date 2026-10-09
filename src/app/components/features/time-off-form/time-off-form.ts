@@ -158,7 +158,7 @@ export class TimeOffForm implements OnInit {
     const employeeCode = this.getEmployeeCodeFromStorage();
     this.timeOffService.getEmployeeLeaveSummary(employeeCode, dayjs().year()).subscribe({
       next: (summary) => {
-        console.log('[getEmployeeLeaveSummary] Response', summary);
+        // console.log('[getEmployeeLeaveSummary] Response', summary);
         this.zone.run(() => {
           this.leaveTypes = summary.map((type) => ({
             id: String(type.leave_type_id),
@@ -312,14 +312,7 @@ export class TimeOffForm implements OnInit {
   }
 
   clearInvalidField(
-    field:
-      | 'leaveType'
-      | 'startDate'
-      | 'endDate'
-      | 'leaveDays'
-      | 'startTime'
-      | 'endTime'
-      | 'reason',
+    field: 'leaveType' | 'startDate' | 'endDate' | 'leaveDays' | 'startTime' | 'endTime' | 'reason',
   ): void {
     if (!this.invalidFields()[field]) return;
     this.invalidFields.update((fields) => ({ ...fields, [field]: false }));
@@ -327,7 +320,8 @@ export class TimeOffForm implements OnInit {
 
   private scrollToFirstInvalidField(): void {
     requestAnimationFrame(() => {
-      const invalidField = this.elementRef.nativeElement.querySelector<HTMLElement>('.field-invalid');
+      const invalidField =
+        this.elementRef.nativeElement.querySelector<HTMLElement>('.field-invalid');
       invalidField?.scrollIntoView({ behavior: 'smooth', block: 'center' });
     });
   }
@@ -504,7 +498,10 @@ export class TimeOffForm implements OnInit {
 
     if (!this.dateUtil.isValidDateRange(this.startDate(), this.endDate())) {
       this.invalidFields.update((fields) => ({ ...fields, startDate: true, endDate: true }));
-      await this.swalService.warning('ข้อมูลไม่ถูกต้อง', 'วันที่เริ่มต้นต้องไม่มากกว่าวันที่สิ้นสุด');
+      await this.swalService.warning(
+        'ข้อมูลไม่ถูกต้อง',
+        'วันที่เริ่มต้นต้องไม่มากกว่าวันที่สิ้นสุด',
+      );
       return;
     }
 
@@ -528,7 +525,10 @@ export class TimeOffForm implements OnInit {
     const availableDays = this.getSelectedLeaveTypeAvailableDays();
     if (availableDays !== undefined && leaveDays > availableDays) {
       this.invalidFields.update((fields) => ({ ...fields, leaveDays: true }));
-      await this.swalService.warning('ข้อมูลไม่ถูกต้อง', `จำนวนวันลาต้องไม่เกินสิทธิ์ที่ใช้ได้ ${availableDays} วัน`);
+      await this.swalService.warning(
+        'ข้อมูลไม่ถูกต้อง',
+        `จำนวนวันลาต้องไม่เกินสิทธิ์ที่ใช้ได้ ${availableDays} วัน`,
+      );
       return;
     }
 
@@ -605,7 +605,7 @@ export class TimeOffForm implements OnInit {
       request_by: employeeCode,
     };
 
-    console.log('[Time Off] Save payload:', payload);
+    // console.log('[Time Off] Save payload:', payload);
 
     this.timeOffService.saveLeaveRequest(payload).subscribe({
       next: () => {

@@ -451,7 +451,7 @@ export class Report {
 
     const labels = chartData.map((x) => x.code);
 
-    console.log('buildCompanyBar', chartData, labels);
+    // console.log('buildCompanyBar', chartData, labels);
 
     this.companyBarOption = {
       grid: { left: 18, right: 18, top: 18, bottom: 26, containLabel: true },

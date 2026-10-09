@@ -1109,7 +1109,7 @@ export class ItService implements OnInit {
   }
 
   getTicketStatus(ticket: any) {
-    console.log('getTicketStatus', ticket);
+    // console.log('getTicketStatus', ticket);
     if (
       (ticket.IT_Status === 'Assigned' &&
         ticket.user_status === 'Pending' &&
@@ -1213,7 +1213,7 @@ export class ItService implements OnInit {
       })
       .subscribe({
         next: (res) => {
-          console.log(res);
+          // console.log(res);
           this.Tickets.set(
             res.data.map((ticket: any) => ({
               ...ticket,

@@ -285,10 +285,10 @@ export class TimeoffComponent implements OnInit {
     }
 
     this.loadingService.start('timeoff-list');
-    console.log('[getLeaveRequests] Response', { yearFrom, yearTo, employeeCode });
+    // console.log('[getLeaveRequests] Response', { yearFrom, yearTo, employeeCode });
     this.timeoffService.getLeaveRequests(yearFrom, yearTo, employeeCode).subscribe({
       next: (data: TimeOffRequest[]) => {
-        console.log('[getLeaveRequests] Response', data);
+        // console.log('[getLeaveRequests] Response', data);
         this.requests.set(data);
         this.loadingService.stop('timeoff-list');
         this.applyPendingFocus();

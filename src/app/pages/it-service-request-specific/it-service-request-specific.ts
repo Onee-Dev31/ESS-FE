@@ -726,7 +726,7 @@ export class ITServiceRequestSpecificComponent implements OnInit {
       formData.append('serviceTypeIds', service.id.toString());
     });
 
-    console.log('formData', [...formData.entries()]);
+    // console.log('formData', [...formData.entries()]);
 
     this.swalService.loading('กำลังบันทึกข้อมูล...');
     this.itServiceService

@@ -406,7 +406,7 @@ export class DeptHeadsComponent implements OnInit {
     this.loadingService.start('dept-heads');
     this.settingService.getDeptHeads().subscribe({
       next: (res) => {
-        console.log(res);
+        // console.log(res);
         this.items.set(res.data ?? []);
         this.loadingService.stop('dept-heads');
       },

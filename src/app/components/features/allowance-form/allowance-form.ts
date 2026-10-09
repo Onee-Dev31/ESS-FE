@@ -300,7 +300,7 @@ export class AllowanceFormComponent implements OnInit, OnChanges {
 
     this.allowanceService.getEligibleDates(employeeCode, yearCE, month).subscribe({
       next: (res) => {
-        console.log(res);
+        // console.log(res);
         this.logs = (res.data ?? []).map((item) => {
           const dateStr = item.work_date.split('T')[0]; // "2026-03-02"
           const eligible = item.is_eligible === 1;

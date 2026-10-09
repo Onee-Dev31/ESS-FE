@@ -50,7 +50,7 @@ export class InfoModal implements OnChanges {
         ),
       }).subscribe({
         next: (res) => {
-          console.log('res', res);
+          // console.log('res', res);
           // API 1
           this.emp_asset = res.asset?.data ?? [];
           this.userId_asset = res.asset?.userId;

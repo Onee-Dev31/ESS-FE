@@ -18,7 +18,6 @@ function isBrowserViewable(fileName: string): boolean {
 }
 
 async function blobDownload(url: string, fileName: string): Promise<void> {
-  console.log('url : ', url);
   const response = await fetch(url, { credentials: 'omit' });
   // const response = await fetch(toSameOriginFileUrl(url), { credentials: 'omit' });
 
@@ -48,7 +47,6 @@ function toSameOriginFileUrl(url: string): string {
       (fileUrl.hostname === '10.31.1.85' || fileUrl.hostname === 'ess.oneeclick.co') &&
       fileUrl.pathname.startsWith('/uploads/')
     ) {
-      console.log('fileUrl : ', fileUrl);
       return `${fileUrl.pathname}${fileUrl.search}`;
     }
   } catch {
