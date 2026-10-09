@@ -280,8 +280,8 @@ export const routes: Routes = [
       {
         path: 'guide-document-setting',
         loadComponent: () =>
-          import('./pages/setting-guide-document/setting-guide-document').then(
-            (m) => m.SettingGuideDocument,
+          import('./pages/setting-for-it/setting-for-it').then(
+            (m) => m.SettingForIT,
           ),
         data: { animation: 'Dashboard' },
       },

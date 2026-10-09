@@ -1,12 +1,9 @@
 @use '../../../styles/variables' as *;
 @use '../../../styles/mixins' as *;
 
-.setting-page {
-  min-height: 100%;
-  padding: 20px;
-  background: var(--bg-page);
-  color: var(--text);
-}
+:host { display: block; }
+:host([hidden]) { display: none; }
+
 .setting-card h2 {
   margin: 0;
   color: var(--text-header);
@@ -136,7 +133,7 @@ button,
 }
 .document-list {
   display: grid;
-  gap: 14px;
+  gap: 10px;
   min-width: 0;
 }
 .detail-card { min-width: 0; overflow: hidden; }
@@ -148,7 +145,7 @@ article {
   width: 100%;
   min-width: 0;
   box-sizing: border-box;
-  padding: 18px 24px;
+  padding: 6px 18px;
   border: 1px solid var(--border-color);
   border-radius: 14px;
 }
@@ -156,6 +153,34 @@ article {
   flex: 1 1 auto;
   min-width: 0;
   overflow: hidden;
+}
+.audit-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 12px;
+  margin-top: 6px;
+  color: var(--text-muted);
+  font-size: 11px;
+  line-height: 1.6;
+}
+.audit-item {
+  display: inline-flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 5px;
+  min-width: 0;
+  overflow-wrap: anywhere;
+  b { color: var(--text-sub); font-weight: 500; }
+  i { font-size: 10px; }
+  & + .audit-item {
+    border-left: 1px solid var(--border-color);
+    padding-left: 12px;
+  }
+}
+@media (max-width: 520px) {
+  .audit-meta { flex-direction: column; align-items: flex-start; }
+  .audit-item + .audit-item { border-left: 0; padding-left: 0; }
 }
 .doc-info strong,
 .doc-info small {
@@ -179,6 +204,7 @@ article {
 }
 .document-list .outline {
   flex: 0 0 auto;
+  height: 42px;
   min-height: 42px;
   padding: 0 14px;
   border-width: 1px;
@@ -195,6 +221,30 @@ article {
 .danger {
   color: #dc2626;
   border-color: #fecaca;
+  &:hover {
+    color: #dc2626;
+    border-color: #dc2626;
+    background: rgba(220, 38, 38, 0.06);
+  }
+}
+.document-list .icon-action.outline {
+  width: 48px;
+  min-width: 48px;
+  height: 40px;
+  min-height: 40px;
+  padding: 0;
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  color: var(--text-sub);
+  background: var(--bg-card);
+  box-shadow: none;
+  font-size: 15px;
+  &:hover { background: var(--bg-slate); }
+  &.danger {
+    color: #ff3038;
+    border-color: #ff3038;
+    &:hover { background: rgba(255, 48, 56, 0.06); }
+  }
 }
 .empty {
   padding: 50px;
@@ -218,13 +268,6 @@ article {
   .doc-info {
     min-width: calc(100% - 50px);
   }
-  .setting-page {
-    padding: 12px;
-  }
-  .page-hero {
-    padding: 22px;
-  }
-  .page-hero h1 {
-    font-size: 25px;
-  }
+
 }
+

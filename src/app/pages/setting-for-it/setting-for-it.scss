@@ -1,0 +1,64 @@
+@use '../../../styles/variables' as *;
+
+.setting-page {
+  min-height: 100%;
+  padding: 20px;
+  background: var(--bg-page);
+  color: var(--text);
+}
+@media (max-width: 800px) {
+  .setting-page { padding: 12px; }
+}
+
+.settings-tabs {
+  display: flex;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 16px;
+  margin-bottom: 20px;
+  border-bottom: 2px solid var(--border-table-head);
+  button {
+    flex-shrink: 0;
+    gap: 7px;
+    height: auto;
+    padding: 10px 20px;
+    border: 0;
+    border-bottom: 2px solid transparent;
+    border-radius: 8px 8px 0 0;
+    margin-bottom: -2px;
+    background: transparent;
+    color: var(--text-sub);
+    font-size: $font-size-label;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+    &:hover {
+      color: var(--primary);
+      background: color-mix(in srgb, var(--primary), transparent 92%);
+    }
+    &.active {
+      color: var(--primary);
+      border-bottom-color: var(--primary);
+      background: color-mix(in srgb, var(--primary), transparent 92%);
+    }
+    &:focus-visible { outline: 2px solid var(--primary); outline-offset: -2px; }
+  }
+}
+@media (max-width: 767px) {
+  .settings-tabs {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 6px;
+    button {
+      min-width: 0;
+      min-height: 60px;
+      flex-direction: column;
+      gap: 5px;
+      padding: 8px 5px;
+      white-space: normal;
+    }
+  }
+}
+app-reply-template-settings[hidden] { display: none; }

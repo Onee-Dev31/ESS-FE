@@ -1,9 +1,9 @@
-import { Component, EventEmitter, inject, Input, OnInit, Output, signal } from '@angular/core';
+import { Component, inject, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { AuthService } from '../../services/auth.service';
-import { ItServiceService, ManageGuideDocumentPayload } from '../../services/it-service.service';
-import { SwalService } from '../../services/swal.service';
-import { PageHeaderComponent } from '../../components/shared/page-header/page-header';
+import { AuthService } from '../../../services/auth.service';
+import { ItServiceService, ManageGuideDocumentPayload } from '../../../services/it-service.service';
+import { SwalService } from '../../../services/swal.service';
+
 
 interface GuideDocument {
   id: number;
@@ -11,18 +11,18 @@ interface GuideDocument {
   fileUrl: string;
   filePath: string;
   isActive: boolean;
+  createdBy: string;
+  updatedBy: string;
 }
 
 @Component({
-  selector: 'app-setting-guide-document',
+  selector: 'app-guide-document-settings',
   standalone: true,
-  imports: [FormsModule, PageHeaderComponent],
-  templateUrl: './setting-guide-document.html',
-  styleUrl: './setting-guide-document.scss',
+  imports: [FormsModule],
+  templateUrl: './guide-document-settings.html',
+  styleUrl: './guide-document-settings.scss',
 })
-export class SettingGuideDocument implements OnInit {
-  @Input() asPage = true;
-  @Output() closeModal = new EventEmitter<void>();
+export class GuideDocumentSettings implements OnInit {
   private readonly api = inject(ItServiceService);
   private readonly auth = inject(AuthService);
   private readonly swal = inject(SwalService);
@@ -52,6 +52,8 @@ export class SettingGuideDocument implements OnInit {
             fileUrl: item.File_Url ?? item.fileUrl,
             filePath: item.File_Path ?? item.filePath,
             isActive: item.IsActive ?? item.isActive,
+            createdBy: String(item.Created_by ?? item.Created_By ?? item.Create_By ?? item.createdBy ?? '').trim(),
+            updatedBy: String(item.Update_by ?? item.Update_By ?? item.Updated_By ?? item.updatedBy ?? '').trim(),
           })),
         );
         this.loading.set(false);
@@ -135,8 +137,5 @@ export class SettingGuideDocument implements OnInit {
     this.api
       .manageGuideDocument(payload)
       .subscribe({ next: () => this.load(), error: () => this.swal.warning('ลบเอกสารไม่สำเร็จ') });
-  }
-  close(): void {
-    this.closeModal.emit();
   }
 }

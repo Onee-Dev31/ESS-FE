@@ -1,0 +1,336 @@
+<section class="template-settings" aria-label="แก้ไขเทมเพลตตอบกลับ">
+        <section class="setting-card search-card">
+          <h2>ค้นหา</h2>
+          <div class="search-row">
+          <div class="search-input">
+            <i class="fa-solid fa-magnifying-glass"></i>
+
+            <input
+              class="styled-input" type="search"
+              [(ngModel)]="templateSearch"
+              [disabled]="templateBusy() || editingTemplateId !== null"
+              placeholder="ค้นหาชื่อหรือรายละเอียดเทมเพลต..."
+            />
+          </div>
+          <button type="button" class="primary"
+            [disabled]="!templateSearch || templateBusy() || editingTemplateId !== null"
+            (click)="templateSearch = ''" aria-label="ล้างคำค้นหา">
+            <i class="fa-solid fa-xmark"></i> Clear
+          </button>
+          <button type="button" class="outline"
+            [disabled]="templateBusy() || editingTemplateId !== null" (click)="addTemplate()">
+            <i class="fa-solid fa-plus"></i> เพิ่มเทมเพลต
+          </button>
+          </div>
+        </section>
+
+          @if (editingTemplateId === 0) {
+            <section class="setting-card form-card">
+            <div class="template-detail template-new-detail">
+              <fieldset [disabled]="templateBusy()">
+                @if (templateActionError()) {
+                  <p class="template-error" role="alert">{{ templateActionError() }}</p>
+                }
+                <h2>เพิ่มเทมเพลตใหม่</h2>
+                <label for="new-template-title">ชื่อเทมเพลต</label>
+                <input id="new-template-title" type="text" [(ngModel)]="templateTitle" required />
+                <label for="new-template-scope">การใช้งาน</label>
+                <div class="scope-toggle" role="group" aria-label="การใช้งาน">
+                  <button
+                    type="button"
+                    [class.active]="templateScope === 'PERSONAL'"
+                    (click)="templateScope = 'PERSONAL'"
+                  >
+                    ส่วนตัว
+                  </button>
+                  <button
+                    type="button"
+                    [class.active]="templateScope === 'GENERAL'"
+                    (click)="templateScope = 'GENERAL'"
+                  >
+                    สาธารณะ
+                  </button>
+                </div>
+                <label for="new-template-body">ข้อความเทมเพลต</label>
+                <quill-editor
+                  id="new-template-body"
+                  [(ngModel)]="templateBody"
+                  [modules]="templateEditorModules"
+                  [readOnly]="templateBusy()"
+                  placeholder="กรอกข้อความเทมเพลต..."
+                />
+                <button
+                  type="button"
+                  class="outline btn-select-guide"
+                  (click)="openGuideModal()"
+                >
+                  <i class="fa-regular fa-folder-open"></i> เลือกเอกสารคู่มือจาก Master
+                </button>
+                <div class="form-actions">
+                  <button type="button" class="outline" (click)="cancelTemplateEdit()">
+                    ยกเลิก
+                  </button>
+                  <button
+                    type="button"
+                    class="primary"
+                    [disabled]="!validTemplateDraft || templateBusy()"
+                    (click)="saveNewTemplate()"
+                  >
+                    {{ templateBusy() ? 'กำลังบันทึก...' : 'บันทึก' }}
+                  </button>
+                </div>
+              </fieldset>
+            </div>
+            </section>
+          }
+
+      <div class="setting-card detail-card">
+          <div class="section-title">
+            <h2>รายละเอียด</h2>
+            @if (!templatesLoading() && !templatesError()) {
+              <span>{{ filteredTemplates.length }} รายการ</span>
+            }
+          </div>
+        @if (templateActionError() && editingTemplateId !== 0) {
+          <p class="template-error" role="alert">{{ templateActionError() }}</p>
+        }
+        @if (templatesLoading()) {
+          <div class="template-state">
+            <i class="fa-solid fa-spinner fa-spin"></i>
+            กำลังโหลดเทมเพลต...
+          </div>
+        } @else if (templatesError()) {
+          <div class="template-state">
+            <span>โหลดเทมเพลตไม่สำเร็จ</span>
+
+            <button type="button" (click)="loadTemplates()">ลองใหม่</button>
+          </div>
+        } @else {
+            <div class="document-list">
+              @for (template of filteredTemplates; track template.Id) {
+                <article class="template-card" [class.expanded]="expandedTemplateId === template.Id">
+                  <div class="template-option">
+                    <span class="doc-info">
+                      <span class="template-option-heading">
+                        <strong>{{ template.Title }}</strong>
+
+                        <span
+                          class="template-badge"
+                          [class.private]="template.Scope === 'PERSONAL'"
+                        >
+                          <i
+                            class="fa-solid"
+                            [class.fa-users]="template.Scope === 'GENERAL'"
+                            [class.fa-lock]="template.Scope === 'PERSONAL'"
+                          ></i>
+
+                          {{ template.Scope === 'GENERAL' ? 'ส่วนกลาง' : 'ของฉัน' }}
+                        </span>
+                      </span>
+                      @if (template.Created_By || template.Update_By) {
+                        <span class="audit-meta">
+                          @if (template.Created_By) {
+                            <span class="audit-item"><i class="fa-regular fa-user" aria-hidden="true"></i> สร้างโดย <b>{{ template.Created_By }}</b></span>
+                          }
+                          @if (template.Update_By) {
+                            <span class="audit-item"><i class="fa-regular fa-pen-to-square" aria-hidden="true"></i> แก้ไขโดย <b>{{ template.Update_By }}</b></span>
+                          }
+                        </span>
+                      }
+                    </span>
+
+                    <div class="doc-actions">
+                      <button title="แก้ไข"
+                        type="button"
+                        class="outline"
+                        [disabled]="templateBusy() || editingTemplateId !== null"
+                        (click)="editTemplate(template)"
+                        aria-label="แก้ไขเทมเพลต"
+                      >
+                        <i class="fa-regular fa-pen-to-square"></i><span class="action-label">แก้ไข</span></button>
+                      <button
+                        type="button"
+                        class="outline template-expand-button"
+                        [disabled]="templateBusy() || editingTemplateId !== null"
+                        [attr.aria-label]="
+                          expandedTemplateId === template.Id ? 'ซ่อนรายละเอียด' : 'ดูรายละเอียด'
+                        "
+                        [attr.aria-expanded]="expandedTemplateId === template.Id"
+                        [attr.aria-controls]="'template-detail-' + template.Id"
+                        (click)="toggleTemplate(template)"
+                      >
+                        <i
+                          class="fa-solid"
+                          [class.fa-chevron-up]="expandedTemplateId === template.Id"
+                          [class.fa-chevron-down]="expandedTemplateId !== template.Id"
+                        ></i>
+                      </button>
+                    </div>
+                  </div>
+                  @if (expandedTemplateId === template.Id) {
+                    <section
+                      class="template-detail"
+                      [id]="'template-detail-' + template.Id"
+                      aria-label="รายละเอียดเทมเพลต"
+                    >
+                      @if (editingTemplateId === template.Id) {
+                        <fieldset [disabled]="templateBusy()">
+                          <label [for]="'template-title-' + template.Id">ชื่อเทมเพลต</label>
+                          <input
+                            [id]="'template-title-' + template.Id"
+                            type="text"
+                            [(ngModel)]="templateTitle"
+                            required
+                          />
+                          <label [for]="'template-scope-' + template.Id">การใช้งาน</label>
+                          <div class="scope-toggle" role="group" aria-label="การใช้งาน">
+                            <button
+                              type="button"
+                              [class.active]="templateScope === 'PERSONAL'"
+                              (click)="templateScope = 'PERSONAL'"
+                            >
+                              ส่วนตัว
+                            </button>
+                            <button
+                              type="button"
+                              [class.active]="templateScope === 'GENERAL'"
+                              (click)="templateScope = 'GENERAL'"
+                            >
+                              สาธารณะ
+                            </button>
+                          </div>
+                          <label [for]="'template-body-' + template.Id">ข้อความเทมเพลต</label>
+                          <quill-editor
+                            [id]="'template-body-' + template.Id"
+                            [(ngModel)]="templateBody"
+                            [modules]="templateEditorModules"
+                            [readOnly]="templateBusy()"
+                            placeholder="กรอกข้อความเทมเพลต..."
+                          />
+                          <button
+                            type="button"
+                            class="outline btn-select-guide"
+                            (click)="openGuideModal()"
+                          >
+                            <i class="fa-regular fa-folder-open"></i> เลือกเอกสารคู่มือจาก Master
+                          </button>
+                          <div class="template-actions template-detail-actions">
+                            <button
+                              type="button"
+                              class="outline"
+                              (click)="cancelTemplateEdit()"
+                            >
+                              ยกเลิก
+                            </button>
+                            <button
+                              type="button"
+                              class="primary"
+                              [disabled]="!validTemplateDraft || templateBusy()"
+                              (click)="saveTemplate(template)"
+                            >
+                              {{ templateBusy() ? 'กำลังบันทึก...' : 'บันทึก' }}
+                            </button>
+                          </div>
+                        </fieldset>
+                      } @else {
+                        <div
+                          class="template-preview ql-editor"
+                          [innerHTML]="normalizeTemplateHtml(template.Body)"
+                        ></div>
+                        <div class="template-actions template-detail-actions">
+                          <button title="ลบ" aria-label="ลบเทมเพลต"
+                            type="button"
+                            class="outline danger"
+                            [disabled]="templateBusy()"
+                            (click)="deleteTemplate(template)"
+                          >
+                            <i class="fa-regular fa-trash-can"></i> ลบ</button>
+                          <button title="แก้ไข" aria-label="แก้ไขเทมเพลต"
+                            type="button"
+                            class="outline"
+                            [disabled]="templateBusy()"
+                            (click)="editTemplate(template)"
+                          >
+                            <i class="fa-regular fa-pen-to-square"></i> แก้ไข</button>
+                        </div>
+                      }
+                    </section>
+                  }
+                </article>
+              } @empty {
+                <div class="template-state">
+                  <i class="fa-regular fa-folder-open"></i>
+                  ไม่พบเทมเพลตที่ตรงกับการค้นหา
+                </div>
+              }
+            </div>
+        }
+      </div>
+</section>
+@if (guideModalOpen) {
+  <div class="template-modal-overlay" (mousedown)="closeGuideModal()">
+    <div
+      class="template-modal guide-picker-modal"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="guide-modal-title"
+      (mousedown)="$event.stopPropagation()"
+    >
+      <header class="template-modal-header">
+        <div>
+          <h3 id="guide-modal-title">
+            <i class="fa-regular fa-folder-open"></i> เลือกเอกสารคู่มือ
+          </h3>
+        </div>
+        <button
+          type="button"
+          class="template-modal-close"
+          (click)="closeGuideModal()"
+          aria-label="ปิด"
+        >
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </header>
+      <div class="template-modal-tools">
+        <div class="template-search-wrapper">
+          <i class="fa-solid fa-magnifying-glass"></i
+          ><input type="search" [(ngModel)]="guideSearch" placeholder="ค้นหาชื่อเอกสาร..." />
+        </div>
+      </div>
+      <div class="template-modal-body">
+        @if (guideLoading()) {
+          <div class="template-state">
+            <i class="fa-solid fa-spinner fa-spin"></i> กำลังโหลดเอกสาร...
+          </div>
+        } @else {
+          <div class="template-modal-list">
+            @for (document of filteredGuideDocuments; track document.id) {
+              <div class="template-option">
+                <span class="template-option-icon">
+                  <i class="fa-regular fa-file-lines"></i>
+                </span>
+                <span class="template-option-content">
+                  <span class="template-option-heading">
+                    <strong>{{ document.name }}</strong>
+                  </span>
+                </span>
+                <button
+                  type="button"
+                  class="btn-template-cancel template-use"
+                  (click)="insertGuideDocument(document)"
+                >
+                  <i class="fa-solid fa-link"></i> แทรกในข้อความ
+                </button>
+              </div>
+            } @empty {
+              <div class="template-state">ไม่พบเอกสารคู่มือ</div>
+            }
+          </div>
+        }
+      </div>
+      <footer class="template-modal-footer">
+        <button type="button" class="btn-template-cancel" (click)="closeGuideModal()">ปิด</button>
+      </footer>
+    </div>
+  </div>
+}

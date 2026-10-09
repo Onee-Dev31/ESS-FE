@@ -1,0 +1,89 @@
+@use '../../dashboard-it/modal/message-composer/message-composer';
+@use '../settings-content';
+
+// Page controls use the same stylesheet as the guide documents tab.
+// The composer styles are retained for the editor and guide picker dialog.
+.template-settings {
+  display: block;
+
+  .template-card {
+    display: block;
+    border: 1px solid var(--border-color);
+    border-radius: 14px;
+    background: var(--bg-card);
+  }
+  .template-option {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    min-height: 0;
+    gap: 16px;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    &:hover { background: transparent; }
+  }
+  .template-option-heading strong {
+    font-size: inherit;
+    color: inherit;
+  }
+  .template-updated-by {
+    margin-top: 5px;
+    font-size: 12px;
+  }
+  .template-badge { font-size: 11px; }
+  .template-expand-button { width: 44px; padding: 0; }
+  .template-detail {
+    margin-top: 16px;
+    padding: 20px;
+    background: var(--bg-slate);
+    border-radius: 0 0 10px 10px;
+  }
+  .template-new-detail {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    h2 { margin-bottom: 22px; }
+    label { font-size: 13px; font-weight: 600; }
+    input { height: 48px; border-radius: 10px; font-size: 14px; }
+  }
+  button:disabled { cursor: not-allowed; }
+  .doc-actions .outline:disabled {
+    color: #94a3b8;
+    border-color: var(--border-color);
+    background: var(--bg-slate);
+    box-shadow: none;
+    transform: none;
+    cursor: not-allowed;
+  }
+}
+
+@media (max-width: 900px) {
+  .template-settings .template-option { gap: 10px; }
+}
+
+:host ::ng-deep .template-settings .template-detail quill-editor {
+  display: block;
+  border-radius: 12px;
+  background: var(--input-bg);
+
+  .ql-toolbar.ql-snow {
+    border-color: var(--input-border);
+    border-radius: 12px 12px 0 0;
+  }
+  .ql-container.ql-snow {
+    border-color: var(--input-border);
+    border-radius: 0 0 12px 12px;
+    font-family: inherit;
+  }
+  .ql-editor {
+    min-height: 240px;
+    max-height: 480px;
+    overflow-y: auto;
+    color: var(--input-text);
+    font-size: 14px;
+  }
+  .ql-editor.ql-blank::before {
+    color: var(--text-muted);
+  }
+}

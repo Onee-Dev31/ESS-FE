@@ -1,0 +1,23 @@
+<div class="setting-page">
+  <app-page-header
+    title="กำหนดเอกสารคู่มือ"
+    subtitle="Guide Document Setting"
+    icon="fas fa-folder-open"
+  />
+
+  <nav class="settings-tabs" aria-label="ตั้งค่าคู่มือและเทมเพลต">
+    <button type="button" [class.active]="activeTab === 'documents'"
+      [attr.aria-pressed]="activeTab === 'documents'" (click)="activeTab = 'documents'">
+      <i class="fa-regular fa-folder-open"></i> เอกสารคู่มือ
+    </button>
+    <button type="button" [class.active]="activeTab === 'templates'"
+      [attr.aria-pressed]="activeTab === 'templates'" (click)="activeTab = 'templates'">
+      <i class="fa-regular fa-pen-to-square"></i> แก้ไขเทมเพลตตอบกลับ
+    </button>
+  </nav>
+
+  <app-guide-document-settings [hidden]="activeTab !== 'documents'" />
+  @defer (when activeTab === 'templates') {
+    <app-reply-template-settings [hidden]="activeTab !== 'templates'" />
+  }
+</div>

@@ -1,10 +1,3 @@
-<div class="setting-page">
-  <app-page-header
-    title="กำหนดเอกสารคู่มือ"
-    subtitle="Guide Document Setting"
-    icon="fas fa-folder-open"
-  />
-
   <section class="setting-card search-card">
     <h2>ค้นหา</h2>
     <div class="search-row">
@@ -17,8 +10,8 @@
           placeholder="ค้นหาชื่อเอกสาร..."
         />
       </div>
-      <button class="primary" (click)="load()">
-        <i class="fa-solid fa-rotate-right"></i> ค้นหา
+      <button type="button" class="primary" (click)="search = ''" [disabled]="!search" aria-label="ล้างคำค้นหา">
+        <i class="fa-solid fa-xmark"></i> Clear
       </button>
       <button class="outline" (click)="add()" [disabled]="editingId !== null">
         <i class="fa-solid fa-plus"></i> เพิ่มเอกสาร
@@ -57,6 +50,16 @@
           <article>
             <div class="doc-info">
               <strong>{{ doc.name }}</strong>
+              @if (doc.createdBy || doc.updatedBy) {
+                <span class="audit-meta">
+                  @if (doc.createdBy) {
+                    <span class="audit-item"><i class="fa-regular fa-user" aria-hidden="true"></i> สร้างโดย <b>{{ doc.createdBy }}</b></span>
+                  }
+                  @if (doc.updatedBy) {
+                    <span class="audit-item"><i class="fa-regular fa-pen-to-square" aria-hidden="true"></i> แก้ไขโดย <b>{{ doc.updatedBy }}</b></span>
+                  }
+                </span>
+              }
             </div>
             <div class="doc-actions">
               <span class="status" [class.off]="!doc.isActive">{{ doc.isActive ? 'ใช้งาน' : 'ปิดใช้งาน' }}</span>
@@ -82,4 +85,3 @@
       </div>
     }
   </section>
-</div>
