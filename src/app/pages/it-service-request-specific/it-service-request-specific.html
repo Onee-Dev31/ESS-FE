@@ -533,28 +533,35 @@
 
                       <div class="form-field">
                         <label>สิทธิ์เหมือนใคร</label>
-                        <input
+                        <!-- <input
                           class="form-input"
                           placeholder="ระบุชื่อ"
                           [(ngModel)]="person.bms.detail"
                           (ngModelChange)="touchSpecificPeople()"
                           [name]="'bmsCompany' + person.id"
-                        />
-                        <!-- <nz-select
-                        nzShowSearch
-                        nzAllowClear
-                        nzPlaceHolder="เลือกพนักงาน"
-                        class="form-input"
-                        [(ngModel)]="person.bms.detail"
-                        [name]="'bmsDetail' + person.id"
-                        (ngModelChange)="validateBmsDetail($event, person)"
-                        (nzBlur)="validateBmsDetail(person.bms.detail, person)"
-                        [class.input-error]="person.errors?.['bms_detail']"
-                      >
-                        @for (opt of openForOptions_noFreelance(); track opt.value) {
-                          <nz-option [nzLabel]="opt.label" [nzValue]="opt" />
-                        }
-                      </nz-select> -->
+                        /> -->
+                        <nz-select
+                          nzShowSearch
+                          nzAllowClear
+                          nzPlaceHolder="เลือกหรือพิมพ์ชื่อพนักงาน"
+                          class="form-input"
+                          [(ngModel)]="person.bms.detail"
+                          [name]="'bmsDetail' + person.id"
+                          (nzOnSearch)="onBmsDetailSearch($event, person)"
+                          (ngModelChange)="validateBmsDetail($event, person)"
+                          [class.input-error]="person.errors?.['bms_detail']"
+                        >
+                          @for (opt of getBmsDetailOptions(person); track opt.value) {
+                            <nz-option [nzLabel]="opt.label" [nzValue]="opt.label" />
+                          }
+
+                          @if (person.bms.searchText?.trim()) {
+                            <nz-option
+                              [nzLabel]="'' + person.bms.searchText"
+                              [nzValue]="person.bms.searchText"
+                            />
+                          }
+                        </nz-select>
                       </div>
                     </div>
                   }

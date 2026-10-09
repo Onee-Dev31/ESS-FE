@@ -261,6 +261,8 @@ export class EmpAdForm implements OnChanges {
       CODEMPIDH: this.addForm.headEmployeeCode,
       HEAD_NAME: selectedHead?.NAMETHAI ?? '',
       AD_USER: this.addForm.adUser,
+      EMAIL: this.addForm.email,
+      USR_MOBILE: this.addForm.mobile,
     };
 
     if (this.isRequestUser) {

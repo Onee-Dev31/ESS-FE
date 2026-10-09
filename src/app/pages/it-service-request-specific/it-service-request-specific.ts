@@ -66,6 +66,7 @@ interface SpecificPersonRequest {
   bms: {
     companies: any[];
     detail: string;
+    searchText?: string;
   };
 
   oracle: {
@@ -208,6 +209,8 @@ export class ITServiceRequestSpecificComponent implements OnInit {
 
   onSpecificOpenForChange(person: any, value: any) {
     person.openFor = value;
+    person.bms.detail = '';
+    person.bms.searchText = '';
     if (!value?.value) {
       for (const system of person.systems) {
         this.resetSystemData(person, system);
@@ -1259,7 +1262,8 @@ export class ITServiceRequestSpecificComponent implements OnInit {
           });
 
           if (person.bms.detail) {
-            html += `สิทธิ์เหมือน : ${person.bms.detail.label ?? person.bms.detail}`;
+            // html += `สิทธิ์เหมือน : ${person.bms.detail.label ?? person.bms.detail}`;
+            html += `สิทธิ์เหมือน : ${person.bms.detail}`;
           }
 
           html += `</ul>`;
@@ -1433,6 +1437,9 @@ export class ITServiceRequestSpecificComponent implements OnInit {
     });
   }
 
+  onBmsDetailSearch(value: string, person: SpecificPersonRequest) {
+    person.bms.searchText = value;
+  }
   // ระบบเฉพาะ
   validateOracleCompany(companyItem: any, person: any, index: number) {
     person.errors ??= {};
@@ -1480,8 +1487,8 @@ export class ITServiceRequestSpecificComponent implements OnInit {
     this.touchSpecificPeople();
   }
 
-  validateBmsDetail(value: any, person: any) {
-    person.bms.detail = value;
+  validateBmsDetail(value: string | null, person: any) {
+    person.bms.detail = value ?? '';
     person.errors ??= {};
     delete person.errors['bms_detail'];
     this.touchSpecificPeople();
@@ -1566,6 +1573,12 @@ export class ITServiceRequestSpecificComponent implements OnInit {
         delete person.errors[key];
       }
     });
+  }
+
+  getBmsDetailOptions(person: SpecificPersonRequest) {
+    const currentEmpId = person.openFor?.value;
+
+    return this.openForOptions_noFreelance().filter((opt: any) => opt.value !== currentEmpId);
   }
 
   // MASTER
@@ -1667,65 +1680,94 @@ export class ITServiceRequestSpecificComponent implements OnInit {
   }
 
   getOpenFor() {
-    if (this.openBy === 'IT') {
-      this.initialLoadsPending.update((count) => count + 1);
-      this.itServiceService
-        .getOpenFor({ currentEmpId: this.authService.userData().CODEMPID })
-        .pipe(finalize(() => this.completeInitialLoad()))
-        .subscribe({
-          next: (res) => {
-            const options = res.data.map((item: any) => ({
-              ...item,
-              label: item.value === '__FREELANCE__' ? 'Freelance' : item.label,
-            }));
-            this.openForOptions.set(options);
-            this.openForOptions_noFreelance.set(
-              options.filter((item: any) => item.value !== '__FREELANCE__'),
+    // if (this.openBy === 'IT') {
+    //   this.initialLoadsPending.update((count) => count + 1);
+    //   this.itServiceService
+    //     .getOpenFor({ currentEmpId: this.authService.userData().CODEMPID })
+    //     .pipe(finalize(() => this.completeInitialLoad()))
+    //     .subscribe({
+    //       next: (res) => {
+    //         const options = res.data.map((item: any) => ({
+    //           ...item,
+    //           label: item.value === '__FREELANCE__' ? 'Freelance' : item.label,
+    //         }));
+    //         this.openForOptions.set(options);
+    //         this.openForOptions_noFreelance.set(
+    //           options.filter((item: any) => item.value !== '__FREELANCE__'),
+    //         );
+    //         this.refreshOneeSupervisors();
+
+    //         const defaultOption = options.find(
+    //           (option: any) => option.value === this.authService.userData().CODEMPID,
+    //         );
+    //         if (defaultOption) {
+    //           this.specificPeople.update((people) =>
+    //             people.map((person, index) =>
+    //               index === 0 ? { ...person, openFor: defaultOption } : person,
+    //             ),
+    //           );
+    //         }
+    //       },
+    //       error: (error) => console.error('Error fetching open-for options:', error),
+    //     });
+    //   return;
+    // }
+
+    // const employee = this.authService.userData();
+    // const selfOption = {
+    //   value: employee.CODEMPID,
+    //   label: `${employee.CODEMPID} - ${employee.NAMFIRSTT ?? ''} ${employee.NAMLASTT ?? ''}`.trim(),
+    //   labelEN:
+    //     `${employee.CODEMPID} - ${employee.NAMFIRSTE ?? ''} ${employee.NAMLASTE ?? ''}`.trim(),
+    //   AD_USER: employee.AD_USER,
+    //   COMPANY_CODE: employee.COMPANY_CODE,
+    //   COMPANY_NAME: employee.COMPANY_NAME,
+    //   DEPARTMENT: employee.DEPARTMENT,
+    //   POST: employee.POST,
+    //   EMAIL: employee.EMAIL,
+    // };
+    // const freelanceOption = {
+    //   value: '__FREELANCE__',
+    //   label: 'Freelance',
+    //   labelEN: 'Freelance',
+    //   isFreelance: true,
+    // };
+
+    // this.openForOptions.set([selfOption, freelanceOption]);
+    // this.openForOptions_noFreelance.set([selfOption]);
+    // this.refreshOneeSupervisors();
+    // this.specificPeople.update((people) =>
+    //   people.map((person, index) => (index === 0 ? { ...person, openFor: selfOption } : person)),
+    // );
+    this.initialLoadsPending.update((count) => count + 1);
+    this.itServiceService
+      .getOpenFor({ currentEmpId: this.authService.userData().CODEMPID })
+      .pipe(finalize(() => this.completeInitialLoad()))
+      .subscribe({
+        next: (res) => {
+          const options = res.data.map((item: any) => ({
+            ...item,
+            label: item.value === '__FREELANCE__' ? 'Freelance หรือ บุคคลอื่น' : item.label,
+          }));
+          this.openForOptions.set(options);
+          this.openForOptions_noFreelance.set(
+            options.filter((item: any) => item.value !== '__FREELANCE__'),
+          );
+          this.refreshOneeSupervisors();
+
+          const defaultOption = options.find(
+            (option: any) => option.value === this.authService.userData().CODEMPID,
+          );
+          if (defaultOption) {
+            this.specificPeople.update((people) =>
+              people.map((person, index) =>
+                index === 0 ? { ...person, openFor: defaultOption } : person,
+              ),
             );
-            this.refreshOneeSupervisors();
-
-            const defaultOption = options.find(
-              (option: any) => option.value === this.authService.userData().CODEMPID,
-            );
-            if (defaultOption) {
-              this.specificPeople.update((people) =>
-                people.map((person, index) =>
-                  index === 0 ? { ...person, openFor: defaultOption } : person,
-                ),
-              );
-            }
-          },
-          error: (error) => console.error('Error fetching open-for options:', error),
-        });
-      return;
-    }
-
-    const employee = this.authService.userData();
-    const selfOption = {
-      value: employee.CODEMPID,
-      label: `${employee.CODEMPID} - ${employee.NAMFIRSTT ?? ''} ${employee.NAMLASTT ?? ''}`.trim(),
-      labelEN:
-        `${employee.CODEMPID} - ${employee.NAMFIRSTE ?? ''} ${employee.NAMLASTE ?? ''}`.trim(),
-      AD_USER: employee.AD_USER,
-      COMPANY_CODE: employee.COMPANY_CODE,
-      COMPANY_NAME: employee.COMPANY_NAME,
-      DEPARTMENT: employee.DEPARTMENT,
-      POST: employee.POST,
-      EMAIL: employee.EMAIL,
-    };
-    const freelanceOption = {
-      value: '__FREELANCE__',
-      label: 'Freelance',
-      labelEN: 'Freelance',
-      isFreelance: true,
-    };
-
-    this.openForOptions.set([selfOption, freelanceOption]);
-    this.openForOptions_noFreelance.set([selfOption]);
-    this.refreshOneeSupervisors();
-    this.specificPeople.update((people) =>
-      people.map((person, index) => (index === 0 ? { ...person, openFor: selfOption } : person)),
-    );
+          }
+        },
+        error: (error) => console.error('Error fetching open-for options:', error),
+      });
   }
   getDeptHeads() {
     this.settingService

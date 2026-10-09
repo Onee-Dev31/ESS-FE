@@ -32,10 +32,10 @@
                   authData.employee.CODEMPID
                 }})
               </span>
-              <span class="user-divider"> • </span>
+              <span class="user-divider"> | </span>
               <span class="user-email-inline">aduser : {{ authData.employee.AD_USER }}</span>
-              <span class="user-divider"> • </span>
-              <span class="user-email-inline">{{ authData.employee.EMAIL }}</span>
+              <span class="user-divider"> | </span>
+              <span class="user-email-inline">{{ authData.employee.EMAIL ?? '-' }}</span>
             </span>
           </label>
         </div>

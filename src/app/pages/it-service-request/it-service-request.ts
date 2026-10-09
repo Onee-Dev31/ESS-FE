@@ -652,10 +652,14 @@ export class ITServiceRequestComponent implements OnInit {
       formData.append('openForType', isSelf ? 'self' : 'other');
       formData.append('openForCodeempid', this.selectedOpenFor().value);
     }
-    formData.append(
-      'description',
-      this.IsOneeJob ? `[ONEE JOBS]\n ${this.requestDetails()}` : this.requestDetails(),
-    );
+    // formData.append(
+    //   'description',
+    //   this.IsOneeJob ? `[ONEE JOBS]\n ${this.requestDetails()}` : this.requestDetails(),
+    // );
+    const details = this.IsOneeJob
+      ? `[ONEE JOBS]\n${this.requestDetails()}`
+      : this.requestDetails();
+    formData.append('description', this.convertTextToHtml(details));
     formData.append('requesterAduser', this.authService.currentUser() || '-');
     formData.append('contactPhone', this.phoneNumber());
     formData.append(
@@ -841,7 +845,7 @@ export class ITServiceRequestComponent implements OnInit {
   }
 
   onEmployeeFormSave(data: any) {
-    // console.log(data);
+    console.log(data);
     this.requestUserData = data;
 
     const requestUserDetail = `
@@ -867,6 +871,19 @@ export class ITServiceRequestComponent implements OnInit {
 
     this.requestDetails.set(requestUserDetail);
     this.showEmpAdForm = false;
+  }
+
+  private convertTextToHtml(text: string): string {
+    if (!text?.trim()) return '';
+
+    const escaped = text
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+
+    return `<div style="white-space: pre-wrap; overflow-wrap: anywhere;">${escaped}</div>`;
   }
 
   // GET MASTER
@@ -910,45 +927,70 @@ export class ITServiceRequestComponent implements OnInit {
       });
   }
   getOpenFor() {
-    if (this.openBy === 'IT') {
-      this.initialLoadsPending.update((count) => count + 1);
-      this.itServiceService
-        .getOpenFor({ currentEmpId: this.authService.userData().CODEMPID })
-        .pipe(finalize(() => this.completeInitialLoad()))
-        .subscribe({
-          next: (res) => {
-            const options = res.data.map((item: any) => ({
-              ...item,
-              label: item.value === '__FREELANCE__' ? 'Freelance' : item.label,
-            }));
-            this.openForOptions.set(options);
+    // if (this.openBy === 'IT') {
+    //   this.initialLoadsPending.update((count) => count + 1);
+    //   this.itServiceService
+    //     .getOpenFor({ currentEmpId: this.authService.userData().CODEMPID })
+    //     .pipe(finalize(() => this.completeInitialLoad()))
+    //     .subscribe({
+    //       next: (res) => {
+    //         const options = res.data.map((item: any) => ({
+    //           ...item,
+    //           label: item.value === '__FREELANCE__' ? 'Freelance' : item.label,
+    //         }));
+    //         this.openForOptions.set(options);
 
-            const defaultOption = options.find(
-              (option: any) => option.value === this.authService.userData().CODEMPID,
-            );
-            if (defaultOption) {
-              this.selectedOpenFor.set({
-                value: defaultOption.value,
-                label: defaultOption.label,
-              });
-            }
-          },
-          error: (error) => console.error('Error fetching open-for options:', error),
-        });
-      return;
-    }
+    //         const defaultOption = options.find(
+    //           (option: any) => option.value === this.authService.userData().CODEMPID,
+    //         );
+    //         if (defaultOption) {
+    //           this.selectedOpenFor.set({
+    //             value: defaultOption.value,
+    //             label: defaultOption.label,
+    //           });
+    //         }
+    //       },
+    //       error: (error) => console.error('Error fetching open-for options:', error),
+    //     });
+    //   return;
+    // }
 
-    const employee = this.authService.userData();
-    const selfOption = {
-      value: employee.CODEMPID,
-      label: `${employee.CODEMPID} - ${employee.NAMFIRSTT ?? ''} ${employee.NAMLASTT ?? ''}`.trim(),
-    };
+    // const employee = this.authService.userData();
+    // const selfOption = {
+    //   value: employee.CODEMPID,
+    //   label: `${employee.CODEMPID} - ${employee.NAMFIRSTT ?? ''} ${employee.NAMLASTT ?? ''}`.trim(),
+    // };
 
-    this.openForOptions.set([
-      selfOption,
-      { value: '__FREELANCE__', label: 'Freelance', isFreelance: true },
-    ]);
-    this.selectedOpenFor.set(selfOption);
+    // this.openForOptions.set([
+    //   selfOption,
+    //   { value: '__FREELANCE__', label: 'Freelance', isFreelance: true },
+    // ]);
+    // this.selectedOpenFor.set(selfOption);
+
+    this.initialLoadsPending.update((count) => count + 1);
+    this.itServiceService
+      .getOpenFor({ currentEmpId: this.authService.userData().CODEMPID })
+      .pipe(finalize(() => this.completeInitialLoad()))
+      .subscribe({
+        next: (res) => {
+          const options = res.data.map((item: any) => ({
+            ...item,
+            label: item.value === '__FREELANCE__' ? 'Freelance หรือ บุคคลอื่น' : item.label,
+          }));
+          this.openForOptions.set(options);
+
+          const defaultOption = options.find(
+            (option: any) => option.value === this.authService.userData().CODEMPID,
+          );
+          if (defaultOption) {
+            this.selectedOpenFor.set({
+              value: defaultOption.value,
+              label: defaultOption.label,
+            });
+          }
+        },
+        error: (error) => console.error('Error fetching open-for options:', error),
+      });
   }
 
   getDetailFromJobsByApplicantId(id: string) {
