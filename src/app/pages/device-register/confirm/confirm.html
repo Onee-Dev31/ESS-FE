@@ -1,0 +1,36 @@
+<main class="confirm-page">
+  <section class="confirm-card">
+    <div class="brand-mark"><i class="fa-solid fa-key"></i></div>
+    <p class="eyebrow">PASSKEY DEMO</p>
+    <h1>ทดลองลงทะเบียน Passkey</h1>
+    <p class="description">หน้านี้เป็นการทดลองสร้าง Passkey บนอุปกรณ์ของคุณ โดยใช้ QR Token แบบจำลอง</p>
+
+    <div class="token-status" [class.token-status--error]="!qrToken">
+      <span>สถานะ QR Token</span><strong>{{ qrToken ? 'พร้อมใช้งาน' : 'ไม่พบ Token' }}</strong>
+      @if (qrToken) { <code>{{ maskedToken() }}</code> }
+    </div>
+
+    @if (errorMessage()) {
+      <div class="error-message" role="alert"><i class="fa-solid fa-circle-exclamation"></i><span>{{ errorMessage() }}</span></div>
+    }
+
+    <button class="create-button" type="button" [disabled]="!qrToken || loading()" (click)="createPasskey()">
+      @if (loading()) { <span class="spinner"></span> กำลังสร้าง Passkey... }
+      @else { <i class="fa-solid fa-fingerprint"></i> สร้าง Passkey }
+    </button>
+
+    @if (registrationOptions()) {
+      <section class="json-panel">
+        <header><h2>Registration Options JSON</h2><button type="button" (click)="copyJson('options')"><i class="fa-regular fa-copy"></i> {{ copiedSection() === 'options' ? 'คัดลอกแล้ว' : 'Copy JSON' }}</button></header>
+        <pre>{{ formatJson(registrationOptions()) }}</pre>
+      </section>
+    }
+    @if (credentialJson()) {
+      <section class="json-panel json-panel--success">
+        <header><h2>Credential JSON</h2><button type="button" (click)="copyJson('credential')"><i class="fa-regular fa-copy"></i> {{ copiedSection() === 'credential' ? 'คัดลอกแล้ว' : 'Copy JSON' }}</button></header>
+        <pre>{{ formatJson(credentialJson()) }}</pre>
+      </section>
+    }
+    <p class="privacy-note"><i class="fa-solid fa-shield-halved"></i> QR Token จะไม่ถูกแสดงแบบเต็มหรือบันทึกลง Console</p>
+  </section>
+</main>

@@ -22,6 +22,13 @@ export const routes: Routes = [
     loadComponent: () => import('./pages/qr-confirm/qr-confirm').then((m) => m.QrConfirmComponent),
   },
   {
+    path: 'device-register/confirm',
+    loadComponent: () =>
+      import('./pages/device-register/confirm/confirm').then(
+        (m) => m.DeviceRegisterConfirmComponent,
+      ),
+  },
+  {
     path: '',
     component: LayoutComponent,
     canActivate: [authGuard],

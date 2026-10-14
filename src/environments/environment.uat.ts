@@ -1,6 +1,7 @@
 export const environment = {
   production: true,
   api_url: 'http://10.31.1.85:5259/api',
+  passkey_api_url: 'http://10.31.1.85:5259/api',
   previewUrl: 'http://ess-uat.oneeclick.co',
   api_ONEEJOB_url: 'https://localhost:7113/api',
   employeeImageUrl: 'https://imgemp.oneeclick.co/employeeimage',

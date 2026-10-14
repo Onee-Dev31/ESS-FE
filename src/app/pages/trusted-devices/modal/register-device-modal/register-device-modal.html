@@ -77,18 +77,23 @@
             <p>เปิดแอป Internal PWA บนมือถือ แล้วสแกน QR Code นี้เพื่อสร้าง Credential</p>
           </div>
         </div>
-        <div class="qr-frame" aria-label="QR Code สำหรับลงทะเบียน">
-          <i class="fa-solid fa-qrcode" aria-hidden="true"></i>
+        <div class="qr-frame" [class.qr-frame--expired]="qrExpired()" aria-label="QR Code สำหรับลงทะเบียน">
+          <qrcode [qrdata]="qrUrl()" [width]="204" [margin]="1" [errorCorrectionLevel]="'M'"></qrcode>
+          @if (qrExpired()) {
+            <div class="qr-expired"><i class="fa-solid fa-clock-rotate-left"></i><strong>QR Code หมดอายุ</strong></div>
+          }
         </div>
-        <div class="qr-expiry">
-          <span><i class="fa-regular fa-clock"></i> หมดอายุใน</span><strong>00 : 58</strong
+        <div class="qr-expiry" [class.qr-expiry--expired]="qrExpired()">
+          <span><i class="fa-regular fa-clock"></i> {{ qrExpired() ? 'QR Code หมดอายุแล้ว' : 'หมดอายุใน' }}</span><strong>{{ countdownDisplay }}</strong
           ><small>นาที&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;วินาที</small>
         </div>
         <div class="dialog-actions">
           <button class="secondary-button" type="button" (click)="step.set(1)">ย้อนกลับ</button>
-          <button class="primary-button" type="button" (click)="completeRegistration()">
-            จำลองการสแกนสำเร็จ
-          </button>
+          @if (qrExpired()) {
+            <button class="primary-button" type="button" (click)="generateQrCode()"><i class="fa-solid fa-rotate"></i> สร้าง QR ใหม่</button>
+          } @else {
+            <button class="primary-button" type="button" (click)="completeRegistration()">จำลองการสแกนสำเร็จ</button>
+          }
         </div>
       </div>
     } @else {

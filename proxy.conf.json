@@ -1,4 +1,10 @@
 {
+  "/api/passkeys": {
+    "target": "https://localhost:7097",
+    "secure": false,
+    "changeOrigin": true,
+    "logLevel": "debug"
+  },
   "/api": {
     "target": "http://10.31.1.83:8001",
     "secure": false,

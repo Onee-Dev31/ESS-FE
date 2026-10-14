@@ -215,6 +215,7 @@
   text-align: left;
 }
 .qr-frame {
+  position: relative;
   display: grid;
   place-items: center;
   width: 220px;
@@ -222,10 +223,11 @@
   margin: 6px auto 16px;
   border: 3px solid var(--primary);
   border-radius: 14px;
-  color: #0f172a;
+  overflow: hidden;
   background: #fff;
-  font-size: 11rem;
 }
+.qr-frame--expired qrcode { opacity: 0.14; filter: blur(1px); }
+.qr-expired { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; color: var(--danger); background: rgba(255, 255, 255, 0.78); i { font-size: 2rem; } }
 .qr-expiry {
   display: flex;
   flex-direction: column;
@@ -244,6 +246,7 @@
     letter-spacing: 2px;
   }
 }
+.qr-expiry--expired { background: color-mix(in srgb, var(--danger) 8%, var(--bg-card)); strong, span { color: var(--danger); } }
 .dialog-actions {
   display: flex;
   justify-content: flex-end;

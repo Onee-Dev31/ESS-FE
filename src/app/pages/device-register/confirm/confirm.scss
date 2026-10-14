@@ -1,0 +1,66 @@
+:host {
+  display: block;
+  min-height: 100dvh;
+  background: #f3f7fc;
+  color: #172033;
+}
+.confirm-page {
+  min-height: 100dvh;
+  display: grid;
+  place-items: start center;
+  box-sizing: border-box;
+  padding: max(24px, env(safe-area-inset-top)) 16px max(24px, env(safe-area-inset-bottom));
+}
+.confirm-card {
+  width: min(100%, 620px);
+  box-sizing: border-box;
+  padding: 30px 22px;
+  border: 1px solid #e3eaf3;
+  border-radius: 20px;
+  background: #fff;
+  box-shadow: 0 14px 40px rgba(30, 64, 175, 0.08);
+}
+.brand-mark {
+  display: grid;
+  place-items: center;
+  width: 52px;
+  height: 52px;
+  margin: 0 auto 12px;
+  border-radius: 15px;
+  background: #e8f1ff;
+  color: #1268dc;
+  font-size: 1.35rem;
+}
+.eyebrow { margin: 0 0 6px; color: #1268dc; text-align: center; font-size: 0.72rem; font-weight: 700; letter-spacing: 0.12em; }
+h1 { margin: 0; color: #172033; text-align: center; font-size: clamp(1.45rem, 7vw, 2rem); }
+.description { margin: 10px auto 22px; color: #64748b; text-align: center; line-height: 1.65; }
+.token-status {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 4px 12px;
+  padding: 14px 16px;
+  border-radius: 12px;
+  background: #edf8f1;
+  color: #166534;
+  span { font-size: 0.82rem; }
+  strong { grid-row: span 2; align-self: center; }
+  code { color: #64748b; font-size: 0.76rem; }
+  &--error { background: #fff1f2; color: #b91c1c; }
+}
+.error-message { display: flex; gap: 9px; align-items: flex-start; margin-top: 14px; padding: 12px 14px; border-radius: 10px; background: #fff1f2; color: #b91c1c; line-height: 1.45; }
+.create-button { width: 100%; min-height: 50px; display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: 18px; border: 0; border-radius: 11px; background: #1268dc; color: #fff; font: inherit; font-weight: 700; cursor: pointer; &:disabled { opacity: 0.55; cursor: not-allowed; } }
+.spinner { width: 18px; height: 18px; border: 2px solid rgba(255, 255, 255, 0.45); border-top-color: #fff; border-radius: 50%; animation: spin 0.7s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.json-panel {
+  margin-top: 20px;
+  overflow: hidden;
+  border: 1px solid #dbe5f1;
+  border-radius: 12px;
+  header { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 11px 13px; background: #f8fafc; }
+  h2 { margin: 0; color: #334155; font-size: 0.88rem; }
+  button { padding: 6px 9px; border: 1px solid #dbe5f1; border-radius: 7px; background: #fff; color: #1268dc; font: inherit; font-size: 0.75rem; cursor: pointer; }
+  pre { max-height: 280px; overflow: auto; margin: 0; padding: 14px; background: #111827; color: #d1fae5; font-size: 0.72rem; line-height: 1.55; white-space: pre-wrap; overflow-wrap: anywhere; }
+  &--success { border-color: #bbf7d0; }
+}
+.privacy-note { margin: 18px 0 0; color: #64748b; text-align: center; font-size: 0.76rem; }
+@media (min-width: 600px) { .confirm-page { padding-top: 48px; } .confirm-card { padding: 38px; } }

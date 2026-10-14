@@ -1,6 +1,7 @@
 export const environment = {
   production: true,
   api_url: '/api',
+  passkey_api_url: '/api',
   // previewUrl: '',
   previewUrl: 'https://ess.oneeclick.co',
   // previewUrl: 'http://10.31.1.85:5259',

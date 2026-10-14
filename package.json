@@ -54,6 +54,7 @@
     "@ng-icons/material-icons": "^33.0.0",
     "@ng-icons/tabler-icons": "^33.0.0",
     "@tanstack/angular-table": "^8.21.3",
+    "angularx-qrcode": "21.0.5",
     "crypto-js": "^4.2.0",
     "date-holidays": "^3.26.7",
     "dayjs": "^1.11.19",

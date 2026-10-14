@@ -5,6 +5,7 @@ export const environment = {
   ...devEnvironment,
   // Connect directly, as local development did before the deployment proxy split.
   api_url: 'https://localhost:7081/api',
+  passkey_api_url: 'https://localhost:7097/api',
   file_base_url: 'https://localhost:7081',
   pr: 'http://10.31.1.85:5259',
 };
