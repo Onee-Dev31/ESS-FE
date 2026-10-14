@@ -13,9 +13,11 @@
       <button type="button" class="primary" (click)="search = ''" [disabled]="!search" aria-label="ล้างคำค้นหา">
         <i class="fa-solid fa-xmark"></i> Clear
       </button>
-      <button class="outline" (click)="add()" [disabled]="editingId !== null">
-        <i class="fa-solid fa-plus"></i> เพิ่มเอกสาร
-      </button>
+      @if (!readOnly) {
+        <button class="outline" (click)="add()" [disabled]="editingId !== null">
+          <i class="fa-solid fa-plus"></i> เพิ่มเอกสาร
+        </button>
+      }
     </div>
   </section>
 
@@ -64,8 +66,10 @@
             <div class="doc-actions">
               <span class="status" [class.off]="!doc.isActive">{{ doc.isActive ? 'ใช้งาน' : 'ปิดใช้งาน' }}</span>
               <a class="outline" [href]="doc.fileUrl" target="_blank" rel="noopener" aria-label="เปิดเอกสาร" title="เปิด"><i class="fa-solid fa-arrow-up-right-from-square"></i><span class="action-label">เปิด</span></a>
-              <button class="outline" (click)="edit(doc)" aria-label="แก้ไขเอกสาร" title="แก้ไข"><i class="fa-regular fa-pen-to-square"></i><span class="action-label">แก้ไข</span></button>
-              <button class="outline danger" (click)="remove(doc)" aria-label="ลบเอกสาร" title="ลบ"><i class="fa-regular fa-trash-can"></i><span class="action-label">ลบ</span></button>
+              @if (!readOnly) {
+                <button class="outline" (click)="edit(doc)" aria-label="แก้ไขเอกสาร" title="แก้ไข"><i class="fa-regular fa-pen-to-square"></i><span class="action-label">แก้ไข</span></button>
+                <button class="outline danger" (click)="remove(doc)" aria-label="ลบเอกสาร" title="ลบ"><i class="fa-regular fa-trash-can"></i><span class="action-label">ลบ</span></button>
+              }
             </div>
             @if (editingId === doc.id) {
               <div class="inline-edit">

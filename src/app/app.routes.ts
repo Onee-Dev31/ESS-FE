@@ -293,6 +293,14 @@ export const routes: Routes = [
         data: { animation: 'Dashboard' },
       },
       {
+        path: 'guide-document',
+        loadComponent: () =>
+          import('./pages/setting-for-it/setting-for-it').then(
+            (m) => m.SettingForIT,
+          ),
+        data: { animation: 'Dashboard', readOnly: true },
+      },
+      {
         path: 'vehicle-policy-setting',
         loadComponent: () =>
           import('./pages/setting-vehicle-policy/setting-vehicle-policy').then(

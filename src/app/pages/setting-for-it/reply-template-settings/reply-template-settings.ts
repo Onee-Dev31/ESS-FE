@@ -1,6 +1,7 @@
 import {
   Component,
   DestroyRef,
+  Input,
   OnInit,
   inject,
   signal,
@@ -26,6 +27,7 @@ interface GuideDocumentOption {
   styleUrl: './reply-template-settings.scss',
 })
 export class ReplyTemplateSettings implements OnInit {
+  @Input() readOnly = false;
   private readonly authService = inject(AuthService);
   private readonly destroyRef = inject(DestroyRef);
   private readonly swalService = inject(SwalService);
@@ -155,6 +157,7 @@ export class ReplyTemplateSettings implements OnInit {
   }
 
   editTemplate(template: EmailReplyTemplateApi): void {
+    if (this.readOnly) return;
     if (this.templateBusy() || this.editingTemplateId !== null) return;
     this.expandedTemplateId = template.Id;
     this.editingTemplateId = template.Id;
@@ -204,6 +207,7 @@ export class ReplyTemplateSettings implements OnInit {
   }
 
   addTemplate(): void {
+    if (this.readOnly) return;
     if (this.templateBusy() || this.editingTemplateId !== null) return;
     this.expandedTemplateId = null;
     this.editingTemplateId = 0;
@@ -256,6 +260,7 @@ export class ReplyTemplateSettings implements OnInit {
   }
 
   async deleteTemplate(template: EmailReplyTemplateApi): Promise<void> {
+    if (this.readOnly) return;
     if (this.templateBusy() || this.editingTemplateId !== null) return;
     this.templateBusy.set(true);
     try {

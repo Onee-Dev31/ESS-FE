@@ -10,14 +10,18 @@
       [attr.aria-pressed]="activeTab === 'documents'" (click)="activeTab = 'documents'">
       <i class="fa-regular fa-folder-open"></i> เอกสารคู่มือ
     </button>
-    <button type="button" [class.active]="activeTab === 'templates'"
-      [attr.aria-pressed]="activeTab === 'templates'" (click)="activeTab = 'templates'">
-      <i class="fa-regular fa-pen-to-square"></i> แก้ไขเทมเพลตตอบกลับ
-    </button>
+    @if (!readOnly) {
+      <button type="button" [class.active]="activeTab === 'templates'"
+        [attr.aria-pressed]="activeTab === 'templates'" (click)="activeTab = 'templates'">
+        <i class="fa-regular fa-pen-to-square"></i> แก้ไขเทมเพลตตอบกลับ
+      </button>
+    }
   </nav>
 
-  <app-guide-document-settings [hidden]="activeTab !== 'documents'" />
-  @defer (when activeTab === 'templates') {
-    <app-reply-template-settings [hidden]="activeTab !== 'templates'" />
+  <app-guide-document-settings [hidden]="activeTab !== 'documents'" [readOnly]="readOnly" />
+  @defer (when !readOnly && activeTab === 'templates') {
+    @if (!readOnly) {
+      <app-reply-template-settings [hidden]="activeTab !== 'templates'" [readOnly]="readOnly" />
+    }
   }
 </div>

@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, inject, Input, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../../services/auth.service';
 import { ItServiceService, ManageGuideDocumentPayload } from '../../../services/it-service.service';
@@ -23,6 +23,7 @@ interface GuideDocument {
   styleUrl: './guide-document-settings.scss',
 })
 export class GuideDocumentSettings implements OnInit {
+  @Input() readOnly = false;
   private readonly api = inject(ItServiceService);
   private readonly auth = inject(AuthService);
   private readonly swal = inject(SwalService);
@@ -69,6 +70,7 @@ export class GuideDocumentSettings implements OnInit {
     return this.documents().filter((d) => !q || `${d.name} ${d.fileUrl}`.toLowerCase().includes(q));
   }
   add(): void {
+    if (this.readOnly) return;
     this.editingId = 0;
     this.name = '';
     this.fileUrl = '';
@@ -76,6 +78,7 @@ export class GuideDocumentSettings implements OnInit {
     this.isActive = true;
   }
   edit(doc: GuideDocument): void {
+    if (this.readOnly) return;
     this.editingId = doc.id;
     this.name = doc.name;
     this.fileUrl = doc.fileUrl;
@@ -86,6 +89,7 @@ export class GuideDocumentSettings implements OnInit {
     this.editingId = null;
   }
   async save(): Promise<void> {
+    if (this.readOnly) return;
     if (!this.name.trim() || !this.fileUrl.trim() || this.saving()) return;
     const result = await this.swal.confirm(
       this.editingId ? 'ยืนยันการแก้ไขเอกสาร?' : 'ยืนยันการเพิ่มเอกสาร?',
@@ -121,6 +125,7 @@ export class GuideDocumentSettings implements OnInit {
     });
   }
   async remove(doc: GuideDocument): Promise<void> {
+    if (this.readOnly) return;
     const result = await this.swal.confirm('ยืนยันการลบเอกสาร?', doc.name, undefined, {
       confirmButtonText: 'ลบ',
       focusCancel: true,

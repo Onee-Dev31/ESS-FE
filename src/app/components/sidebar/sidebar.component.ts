@@ -217,6 +217,11 @@ export class Sidebar {
       this.router.navigate([item.path]);
     }
 
+    if (item.subItems.length === 0) {
+      this.openMenu = null;
+      return;
+    }
+
     if (this.openMenu === item.name) {
       // if (item.name === 'IT Service') return;
       this.openMenu = null;
@@ -228,5 +233,9 @@ export class Sidebar {
 
   isSubMenuActive(path: string): boolean {
     return this.currentUrl === path;
+  }
+
+  isMenuActive(item: MenuItem): boolean {
+    return item.path === this.currentUrl || item.subItems.some((sub) => this.isSubMenuActive(sub.path));
   }
 }

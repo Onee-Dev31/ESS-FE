@@ -5,7 +5,11 @@
 
       <ul class="nav-list">
         <li class="nav-item" *ngFor="let item of menuItems()" [class.open]="openMenu === item.name">
-          <div class="nav-link" (click)="toggleMenu(item)" [class.active]="openMenu === item.name">
+          <div
+            class="nav-link"
+            (click)="toggleMenu(item)"
+            [class.active]="isMenuActive(item)"
+          >
             <div class="link-content">
               <!-- <i [class]="'fas ' + item.icon + ' nav-icon'"></i> -->
               <i *ngIf="item.iconType === 'fa'" [class]="'fas ' + item.icon + ' nav-icon'"> </i>
@@ -19,11 +23,15 @@
                 {{ item.icon }}
               </mat-icon>
               <span class="link-text">{{ item.name }}</span>
-              <i class="fas fa-chevron-down arrow-icon"></i>
+              <i *ngIf="item.subItems.length > 0" class="fas fa-chevron-down arrow-icon"></i>
             </div>
           </div>
 
-          <ul class="sub-menu" [class.expanded]="openMenu === item.name">
+          <ul
+            *ngIf="item.subItems.length > 0"
+            class="sub-menu"
+            [class.expanded]="openMenu === item.name"
+          >
             <li
               class="sub-item"
               *ngFor="let sub of item.subItems"

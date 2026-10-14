@@ -17,10 +17,12 @@
             (click)="templateSearch = ''" aria-label="ล้างคำค้นหา">
             <i class="fa-solid fa-xmark"></i> Clear
           </button>
-          <button type="button" class="outline"
-            [disabled]="templateBusy() || editingTemplateId !== null" (click)="addTemplate()">
-            <i class="fa-solid fa-plus"></i> เพิ่มเทมเพลต
-          </button>
+          @if (!readOnly) {
+            <button type="button" class="outline"
+              [disabled]="templateBusy() || editingTemplateId !== null" (click)="addTemplate()">
+              <i class="fa-solid fa-plus"></i> เพิ่มเทมเพลต
+            </button>
+          }
           </div>
         </section>
 
@@ -140,6 +142,7 @@
                     </span>
 
                     <div class="doc-actions">
+                      @if (!readOnly) {
                       <button title="แก้ไข"
                         type="button"
                         class="outline"
@@ -148,6 +151,7 @@
                         aria-label="แก้ไขเทมเพลต"
                       >
                         <i class="fa-regular fa-pen-to-square"></i><span class="action-label">แก้ไข</span></button>
+                      }
                       <button
                         type="button"
                         class="outline template-expand-button"
@@ -237,6 +241,7 @@
                           class="template-preview ql-editor"
                           [innerHTML]="normalizeTemplateHtml(template.Body)"
                         ></div>
+                        @if (!readOnly) {
                         <div class="template-actions template-detail-actions">
                           <button title="ลบ" aria-label="ลบเทมเพลต"
                             type="button"
@@ -253,6 +258,7 @@
                           >
                             <i class="fa-regular fa-pen-to-square"></i> แก้ไข</button>
                         </div>
+                        }
                       }
                     </section>
                   }
