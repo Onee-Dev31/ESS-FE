@@ -1,0 +1,291 @@
+:host {
+  position: fixed;
+  z-index: 2000;
+  inset: 0;
+}
+.dialog-backdrop {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  background: rgba(15, 23, 42, 0.55);
+  backdrop-filter: blur(3px);
+}
+.dialog {
+  position: relative;
+  width: min(100%, 720px);
+  max-height: calc(100vh - 40px);
+  overflow-y: auto;
+  box-sizing: border-box;
+  padding: 36px;
+  border-radius: 18px;
+  background: var(--bg-card);
+  color: var(--text-header);
+  box-shadow: 0 24px 70px rgba(15, 23, 42, 0.3);
+}
+.dialog-close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  padding: 0;
+  border: 0;
+  border-radius: 9px;
+  background: transparent;
+  color: var(--text-sub);
+  cursor: pointer;
+  &:hover {
+    background: var(--bg-item);
+  }
+}
+.stepper {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  margin: 2px 14px 32px;
+}
+.step {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 7px;
+  color: var(--text-muted);
+  &::before {
+    content: '';
+    position: absolute;
+    top: 16px;
+    right: 50%;
+    width: 100%;
+    height: 2px;
+    background: var(--border-color);
+  }
+  &:first-child::before {
+    display: none;
+  }
+  span {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    place-items: center;
+    width: 32px;
+    height: 32px;
+    border: 2px solid var(--border-color);
+    border-radius: 50%;
+    background: var(--bg-card);
+    color: var(--text-muted);
+    font-weight: 700;
+  }
+  small {
+    font-weight: 600;
+    text-align: center;
+  }
+  &--active {
+    color: var(--primary);
+    &::before {
+      background: color-mix(in srgb, var(--primary) 40%, var(--border-color));
+    }
+    span {
+      border-color: var(--primary);
+      background: var(--primary);
+      color: #fff;
+    }
+  }
+}
+.dialog-heading {
+  display: flex;
+  align-items: flex-start;
+  gap: 13px;
+  margin-bottom: 22px;
+  h2 {
+    margin: 0 0 4px;
+    font-size: 1.2rem;
+    color: var(--text-header);
+  }
+  p {
+    margin: 0;
+    color: var(--text-sub);
+    font-size: 0.9rem;
+  }
+}
+.heading-icon {
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  flex: 0 0 38px;
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--primary) 11%, transparent);
+  color: var(--primary);
+}
+.registration-form {
+  display: grid;
+  gap: 18px;
+}
+.form-field {
+  display: grid;
+  gap: 7px;
+  color: var(--text-header);
+  font-weight: 600;
+  b {
+    color: var(--danger);
+  }
+  em {
+    color: var(--text-sub);
+    font-weight: 400;
+    font-style: normal;
+  }
+  input,
+  select,
+  textarea {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 11px 13px;
+    border: 1px solid var(--input-border);
+    border-radius: 9px;
+    outline: none;
+    background: var(--input-bg);
+    color: var(--input-text);
+    font: inherit;
+    font-weight: 400;
+    &:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary) 13%, transparent);
+    }
+    &::placeholder {
+      color: var(--input-text-placeholder);
+    }
+  }
+  textarea {
+    resize: vertical;
+    min-height: 100px;
+  }
+  small {
+    justify-self: end;
+    color: var(--text-sub);
+    font-weight: 400;
+    margin-top: -27px;
+    margin-right: 10px;
+    pointer-events: none;
+  }
+}
+.primary-button,
+.secondary-button {
+  min-height: 46px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 10px 22px;
+  border-radius: 10px;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+.primary-button {
+  border: 0;
+  background: var(--primary);
+  color: #fff;
+  box-shadow: 0 6px 16px color-mix(in srgb, var(--primary) 28%, transparent);
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+.secondary-button {
+  border: 1px solid var(--border-color);
+  background: var(--bg-card);
+  color: var(--text-header);
+  &:hover {
+    background: var(--bg-item);
+  }
+}
+.full {
+  width: 100%;
+  margin-top: 8px;
+}
+.qr-step,
+.success-state {
+  text-align: center;
+}
+.qr-step .dialog-heading {
+  text-align: left;
+}
+.qr-frame {
+  display: grid;
+  place-items: center;
+  width: 220px;
+  height: 220px;
+  margin: 6px auto 16px;
+  border: 3px solid var(--primary);
+  border-radius: 14px;
+  color: #0f172a;
+  background: #fff;
+  font-size: 11rem;
+}
+.qr-expiry {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 12px;
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--primary) 8%, var(--bg-card));
+  span,
+  small {
+    color: var(--text-sub);
+  }
+  strong {
+    color: var(--primary);
+    font-size: 2rem;
+    line-height: 1.15;
+    letter-spacing: 2px;
+  }
+}
+.dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 20px;
+}
+.success-icon {
+  width: 90px;
+  height: 90px;
+  display: grid;
+  place-items: center;
+  margin: 4px auto;
+  border-radius: 50%;
+  background: var(--status-success-bg);
+  color: var(--status-success-text);
+  font-size: 2.5rem;
+}
+.success-state h2 {
+  color: var(--text-header);
+}
+.success-state p {
+  color: var(--text-sub);
+}
+@media (max-width: 430px) {
+  .dialog {
+    padding: 32px 20px 24px;
+  }
+  .stepper {
+    margin-inline: 0;
+  }
+  .step small {
+    font-size: 0.68rem;
+  }
+  .qr-frame {
+    width: 190px;
+    height: 190px;
+    font-size: 9.5rem;
+  }
+  .dialog-actions {
+    flex-direction: column-reverse;
+  }
+  .dialog-actions button {
+    width: 100%;
+  }
+}

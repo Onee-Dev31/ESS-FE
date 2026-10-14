@@ -1,0 +1,115 @@
+<section class="trusted-devices-page" (click)="openMenuId.set(null)">
+  <header class="page-heading">
+    <div>
+      <h1>อุปกรณ์ของฉัน</h1>
+      <p>จัดการอุปกรณ์ที่ลงทะเบียนสำหรับใช้งานระบบ</p>
+    </div>
+
+    @if (devices().length > 0) {
+      <button class="primary-button" type="button" (click)="openRegistration()">
+        <i class="fa-solid fa-plus" aria-hidden="true"></i>
+        <span>ลงทะเบียนอุปกรณ์</span>
+      </button>
+    }
+  </header>
+
+  @if (devices().length === 0) {
+    <div class="empty-state">
+      <div class="empty-illustration" aria-hidden="true">
+        <i class="fa-solid fa-laptop"></i>
+        <span><i class="fa-solid fa-plus"></i></span>
+      </div>
+      <h2>ยังไม่มีอุปกรณ์ที่ลงทะเบียน</h2>
+      <p>
+        คุณยังไม่ได้ลงทะเบียนอุปกรณ์สำหรับใช้งานระบบ<br />
+        กรุณาลงทะเบียนอุปกรณ์ก่อน เพื่อให้สามารถเข้าสู่ระบบด้วย QR Code ได้
+      </p>
+      <button
+        class="primary-button primary-button--large"
+        type="button"
+        (click)="openRegistration()"
+      >
+        <i class="fa-solid fa-plus" aria-hidden="true"></i>
+        <span>ลงทะเบียนอุปกรณ์</span>
+      </button>
+    </div>
+  } @else {
+    <div class="device-list" aria-label="อุปกรณ์ที่ลงทะเบียน">
+      @for (device of devices(); track device.id) {
+        <article class="device-card">
+          <div
+            class="device-visual"
+            [class.device-visual--laptop]="device.icon === 'laptop'"
+            aria-hidden="true"
+          >
+            <i
+              [class]="
+                device.icon === 'phone' ? 'fa-solid fa-mobile-screen-button' : 'fa-solid fa-laptop'
+              "
+            ></i>
+          </div>
+
+          <div class="device-content">
+            <span class="status" [class.status--inactive]="device.status === 'inactive'">
+              <i class="fa-solid fa-lock" aria-hidden="true"></i>
+              {{ device.status === 'active' ? 'Active' : 'Inactive' }}
+            </span>
+            <h2>{{ device.name }}</h2>
+
+            <dl class="device-details">
+              <div>
+                <dt>ประเภทอุปกรณ์</dt>
+                <dd>{{ device.type }}</dd>
+              </div>
+              <div>
+                <dt>ระบบปฏิบัติการ</dt>
+                <dd>{{ device.operatingSystem }}</dd>
+              </div>
+              <div>
+                <dt>ลงทะเบียนเมื่อ</dt>
+                <dd>{{ device.registeredAt }}</dd>
+              </div>
+              <div>
+                <dt>อัปเดตล่าสุด</dt>
+                <dd>{{ device.lastActiveAt }}</dd>
+              </div>
+              @if (device.note) {
+                <div>
+                  <dt>หมายเหตุ</dt>
+                  <dd>{{ device.note }}</dd>
+                </div>
+              }
+            </dl>
+          </div>
+
+          <div class="device-actions" (click)="$event.stopPropagation()">
+            <button
+              class="icon-button"
+              type="button"
+              aria-label="เมนูจัดการอุปกรณ์"
+              [attr.aria-expanded]="openMenuId() === device.id"
+              (click)="toggleMenu(device.id)"
+            >
+              <i class="fa-solid fa-ellipsis" aria-hidden="true"></i>
+            </button>
+            @if (openMenuId() === device.id) {
+              <div class="action-menu">
+                <button type="button" (click)="removeDevice(device.id)">
+                  <i class="fa-regular fa-trash-can" aria-hidden="true"></i>
+                  ลบอุปกรณ์
+                </button>
+              </div>
+            }
+          </div>
+        </article>
+      }
+    </div>
+  }
+</section>
+
+@if (showRegisterDialog()) {
+  <app-register-device-modal
+    (closed)="closeRegistration()"
+    (registered)="addRegisteredDevice($event)"
+  ></app-register-device-modal>
+}

@@ -337,6 +337,14 @@ export const routes: Routes = [
         data: { animation: 'DeptHeads' },
       },
       {
+        path: 'trusted-devices',
+        loadComponent: () =>
+          import('./pages/trusted-devices/trusted-devices').then(
+            (m) => m.TrustedDevicesComponent,
+          ),
+        data: { animation: 'TrustedDevices' },
+      },
+      {
         path: '',
         redirectTo: 'dashboard',
         pathMatch: 'full',

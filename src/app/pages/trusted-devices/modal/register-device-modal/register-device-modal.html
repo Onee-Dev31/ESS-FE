@@ -1,0 +1,103 @@
+<div class="dialog-backdrop" role="presentation" (click)="closed.emit()">
+  <section
+    class="dialog"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="register-title"
+    (click)="$event.stopPropagation()"
+  >
+    <button class="dialog-close" type="button" aria-label="ปิด" (click)="closed.emit()">
+      <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+    </button>
+
+    <div class="stepper" aria-label="ขั้นตอนการลงทะเบียน">
+      <div class="step" [class.step--active]="step() >= 1">
+        <span>1</span><small>กรอกข้อมูลอุปกรณ์</small>
+      </div>
+      <div class="step" [class.step--active]="step() >= 2">
+        <span>2</span><small>สแกน QR Code</small>
+      </div>
+      <div class="step" [class.step--active]="step() >= 3">
+        <span>3</span><small>เสร็จสิ้น</small>
+      </div>
+    </div>
+
+    @if (step() === 1) {
+      <form class="registration-form" #deviceForm="ngForm" (ngSubmit)="createQrCode()">
+        <div class="dialog-heading">
+          <span class="heading-icon"><i class="fa-regular fa-user"></i></span>
+          <div>
+            <h2 id="register-title">ข้อมูลอุปกรณ์</h2>
+            <p>ระบุข้อมูลของอุปกรณ์ที่ต้องการลงทะเบียน</p>
+          </div>
+        </div>
+
+        <label class="form-field">
+          <span>ชื่ออุปกรณ์ <b>*</b></span>
+          <input
+            name="deviceName"
+            type="text"
+            maxlength="80"
+            placeholder="เช่น iPhone 15 Pro"
+            [(ngModel)]="deviceName"
+            required
+          />
+        </label>
+        <label class="form-field">
+          <span>ประเภทอุปกรณ์ <b>*</b></span>
+          <select name="deviceType" [(ngModel)]="deviceType" required>
+            <option value="" disabled>เลือกประเภทอุปกรณ์</option>
+            <option value="โทรศัพท์มือถือ">โทรศัพท์มือถือ</option>
+            <option value="แท็บเล็ต">แท็บเล็ต</option>
+            <option value="แล็ปท็อป">แล็ปท็อป</option>
+            <option value="คอมพิวเตอร์ตั้งโต๊ะ">คอมพิวเตอร์ตั้งโต๊ะ</option>
+          </select>
+        </label>
+        <label class="form-field">
+          <span>หมายเหตุ <em>(ถ้ามี)</em></span>
+          <textarea
+            name="deviceNote"
+            rows="4"
+            maxlength="100"
+            placeholder="เช่น อุปกรณ์ส่วนตัวสำหรับใช้งานนอกองค์กร"
+            [(ngModel)]="deviceNote"
+          ></textarea>
+          <small>{{ deviceNote.length }}/100</small>
+        </label>
+        <button class="primary-button full" type="submit" [disabled]="deviceForm.invalid">
+          <i class="fa-solid fa-qrcode" aria-hidden="true"></i> สร้าง QR Code
+        </button>
+      </form>
+    } @else if (step() === 2) {
+      <div class="qr-step">
+        <div class="dialog-heading">
+          <span class="heading-icon"><i class="fa-solid fa-mobile-screen"></i></span>
+          <div>
+            <h2 id="register-title">สแกน QR Code ด้วยมือถือของคุณ</h2>
+            <p>เปิดแอป Internal PWA บนมือถือ แล้วสแกน QR Code นี้เพื่อสร้าง Credential</p>
+          </div>
+        </div>
+        <div class="qr-frame" aria-label="QR Code สำหรับลงทะเบียน">
+          <i class="fa-solid fa-qrcode" aria-hidden="true"></i>
+        </div>
+        <div class="qr-expiry">
+          <span><i class="fa-regular fa-clock"></i> หมดอายุใน</span><strong>00 : 58</strong
+          ><small>นาที&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;วินาที</small>
+        </div>
+        <div class="dialog-actions">
+          <button class="secondary-button" type="button" (click)="step.set(1)">ย้อนกลับ</button>
+          <button class="primary-button" type="button" (click)="completeRegistration()">
+            จำลองการสแกนสำเร็จ
+          </button>
+        </div>
+      </div>
+    } @else {
+      <div class="success-state">
+        <div class="success-icon" aria-hidden="true"><i class="fa-solid fa-check"></i></div>
+        <h2 id="register-title">ลงทะเบียนสำเร็จ</h2>
+        <p>เพิ่มอุปกรณ์ใหม่ในรายการเรียบร้อยแล้ว</p>
+        <button class="primary-button full" type="button" (click)="closed.emit()">เสร็จสิ้น</button>
+      </div>
+    }
+  </section>
+</div>
