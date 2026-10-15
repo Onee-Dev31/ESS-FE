@@ -4,11 +4,18 @@ import { AvatarPreviewModal } from '../../modals/avatar-preview-modal/avatar-pre
 import { TicketStatusPillComponent } from '../ticket-status-pill/ticket-status-pill';
 import { TicketStatusAudience } from '../ticket-status-pill/ticket-status.model';
 import { SafeEmailHtmlPipe } from '../../../pipes/safe-email-html.pipe';
+import { ApproverNamesModal } from '../../../pages/dashboard-it/modal/approver-names-modal/approver-names-modal';
 
 @Component({
   selector: 'app-ticket-progress-card',
   standalone: true,
-  imports: [CommonModule, AvatarPreviewModal, TicketStatusPillComponent, SafeEmailHtmlPipe],
+  imports: [
+    CommonModule,
+    AvatarPreviewModal,
+    TicketStatusPillComponent,
+    SafeEmailHtmlPipe,
+    ApproverNamesModal,
+  ],
   templateUrl: './ticket-progress-card.html',
   styleUrl: './ticket-progress-card.scss',
 })
@@ -20,6 +27,7 @@ export class TicketProgressCardComponent {
   @Output() noteClick = new EventEmitter<void>();
 
   selectedAssignee = signal<any | null>(null);
+  selectedApproverNames = signal<unknown | null>(null);
 
   isRichReason(reason: string): boolean {
     // Rich Text : ข้อความที่จัดรูปแบบได้
@@ -34,6 +42,5 @@ export class TicketProgressCardComponent {
 
   selectAssignee(assignee: any): void {
     this.selectedAssignee.set(assignee);
-    console.log('Selected Assignee:', assignee);
   }
 }

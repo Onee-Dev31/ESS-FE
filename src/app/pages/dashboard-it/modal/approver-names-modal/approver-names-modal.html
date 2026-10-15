@@ -1,0 +1,24 @@
+<app-modal-shell
+  title="รายชื่อผู้อนุมัติ"
+  icon="fa-solid fa-user-check"
+  size="sm"
+  [showClose]="true"
+  [showFooter]="false"
+  [mobileFullscreen]="true"
+  (closeModal)="closeModal.emit()"
+>
+  <div class="approval-hint">
+    <i class="fa-solid fa-circle-info"></i>
+    <span>รายการนี้ต้องได้รับการอนุมัติจากผู้อนุมัติคนใดคนหนึ่งในรายชื่อต่อไปนี้</span>
+  </div>
+  <div class="approver-list">
+    @for (name of names; track name + '|' + $index) {
+      <div class="approver-item">
+        <span class="approver-icon"><i class="fa-solid fa-user"></i></span>
+        <span>{{ name }}</span>
+      </div>
+    } @empty {
+      <div class="empty-state">ไม่พบรายชื่อผู้อนุมัติ</div>
+    }
+  </div>
+</app-modal-shell>

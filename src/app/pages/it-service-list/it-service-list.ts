@@ -485,7 +485,7 @@ export class ItService implements OnInit {
         this.desNew = ticket.description;
 
         const itNotes = await this.buildItNotes(replies, replyAttachments, ticket.requester_aduser);
-        const result = this.buildTimeline(res.timeline, res.timelineAssignees);
+        const result = this.buildTimeline(res.timeline, res.timelineAssignees, ticket);
         let status = this.getTicketStatus(ticket);
         const isOpenForSelf =
           res.requestFor?.emp_code && res.requestFor.emp_code === res.requester?.emp_code;
@@ -978,8 +978,8 @@ export class ItService implements OnInit {
     this.removeAttachment(file);
   }
 
-  buildTimeline(timelines: any[], assignees: any[]) {
-    return timelines.map((t) => {
+  buildTimeline(timelines: any[], assignees: any[], ticket?: any) {
+    const result: any[] = timelines.map((t) => {
       const assigneeList = assignees
         .filter((a) => a.timeline_id === t.timeline_id)
         .map((a) => ({
@@ -999,6 +999,7 @@ export class ItService implements OnInit {
         reason: t.reason,
         status: t.status,
         Assignee: assigneeList,
+        approverNames: null,
 
         createBy: {
           fullName: t.created_by_name,
@@ -1010,6 +1011,43 @@ export class ItService implements OnInit {
         createdDate: new Date(t.created_at).toISOString(),
       };
     });
+
+    const latestTimeline = timelines[timelines.length - 1];
+    const latestResult = result[result.length - 1];
+    if (!latestTimeline || !latestResult) return result;
+
+    // สถานะเสริมที่แสดงเหนือ Timeline โดยไม่ถูกนับเป็น Step
+    if (timelines.length === 1) {
+      latestResult.showWaitingStatus = true;
+      latestResult.waitingStatusLabel =
+        Number(ticket?.ticket_type_id) === 3 ? 'รอการอนุมัติ' : 'รอ IT รับเรื่อง';
+      latestResult.approverNames =
+        Number(ticket?.ticket_type_id) === 3 ? latestTimeline.approver_names : null;
+    }
+
+    // แจ้งซ่อม (type 1) → แสดงรออนุมัติ หลัง user กด Re-Submit
+    if (
+      Number(ticket?.ticket_type_id) === 1 &&
+      ticket?.approval_status === 'New' &&
+      latestTimeline?.status === 'Re-Submit'
+    ) {
+      latestResult.showWaitingStatus = true;
+      latestResult.waitingStatusLabel = 'รอการอนุมัติ';
+      latestResult.approverNames = latestTimeline.approver_names;
+    }
+
+    // แจ้งซ่อม (type 1) → แสดงรออนุมัติ หลัง เลขา/อนุมัติ1/อนุมัติ2 Approve แล้ว แต่รอ IT-Director
+    if (
+      Number(ticket?.ticket_type_id) === 1 &&
+      ticket?.IT_Status == null &&
+      ticket?.approval_status === 'Approved'
+    ) {
+      latestResult.showWaitingStatus = true;
+      latestResult.waitingStatusLabel = 'รอการอนุมัติ\nจาก IT-Director';
+      latestResult.approverNames = null;
+    }
+
+    return result;
   }
 
   async buildItNotes(replies: any[], attachments: any[], requesterAduser?: string) {
@@ -1072,9 +1110,7 @@ export class ItService implements OnInit {
       const mine = readers.find((r) => r.userCodeempid === codeempid);
       if (mine && mine.lastReadReplyId >= latestReply.id) return readers;
       return mine
-        ? readers.map((r) =>
-            r === mine ? { ...r, lastReadReplyId: latestReply.id } : r,
-          )
+        ? readers.map((r) => (r === mine ? { ...r, lastReadReplyId: latestReply.id } : r))
         : [...readers, { userCodeempid: codeempid, nickName: '', lastReadReplyId: latestReply.id }];
     });
     this.itServiceService.markReplyRead(ticketId, codeempid, latestReply.id).subscribe({
@@ -1091,7 +1127,7 @@ export class ItService implements OnInit {
   }
 
   getTicketStatus(ticket: any) {
-    console.log('getTicketStatus', ticket);
+    // console.log('getTicketStatus', ticket);
     if (
       (ticket.IT_Status === 'Assigned' &&
         ticket.user_status === 'Pending' &&
@@ -1102,7 +1138,12 @@ export class ItService implements OnInit {
       ticket.user_status === 'Referred_Back'
     ) {
       return 'Waiting you';
-    } else if (ticket.IT_Status === null && ticket.approval_status === 'New') {
+    } else if (
+      (ticket.IT_Status === null && ticket.approval_status === 'New') || //รอเลขา รออนุมัติ1 รออนุมัติ2
+      (ticket.IT_Status === null &&
+        ticket.approval_status === 'Approved' &&
+        ticket.ticket_type_id === 1) // type 1 (แจ้งซ่อม) ที่ยังไม่ รอ IT-Director approve
+    ) {
       return 'Waiting Approval';
     } else if (
       ticket.IT_Status === 'Assigned' &&

@@ -19,12 +19,32 @@
 
   @if (ticket.assignTimeline?.length) {
     <div class="timeline">
-      @if (showWaitingItTemplate && ticket.assignTimeline.length === 1) {
+      @if (
+        showWaitingItTemplate &&
+        ticket.assignTimeline[ticket.assignTimeline.length - 1].showWaitingStatus
+      ) {
         <div class="timeline-item timeline-item--waiting-it">
           <div class="timeline-icon active"></div>
           <div class="timeline-content">
             <div class="timeline-title">
-              {{ +ticket.ticketTypeId === 3 ? 'รอการอนุมัติ' : 'รอ IT รับเรื่อง' }}<br />
+              <span class="waiting-approval-label">{{
+                  ticket.assignTimeline[ticket.assignTimeline.length - 1].waitingStatusLabel
+                }}</span
+              ><br />
+              @if (ticket.assignTimeline[ticket.assignTimeline.length - 1].approverNames) {
+                <button
+                  type="button"
+                  class="approver-names-button"
+                  (click)="
+                    selectedApproverNames.set(
+                      ticket.assignTimeline[ticket.assignTimeline.length - 1].approverNames
+                    )
+                  "
+                >
+                  <i class="fa-solid fa-users"></i>
+                  ดูรายชื่อผู้อนุมัติ
+                </button>
+              }
             </div>
           </div>
         </div>
@@ -38,11 +58,15 @@
           <div
             class="timeline-icon"
             [class.done]="
-              !first || ticket.assignTimeline.length === 1 || step.title.includes('ปิด')
+              !first ||
+              ticket.assignTimeline.length === 1 ||
+              ticket.assignTimeline[ticket.assignTimeline.length - 1].showWaitingStatus ||
+              step.title.includes('ปิด')
             "
             [class.active]="
               first &&
               ticket.assignTimeline.length !== 1 &&
+              !ticket.assignTimeline[ticket.assignTimeline.length - 1].showWaitingStatus &&
               !step.title.includes('ปิด') &&
               !step.title.includes('ปฏิเสธ') &&
               !step.title.toLowerCase().includes('rejected') &&
@@ -106,6 +130,13 @@
     </div>
   }
 </section>
+
+@if (selectedApproverNames(); as approverNames) {
+  <app-approver-names-modal
+    [approverNames]="approverNames"
+    (closeModal)="selectedApproverNames.set(null)"
+  />
+}
 
 @if (selectedAssignee(); as assignee) {
   <div class="assignee-overlay" (click)="selectedAssignee.set(null)">
