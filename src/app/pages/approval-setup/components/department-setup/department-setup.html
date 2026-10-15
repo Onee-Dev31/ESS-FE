@@ -126,6 +126,7 @@
                   </div>
                   <div class="approver-info">
                     <span class="approver-name">{{ row.secretaryEmpName }}</span>
+                    <span class="approver-nickname" *ngIf="row.secretaryEmpNickName">({{ row.secretaryEmpNickName }})</span>
                     <span class="approver-code">{{ row.secretaryEmpNo }}</span>
                     <span
                       class="approver-post"
@@ -155,6 +156,7 @@
                   </div>
                   <div class="approver-info">
                     <span class="approver-name">{{ row.approve1EmpName }}</span>
+                    <span class="approver-nickname" *ngIf="row.approve1EmpNickName">({{ row.approve1EmpNickName }})</span>
                     <span class="approver-code">{{ row.approve1EmpNo }}</span>
                     <span
                       class="approver-post"
@@ -184,6 +186,7 @@
                   </div>
                   <div class="approver-info">
                     <span class="approver-name">{{ row.approve2EmpName }}</span>
+                    <span class="approver-nickname" *ngIf="row.approve2EmpNickName">({{ row.approve2EmpNickName }})</span>
                     <span class="approver-code">{{ row.approve2EmpNo }}</span>
                     <span
                       class="approver-post"
@@ -214,6 +217,7 @@
                     </div>
                     <div class="approver-info">
                       <span class="approver-name">{{ emp.empName }}</span>
+                      <span class="approver-nickname" *ngIf="emp.empNickName">({{ emp.empNickName }})</span>
                       <span class="approver-code">{{ emp.empNo }}</span>
                       <span class="approver-post" *ngIf="emp.empPost" [attr.title]="emp.empPost">
                         {{ emp.empPost }}
@@ -240,6 +244,7 @@
                   </div>
                   <div class="approver-info">
                     <span class="approver-name">{{ row.itDirectorEmpName }}</span>
+                    <span class="approver-nickname" *ngIf="row.itDirectorEmpNickName">({{ row.itDirectorEmpNickName }})</span>
                     <span class="approver-code">{{ row.itDirectorEmpNo }}</span>
                     <span
                       class="approver-post"

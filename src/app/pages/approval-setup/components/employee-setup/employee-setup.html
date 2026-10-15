@@ -140,6 +140,9 @@
                   </div>
                   <div>
                     <strong>{{ employee.emp_name }}</strong>
+                    @if (employee.nickname) {
+                      <small class="approver-nickname">({{ employee.nickname }})</small>
+                    }
                     <small>{{ employee.emp_code }}</small>
                     @if (employee.Post) {
                       <small class="employee-post" [attr.title]="employee.Post">
@@ -164,6 +167,7 @@
                       </div>
                       <div class="approver-info">
                         <span class="approver-name">{{ approver1.empName }}</span>
+                        <span class="approver-nickname" *ngIf="approver1.empNickName">({{ approver1.empNickName }})</span>
                         <span class="approver-code">{{ approver1.empNo }}</span>
                         <span
                           class="employee-approver-post"
@@ -194,6 +198,7 @@
                       </div>
                       <div class="approver-info">
                         <span class="approver-name">{{ approver2.empName }}</span>
+                        <span class="approver-nickname" *ngIf="approver2.empNickName">({{ approver2.empNickName }})</span>
                         <span class="approver-code">{{ approver2.empNo }}</span>
                         <span
                           class="employee-approver-post"

@@ -122,6 +122,7 @@
                       </div>
                       <div class="approver-info">
                         <span class="approver-name">{{ row.ApproverName }}</span>
+                        <span class="approver-nickname" *ngIf="row.ApproverNickname">({{ row.ApproverNickname }})</span>
                         <span class="approver-code">{{ row.ApproverCode }}</span>
                         <span class="approver-post" *ngIf="row.POST" [attr.title]="row.POST">
                           {{ row.POST }}

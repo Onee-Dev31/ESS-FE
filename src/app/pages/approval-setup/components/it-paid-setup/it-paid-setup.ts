@@ -19,6 +19,7 @@ interface ItPaidApproverRow {
   COMPANY_NAME: string;
   ApproverCode: string | null;
   ApproverName: string | null;
+  ApproverNickname: string | null;
   Department: string | null;
   POST: string | null;
   CreatedDate: string;

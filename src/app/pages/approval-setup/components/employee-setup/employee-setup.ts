@@ -35,6 +35,7 @@ interface EmployeeApprovalOverride {
   level: number;
   head_codeempid: string;
   head_name: string;
+  emp_nickname?: string | null;
   head_department?: string | null;
   head_post?: string | null;
   reason?: string;
@@ -43,6 +44,7 @@ interface EmployeeApprovalOverride {
 interface DisplayApprover {
   empNo: string;
   empName: string;
+  empNickName: string;
   department: string;
   post: string;
   isOverride: boolean;
@@ -350,6 +352,7 @@ export class EmployeeSetup implements OnInit {
       return {
         empNo: override.head_codeempid,
         empName: override.head_name,
+        empNickName: override.emp_nickname ?? '',
         department: override.head_department ?? '',
         post: override.head_post ?? '',
         isOverride: true,
@@ -360,6 +363,8 @@ export class EmployeeSetup implements OnInit {
     const empNo = level === 1 ? departmentDefault?.approve1EmpNo : departmentDefault?.approve2EmpNo;
     const empName =
       level === 1 ? departmentDefault?.approve1EmpName : departmentDefault?.approve2EmpName;
+    const empNickName =
+      level === 1 ? departmentDefault?.approve1EmpNickName : departmentDefault?.approve2EmpNickName;
     const department =
       level === 1 ? departmentDefault?.approve1Dept : departmentDefault?.approve2Dept;
     const post = level === 1 ? departmentDefault?.approve1Post : departmentDefault?.approve2Post;
@@ -368,6 +373,7 @@ export class EmployeeSetup implements OnInit {
       ? {
           empNo,
           empName: empName ?? '',
+          empNickName: empNickName ?? '',
           department: department ?? '',
           post: post ?? '',
           isOverride: false,
@@ -380,6 +386,7 @@ export class EmployeeSetup implements OnInit {
     empNames: string | null,
     empPosts: string | null,
     empDept: string | null,
+    empNickNames: string | null,
   ): HrApproverEmp[] {
     const nos = empNos
       ? empNos
@@ -395,10 +402,12 @@ export class EmployeeSetup implements OnInit {
       : [];
     const posts = empPosts ? empPosts.split(',').map((s) => s.trim()) : [];
     const depts = empDept ? empDept.split(',').map((s) => s.trim()) : [];
+    const nickNames = empNickNames ? empNickNames.split(',').map((s) => s.trim()) : [];
 
     return nos.map((empNo, i) => ({
       empNo,
       empName: names[i] ?? '',
+      empNickName: nickNames[i] ?? '',
       empPost: posts[i] ?? '',
       empDept: depts[i] ?? '',
     }));
@@ -406,27 +415,37 @@ export class EmployeeSetup implements OnInit {
 
   private mapSetupRow(emp: any): ApprovalSetupRow {
     return {
+      rowNo: emp.RowNo ?? null,
+      workflowId: emp.WorkflowID ?? null,
       costCent: emp.COSTCENT,
       costCenterName: emp.DepartmentName,
       companyCode: emp.COMPANY_CODE,
       companyName: emp.COMPANY_NAME,
       secretaryEmpNo: emp.SecretaryEmpNo,
       secretaryEmpName: emp.SecretaryName,
+      secretaryEmpNickName: emp.SecretaryNickname ?? emp.SecretaryNickName,
       secretaryPost: emp.SecretaryPost,
       secretaryDept: emp.SecretaryDepartment,
       approve1EmpNo: emp.Approver1EmpNo || emp.Approve1EmpNo,
       approve1EmpName: emp.Approver1Name || emp.Approve1Name,
+      approve1EmpNickName: emp.Approver1Nickname,
       approve1Post: emp.Approver1Post,
       approve1Dept: emp.Approver1Department,
+      approve1Type: emp.Approver1Type,
       approve2EmpNo: emp.HeadOfApprover1EmpNo || emp.Approve2EmpNo,
       approve2EmpName: emp.HeadOfApprover1Name || emp.Approve2Name,
+      approve2EmpNickName: emp.HeadOfApprover1Nickname,
       approve2Post: emp.HeadOfApprover1Post,
       approve2Dept: emp.HeadOfApprover1Department,
-      hrApprovers: this.mapHrApprovers(emp.HREmpNo, emp.HRUsers, emp.HRPosts, emp.HRDepartments),
+      hrApprovers: this.mapHrApprovers(emp.HREmpNo, emp.HRUsers, emp.HRPosts, emp.HRDepartments, emp.HRNicknames),
+      hrType: emp.HRType,
+      hrNickNames: emp.HRNicknames,
       itDirectorEmpNo: emp.ITDirectorEmpNo,
       itDirectorEmpName: emp.ITDirectorName,
+      itDirectorEmpNickName: emp.ITDirectorNickname,
       itDirectorPost: emp.ITDirectorPost,
       itDirectorDept: emp.ITDirectorDepartment,
+      configMode: emp.ConfigMode,
       isSkipSecretary: emp.ConfigMode === 'AutoSkip',
       modifiedDate: emp.ModifiedDate,
       modifiedBy: emp.ModifiedBy,
