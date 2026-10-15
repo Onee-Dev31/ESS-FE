@@ -332,33 +332,19 @@ export class TicketWorkspaceComponent implements OnInit, OnChanges {
   IS_CHAT_OPEN = signal(false);
   private cdr = inject(ChangeDetectorRef);
 
-  private readonly CHAT_READ_KEY = 'ess_it_chat_read';
-
-  private loadChatReadCounts(): Map<number, number> {
-    try {
-      const raw = localStorage.getItem(this.CHAT_READ_KEY);
-      const obj = raw ? JSON.parse(raw) : {};
-      return new Map(Object.entries(obj).map(([k, v]) => [Number(k), v as number]));
-    } catch {
-      return new Map();
-    }
-  }
-
-  private saveChatReadCounts(m: Map<number, number>) {
-    localStorage.setItem(this.CHAT_READ_KEY, JSON.stringify(Object.fromEntries(m)));
-  }
-
-  private chatReadCounts = signal<Map<number, number>>(new Map());
-
   replyReaders = signal<TicketChatReader[]>([]);
+  private replyReadersTicketId = signal<number | null>(null);
   replyingTo = signal<any>(null);
 
   unreadChatCount = computed(() => {
     const ticket = this.selectedTicket();
-    if (!ticket) return 0;
-    const total = (ticket.itNotes ?? []).length;
-    const read = this.chatReadCounts().get(ticket.ticketId) ?? 0;
-    return Math.max(0, total - read);
+    if (!ticket || this.replyReadersTicketId() !== Number(ticket.ticketId)) return 0;
+    const myCode = this.authService.userData()?.CODEMPID;
+    const lastRead =
+      this.replyReaders().find((r) => r.userCodeempid === myCode)?.lastReadReplyId ?? 0;
+    return (ticket.itNotes ?? []).filter(
+      (n: any) => n.id > lastRead && n.createBy?.empCode !== myCode,
+    ).length;
   });
 
   @ViewChild(TicketChatComponent) ticketChat?: TicketChatComponent;
@@ -479,7 +465,6 @@ export class TicketWorkspaceComponent implements OnInit, OnChanges {
   }
 
   ngOnInit() {
-    this.chatReadCounts.set(this.loadChatReadCounts());
     this.checkScreen();
     this.destroyRef.onDestroy(() => {
       if (this.keywordSearchTimer) clearTimeout(this.keywordSearchTimer);
@@ -831,6 +816,7 @@ export class TicketWorkspaceComponent implements OnInit, OnChanges {
             if (previousTicketId !== objectData.ticketId) {
               this.clearChatDraft();
               this.replyReaders.set([]);
+              this.replyReadersTicketId.set(null);
             }
             if (options?.openChat) {
               this.IS_CHAT_OPEN.set(true);
@@ -900,13 +886,6 @@ export class TicketWorkspaceComponent implements OnInit, OnChanges {
     this.newNoteTicketIds.update((s) => {
       s.delete(ticket.ticketId);
       return new Set(s);
-    });
-    const total = (ticket.itNotes ?? []).length;
-    this.chatReadCounts.update((m) => {
-      const next = new Map(m);
-      next.set(ticket.ticketId, total);
-      this.saveChatReadCounts(next);
-      return next;
     });
   }
 
@@ -1525,7 +1504,9 @@ export class TicketWorkspaceComponent implements OnInit, OnChanges {
   loadReplyReadStatus(ticketId: string | number) {
     this.itServiceService.getReplyReadStatus(ticketId).subscribe({
       next: (res) => {
+        if (Number(this.selectedTicket()?.ticketId) !== Number(ticketId)) return;
         if (res?.readers) this.replyReaders.set(res.readers);
+        this.replyReadersTicketId.set(Number(ticketId));
       },
       error: () => {},
     });
@@ -1535,6 +1516,15 @@ export class TicketWorkspaceComponent implements OnInit, OnChanges {
     const codeempid = this.authService.userData()?.CODEMPID;
     const latestReply = notes.at(-1);
     if (!codeempid || !latestReply) return;
+    this.replyReaders.update((readers) => {
+      const mine = readers.find((r) => r.userCodeempid === codeempid);
+      if (mine && mine.lastReadReplyId >= latestReply.id) return readers;
+      return mine
+        ? readers.map((r) =>
+            r === mine ? { ...r, lastReadReplyId: latestReply.id } : r,
+          )
+        : [...readers, { userCodeempid: codeempid, nickName: '', lastReadReplyId: latestReply.id }];
+    });
     this.itServiceService.markReplyRead(ticketId, codeempid, latestReply.id).subscribe({
       complete: () => this.loadReplyReadStatus(ticketId),
       error: () => {},

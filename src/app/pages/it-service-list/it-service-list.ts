@@ -103,33 +103,19 @@ export class ItService implements OnInit {
   isTicketDetailOpen = signal(false);
   IS_CHAT_OPEN = signal(false);
 
-  private readonly CHAT_READ_KEY = 'ess_user_chat_read';
-
-  private loadChatReadCounts(): Map<number, number> {
-    try {
-      const raw = localStorage.getItem(this.CHAT_READ_KEY);
-      const obj = raw ? JSON.parse(raw) : {};
-      return new Map(Object.entries(obj).map(([k, v]) => [Number(k), v as number]));
-    } catch {
-      return new Map();
-    }
-  }
-
-  private saveChatReadCounts(m: Map<number, number>) {
-    localStorage.setItem(this.CHAT_READ_KEY, JSON.stringify(Object.fromEntries(m)));
-  }
-
-  private chatReadCounts = signal<Map<number, number>>(new Map());
-
   replyReaders = signal<TicketChatReader[]>([]);
+  private replyReadersTicketId = signal<number | null>(null);
   replyingTo = signal<any>(null);
 
   unreadChatCount = computed(() => {
     const ticket = this.selectedTicket();
-    if (!ticket) return 0;
-    const total = (ticket.itNotes ?? []).length;
-    const read = this.chatReadCounts().get(ticket.ticketId) ?? 0;
-    return Math.max(0, total - read);
+    if (!ticket || this.replyReadersTicketId() !== Number(ticket.ticketId)) return 0;
+    const myCode = this.authService.userData()?.CODEMPID;
+    const lastRead =
+      this.replyReaders().find((r) => r.userCodeempid === myCode)?.lastReadReplyId ?? 0;
+    return (ticket.itNotes ?? []).filter(
+      (n: any) => n.id > lastRead && n.createBy?.empCode !== myCode,
+    ).length;
   });
   canAccessChat = computed(() => {
     const ticket = this.selectedTicket();
@@ -245,7 +231,6 @@ export class ItService implements OnInit {
   }
 
   ngOnInit() {
-    this.chatReadCounts.set(this.loadChatReadCounts());
     this.getMyTicket();
     this.checkScreen();
     this.checkMobile();
@@ -390,7 +375,6 @@ export class ItService implements OnInit {
       this.selectedTicket.update((t) => (t ? { ...t, itNotes } : t));
       this.scrollToBottom();
       if (this.IS_CHAT_OPEN()) {
-        this.markChatAsRead();
         this.markLatestReplyRead(ticket.ticketId, itNotes);
       }
     } catch {
@@ -556,13 +540,13 @@ export class ItService implements OnInit {
         if (previousTicketId !== objectData.ticketId) {
           this.clearChatDraft();
           this.replyReaders.set([]);
+          this.replyReadersTicketId.set(null);
         }
         if (options?.openChat && this.canAccessChat()) {
           this.IS_CHAT_OPEN.set(true);
           setTimeout(() => this.ticketChat?.focusComposer(), 100);
         }
         if (this.IS_CHAT_OPEN()) {
-          this.markChatAsRead();
           this.markLatestReplyRead(objectData.ticketId, objectData.itNotes ?? []);
         }
         this.scrollToBottom();
@@ -586,24 +570,11 @@ export class ItService implements OnInit {
     this.closeChat();
   }
 
-  private markChatAsRead() {
-    const ticket = this.selectedTicket();
-    if (!ticket) return;
-    const total = (ticket.itNotes ?? []).length;
-    this.chatReadCounts.update((m) => {
-      const next = new Map(m);
-      next.set(ticket.ticketId, total);
-      this.saveChatReadCounts(next);
-      return next;
-    });
-  }
-
   toggleChat() {
     this.IS_CHAT_OPEN.update((isOpen) => {
       const next = !isOpen;
       if (next) {
         this.scrollToBottom();
-        this.markChatAsRead();
         const ticket = this.selectedTicket();
         if (ticket) {
           this.markLatestReplyRead(ticket.ticketId, ticket.itNotes ?? []);
@@ -1085,7 +1056,9 @@ export class ItService implements OnInit {
   loadReplyReadStatus(ticketId: string | number) {
     this.itServiceService.getReplyReadStatus(ticketId).subscribe({
       next: (res) => {
+        if (Number(this.selectedTicket()?.ticketId) !== Number(ticketId)) return;
         if (res?.readers) this.replyReaders.set(res.readers);
+        this.replyReadersTicketId.set(Number(ticketId));
       },
       error: () => {},
     });
@@ -1095,6 +1068,15 @@ export class ItService implements OnInit {
     const codeempid = this.authService.userData()?.CODEMPID;
     const latestReply = notes.at(-1);
     if (!codeempid || !latestReply) return;
+    this.replyReaders.update((readers) => {
+      const mine = readers.find((r) => r.userCodeempid === codeempid);
+      if (mine && mine.lastReadReplyId >= latestReply.id) return readers;
+      return mine
+        ? readers.map((r) =>
+            r === mine ? { ...r, lastReadReplyId: latestReply.id } : r,
+          )
+        : [...readers, { userCodeempid: codeempid, nickName: '', lastReadReplyId: latestReply.id }];
+    });
     this.itServiceService.markReplyRead(ticketId, codeempid, latestReply.id).subscribe({
       complete: () => this.loadReplyReadStatus(ticketId),
       error: () => {},
