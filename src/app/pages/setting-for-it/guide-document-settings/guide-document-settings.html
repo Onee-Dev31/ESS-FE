@@ -1,91 +1,193 @@
-  <section class="setting-card search-card">
-    <h2>ค้นหา</h2>
-    <div class="search-row">
-      <div class="search-input">
-        <i class="fa-solid fa-magnifying-glass"></i
-        ><input
-          class="styled-input"
-          type="search"
-          [(ngModel)]="search"
-          placeholder="ค้นหาชื่อเอกสาร..."
-        />
-      </div>
-      <button type="button" class="primary" (click)="search = ''" [disabled]="!search" aria-label="ล้างคำค้นหา">
-        <i class="fa-solid fa-xmark"></i> Clear
+<section class="setting-card search-card">
+  <h2>ค้นหา</h2>
+  <div class="search-row">
+    <div class="search-input">
+      <i class="fa-solid fa-magnifying-glass"></i
+      ><input
+        class="styled-input"
+        type="search"
+        [(ngModel)]="search"
+        placeholder="ค้นหาชื่อเอกสาร..."
+      />
+    </div>
+    <button
+      type="button"
+      class="primary"
+      (click)="search = ''"
+      [disabled]="!search"
+      aria-label="ล้างคำค้นหา"
+    >
+      <i class="fa-solid fa-xmark"></i> Clear
+    </button>
+    @if (!readOnly) {
+      <button class="outline" (click)="add()" [disabled]="editingId !== null">
+        <i class="fa-solid fa-plus"></i> เพิ่มเอกสาร
       </button>
-      @if (!readOnly) {
-        <button class="outline" (click)="add()" [disabled]="editingId !== null">
-          <i class="fa-solid fa-plus"></i> เพิ่มเอกสาร
-        </button>
+    }
+  </div>
+</section>
+
+@if (editingId === 0) {
+  <section class="setting-card form-card">
+    <h2>{{ editingId === 0 ? 'เพิ่มเอกสาร' : 'แก้ไขเอกสาร' }}</h2>
+    <div class="form-grid">
+      <label>ชื่อเอกสาร<input class="styled-input" [(ngModel)]="name" /></label
+      ><label>URL สำหรับเปิดดู<input class="styled-input" [(ngModel)]="fileUrl" /></label
+      ><label>Path ของไฟล์<input class="styled-input" [(ngModel)]="filePath" /></label>
+      <label class="toggle-field"
+        ><button
+          type="button"
+          class="toggle"
+          [class.active]="isActive"
+          [attr.aria-pressed]="isActive"
+          (click)="isActive = !isActive"
+        >
+          <span></span></button
+        ><span>เปิดใช้งาน</span></label
+      >
+    </div>
+    <div class="form-actions">
+      <button class="outline" (click)="cancel()">ยกเลิก</button
+      ><button class="primary" [disabled]="saving()" (click)="save()">
+        {{ saving() ? 'กำลังบันทึก...' : 'บันทึก' }}
+      </button>
+    </div>
+  </section>
+}
+
+<section class="setting-card detail-card">
+  <div class="section-title">
+    <h2>รายละเอียด</h2>
+    <span>{{ filtered.length }} รายการ</span>
+  </div>
+  @if (loading()) {
+    <div class="empty">กำลังโหลด...</div>
+  } @else {
+    <div class="document-list">
+      @for (doc of filtered; track doc.id) {
+        <article>
+          <div class="doc-info">
+            <strong>{{ doc.name }}</strong>
+            @if (readOnly && (doc.createdDate || doc.updatedDate)) {
+              <span class="audit-meta">
+                <span class="audit-item">
+                  <i class="fa-regular fa-clock" aria-hidden="true"></i>
+                  {{ doc.updatedDate ? 'แก้ไขล่าสุด' : 'วันที่สร้าง' }}
+                  <b>{{ doc.updatedDate || doc.createdDate | date: 'dd/MM/yyyy HH:mm' }}</b>
+                </span>
+              </span>
+            } @else if (!readOnly && (doc.createdBy || doc.updatedBy)) {
+              <span class="audit-meta">
+                @if (doc.createdBy) {
+                  <span class="audit-item"
+                    ><i class="fa-regular fa-user" aria-hidden="true"></i> สร้างโดย
+                    <b>{{ doc.createdBy }}</b></span
+                  >
+                }
+                @if (doc.updatedBy) {
+                  <span class="audit-item"
+                    ><i class="fa-regular fa-pen-to-square" aria-hidden="true"></i> แก้ไขโดย
+                    <b>{{ doc.updatedBy }}</b></span
+                  >
+                }
+              </span>
+            }
+          </div>
+          <div class="doc-actions">
+            <span class="view-count" title="จำนวนการเข้าชม" aria-label="จำนวนการเข้าชม">
+              <i class="fa-regular fa-eye" aria-hidden="true"></i>{{ doc.countView }}
+            </span>
+            <div class="reaction-actions" aria-label="ความคิดเห็นต่อเอกสาร">
+              <button
+                type="button"
+                class="reaction-button like"
+                [class.active]="doc.reaction === 'LIKE'"
+                [disabled]="!readOnly || reactingIds().has(doc.id)"
+                [attr.aria-pressed]="doc.reaction === 'LIKE'"
+                (click)="react(doc, 'LIKE')"
+                title="ถูกใจ"
+              >
+                <i
+                  [class]="
+                    doc.reaction === 'LIKE' ? 'fa-solid fa-thumbs-up' : 'fa-regular fa-thumbs-up'
+                  "
+                ></i
+                ><span>{{ doc.likeCount }}</span>
+              </button>
+              <button
+                type="button"
+                class="reaction-button unlike"
+                [class.active]="doc.reaction === 'UNLIKE'"
+                [disabled]="!readOnly || reactingIds().has(doc.id)"
+                [attr.aria-pressed]="doc.reaction === 'UNLIKE'"
+                (click)="react(doc, 'UNLIKE')"
+                title="ไม่ถูกใจ"
+              >
+                <i
+                  [class]="
+                    doc.reaction === 'UNLIKE'
+                      ? 'fa-solid fa-thumbs-down'
+                      : 'fa-regular fa-thumbs-down'
+                  "
+                ></i
+                ><span>{{ doc.unlikeCount }}</span>
+              </button>
+            </div>
+            @if (!readOnly) {
+              <span class="status" [class.off]="!doc.isActive">{{
+                doc.isActive ? 'ใช้งาน' : 'ปิดใช้งาน'
+              }}</span>
+            }
+            <a
+              class="outline"
+              [href]="doc.fileUrl"
+              (click)="viewGuideDocument(doc.id)"
+              target="_blank"
+              rel="noopener"
+              aria-label="เปิดเอกสาร"
+              title="เปิด"
+              ><i class="fa-solid fa-arrow-up-right-from-square"></i
+              ><span class="action-label">เปิด</span></a
+            >
+            @if (!readOnly) {
+              <button class="outline" (click)="edit(doc)" aria-label="แก้ไขเอกสาร" title="แก้ไข">
+                <i class="fa-regular fa-pen-to-square"></i><span class="action-label">แก้ไข</span>
+              </button>
+              <!-- <button class="outline danger" (click)="remove(doc)" aria-label="ลบเอกสาร" title="ลบ">
+                <i class="fa-regular fa-trash-can"></i><span class="action-label">ลบ</span>
+              </button> -->
+            }
+          </div>
+          @if (editingId === doc.id) {
+            <div class="inline-edit">
+              <div class="form-grid">
+                <label>ชื่อเอกสาร<input class="styled-input" [(ngModel)]="name" /></label>
+                <label>URL สำหรับเปิดดู<input class="styled-input" [(ngModel)]="fileUrl" /></label>
+                <label>Path ของไฟล์<input class="styled-input" [(ngModel)]="filePath" /></label>
+                <label class="toggle-field"
+                  ><button
+                    type="button"
+                    class="toggle"
+                    [class.active]="isActive"
+                    [attr.aria-pressed]="isActive"
+                    (click)="isActive = !isActive"
+                  >
+                    <span></span></button
+                  ><span>เปิดใช้งาน</span></label
+                >
+              </div>
+              <div class="form-actions">
+                <button class="outline" (click)="cancel()">ยกเลิก</button
+                ><button class="primary" [disabled]="saving()" (click)="save()">
+                  {{ saving() ? 'กำลังบันทึก...' : 'บันทึก' }}
+                </button>
+              </div>
+            </div>
+          }
+        </article>
+      } @empty {
+        <div class="empty">ไม่พบเอกสาร</div>
       }
     </div>
-  </section>
-
-  @if (editingId === 0) {
-    <section class="setting-card form-card">
-      <h2>{{ editingId === 0 ? 'เพิ่มเอกสาร' : 'แก้ไขเอกสาร' }}</h2>
-      <div class="form-grid">
-        <label>ชื่อเอกสาร<input class="styled-input" [(ngModel)]="name" /></label
-        ><label>URL สำหรับเปิดดู<input class="styled-input" [(ngModel)]="fileUrl" /></label
-        ><label>Path ของไฟล์<input class="styled-input" [(ngModel)]="filePath" /></label
-        ><label class="toggle-field"><button type="button" class="toggle" [class.active]="isActive" [attr.aria-pressed]="isActive" (click)="isActive = !isActive"><span></span></button><span>เปิดใช้งาน</span></label>
-      </div>
-      <div class="form-actions">
-        <button class="outline" (click)="cancel()">ยกเลิก</button
-        ><button class="primary" [disabled]="saving()" (click)="save()">
-          {{ saving() ? 'กำลังบันทึก...' : 'บันทึก' }}
-        </button>
-      </div>
-    </section>
   }
-
-  <section class="setting-card detail-card">
-    <div class="section-title">
-      <h2>รายละเอียด</h2>
-      <span>{{ filtered.length }} รายการ</span>
-    </div>
-    @if (loading()) {
-      <div class="empty">กำลังโหลด...</div>
-    } @else {
-      <div class="document-list">
-        @for (doc of filtered; track doc.id) {
-          <article>
-            <div class="doc-info">
-              <strong>{{ doc.name }}</strong>
-              @if (doc.createdBy || doc.updatedBy) {
-                <span class="audit-meta">
-                  @if (doc.createdBy) {
-                    <span class="audit-item"><i class="fa-regular fa-user" aria-hidden="true"></i> สร้างโดย <b>{{ doc.createdBy }}</b></span>
-                  }
-                  @if (doc.updatedBy) {
-                    <span class="audit-item"><i class="fa-regular fa-pen-to-square" aria-hidden="true"></i> แก้ไขโดย <b>{{ doc.updatedBy }}</b></span>
-                  }
-                </span>
-              }
-            </div>
-            <div class="doc-actions">
-              <span class="status" [class.off]="!doc.isActive">{{ doc.isActive ? 'ใช้งาน' : 'ปิดใช้งาน' }}</span>
-              <a class="outline" [href]="doc.fileUrl" target="_blank" rel="noopener" aria-label="เปิดเอกสาร" title="เปิด"><i class="fa-solid fa-arrow-up-right-from-square"></i><span class="action-label">เปิด</span></a>
-              @if (!readOnly) {
-                <button class="outline" (click)="edit(doc)" aria-label="แก้ไขเอกสาร" title="แก้ไข"><i class="fa-regular fa-pen-to-square"></i><span class="action-label">แก้ไข</span></button>
-                <button class="outline danger" (click)="remove(doc)" aria-label="ลบเอกสาร" title="ลบ"><i class="fa-regular fa-trash-can"></i><span class="action-label">ลบ</span></button>
-              }
-            </div>
-            @if (editingId === doc.id) {
-              <div class="inline-edit">
-                <div class="form-grid">
-                  <label>ชื่อเอกสาร<input class="styled-input" [(ngModel)]="name" /></label>
-                  <label>URL สำหรับเปิดดู<input class="styled-input" [(ngModel)]="fileUrl" /></label>
-                  <label>Path ของไฟล์<input class="styled-input" [(ngModel)]="filePath" /></label>
-                  <label class="toggle-field"><button type="button" class="toggle" [class.active]="isActive" [attr.aria-pressed]="isActive" (click)="isActive = !isActive"><span></span></button><span>เปิดใช้งาน</span></label>
-                </div>
-                <div class="form-actions"><button class="outline" (click)="cancel()">ยกเลิก</button><button class="primary" [disabled]="saving()" (click)="save()">{{ saving() ? 'กำลังบันทึก...' : 'บันทึก' }}</button></div>
-              </div>
-            }
-          </article>
-        } @empty {
-          <div class="empty">ไม่พบเอกสาร</div>
-        }
-      </div>
-    }
-  </section>
+</section>

@@ -648,8 +648,10 @@ export class ItServiceService {
     );
   }
 
-  getGuideDocuments(): Observable<any> {
-    return this._http.get<any>(`${this.baseUrl}/template-reply-guide-doc/get-guide-document`);
+  getGuideDocuments(empCode?: string): Observable<any> {
+    return this._http.get<any>(`${this.baseUrl}/template-reply-guide-doc/get-guide-document`, {
+      params: empCode ? { codeEmpId: empCode } : {},
+    });
   }
 
   manageGuideDocument(payload: ManageGuideDocumentPayload): Observable<any> {
@@ -661,6 +663,19 @@ export class ItServiceService {
 
   createGuideDocument(payload: Omit<ManageGuideDocumentPayload, 'id'>): Observable<any> {
     return this.manageGuideDocument({ ...payload, id: 0 });
+  }
+
+  reactGuideDocument(payload: ReactGuideDocumentPayload): Observable<any> {
+    return this._http.post<any>(
+      `${this.baseUrl}/template-reply-guide-doc/react-guide-document`,
+      payload,
+    );
+  }
+
+  viewGuideDocument(id: number): Observable<any> {
+    return this._http.post<any>(`${this.baseUrl}/template-reply-guide-doc/view-guide-document`, {
+      id: String(id),
+    });
   }
 }
 
@@ -692,4 +707,10 @@ export interface ManageGuideDocumentPayload {
   filePath: string;
   isActive: boolean;
   executeBy: string;
+}
+
+export interface ReactGuideDocumentPayload {
+  guideDocId: number;
+  codeEmpId: string;
+  reaction: 'LIKE' | 'UNLIKE' | null;
 }
