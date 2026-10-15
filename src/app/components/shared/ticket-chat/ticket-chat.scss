@@ -89,6 +89,21 @@
 .floating-chat__close:hover {
   background: rgba(255, 255, 255, 0.24);
 }
+.floating-chat__nudge i {
+  display: inline-block;
+  transform-origin: 50% 0;
+  will-change: transform;
+}
+.floating-chat__nudge i.is-ringing {
+  animation: floating-chat-bell-ring 0.65s ease-in-out;
+}
+.floating-chat__nudge:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+.floating-chat__nudge:disabled:hover {
+  background: rgba(255, 255, 255, 0.14);
+}
 .floating-chat__close {
   width: 30px;
   height: 30px;
@@ -666,6 +681,26 @@
   }
   to {
     box-shadow: 0 3px 12px rgba(15, 23, 42, 0.06);
+  }
+}
+@keyframes floating-chat-bell-ring {
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+  15%,
+  45% {
+    transform: rotate(18deg);
+  }
+  30%,
+  60% {
+    transform: rotate(-18deg);
+  }
+  75% {
+    transform: rotate(8deg);
+  }
+  90% {
+    transform: rotate(-8deg);
   }
 }
 @media (max-width: 860px) {

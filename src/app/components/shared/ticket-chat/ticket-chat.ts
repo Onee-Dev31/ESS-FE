@@ -17,6 +17,7 @@ import { AuthService } from '../../../services/auth.service';
 import { ItServiceService } from '../../../services/it-service.service';
 import { environment } from '../../../../environments/environment';
 import { SafeEmailHtmlPipe } from '../../../pipes/safe-email-html.pipe';
+import { NzMessageService } from 'ng-zorro-antd/message';
 
 export interface TicketChatReader {
   userCodeempid: string;
@@ -266,10 +267,12 @@ export class TicketChatComponent implements OnChanges {
   @ViewChild('cardBody') private cardBody?: ElementRef<HTMLElement>;
   @ViewChild('chatTextarea') private chatTextarea?: ElementRef<HTMLTextAreaElement>;
   @ViewChild('root') private root?: ElementRef<HTMLElement>;
+  @ViewChild('nudgeIcon') private nudgeIcon?: ElementRef<HTMLElement>;
 
   private readonly swalService = inject(SwalService);
   private readonly authService = inject(AuthService);
   private readonly itServiceService = inject(ItServiceService);
+  private readonly messageService = inject(NzMessageService);
   private mentionQuery = '';
   private mentionAtIndex = -1;
   private mentionDebounce: ReturnType<typeof setTimeout> | null = null;
@@ -289,6 +292,7 @@ export class TicketChatComponent implements OnChanges {
   mentionActiveIndex = 0;
   replyingTo: any = null;
   showScrollToBottom = false;
+  private isNudgingRequester = false;
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['isOpen'] && !this.isOpen) {
@@ -317,6 +321,45 @@ export class TicketChatComponent implements OnChanges {
 
   get showExport(): boolean {
     return this.mode === 'it-dashboard';
+  }
+
+  get isRequesterDepartmentUnspecified(): boolean {
+    return this.ticket?.requesterDept?.trim() === 'ไม่ระบุแผนก';
+  }
+
+  nudgeRequester(): void {
+    if (this.isRequesterDepartmentUnspecified || this.isNudgingRequester) return;
+
+    const email = this.ticket?.requesterEmail?.trim();
+    const ticketNumber = this.ticket?.ticketNumber?.trim();
+    if (!email || !ticketNumber) {
+      this.messageService.warning('ไม่สามารถสะกิดผู้แจ้งได้: ไม่พบอีเมลหรือเลขที่ Ticket');
+      return;
+    }
+
+    const icon = this.nudgeIcon?.nativeElement;
+    if (icon) {
+      icon.classList.remove('is-ringing');
+      void icon.offsetWidth;
+      icon.classList.add('is-ringing');
+    }
+
+    this.isNudgingRequester = true;
+    this.itServiceService.nudgeChatMessageEmailUser(email, ticketNumber).subscribe({
+      next: (response) => {
+        this.messageService.success(
+          response?.message || 'ส่งการแจ้งเตือนให้ผู้แจ้งเรียบร้อยแล้ว',
+        );
+        this.isNudgingRequester = false;
+      },
+      error: (error) => {
+        console.error('Nudge error:', error);
+        this.messageService.error(
+          error?.error?.message || 'ส่งการแจ้งเตือนไม่สำเร็จ กรุณาลองใหม่อีกครั้ง',
+        );
+        this.isNudgingRequester = false;
+      },
+    });
   }
 
   get showServiceHours(): boolean {

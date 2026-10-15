@@ -32,6 +32,25 @@
                 ><span class="floating-chat__export-label">Export</span>
               </button>
             }
+            @if (showExport) {
+              <button
+                class="floating-chat__summary floating-chat__nudge"
+                type="button"
+                [title]="
+                  isRequesterDepartmentUnspecified
+                    ? 'ไม่สามารถสะกิดผู้แจ้งที่ไม่ระบุแผนกได้'
+                    : 'สะกิดผู้แจ้งให้เข้ามาอ่านแชท'
+                "
+                [disabled]="isRequesterDepartmentUnspecified"
+                (click)="nudgeRequester()"
+              >
+                <i
+                  #nudgeIcon
+                  class="fas"
+                  [ngClass]="isRequesterDepartmentUnspecified ? 'fa-bell-slash' : 'fa-bell'"
+                ></i>
+              </button>
+            }
           </div>
           <button class="floating-chat__close" type="button" title="ปิดแชท" (click)="close.emit()">
             <i class="fas fa-times"></i>

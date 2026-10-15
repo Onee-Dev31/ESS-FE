@@ -677,6 +677,13 @@ export class ItServiceService {
       id: String(id),
     });
   }
+
+  nudgeChatMessageEmailUser(email: string, ticketNumber: string): Observable<any> {
+    return this._http.post<any>(`${this.baseUrl}/notification/chat-message-email-notify`, {
+      email,
+      ticketNumber,
+    });
+  }
 }
 
 export interface EmailReplyTemplateApi {
