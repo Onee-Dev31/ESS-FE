@@ -122,6 +122,33 @@ input.invalid {
   width: 100%;
 }
 
+.groups-field {
+  grid-column: 1 / -1;
+  min-width: 0;
+}
+
+:host ::ng-deep .groups-field .ant-transfer-list {
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+:host ::ng-deep .groups-field .ant-transfer-list-body-customize-wrapper {
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.source-groups-list {
+  height: 100%;
+  overflow-y: auto;
+
+  label {
+    display: flex;
+    margin: 0;
+    padding: 6px 12px;
+  }
+}
+
 :host ::ng-deep .field-nz-select .ant-select-selector {
   height: 38px !important;
   border: 1px solid var(--border-table-head) !important;
@@ -131,10 +158,13 @@ input.invalid {
   .ant-select-selection-search-input {
     height: 36px !important;
   }
-  .ant-select-selection-placeholder,
-  .ant-select-selection-item {
+  .ant-select-selection-placeholder {
     line-height: 36px !important;
   }
+}
+
+:host ::ng-deep .field-nz-select.ant-select-single .ant-select-selection-item {
+  line-height: 36px !important;
 }
 
 :host
@@ -182,7 +212,7 @@ input.invalid {
   flex-direction: column;
   gap: 6px;
 
-  label {
+  > label {
     font-size: 0.8rem;
     font-weight: 600;
     color: var(--text-sub);

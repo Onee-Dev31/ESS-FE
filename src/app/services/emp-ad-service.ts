@@ -161,4 +161,15 @@ export class EmpAdService {
       params: new HttpParams().set('companycode', comcode),
     });
   }
+
+  getAdUserGroups(samAccountName: string): Observable<any> {
+    return this._http.get(`${this.baseUrl}/ActiveDirectory/GetUserGroups`, {
+      params: new HttpParams().set('samAccountName', samAccountName),
+      context: new HttpContext().set(SKIP_ERROR_TOAST, true),
+    });
+  }
+
+  getAllGroups(): Observable<any> {
+    return this._http.get(`${this.baseUrl}/ActiveDirectory/GetUserGroupsAll`);
+  }
 }
