@@ -10,6 +10,7 @@ import {
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { NzSelectModule } from 'ng-zorro-antd/select';
+import { NzTransferModule, TransferItem } from 'ng-zorro-antd/transfer';
 import { Subscription } from 'rxjs';
 import { EmpAdService } from '../../../../services/emp-ad-service';
 import { MasterDataService } from '../../../../services/master-data.service';
@@ -18,7 +19,7 @@ import { SettingService } from '../../../../services/setting.service';
 
 @Component({
   selector: 'app-emp-ad-form',
-  imports: [CommonModule, FormsModule, NzSelectModule],
+  imports: [CommonModule, FormsModule, NzSelectModule, NzTransferModule],
   templateUrl: './emp-ad-form.html',
   styleUrl: './emp-ad-form.scss',
 })
@@ -117,21 +118,19 @@ export class EmpAdForm implements OnChanges, OnDestroy {
   filteredDepartmentList: any[] = [];
   selectedCompany: any = null;
   selectedEmployee: string | null = null;
-  employeeList: { value: string; label: string }[] = [];
-  selectedMockField: string | null = null;
-  mockFieldList = [
-    'Mock 1',
-    'Mock 2',
-    'Mock 3',
-    'Mock 4',
-    'Mock 5',
-    'Mock 6',
-    'Mock 7',
-    'Mock 8',
-    'Mock 9',
-    'Mock 10',
-  ];
+  employeeList: any[] = [];
+  groupList: TransferItem[] = [];
+  allGroups: any[] = [];
+
+  get selectedGroups(): string[] {
+    return this.groupList
+      .filter((group) => group.direction === 'right')
+      .map((group) => group['key']);
+  }
+
   private employeeRequest?: Subscription;
+  private groupRequest?: Subscription;
+  private allGroupsRequest?: Subscription;
 
   constructor(
     private empAdService: EmpAdService,
@@ -177,6 +176,45 @@ export class EmpAdForm implements OnChanges, OnDestroy {
     if (department) this.loadEmployees(department.COSTCENT);
   }
 
+  onEmployeeChange(employeeId: string | null) {
+    this.selectedEmployee = employeeId;
+    this.groupRequest?.unsubscribe();
+    this.setGroupList([]);
+    const adUser = this.employeeList.find(
+      (employee) => employee.value === this.selectedEmployee,
+    )?.adUser;
+    if (!adUser) return;
+
+    this.groupRequest = this.empAdService.getAdUserGroups(adUser).subscribe({
+      next: (res) => {
+        const user = Array.isArray(res) ? res[0] : res;
+        this.setGroupList(user?.groups ?? []);
+        this.cdr.detectChanges();
+      },
+      error: () => {
+        this.swalService.error('ไม่สามารถโหลด Groups ของพนักงานได้');
+      },
+    });
+  }
+
+  private setGroupList(selectedGroups: { name: string; distinguishedName: string }[]) {
+    const selected = new Set(selectedGroups.map((group) => group.distinguishedName));
+    const groups = [...this.allGroups, ...selectedGroups].filter(
+      (group) =>
+        typeof group?.name === 'string' &&
+        group.name.trim().length > 0 &&
+        typeof group.distinguishedName === 'string' &&
+        group.distinguishedName.trim().length > 0,
+    );
+    this.groupList = [
+      ...new Map(groups.map((group) => [group.distinguishedName, group])).values(),
+    ].map((group) => ({
+      key: group.distinguishedName,
+      title: group.name,
+      direction: selected.has(group.distinguishedName) ? 'right' : 'left',
+    }));
+  }
+
   private loadEmployees(costCent: string, page = 1) {
     this.employeeRequest = this.settingService
       .getEmployee({
@@ -192,6 +230,7 @@ export class EmpAdForm implements OnChanges, OnDestroy {
             ...items.map((employee: any) => ({
               value: employee.UserID,
               label: `${employee.UserID} - ${employee.FullNameThai ?? ''}`.trim(),
+              adUser: employee.ADUsername ?? employee.ADUser ?? '',
             })),
           ];
           this.cdr.detectChanges();
@@ -203,12 +242,14 @@ export class EmpAdForm implements OnChanges, OnDestroy {
 
   private resetEmployeeList() {
     this.employeeRequest?.unsubscribe();
-    this.selectedEmployee = null;
+    this.onEmployeeChange(null);
     this.employeeList = [];
   }
 
   ngOnDestroy() {
     this.employeeRequest?.unsubscribe();
+    this.groupRequest?.unsubscribe();
+    this.allGroupsRequest?.unsubscribe();
   }
 
   ngOnChanges() {
@@ -224,6 +265,27 @@ export class EmpAdForm implements OnChanges, OnDestroy {
   }
 
   loadMasterData() {
+    this.allGroupsRequest?.unsubscribe();
+    this.allGroupsRequest = this.empAdService.getAllGroups().subscribe({
+      next: (res) => {
+        console.log('GetAllGroups response:', res);
+        const items = Array.isArray(res) ? res : [res];
+        const groups = items.flatMap((item) => item?.groups ?? [item]);
+        this.allGroups = groups;
+        this.setGroupList(
+          this.groupList
+            .filter((group) => group.direction === 'right')
+            .map((group) => ({
+              name: group.title,
+              distinguishedName: group['key'],
+            })),
+        );
+        this.cdr.detectChanges();
+      },
+      error: () => {
+        this.swalService.error('ไม่สามารถโหลด Groups ทั้งหมดได้');
+      },
+    });
     this.empAdService.getEmployeeFloors().subscribe({
       next: (res) => {
         this.floorList = Array.isArray(res) ? res : (res.data ?? []);
@@ -324,6 +386,7 @@ export class EmpAdForm implements OnChanges, OnDestroy {
       CODEMPIDH: this.addForm.headEmployeeCode,
       HEAD_NAME: selectedHead?.NAMETHAI ?? '',
       AD_USER: this.addForm.adUser,
+      AD_GROUPS: this.selectedGroups,
     };
 
     if (this.isRequestUser) {
@@ -401,7 +464,6 @@ export class EmpAdForm implements OnChanges, OnDestroy {
   }
 
   private resetAddForm() {
-    this.selectedMockField = null;
     this.resetEmployeeList();
     this.selectedCompany = null;
     this.filteredDepartmentList = [];

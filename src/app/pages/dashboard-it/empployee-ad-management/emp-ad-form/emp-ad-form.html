@@ -66,21 +66,11 @@
       <div class="form-grid">
         <div class="field-group">
           <label>Head Employee Code</label>
-          <input
-            type="text"
-            [(ngModel)]="form.headEmployeeCode"
-            name="headEmployeeCode"
-            readonly
-          />
+          <input type="text" [(ngModel)]="form.headEmployeeCode" name="headEmployeeCode" readonly />
         </div>
         <div class="field-group">
           <label>Head Employee Name</label>
-          <input
-            type="text"
-            [(ngModel)]="form.headEmployeeName"
-            name="headEmployeeName"
-            readonly
-          />
+          <input type="text" [(ngModel)]="form.headEmployeeName" name="headEmployeeName" readonly />
         </div>
         <div class="field-group">
           <label>AD User</label>
@@ -253,10 +243,7 @@
             [nzStatus]="isInvalid('floor') ? 'error' : ''"
           >
             @for (f of floorList; track f.FloorID) {
-              <nz-option
-                [nzValue]="f.FloorID"
-                [nzLabel]="f.FloorNumber + ' - ' + f.Description"
-              />
+              <nz-option [nzValue]="f.FloorID" [nzLabel]="f.FloorNumber + ' - ' + f.Description" />
             }
           </nz-select>
         </div>
@@ -309,7 +296,8 @@
             nzAllowClear
             nzPlaceHolder="เลือกพนักงาน"
             class="field-nz-select"
-            [(ngModel)]="selectedEmployee"
+            [ngModel]="selectedEmployee"
+            (ngModelChange)="onEmployeeChange($event)"
             name="employee"
             [nzDisabled]="!addForm.companyCode || !addForm.department"
           >
@@ -318,29 +306,22 @@
             }
           </nz-select>
         </div>
-        <div class="field-group span-2">
-          <label>MockField</label>
-          <nz-select
-            nzShowSearch
-            nzAllowClear
-            nzPlaceHolder="เลือก MockField"
-            class="field-nz-select"
-            [(ngModel)]="selectedMockField"
-            name="mockField"
+        <div class="field-group groups-field">
+          <label>Groups</label>
+          <nz-transfer
+            [nzDataSource]="groupList"
+            [nzOneWay]="true"
+            [nzShowSearch]="true"
+            [nzTitles]="['Source', 'Target']"
+            nzSearchPlaceholder="ค้นหา Groups"
+            [nzListStyle]="{ width: '100%', height: '300px' }"
+            [nzDisabled]="!selectedEmployee"
           >
-            @for (option of mockFieldList; track option) {
-              <nz-option [nzValue]="option" [nzLabel]="option" />
-            }
-          </nz-select>
+          </nz-transfer>
         </div>
         <div class="field-group span-2">
           <label>Email</label>
-          <input
-            type="email"
-            [(ngModel)]="addForm.email"
-            name="email"
-            placeholder="Enter Email"
-          />
+          <input type="email" [(ngModel)]="addForm.email" name="email" placeholder="Enter Email" />
         </div>
         <div class="field-group span-2">
           <label>Mobile</label>
