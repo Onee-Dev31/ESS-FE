@@ -217,6 +217,7 @@ export class ItService implements OnInit {
   showFilter = false;
 
   pendingTicketId = '';
+  pendingOpenChat = false;
 
   constructor() {
     this.route.paramMap.subscribe((params) => {
@@ -226,7 +227,10 @@ export class ItService implements OnInit {
 
     this.route.queryParamMap.subscribe((params) => {
       const ticketId = params.get('ticket') || '';
-      if (ticketId) this.pendingTicketId = ticketId;
+      if (ticketId) {
+        this.pendingTicketId = ticketId;
+        this.pendingOpenChat = params.get('openChat') === 'true';
+      }
     });
   }
 
@@ -1250,7 +1254,9 @@ export class ItService implements OnInit {
 
           if (this.pendingTicketId) {
             const pending = this.pendingTicketId;
+            const shouldOpenChat = this.pendingOpenChat;
             this.pendingTicketId = '';
+            this.pendingOpenChat = false;
             this.location.replaceState('/it-service-list');
 
             const matched = this.Tickets().find(
@@ -1258,7 +1264,7 @@ export class ItService implements OnInit {
             );
             if (matched) {
               setTimeout(() => {
-                this.selectTicket(String(matched.ticketId));
+                this.selectTicket(String(matched.ticketId), { openChat: shouldOpenChat });
                 this.cdr.detectChanges();
 
                 const scrollToTop = (id: string, retries = 10) => {

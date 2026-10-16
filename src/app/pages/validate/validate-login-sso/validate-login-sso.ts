@@ -27,7 +27,10 @@ export class ValidateLoginSso {
       const token = params.get('token') || '';
       this.systemCode = params.get('systemCode') || '';
       this.applicantId = params.get('applicantId') || '';
-      this.ticketNumber = this.systemCode === 'ESS-EMAIL-IT-Req' ? params.get('ticket') || '' : '';
+      this.ticketNumber =
+        this.systemCode === 'ESS-EMAIL-IT-Req' || this.systemCode === 'ESS-EMAIL-Chat'
+          ? params.get('ticket') || ''
+          : '';
       this.voucherNo =
         this.systemCode === 'ESS-EMAIL-Medical' ||
         this.systemCode === 'ESS-EMAIL-Allowance' ||
@@ -48,6 +51,10 @@ export class ValidateLoginSso {
             if (res.systmeCode == 'ESS-EMAIL-IT-Req') {
               const url = `${res.landingPath || '/'}?ticket=${encodeURIComponent(this.ticketNumber.trim())}`;
               // console.log('go url:', url);
+              this.router.navigateByUrl(url);
+            } else if (res.systmeCode == 'ESS-EMAIL-Chat' || this.systemCode == 'ESS-EMAIL-Chat') {
+              const basePath = res.landingPath || '/it-service-list';
+              const url = `${basePath}?ticket=${encodeURIComponent(this.ticketNumber.trim())}&openChat=true`;
               this.router.navigateByUrl(url);
             } else if (res.systmeCode == 'ESS-EMAIL-Medical') {
               const basePath = res.landingPath || '/approvals-medical';
