@@ -543,7 +543,7 @@
       (closeModal)="closeEmpAdForm()"
     >
       <app-emp-ad-form
-
+        #employeeForm
         mode="add"
         (onSaveSuccess)="onEmployeeFormSave($event)"
         [isRequestUser]="true"
