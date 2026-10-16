@@ -710,6 +710,7 @@ export interface ManageEmailReplyTemplatePayload {
 export interface ManageGuideDocumentPayload {
   id: number;
   name: string;
+  description: string;
   fileUrl: string;
   filePath: string;
   isActive: boolean;

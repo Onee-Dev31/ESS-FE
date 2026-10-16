@@ -1,1 +1,21 @@
 @use '../settings-content';
+
+.name-field,
+.description-field {
+  grid-column: 1 / -1;
+}
+
+.description-field textarea {
+  box-sizing: border-box;
+  min-height: 88px;
+  margin-top: 7px;
+  resize: vertical;
+  line-height: 1.5;
+}
+
+.doc-info .doc-description {
+  overflow: visible;
+  text-overflow: initial;
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+}

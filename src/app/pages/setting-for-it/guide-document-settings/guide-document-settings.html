@@ -31,7 +31,18 @@
   <section class="setting-card form-card">
     <h2>{{ editingId === 0 ? 'เพิ่มเอกสาร' : 'แก้ไขเอกสาร' }}</h2>
     <div class="form-grid">
-      <label>ชื่อเอกสาร<input class="styled-input" [(ngModel)]="name" /></label
+      <label class="name-field"
+        >ชื่อเอกสาร<input
+          class="styled-input"
+          [(ngModel)]="name"
+          placeholder="ระบุชื่อเอกสาร" /></label
+      ><label class="description-field"
+        >รายละเอียด<textarea
+          class="styled-input"
+          [(ngModel)]="description"
+          rows="3"
+          placeholder="ระบุรายละเอียดเอกสาร"
+        ></textarea></label
       ><label>URL สำหรับเปิดดู<input class="styled-input" [(ngModel)]="fileUrl" /></label
       ><label>Path ของไฟล์<input class="styled-input" [(ngModel)]="filePath" /></label>
       <label class="toggle-field"
@@ -68,12 +79,15 @@
         <article>
           <div class="doc-info">
             <strong>{{ doc.name }}</strong>
+            @if (doc.description) {
+              <small class="doc-description">{{ doc.description }}</small>
+            }
             @if (readOnly && (doc.createdDate || doc.updatedDate)) {
               <span class="audit-meta">
                 <span class="audit-item">
                   <i class="fa-regular fa-clock" aria-hidden="true"></i>
-                  {{ doc.updatedDate ? 'แก้ไขล่าสุด' : 'วันที่สร้าง' }}
-                  <b>{{ doc.updatedDate || doc.createdDate | date: 'dd/MM/yyyy HH:mm' }}</b>
+                  {{ doc.createdDate ? 'วันที่สร้าง' : 'แก้ไขล่าสุด' }}
+                  <b>{{ doc.createdDate || doc.updatedDate | date: 'dd/MM/yyyy HH:mm' }}</b>
                 </span>
               </span>
             } @else if (!readOnly && (doc.createdBy || doc.updatedBy)) {
@@ -161,7 +175,20 @@
           @if (editingId === doc.id) {
             <div class="inline-edit">
               <div class="form-grid">
-                <label>ชื่อเอกสาร<input class="styled-input" [(ngModel)]="name" /></label>
+                <label class="name-field"
+                  >ชื่อเอกสาร<input
+                    class="styled-input"
+                    [(ngModel)]="name"
+                    placeholder="ระบุชื่อเอกสาร"
+                /></label>
+                <label class="description-field"
+                  >รายละเอียด<textarea
+                    class="styled-input"
+                    [(ngModel)]="description"
+                    rows="3"
+                    placeholder="ระบุรายละเอียดเอกสาร"
+                  ></textarea>
+                </label>
                 <label>URL สำหรับเปิดดู<input class="styled-input" [(ngModel)]="fileUrl" /></label>
                 <label>Path ของไฟล์<input class="styled-input" [(ngModel)]="filePath" /></label>
                 <label class="toggle-field"
