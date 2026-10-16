@@ -149,6 +149,21 @@ input.invalid {
   box-shadow: none !important;
 }
 
+:host ::ng-deep .field-nz-select.ant-select-disabled {
+  .ant-select-selector {
+    background: var(--input-disabled-bg) !important;
+    border-color: var(--input-disabled-border) !important;
+    cursor: not-allowed;
+    box-shadow: none !important;
+  }
+
+  .ant-select-selection-placeholder,
+  .ant-select-selection-item,
+  .ant-select-arrow {
+    color: var(--text-muted) !important;
+  }
+}
+
 .field-select {
   height: 38px;
   border: 1px solid var(--border-table-head);
