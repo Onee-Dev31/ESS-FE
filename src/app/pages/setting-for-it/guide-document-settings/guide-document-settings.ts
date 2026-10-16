@@ -70,7 +70,11 @@ export class GuideDocumentSettings implements OnInit {
             createdBy: String(item.Created_by ?? '').trim(),
             updatedBy: String(item.Update_by ?? '').trim(),
             createdDate:
-              item.Created_Date ?? item.created_Date ?? item.createdDate ?? item.CreatedDate ?? null,
+              item.Created_Date ??
+              item.created_Date ??
+              item.createdDate ??
+              item.CreatedDate ??
+              null,
             updatedDate:
               item.Update_Date ?? item.updated_Date ?? item.updatedDate ?? item.UpdatedDate ?? null,
             likeCount: Number(item.LikeCount ?? 0),
@@ -143,7 +147,7 @@ export class GuideDocumentSettings implements OnInit {
 
   private normalizeReaction(value: unknown): 'LIKE' | 'UNLIKE' | null {
     const reaction = String(value ?? '').toUpperCase();
-    console.log('Normalizing reaction:', value, '->', reaction);
+    // console.log('Normalizing reaction:', value, '->', reaction);
     return reaction === 'LIKE' || reaction === 'UNLIKE' ? reaction : null;
   }
 
