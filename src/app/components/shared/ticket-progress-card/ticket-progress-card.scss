@@ -20,7 +20,7 @@
   margin-bottom: 12px;
 }
 .progress-header.has-note-action {
-  padding-right: 36px;
+  padding-right: 76px;
 }
 .progress-status-row {
   display: flex;
@@ -192,16 +192,21 @@
   top: -3px;
   right: 0;
   display: inline-flex;
-  width: 26px;
+  width: auto;
+  min-width: 62px;
   height: 26px;
   align-items: center;
   justify-content: center;
-  padding: 0;
+  gap: 6px;
+  padding: 0 8px;
   border: 0;
   border-radius: 7px;
   background: transparent;
   color: var(--text-table-head);
   cursor: pointer;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 600;
 }
 .note-button:hover,
 .note-button:focus-visible,

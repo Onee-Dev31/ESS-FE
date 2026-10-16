@@ -12,6 +12,7 @@
         [attr.data-tooltip]="ticket.noteForIt ? 'เปิดหรือแก้ไข Note for IT' : 'เพิ่ม Note for IT'"
         (click)="noteClick.emit()"
       >
+        <span>Note</span>
         <i class="fa-solid fa-note-sticky" aria-hidden="true"></i>
       </button>
     }
@@ -28,8 +29,8 @@
           <div class="timeline-content">
             <div class="timeline-title">
               <span class="waiting-approval-label">{{
-                  ticket.assignTimeline[ticket.assignTimeline.length - 1].waitingStatusLabel
-                }}</span
+                ticket.assignTimeline[ticket.assignTimeline.length - 1].waitingStatusLabel
+              }}</span
               ><br />
               @if (ticket.assignTimeline[ticket.assignTimeline.length - 1].approverNames) {
                 <button
@@ -96,7 +97,10 @@
                 <div class="timeline-reason">
                   <i class="fa-regular fa-comment-dots" aria-hidden="true"></i>
                   @if (isRichReason(step.reason)) {
-                    <div class="timeline-reason-content" [innerHTML]="step.reason | safeEmailHtml"></div>
+                    <div
+                      class="timeline-reason-content"
+                      [innerHTML]="step.reason | safeEmailHtml"
+                    ></div>
                   } @else {
                     <span>{{ step.reason }}</span>
                   }
