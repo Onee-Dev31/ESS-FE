@@ -455,22 +455,31 @@
     </ng-template>
   </nz-modal>
 
-  <!-- Modal -->
-  <nz-modal
-    [(nzVisible)]="showForm"
-    [nzTitle]="formMode === 'add' ? 'Add Employee' : 'View Employee'"
-    [nzWidth]="1200"
-    nzCentered
-    [nzMaskClosable]="false"
-    (nzOnCancel)="closeForm()"
-    [nzFooter]="null"
-  >
-    <ng-container *nzModalContent>
+  @if (showForm) {
+    <app-modal-shell
+      [title]="formMode === 'add' ? 'Add Employee' : 'View Employee'"
+      headerStyle="primary"
+      size="xl"
+      [closeOnBackdrop]="false"
+      [showFooter]="formMode === 'add'"
+      (closeModal)="closeForm()"
+    >
       <app-emp-ad-form
+        #employeeForm
         [mode]="formMode"
         [employeeId]="selectedEmployeeId"
         (onSaveSuccess)="closeForm()"
       ></app-emp-ad-form>
-    </ng-container>
-  </nz-modal>
+      <div modalFooter>
+        <button
+          type="submit"
+          form="employee-ad-form"
+          class="modal-button primary"
+          [disabled]="employeeForm.isSaving"
+        >
+          Save Employee
+        </button>
+      </div>
+    </app-modal-shell>
+  }
 </div>

@@ -66,11 +66,21 @@
       <div class="form-grid">
         <div class="field-group">
           <label>Head Employee Code</label>
-          <input type="text" [(ngModel)]="form.headEmployeeCode" name="headEmployeeCode" readonly />
+          <input
+            type="text"
+            [(ngModel)]="form.headEmployeeCode"
+            name="headEmployeeCode"
+            readonly
+          />
         </div>
         <div class="field-group">
           <label>Head Employee Name</label>
-          <input type="text" [(ngModel)]="form.headEmployeeName" name="headEmployeeName" readonly />
+          <input
+            type="text"
+            [(ngModel)]="form.headEmployeeName"
+            name="headEmployeeName"
+            readonly
+          />
         </div>
         <div class="field-group">
           <label>AD User</label>
@@ -82,7 +92,11 @@
 
   <!-- ===== ADD MODE ===== -->
   @if (mode === 'add') {
-    <form class="form-body" (ngSubmit)="saveEmployee()">
+    <form
+      [id]="isRequestUser ? 'employee-request-form' : 'employee-ad-form'"
+      class="form-body"
+      (ngSubmit)="saveEmployee()"
+    >
       <div class="section-title">Basic Information</div>
       <div class="form-grid">
         <div class="field-group" *ngIf="!isRequestUser">
@@ -239,7 +253,10 @@
             [nzStatus]="isInvalid('floor') ? 'error' : ''"
           >
             @for (f of floorList; track f.FloorID) {
-              <nz-option [nzValue]="f.FloorID" [nzLabel]="f.FloorNumber + ' - ' + f.Description" />
+              <nz-option
+                [nzValue]="f.FloorID"
+                [nzLabel]="f.FloorNumber + ' - ' + f.Description"
+              />
             }
           </nz-select>
         </div>
@@ -272,6 +289,7 @@
             nzPlaceHolder="เลือกแผนก"
             class="field-nz-select"
             [(ngModel)]="addForm.department"
+            (ngModelChange)="onDepartmentChange()"
             name="department"
             [nzDisabled]="!addForm.companyCode"
             [nzStatus]="isInvalid('department') ? 'error' : ''"
@@ -285,8 +303,44 @@
           </nz-select>
         </div>
         <div class="field-group span-2">
+          <label>Employee</label>
+          <nz-select
+            nzShowSearch
+            nzAllowClear
+            nzPlaceHolder="เลือกพนักงาน"
+            class="field-nz-select"
+            [(ngModel)]="selectedEmployee"
+            name="employee"
+            [nzDisabled]="!addForm.companyCode || !addForm.department"
+          >
+            @for (employee of employeeList; track employee.value) {
+              <nz-option [nzValue]="employee.value" [nzLabel]="employee.label" />
+            }
+          </nz-select>
+        </div>
+        <div class="field-group span-2">
+          <label>MockField</label>
+          <nz-select
+            nzShowSearch
+            nzAllowClear
+            nzPlaceHolder="เลือก MockField"
+            class="field-nz-select"
+            [(ngModel)]="selectedMockField"
+            name="mockField"
+          >
+            @for (option of mockFieldList; track option) {
+              <nz-option [nzValue]="option" [nzLabel]="option" />
+            }
+          </nz-select>
+        </div>
+        <div class="field-group span-2">
           <label>Email</label>
-          <input type="email" [(ngModel)]="addForm.email" name="email" placeholder="Enter Email" />
+          <input
+            type="email"
+            [(ngModel)]="addForm.email"
+            name="email"
+            placeholder="Enter Email"
+          />
         </div>
         <div class="field-group span-2">
           <label>Mobile</label>
@@ -327,10 +381,6 @@
             [class.invalid]="isInvalid('adUser')"
           />
         </div>
-      </div>
-
-      <div class="form-actions">
-        <button type="submit" class="btn-save" [disabled]="isSaving">Save Employee</button>
       </div>
     </form>
   }

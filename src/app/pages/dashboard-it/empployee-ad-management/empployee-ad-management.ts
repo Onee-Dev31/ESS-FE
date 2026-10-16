@@ -16,6 +16,7 @@ import { LoadingService } from '../../../services/loading';
 import { MasterDataService } from '../../../services/master-data.service';
 import { SwalService } from '../../../services/swal.service';
 import { EmpAdForm } from './emp-ad-form/emp-ad-form';
+import { ModalShellComponent } from '../../../components/shared/modal-shell/modal-shell';
 
 @Component({
   selector: 'app-empployee-ad-management',
@@ -30,6 +31,7 @@ import { EmpAdForm } from './emp-ad-form/emp-ad-form';
     EmptyStateComponent,
     SkeletonComponent,
     EmpAdForm,
+    ModalShellComponent,
   ],
   templateUrl: './empployee-ad-management.html',
   styleUrl: './empployee-ad-management.scss',

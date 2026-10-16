@@ -5,13 +5,16 @@ import {
   EventEmitter,
   Input,
   OnChanges,
+  OnDestroy,
   Output,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { NzSelectModule } from 'ng-zorro-antd/select';
+import { Subscription } from 'rxjs';
 import { EmpAdService } from '../../../../services/emp-ad-service';
 import { MasterDataService } from '../../../../services/master-data.service';
 import { SwalService } from '../../../../services/swal.service';
+import { SettingService } from '../../../../services/setting.service';
 
 @Component({
   selector: 'app-emp-ad-form',
@@ -19,7 +22,7 @@ import { SwalService } from '../../../../services/swal.service';
   templateUrl: './emp-ad-form.html',
   styleUrl: './emp-ad-form.scss',
 })
-export class EmpAdForm implements OnChanges {
+export class EmpAdForm implements OnChanges, OnDestroy {
   @Input() mode: 'view' | 'add' = 'view';
   @Input() employeeId: string = '';
   @Output() onSaveSuccess = new EventEmitter<any>();
@@ -113,12 +116,29 @@ export class EmpAdForm implements OnChanges {
   departmentList: any[] = [];
   filteredDepartmentList: any[] = [];
   selectedCompany: any = null;
+  selectedEmployee: string | null = null;
+  employeeList: { value: string; label: string }[] = [];
+  selectedMockField: string | null = null;
+  mockFieldList = [
+    'Mock 1',
+    'Mock 2',
+    'Mock 3',
+    'Mock 4',
+    'Mock 5',
+    'Mock 6',
+    'Mock 7',
+    'Mock 8',
+    'Mock 9',
+    'Mock 10',
+  ];
+  private employeeRequest?: Subscription;
 
   constructor(
     private empAdService: EmpAdService,
     private masterService: MasterDataService,
     private swalService: SwalService,
     private cdr: ChangeDetectorRef,
+    private settingService: SettingService,
   ) {}
 
   onCompanyChange(company: any) {
@@ -127,6 +147,7 @@ export class EmpAdForm implements OnChanges {
     this.addForm.companyName = company?.COMPANY_NAME ?? '';
     this.addForm.employeeCode = '';
     this.addForm.department = '';
+    this.resetEmployeeList();
     this.filteredDepartmentList = company
       ? this.departmentList.filter((d) => d.COMPANY_CODE === company.COMPANY_CODE)
       : [];
@@ -146,6 +167,48 @@ export class EmpAdForm implements OnChanges {
         this.cdr.detectChanges();
       },
     });
+  }
+
+  onDepartmentChange() {
+    this.resetEmployeeList();
+    const department = this.filteredDepartmentList.find(
+      (d) => `${d.COSTCENT} ${d.NAMECOSTCENT}` === this.addForm.department,
+    );
+    if (department) this.loadEmployees(department.COSTCENT);
+  }
+
+  private loadEmployees(costCent: string, page = 1) {
+    this.employeeRequest = this.settingService
+      .getEmployee({
+        costCent,
+        page,
+        pageSize: 500,
+      })
+      .subscribe({
+        next: (res) => {
+          const items = Array.isArray(res) ? res : (res.data ?? []);
+          this.employeeList = [
+            ...this.employeeList,
+            ...items.map((employee: any) => ({
+              value: employee.UserID,
+              label: `${employee.UserID} - ${employee.FullNameThai ?? ''}`.trim(),
+            })),
+          ];
+          this.cdr.detectChanges();
+          if (items.length === 500) this.loadEmployees(costCent, page + 1);
+        },
+        error: () => {},
+      });
+  }
+
+  private resetEmployeeList() {
+    this.employeeRequest?.unsubscribe();
+    this.selectedEmployee = null;
+    this.employeeList = [];
+  }
+
+  ngOnDestroy() {
+    this.employeeRequest?.unsubscribe();
   }
 
   ngOnChanges() {
@@ -338,6 +401,8 @@ export class EmpAdForm implements OnChanges {
   }
 
   private resetAddForm() {
+    this.selectedMockField = null;
+    this.resetEmployeeList();
     this.selectedCompany = null;
     this.filteredDepartmentList = [];
     this.addForm = {

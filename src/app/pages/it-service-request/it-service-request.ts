@@ -30,7 +30,7 @@ import {
 } from '../../components/modals/file-preview-modal/file-preview-modal';
 import dayjs from 'dayjs';
 import { MasterDataService } from '../../services/master-data.service';
-import { NzModalModule } from 'ng-zorro-antd/modal';
+import { ModalShellComponent } from '../../components/shared/modal-shell/modal-shell';
 import { EmpAdForm } from '../dashboard-it/empployee-ad-management/emp-ad-form/emp-ad-form';
 import { PageLoaderComponent } from '../../components/shared/page-loader/page-loader';
 import { IT_ATTACHMENT_FILE_CONFIG } from '../../constants/it-attachment-file.constant';
@@ -43,7 +43,7 @@ import { IT_ATTACHMENT_FILE_CONFIG } from '../../constants/it-attachment-file.co
     NzSelectModule,
     ExampleServiceRequestModal,
     FilePreviewModalComponent,
-    NzModalModule,
+    ModalShellComponent,
     EmpAdForm,
     PageLoaderComponent,
     AttachmentUploadComponent,

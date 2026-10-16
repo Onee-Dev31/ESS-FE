@@ -162,30 +162,6 @@ input.invalid {
   width: 100%;
 }
 
-.form-actions {
-  display: flex;
-  justify-content: flex-end;
-  padding-top: 16px;
-  margin-top: 8px;
-  border-top: 1px solid var(--border-toolbar);
-}
-
-.btn-save {
-  padding: 10px 28px;
-  border-radius: 8px;
-  background: #2e7d32;
-  color: #ffffff;
-  border: none;
-  font-size: 0.9rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background 0.2s;
-
-  &:hover {
-    background: #1b5e20;
-  }
-}
-
 .field-group {
   display: flex;
   flex-direction: column;
