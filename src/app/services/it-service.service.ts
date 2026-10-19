@@ -713,6 +713,7 @@ export interface ManageGuideDocumentPayload {
   description: string;
   fileUrl: string;
   filePath: string;
+  groupName: string | null;
   isActive: boolean;
   executeBy: string;
 }

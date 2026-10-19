@@ -26,25 +26,67 @@
     }
   </div>
 </section>
-
 @if (editingId === 0) {
   <section class="setting-card form-card">
     <h2>{{ editingId === 0 ? 'เพิ่มเอกสาร' : 'แก้ไขเอกสาร' }}</h2>
     <div class="form-grid">
       <label class="name-field"
-        >ชื่อเอกสาร<input
+        >ชื่อเอกสาร <span class="required-mark" aria-hidden="true">*</span><input
           class="styled-input"
           [(ngModel)]="name"
+          required
           placeholder="ระบุชื่อเอกสาร" /></label
       ><label class="description-field"
-        >รายละเอียด<textarea
+        >รายละเอียด <span class="optional-hint">(ไม่บังคับ)</span><textarea
           class="styled-input"
           [(ngModel)]="description"
           rows="3"
           placeholder="ระบุรายละเอียดเอกสาร"
         ></textarea></label
-      ><label>URL สำหรับเปิดดู<input class="styled-input" [(ngModel)]="fileUrl" /></label
+      ><label
+        >URL สำหรับเปิดดู <span class="required-mark" aria-hidden="true">*</span
+        ><input class="styled-input" type="url" [(ngModel)]="fileUrl" required /></label
       ><label>Path ของไฟล์<input class="styled-input" [(ngModel)]="filePath" /></label>
+      <label class="group-name-field"
+        >Group Name <span class="optional-hint">(ไม่บังคับ)</span
+        ><div class="group-name-combobox">
+          <input
+            class="styled-input"
+            [(ngModel)]="groupName"
+            placeholder="เลือกหรือพิมพ์กลุ่มใหม่; เว้นว่างเป็นอิสระ"
+            role="combobox"
+            autocomplete="off"
+            [attr.aria-expanded]="showGroupNameDropdown"
+            (focus)="showGroupNameDropdown = true"
+            (input)="showGroupNameDropdown = true"
+            (blur)="closeGroupNameDropdown()"
+            (keydown.escape)="showGroupNameDropdown = false"
+          />
+          <button
+            type="button"
+            class="group-name-trigger"
+            aria-label="แสดงรายการ Group Name"
+            (mousedown)="$event.preventDefault()"
+            (click)="showGroupNameDropdown = !showGroupNameDropdown"
+          >
+            <i class="fa-solid fa-chevron-down"></i>
+          </button>
+          @if (showGroupNameDropdown && filteredGroupNameOptions.length) {
+            <div class="group-name-dropdown" role="listbox">
+              @for (option of filteredGroupNameOptions; track option) {
+                <button
+                  type="button"
+                  role="option"
+                  [class.selected]="option === groupName"
+                  (mousedown)="$event.preventDefault(); selectGroupName(option)"
+                >
+                  {{ option }}
+                </button>
+              }
+            </div>
+          }
+        </div></label
+      >
       <label class="toggle-field"
         ><button
           type="button"
@@ -59,7 +101,7 @@
     </div>
     <div class="form-actions">
       <button class="outline" (click)="cancel()">ยกเลิก</button
-      ><button class="primary" [disabled]="saving()" (click)="save()">
+      ><button class="primary" [disabled]="!canSave" (click)="save()">
         {{ saving() ? 'กำลังบันทึก...' : 'บันทึก' }}
       </button>
     </div>
@@ -79,6 +121,9 @@
         <article>
           <div class="doc-info">
             <strong>{{ doc.name }}</strong>
+            @if (doc.groupName) {
+              <span class="group-name-badge">{{ doc.groupName }}</span>
+            }
             @if (doc.description) {
               <small class="doc-description">{{ doc.description }}</small>
             }
@@ -176,21 +221,65 @@
             <div class="inline-edit">
               <div class="form-grid">
                 <label class="name-field"
-                  >ชื่อเอกสาร<input
+                  >ชื่อเอกสาร <span class="required-mark" aria-hidden="true">*</span><input
                     class="styled-input"
                     [(ngModel)]="name"
+                    required
                     placeholder="ระบุชื่อเอกสาร"
                 /></label>
                 <label class="description-field"
-                  >รายละเอียด<textarea
+                  >รายละเอียด <span class="optional-hint">(ไม่บังคับ)</span><textarea
                     class="styled-input"
                     [(ngModel)]="description"
                     rows="3"
                     placeholder="ระบุรายละเอียดเอกสาร"
                   ></textarea>
                 </label>
-                <label>URL สำหรับเปิดดู<input class="styled-input" [(ngModel)]="fileUrl" /></label>
+                <label
+                  >URL สำหรับเปิดดู <span class="required-mark" aria-hidden="true">*</span
+                  ><input class="styled-input" type="url" [(ngModel)]="fileUrl" required
+                /></label>
                 <label>Path ของไฟล์<input class="styled-input" [(ngModel)]="filePath" /></label>
+                <label class="group-name-field"
+                  >Group Name <span class="optional-hint">(ไม่บังคับ)</span
+                  ><div class="group-name-combobox">
+                    <input
+                      class="styled-input"
+                      [(ngModel)]="groupName"
+                      placeholder="เลือกหรือพิมพ์กลุ่มใหม่; เว้นว่างเป็นอิสระ"
+                      role="combobox"
+                      autocomplete="off"
+                      [attr.aria-expanded]="showGroupNameDropdown"
+                      (focus)="showGroupNameDropdown = true"
+                      (input)="showGroupNameDropdown = true"
+                      (blur)="closeGroupNameDropdown()"
+                      (keydown.escape)="showGroupNameDropdown = false"
+                    />
+                    <button
+                      type="button"
+                      class="group-name-trigger"
+                      aria-label="แสดงรายการ Group Name"
+                      (mousedown)="$event.preventDefault()"
+                      (click)="showGroupNameDropdown = !showGroupNameDropdown"
+                    >
+                      <i class="fa-solid fa-chevron-down"></i>
+                    </button>
+                    @if (showGroupNameDropdown && filteredGroupNameOptions.length) {
+                      <div class="group-name-dropdown" role="listbox">
+                        @for (option of filteredGroupNameOptions; track option) {
+                          <button
+                            type="button"
+                            role="option"
+                            [class.selected]="option === groupName"
+                            (mousedown)="$event.preventDefault(); selectGroupName(option)"
+                          >
+                            {{ option }}
+                          </button>
+                        }
+                      </div>
+                    }
+                  </div></label
+                >
                 <label class="toggle-field"
                   ><button
                     type="button"
@@ -205,7 +294,7 @@
               </div>
               <div class="form-actions">
                 <button class="outline" (click)="cancel()">ยกเลิก</button
-                ><button class="primary" [disabled]="saving()" (click)="save()">
+                ><button class="primary" [disabled]="!canSave" (click)="save()">
                   {{ saving() ? 'กำลังบันทึก...' : 'บันทึก' }}
                 </button>
               </div>

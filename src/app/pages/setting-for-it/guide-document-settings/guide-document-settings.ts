@@ -11,6 +11,7 @@ interface GuideDocument {
   description: string;
   fileUrl: string;
   filePath: string;
+  groupName: string;
   isActive: boolean;
   createdBy: string;
   updatedBy: string;
@@ -43,6 +44,8 @@ export class GuideDocumentSettings implements OnInit {
   description = '';
   fileUrl = '';
   filePath = '';
+  groupName = '';
+  showGroupNameDropdown = false;
   isActive = true;
   search = '';
 
@@ -55,33 +58,41 @@ export class GuideDocumentSettings implements OnInit {
     const empCode = this.readOnly ? this.auth.userData()?.CODEMPID : undefined;
     this.itServiceService.getGuideDocuments(empCode).subscribe({
       next: (res) => {
+        console.log(res);
         const data = Array.isArray(res) ? res : (res?.data ?? []);
         const visibleData = this.readOnly
           ? data.filter((item: any) => item.IsActive === true)
           : data;
         this.documents.set(
-          visibleData.map((item: any) => ({
-            id: item.Id ?? item.id,
-            name: item.Name ?? item.name,
-            description: String(item.Description ?? item.description ?? '').trim(),
-            fileUrl: item.File_Url ?? item.fileUrl,
-            filePath: item.File_Path ?? item.filePath,
-            isActive: item.IsActive ?? item.isActive,
-            createdBy: String(item.Created_by ?? '').trim(),
-            updatedBy: String(item.Update_by ?? '').trim(),
-            createdDate:
-              item.Created_Date ??
-              item.created_Date ??
-              item.createdDate ??
-              item.CreatedDate ??
-              null,
-            updatedDate:
-              item.Update_Date ?? item.updated_Date ?? item.updatedDate ?? item.UpdatedDate ?? null,
-            likeCount: Number(item.LikeCount ?? 0),
-            unlikeCount: Number(item.UnlikeCount ?? 0),
-            countView: Number(item.CountView ?? 0),
-            reaction: this.normalizeReaction(item.MyReaction),
-          })),
+          visibleData
+            .map((item: any): GuideDocument => ({
+              id: item.Id ?? item.id,
+              name: item.Name ?? item.name,
+              description: String(item.Description ?? item.description ?? '').trim(),
+              fileUrl: item.File_Url ?? item.fileUrl,
+              filePath: item.File_Path ?? item.filePath,
+              groupName: String(item.GroupName ?? '').trim(),
+              isActive: item.IsActive ?? item.isActive,
+              createdBy: String(item.Created_by ?? '').trim(),
+              updatedBy: String(item.Update_by ?? '').trim(),
+              createdDate:
+                item.Created_Date ??
+                item.created_Date ??
+                item.createdDate ??
+                item.CreatedDate ??
+                null,
+              updatedDate:
+                item.Update_Date ??
+                item.updated_Date ??
+                item.updatedDate ??
+                item.UpdatedDate ??
+                null,
+              likeCount: Number(item.LikeCount ?? 0),
+              unlikeCount: Number(item.UnlikeCount ?? 0),
+              countView: Number(item.CountView ?? 0),
+              reaction: this.normalizeReaction(item.MyReaction),
+            }))
+            .sort((a: any, b: any) => Number(b.isActive) - Number(a.isActive) || a.id - b.id),
         );
         this.loading.set(false);
       },
@@ -171,8 +182,37 @@ export class GuideDocumentSettings implements OnInit {
   get filtered(): GuideDocument[] {
     const q = this.search.trim().toLowerCase();
     return this.documents().filter(
-      (d) => !q || `${d.name} ${d.description} ${d.fileUrl}`.toLowerCase().includes(q),
+      (d) =>
+        !q || `${d.name} ${d.description} ${d.fileUrl} ${d.groupName}`.toLowerCase().includes(q),
     );
+  }
+
+  get groupNameOptions(): string[] {
+    return [
+      ...new Set(
+        this.documents()
+          .map((document) => document.groupName)
+          .filter(Boolean),
+      ),
+    ].sort((a, b) => a.localeCompare(b, 'th'));
+  }
+
+  get filteredGroupNameOptions(): string[] {
+    const query = this.groupName.trim().toLowerCase();
+    return this.groupNameOptions.filter((option) => !query || option.toLowerCase().includes(query));
+  }
+
+  selectGroupName(groupName: string): void {
+    this.groupName = groupName;
+    this.showGroupNameDropdown = false;
+  }
+
+  closeGroupNameDropdown(): void {
+    setTimeout(() => (this.showGroupNameDropdown = false));
+  }
+
+  get canSave(): boolean {
+    return Boolean(this.name.trim() && this.fileUrl.trim() && !this.saving());
   }
   add(): void {
     if (this.readOnly) return;
@@ -181,6 +221,7 @@ export class GuideDocumentSettings implements OnInit {
     this.description = '';
     this.fileUrl = '';
     this.filePath = '';
+    this.groupName = '';
     this.isActive = true;
   }
   edit(doc: GuideDocument): void {
@@ -190,6 +231,7 @@ export class GuideDocumentSettings implements OnInit {
     this.description = doc.description;
     this.fileUrl = doc.fileUrl;
     this.filePath = doc.filePath;
+    this.groupName = doc.groupName;
     this.isActive = doc.isActive;
   }
   cancel(): void {
@@ -197,7 +239,7 @@ export class GuideDocumentSettings implements OnInit {
   }
   async save(): Promise<void> {
     if (this.readOnly) return;
-    if (!this.name.trim() || !this.fileUrl.trim() || this.saving()) return;
+    if (!this.canSave) return;
     const result = await this.swal.confirm(
       this.editingId ? 'ยืนยันการแก้ไขเอกสาร?' : 'ยืนยันการเพิ่มเอกสาร?',
       undefined,
@@ -211,6 +253,7 @@ export class GuideDocumentSettings implements OnInit {
       description: this.description.trim(),
       fileUrl: this.fileUrl.trim(),
       filePath: (this.filePath || this.fileUrl).trim(),
+      groupName: this.groupName.trim() || null,
       isActive: this.isActive,
       executeBy: String(this.auth.userData()?.CODEMPID ?? ''),
     };
@@ -245,6 +288,7 @@ export class GuideDocumentSettings implements OnInit {
       description: doc.description,
       fileUrl: doc.fileUrl,
       filePath: doc.filePath,
+      groupName: doc.groupName || null,
       isActive: false,
       executeBy: String(this.auth.userData()?.CODEMPID ?? ''),
     };
