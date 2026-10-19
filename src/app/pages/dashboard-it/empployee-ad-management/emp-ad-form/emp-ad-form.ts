@@ -334,7 +334,7 @@ export class EmpAdForm implements OnChanges, OnDestroy {
       next: (res) => {
         const items = Array.isArray(res) ? res : [res];
         const groups = items.flatMap((item) => item?.groups ?? [item]);
-        this.allGroups = groups;
+        this.allGroups = groups.filter((group) => group?.scope !== 'DomainLocal');
         this.setGroupList(
           this.groupList
             .filter((group) => group.direction === 'right')

@@ -129,7 +129,7 @@ export class EmpAdService {
     lastName?: string;
     displayName?: string;
     email?: string;
-    USR_MOBILE?: string;
+    tel?: string;
     jobTitle?: string;
     department?: string;
     company?: string;
@@ -144,7 +144,7 @@ export class EmpAdService {
     if (params.lastName) httpParams = httpParams.set('lastName', params.lastName);
     if (params.displayName) httpParams = httpParams.set('displayName', params.displayName);
     if (params.email) httpParams = httpParams.set('email', params.email);
-    if (params.USR_MOBILE) httpParams = httpParams.set('USR_MOBILE', params.USR_MOBILE);
+    if (params.tel) httpParams = httpParams.set('tel', params.tel);
     if (params.jobTitle) httpParams = httpParams.set('jobTitle', params.jobTitle);
     if (params.department) httpParams = httpParams.set('department', params.department);
     if (params.company) httpParams = httpParams.set('company', params.company);

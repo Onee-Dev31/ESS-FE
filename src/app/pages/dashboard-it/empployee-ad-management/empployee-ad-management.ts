@@ -312,7 +312,9 @@ export class EmpployeeAdManagement implements OnDestroy {
           if (!result) return;
           if (result.source === 'all') {
             const items = Array.isArray(result.data) ? result.data : [result.data];
-            this.editAllGroups = items.flatMap((item) => item?.groups ?? [item]);
+            this.editAllGroups = items
+              .flatMap((item) => item?.groups ?? [item])
+              .filter((group) => group?.scope !== 'DomainLocal');
             this.setEditGroupList(
               this.editGroupList
                 .filter((group) => group.direction === 'right')
@@ -617,7 +619,7 @@ export class EmpployeeAdManagement implements OnDestroy {
       lastName: emp.nameEng2 ?? emp.lastName ?? '',
       displayName: `${emp.nameThai1 ?? ''} ${emp.nameThai2 ?? ''}`.trim(),
       email: this.editEmail,
-      USR_MOBILE: this.editTel,
+      tel: this.editTel,
       jobTitle: emp.position ?? '',
       department: emp.department ?? '',
       company: emp.companyCode ?? '',
