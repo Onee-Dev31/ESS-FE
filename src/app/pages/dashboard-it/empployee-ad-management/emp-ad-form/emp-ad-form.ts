@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+import { CommonModule, formatDate } from '@angular/common';
 import {
   ChangeDetectorRef,
   Component,
@@ -10,16 +10,18 @@ import {
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { NzSelectModule } from 'ng-zorro-antd/select';
+import { NzDatePickerModule } from 'ng-zorro-antd/date-picker';
 import { NzTransferModule, TransferItem } from 'ng-zorro-antd/transfer';
 import { Subscription } from 'rxjs';
 import { EmpAdService } from '../../../../services/emp-ad-service';
 import { MasterDataService } from '../../../../services/master-data.service';
 import { SwalService } from '../../../../services/swal.service';
 import { SettingService } from '../../../../services/setting.service';
+import { getPasswordError } from '../../../../utils/form-validation.util';
 
 @Component({
   selector: 'app-emp-ad-form',
-  imports: [CommonModule, FormsModule, NzSelectModule, NzTransferModule],
+  imports: [CommonModule, FormsModule, NzSelectModule, NzTransferModule, NzDatePickerModule],
   templateUrl: './emp-ad-form.html',
   styleUrl: './emp-ad-form.scss',
 })
@@ -50,6 +52,9 @@ export class EmpAdForm implements OnChanges, OnDestroy {
     'department',
     'headEmployeeCode',
     'adUser',
+    'adPassword',
+    'adConfirmPassword',
+    'adExpireDate',
   ];
 
   // View form
@@ -82,6 +87,9 @@ export class EmpAdForm implements OnChanges, OnDestroy {
   };
 
   // Add form
+  addShowPassword = false;
+  addShowConfirmPassword = false;
+  readonly getPasswordError = getPasswordError;
   addForm = {
     employeeCode: '',
     titleThai: '',
@@ -104,6 +112,9 @@ export class EmpAdForm implements OnChanges, OnDestroy {
     mobile: '',
     headEmployeeCode: '',
     adUser: '',
+    adPassword: '',
+    adConfirmPassword: '',
+    adExpireDate: null as Date | null,
   };
 
   titleOptions = ['นาย', 'นาง', 'นางสาว'];
@@ -146,6 +157,8 @@ export class EmpAdForm implements OnChanges, OnDestroy {
     this.addForm.companyName = company?.COMPANY_NAME ?? '';
     this.addForm.employeeCode = '';
     this.addForm.department = '';
+    this.allGroupsRequest?.unsubscribe();
+    this.allGroups = [];
     this.resetEmployeeList();
     this.filteredDepartmentList = company
       ? this.departmentList.filter((d) => d.COMPANY_CODE === company.COMPANY_CODE)
@@ -154,6 +167,7 @@ export class EmpAdForm implements OnChanges, OnDestroy {
     if (!this.addForm.companyCode) return;
 
     const companyCode = this.addForm.companyCode;
+    if (!this.isRequestUser) this.loadCompanyGroups(companyCode);
     this.empAdService.getfreelanceCode(companyCode).subscribe({
       next: (res) => {
         if (this.addForm.companyCode !== companyCode) return;
@@ -170,6 +184,7 @@ export class EmpAdForm implements OnChanges, OnDestroy {
 
   onDepartmentChange() {
     this.resetEmployeeList();
+    if (this.isRequestUser) return;
     const department = this.filteredDepartmentList.find(
       (d) => `${d.COSTCENT} ${d.NAMECOSTCENT}` === this.addForm.department,
     );
@@ -180,6 +195,7 @@ export class EmpAdForm implements OnChanges, OnDestroy {
     this.selectedEmployee = employeeId;
     this.groupRequest?.unsubscribe();
     this.setGroupList([]);
+    if (this.isRequestUser) return;
     const adUser = this.employeeList.find(
       (employee) => employee.value === this.selectedEmployee,
     )?.adUser;
@@ -264,11 +280,10 @@ export class EmpAdForm implements OnChanges, OnDestroy {
     }
   }
 
-  loadMasterData() {
+  private loadCompanyGroups(companyCode: string) {
     this.allGroupsRequest?.unsubscribe();
-    this.allGroupsRequest = this.empAdService.getAllGroups().subscribe({
+    this.allGroupsRequest = this.empAdService.getAdUserGroupsByCompany(companyCode).subscribe({
       next: (res) => {
-        console.log('GetAllGroups response:', res);
         const items = Array.isArray(res) ? res : [res];
         const groups = items.flatMap((item) => item?.groups ?? [item]);
         this.allGroups = groups;
@@ -283,9 +298,12 @@ export class EmpAdForm implements OnChanges, OnDestroy {
         this.cdr.detectChanges();
       },
       error: () => {
-        this.swalService.error('ไม่สามารถโหลด Groups ทั้งหมดได้');
+        this.swalService.error('ไม่สามารถโหลด Groups ของบริษัทได้');
       },
     });
+  }
+
+  loadMasterData() {
     this.empAdService.getEmployeeFloors().subscribe({
       next: (res) => {
         this.floorList = Array.isArray(res) ? res : (res.data ?? []);
@@ -334,18 +352,33 @@ export class EmpAdForm implements OnChanges, OnDestroy {
     return this.submitted && this.requiredFields.includes(field) && !this.addForm[field];
   }
 
+  get passwordsMismatch(): boolean {
+    return !this.isRequestUser && this.addForm.adPassword !== this.addForm.adConfirmPassword;
+  }
+
   saveEmployee() {
     this.submitted = true;
-    // const hasError = this.requiredFields.some((f) => !this.addForm[f]);
     const excludedFields = this.isRequestUser
-      ? ['employeeCode', 'jobPosition', 'statusEmployee', 'floor', 'adUser']
+      ? [
+          'employeeCode',
+          'jobPosition',
+          'statusEmployee',
+          'floor',
+          'adUser',
+          'adPassword',
+          'adConfirmPassword',
+          'adExpireDate',
+        ]
       : [];
 
     const requiredFields = this.requiredFields.filter((f) => !excludedFields.includes(f));
 
     const hasError = requiredFields.some((f) => !this.addForm[f]);
 
-    if (hasError) return;
+    const hasInvalidPassword =
+      !this.isRequestUser && getPasswordError(this.addForm.adPassword) !== '';
+
+    if (hasError || hasInvalidPassword || this.passwordsMismatch) return;
 
     const selectedJob = this.jobPositionList.find(
       (j) => j.JobPositionID == this.addForm.jobPosition,
@@ -385,8 +418,18 @@ export class EmpAdForm implements OnChanges, OnDestroy {
       DEPARTMENT: this.addForm.department,
       CODEMPIDH: this.addForm.headEmployeeCode,
       HEAD_NAME: selectedHead?.NAMETHAI ?? '',
+      USR_MOBILE: this.addForm.mobile,
+      EMAIL: this.addForm.email,
       AD_USER: this.addForm.adUser,
-      AD_GROUPS: this.selectedGroups,
+      ...(!this.isRequestUser
+        ? {
+            AD_GROUPS: this.selectedGroups,
+            AD_PASSWORD: this.addForm.adPassword,
+            AD_EXPIRE_DATE: this.addForm.adExpireDate
+              ? formatDate(this.addForm.adExpireDate, 'yyyy-MM-dd', 'en-US')
+              : null,
+          }
+        : {}),
     };
 
     if (this.isRequestUser) {
@@ -464,6 +507,10 @@ export class EmpAdForm implements OnChanges, OnDestroy {
   }
 
   private resetAddForm() {
+    this.addShowPassword = false;
+    this.addShowConfirmPassword = false;
+    this.allGroupsRequest?.unsubscribe();
+    this.allGroups = [];
     this.resetEmployeeList();
     this.selectedCompany = null;
     this.filteredDepartmentList = [];
@@ -489,6 +536,9 @@ export class EmpAdForm implements OnChanges, OnDestroy {
       mobile: '',
       headEmployeeCode: '',
       adUser: '',
+      adPassword: '',
+      adConfirmPassword: '',
+      adExpireDate: null,
     };
   }
 }

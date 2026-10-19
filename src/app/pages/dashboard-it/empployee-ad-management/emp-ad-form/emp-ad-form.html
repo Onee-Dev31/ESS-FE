@@ -289,7 +289,7 @@
             }
           </nz-select>
         </div>
-        <div class="field-group span-2">
+        <div class="field-group span-2" *ngIf="!isRequestUser">
           <label>Employee</label>
           <nz-select
             nzShowSearch
@@ -306,7 +306,7 @@
             }
           </nz-select>
         </div>
-        <div class="field-group groups-field">
+        <div class="field-group groups-field" *ngIf="!isRequestUser">
           <label>Groups</label>
           <nz-transfer
             [nzDataSource]="groupList"
@@ -352,17 +352,115 @@
             }
           </nz-select>
         </div>
-        <div class="field-group span-2" *ngIf="!isRequestUser">
-          <label>AD User <span class="req">*</span></label>
-          <input
-            type="text"
-            [(ngModel)]="addForm.adUser"
-            name="adUser"
-            placeholder="Enter AD User"
-            [class.invalid]="isInvalid('adUser')"
-          />
-        </div>
       </div>
+      @if (!isRequestUser) {
+        <div class="section-title">AD Information</div>
+        <div class="form-grid">
+          <div class="field-group span-2">
+            <label for="add-ad-user">AD User <span class="req">*</span></label>
+            <input
+              id="add-ad-user"
+              type="text"
+              [(ngModel)]="addForm.adUser"
+              name="adUser"
+              placeholder="Enter AD User"
+              [class.invalid]="isInvalid('adUser')"
+            />
+          </div>
+          <div class="field-group span-2">
+            <label for="add-ad-password">Password <span class="req">*</span></label>
+            <div class="password-input-wrap">
+              <input
+                id="add-ad-password"
+                [type]="addShowPassword ? 'text' : 'password'"
+                [(ngModel)]="addForm.adPassword"
+                #password="ngModel"
+                name="password"
+                required
+                [class.invalid]="
+                  (submitted || password.touched) && getPasswordError(addForm.adPassword) !== ''
+                "
+                [attr.aria-invalid]="
+                  (submitted || password.touched) && getPasswordError(addForm.adPassword) !== ''
+                "
+                aria-describedby="add-ad-password-error"
+                autocomplete="new-password"
+                placeholder="Enter Password"
+              />
+              <button
+                class="toggle-pass"
+                type="button"
+                (click)="addShowPassword = !addShowPassword"
+                [attr.aria-label]="addShowPassword ? 'ซ่อนรหัสผ่าน' : 'แสดงรหัสผ่าน'"
+                [attr.aria-pressed]="addShowPassword"
+                aria-controls="add-ad-password"
+              >
+                <i
+                  [class]="addShowPassword ? 'fas fa-eye-slash' : 'fas fa-eye'"
+                  aria-hidden="true"
+                ></i>
+              </button>
+            </div>
+            @if ((submitted || password.touched) && getPasswordError(addForm.adPassword) !== '') {
+              <small id="add-ad-password-error" class="password-error" role="alert">
+                {{ getPasswordError(addForm.adPassword) }}
+              </small>
+            }
+          </div>
+          <div class="field-group span-2">
+            <label for="add-ad-confirm-password">Confirm Password <span class="req">*</span></label>
+            <div class="password-input-wrap">
+              <input
+                id="add-ad-confirm-password"
+                [type]="addShowConfirmPassword ? 'text' : 'password'"
+                [(ngModel)]="addForm.adConfirmPassword"
+                #adConfirmPassword="ngModel"
+                name="adConfirmPassword"
+                required
+                autocomplete="new-password"
+                placeholder="Confirm Password"
+                [class.invalid]="(submitted || adConfirmPassword.touched) && passwordsMismatch"
+                [attr.aria-invalid]="(submitted || adConfirmPassword.touched) && passwordsMismatch"
+                aria-describedby="add-ad-confirm-password-error"
+              />
+              <button
+                class="toggle-pass"
+                type="button"
+                (click)="addShowConfirmPassword = !addShowConfirmPassword"
+                [attr.aria-label]="
+                  addShowConfirmPassword ? 'ซ่อนรหัสผ่านยืนยัน' : 'แสดงรหัสผ่านยืนยัน'
+                "
+                [attr.aria-pressed]="addShowConfirmPassword"
+                aria-controls="add-ad-confirm-password"
+              >
+                <i
+                  [class]="addShowConfirmPassword ? 'fas fa-eye-slash' : 'fas fa-eye'"
+                  aria-hidden="true"
+                ></i>
+              </button>
+            </div>
+            @if ((submitted || adConfirmPassword.touched) && passwordsMismatch) {
+              <small id="add-ad-confirm-password-error" class="password-error" role="alert">
+                รหัสผ่านไม่ตรงกัน
+              </small>
+            }
+          </div>
+          <div class="field-group span-2">
+            <label for="add-ad-expire-date">Expire Date <span class="req">*</span></label>
+            <nz-date-picker
+              class="field-nz-datepicker custom-picker"
+              nzDropdownClassName="custom-picker-popup"
+              nzId="add-ad-expire-date"
+              [(ngModel)]="addForm.adExpireDate"
+              name="expireDate"
+              required
+              [nzStatus]="isInvalid('adExpireDate') ? 'error' : ''"
+              nzFormat="dd/MM/yyyy"
+              nzPlaceHolder="เลือกวันที่หมดอายุ"
+            />
+          </div>
+        </div>
+      }
     </form>
   }
 </div>

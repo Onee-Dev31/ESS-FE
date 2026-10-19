@@ -331,7 +331,7 @@
   <nz-modal
     [(nzVisible)]="isEditOpen"
     nzTitle="แก้ไข AD User"
-    [nzWidth]="480"
+    [nzWidth]="760"
     nzCentered
     [nzMaskClosable]="false"
     (nzOnCancel)="closeEdit()"
@@ -351,6 +351,56 @@
           <div class="edit-info-row">
             <span class="edit-label">AD User เดิม</span>
             <span class="edit-value ad-user">{{ editEmp.adUser || '-' }}</span>
+          </div>
+          @if (!editEmp.adUser) {
+            <div class="edit-field">
+              <label>Employee</label>
+              <nz-select
+                nzShowSearch
+                nzAllowClear
+                nzPlaceHolder="เลือกพนักงาน"
+                [ngModel]="editSelectedEmployee"
+                (ngModelChange)="onEditEmployeeChange($event)"
+                [nzDisabled]="isEditGroupsLoading || isEditSaving"
+              >
+                @for (employee of editEmployeeList; track employee.value) {
+                  <nz-option [nzValue]="employee.value" [nzLabel]="employee.label" />
+                }
+              </nz-select>
+            </div>
+          }
+          <div class="edit-field edit-groups-field">
+            <label>Groups</label>
+            @if (isEditGroupsLoading) {
+              <span role="status">กำลังโหลด Groups...</span>
+            }
+            @if (editGroupsLoadFailed) {
+              <span class="field-error" role="alert">
+                โหลด Groups ไม่ครบ กรุณาลองใหม่ก่อนบันทึก
+              </span>
+              <button
+                type="button"
+                nz-button
+                (click)="retryEditGroups()"
+                [disabled]="isEditGroupsLoading || isEditSaving"
+              >
+                โหลด Groups อีกครั้ง
+              </button>
+            }
+            <nz-transfer
+              [nzDataSource]="editGroupList"
+              [nzOneWay]="true"
+              [nzShowSearch]="true"
+              [nzTitles]="['Source', 'Target']"
+              nzSearchPlaceholder="ค้นหา Groups"
+              [nzListStyle]="{ width: '100%', height: '300px' }"
+              [nzDisabled]="
+                isEditGroupsLoading ||
+                isEditSaving ||
+                editGroupsLoadFailed ||
+                (!editEmp.adUser && !editSelectedEmployee)
+              "
+            />
           </div>
           <div class="edit-field">
             <label>AD User ใหม่ <span style="color: #e53935">*</span></label>
@@ -394,7 +444,9 @@
       <button
         class="btn-edit-confirm"
         (click)="confirmEdit()"
-        [disabled]="isEditSaving || validateEditTel()"
+        [disabled]="
+          isEditSaving || isEditGroupsLoading || editGroupsLoadFailed || validateEditTel()
+        "
       >
         <i class="fas fa-save"></i> ยืนยัน
       </button>
@@ -433,6 +485,11 @@
                 [type]="resetShowPassword ? 'text' : 'password'"
                 class="edit-input"
                 [(ngModel)]="resetNewPassword"
+                #resetPassword="ngModel"
+                [class.invalid]="resetPassword.touched && getPasswordError(resetNewPassword) !== ''"
+                [attr.aria-invalid]="resetPassword.touched && getPasswordError(resetNewPassword) !== ''"
+                aria-describedby="reset-password-error"
+                autocomplete="new-password"
                 placeholder="กรอก Password ใหม่"
               />
               <button
@@ -443,13 +500,22 @@
                 <i [class]="resetShowPassword ? 'fas fa-eye-slash' : 'fas fa-eye'"></i>
               </button>
             </div>
+            @if (resetPassword.touched && getPasswordError(resetNewPassword) !== '') {
+              <small id="reset-password-error" class="field-error" role="alert">
+                {{ getPasswordError(resetNewPassword) }}
+              </small>
+            }
           </div>
         </div>
       }
     </ng-container>
     <ng-template #resetFooter>
       <button class="btn-edit-cancel" (click)="closeReset()">ยกเลิก</button>
-      <button class="btn-edit-confirm" (click)="confirmReset()" [disabled]="!resetNewPassword">
+      <button
+        class="btn-edit-confirm"
+        (click)="confirmReset()"
+        [disabled]="getPasswordError(resetNewPassword) !== ''"
+      >
         <i class="fas fa-key"></i> Reset
       </button>
     </ng-template>

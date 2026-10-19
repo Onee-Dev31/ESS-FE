@@ -129,12 +129,13 @@ export class EmpAdService {
     lastName?: string;
     displayName?: string;
     email?: string;
-    tel?: string;
+    USR_MOBILE?: string;
     jobTitle?: string;
     department?: string;
     company?: string;
     description?: string;
     adUserOld?: string;
+    AD_GROUPS?: string[];
   }): Observable<any> {
     let httpParams = new HttpParams().set('codeMpId', params.codeMpId).set('adUser', params.adUser);
     if (params.empTypeId != null)
@@ -144,16 +145,19 @@ export class EmpAdService {
     if (params.lastName) httpParams = httpParams.set('lastName', params.lastName);
     if (params.displayName) httpParams = httpParams.set('displayName', params.displayName);
     if (params.email) httpParams = httpParams.set('email', params.email);
-    if (params.tel) httpParams = httpParams.set('tel', params.tel);
+    if (params.USR_MOBILE) httpParams = httpParams.set('USR_MOBILE', params.USR_MOBILE);
     if (params.jobTitle) httpParams = httpParams.set('jobTitle', params.jobTitle);
     if (params.department) httpParams = httpParams.set('department', params.department);
     if (params.company) httpParams = httpParams.set('company', params.company);
     if (params.description) httpParams = httpParams.set('description', params.description);
     if (params.adUserOld) httpParams = httpParams.set('adUserOld', params.adUserOld);
-    return this._http.put(`${this.baseUrl}/Employee/UpdateEmployeeX1`, null, {
-      params: httpParams,
-      responseType: 'text',
-    });
+    return this._http.put(
+      `${this.baseUrl}/Employee/UpdateEmployeeX1`,
+      params.AD_GROUPS !== undefined ? { AD_GROUPS: params.AD_GROUPS } : null,
+      {
+        params: httpParams,
+      },
+    );
   }
 
   getfreelanceCode(comcode: string): Observable<any> {
@@ -169,7 +173,10 @@ export class EmpAdService {
     });
   }
 
-  getAllGroups(): Observable<any> {
-    return this._http.get(`${this.baseUrl}/ActiveDirectory/GetUserGroupsAll`);
+  getAdUserGroupsByCompany(company: string): Observable<any> {
+    return this._http.get(`${this.baseUrl}/ActiveDirectory/GetUserGroupsAll`, {
+      params: new HttpParams().set('company', company),
+      context: new HttpContext().set(SKIP_ERROR_TOAST, true),
+    });
   }
 }

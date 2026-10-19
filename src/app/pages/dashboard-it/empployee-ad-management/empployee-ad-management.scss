@@ -562,6 +562,12 @@
 }
 
 // ==================== EDIT MODAL ====================
+:host ::ng-deep .edit-groups-field .ant-transfer-list {
+  min-width: 0;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
 .edit-modal-body {
   display: flex;
   flex-direction: column;

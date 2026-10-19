@@ -103,6 +103,32 @@
   grid-column: span 2;
 }
 
+.password-error {
+  color: #dc3545;
+}
+
+.password-input-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+
+  input {
+    width: 100%;
+    min-width: 0;
+    padding-right: 40px;
+  }
+
+  .toggle-pass {
+    position: absolute;
+    right: 10px;
+    padding: 4px;
+    border: none;
+    background: none;
+    color: var(--text-muted);
+    cursor: pointer;
+  }
+}
+
 input.invalid {
   border-color: #e53935 !important;
   background: #fff5f5 !important;
@@ -120,6 +146,24 @@ input.invalid {
 
 .field-nz-select {
   width: 100%;
+}
+
+.field-nz-datepicker {
+  width: 100%;
+  height: 38px;
+  padding: 0 12px;
+  border-radius: 6px;
+  transition: border-color 0.2s;
+
+  &:hover,
+  &.ant-picker-focused {
+    border-color: $primary;
+    box-shadow: none;
+  }
+}
+
+:host ::ng-deep .field-nz-datepicker .ant-picker-input > input {
+  font-size: 0.9rem;
 }
 
 .groups-field {

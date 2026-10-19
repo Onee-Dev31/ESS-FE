@@ -1,11 +1,13 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectorRef, Component } from '@angular/core';
+import { ChangeDetectorRef, Component, OnDestroy } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { from, of } from 'rxjs';
-import { catchError, map, mergeMap, toArray } from 'rxjs/operators';
+import { from, merge, of, Subscription } from 'rxjs';
+import { catchError, finalize, map, mergeMap, toArray } from 'rxjs/operators';
 import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzModalModule } from 'ng-zorro-antd/modal';
 import { NzSelectModule } from 'ng-zorro-antd/select';
+import { NzTransferModule, TransferItem } from 'ng-zorro-antd/transfer';
+import { SettingService } from '../../../services/setting.service';
 import { PageHeaderComponent } from '../../../components/shared/page-header/page-header';
 import { PaginationComponent } from '../../../components/shared/pagination/pagination';
 import { EmptyStateComponent } from '../../../components/shared/empty-state/empty-state';
@@ -17,6 +19,7 @@ import { MasterDataService } from '../../../services/master-data.service';
 import { SwalService } from '../../../services/swal.service';
 import { EmpAdForm } from './emp-ad-form/emp-ad-form';
 import { ModalShellComponent } from '../../../components/shared/modal-shell/modal-shell';
+import { getPasswordError } from '../../../utils/form-validation.util';
 
 @Component({
   selector: 'app-empployee-ad-management',
@@ -26,6 +29,7 @@ import { ModalShellComponent } from '../../../components/shared/modal-shell/moda
     NzButtonModule,
     NzModalModule,
     NzSelectModule,
+    NzTransferModule,
     PageHeaderComponent,
     PaginationComponent,
     EmptyStateComponent,
@@ -36,7 +40,7 @@ import { ModalShellComponent } from '../../../components/shared/modal-shell/moda
   templateUrl: './empployee-ad-management.html',
   styleUrl: './empployee-ad-management.scss',
 })
-export class EmpployeeAdManagement {
+export class EmpployeeAdManagement implements OnDestroy {
   pageTitle = 'จัดการ Employee AD';
   isLoading = false;
 
@@ -50,10 +54,19 @@ export class EmpployeeAdManagement {
   editAdUser = '';
   editEmail = '';
   editTel = '';
+  editSelectedEmployee: string | null = null;
+  editEmployeeList: { value: string; label: string; adUser: string }[] = [];
+  editGroupList: TransferItem[] = [];
+  isEditGroupsLoading = false;
+  editGroupsLoadFailed = false;
+  private editAllGroups: { name: string; distinguishedName: string }[] = [];
+  private editRequests = new Subscription();
+  private editGroupRequest?: Subscription;
 
   isResetOpen = false;
   resetEmp: any = null;
   resetNewPassword = '';
+  readonly getPasswordError = getPasswordError;
   resetShowPassword = false;
 
   adInfoMap: { [adUser: string]: { IsDisabled: string; IsLocked: string } } = {};
@@ -87,6 +100,7 @@ export class EmpployeeAdManagement {
     private loadingService: LoadingService,
     private swalService: SwalService,
     private cdr: ChangeDetectorRef,
+    private settingService: SettingService,
   ) {}
 
   ngOnInit() {
@@ -206,29 +220,182 @@ export class EmpployeeAdManagement {
   }
 
   openEdit(emp: any) {
-    this.empAdService.getEmployeeDetails(emp.employeeId).subscribe({
-      next: (res: any) => {
-        this.editEmp = emp;
-        this.editAdUser = res.AD_USER ?? '';
-        this.editEmail = res.EMAIL ?? '';
-        this.editTel = res.USR_MOBILE ?? '';
-        this.isEditOpen = true;
-        this.cdr.detectChanges();
-      },
-      error: (err) => {
-        this.swalService.error(
-          err?.error?.message ?? 'เกิดข้อผิดพลาดขณะโหลดข้อมูลพนักงาน กรุณาลองใหม่',
-        );
-      },
-    });
+    this.closeEdit();
+    this.editRequests = new Subscription();
+    this.editRequests.add(
+      this.empAdService.getEmployeeDetails(emp.employeeId).subscribe({
+        next: (res: any) => {
+          this.editEmp = { ...emp, adUser: (res.AD_USER ?? emp.adUser ?? '').trim() };
+          this.editAdUser = this.editEmp.adUser;
+          this.editEmail = res.EMAIL ?? '';
+          this.editTel = res.USR_MOBILE ?? '';
+          this.isEditOpen = true;
+          this.loadEditGroups(this.editEmp.adUser);
+          if (!this.editEmp.adUser) this.loadEditEmployees();
+          this.cdr.detectChanges();
+        },
+        error: (err) => {
+          this.swalService.error(
+            err?.error?.message ?? 'เกิดข้อผิดพลาดขณะโหลดข้อมูลพนักงาน กรุณาลองใหม่',
+          );
+        },
+      }),
+    );
   }
 
   closeEdit() {
+    this.editRequests.unsubscribe();
+    this.editGroupRequest?.unsubscribe();
     this.isEditOpen = false;
     this.editEmp = null;
     this.editAdUser = '';
     this.editEmail = '';
     this.editTel = '';
+    this.editSelectedEmployee = null;
+    this.editEmployeeList = [];
+    this.editGroupList = [];
+    this.editAllGroups = [];
+    this.isEditGroupsLoading = false;
+    this.editGroupsLoadFailed = false;
+  }
+
+  ngOnDestroy() {
+    this.editRequests.unsubscribe();
+    this.editGroupRequest?.unsubscribe();
+  }
+
+  retryEditGroups() {
+    if (this.isEditGroupsLoading || !this.editEmp) return;
+    const adUser =
+      this.editEmp.adUser ||
+      this.editEmployeeList.find((employee) => employee.value === this.editSelectedEmployee)
+        ?.adUser ||
+      '';
+    this.loadEditGroups(adUser);
+  }
+
+  private loadEditGroups(adUser: string) {
+    this.isEditGroupsLoading = true;
+    this.editGroupsLoadFailed = false;
+    this.editRequests.add(
+      merge(
+        this.empAdService.getAdUserGroupsByCompany(this.editEmp.companyCode).pipe(
+          map((data) => ({ source: 'all' as const, data })),
+          catchError(() => {
+            this.editGroupsLoadFailed = true;
+            this.swalService.error('ไม่สามารถโหลด Groups ของบริษัทได้ กรุณาลองใหม่');
+            return of(null);
+          }),
+        ),
+        adUser
+          ? this.empAdService.getAdUserGroups(adUser).pipe(
+              map((data) => ({ source: 'user' as const, data })),
+              catchError(() => {
+                this.editGroupsLoadFailed = true;
+                this.swalService.error(
+                  `ไม่สามารถโหลด Groups ของ AD User: ${adUser} ได้ กรุณาลองใหม่`,
+                );
+                return of(null);
+              }),
+            )
+          : of(null),
+      )
+        .pipe(
+          finalize(() => {
+            this.isEditGroupsLoading = false;
+            this.cdr.detectChanges();
+          }),
+        )
+        .subscribe((result) => {
+          if (!result) return;
+          if (result.source === 'all') {
+            const items = Array.isArray(result.data) ? result.data : [result.data];
+            this.editAllGroups = items.flatMap((item) => item?.groups ?? [item]);
+            this.setEditGroupList(
+              this.editGroupList
+                .filter((group) => group.direction === 'right')
+                .map((group) => ({ name: group.title, distinguishedName: group['key'] })),
+            );
+          } else {
+            const user = Array.isArray(result.data) ? result.data[0] : result.data;
+            this.setEditGroupList(user?.groups ?? []);
+          }
+          this.cdr.detectChanges();
+        }),
+    );
+  }
+
+  onEditEmployeeChange(employeeId: string | null) {
+    this.editSelectedEmployee = employeeId;
+    this.editGroupRequest?.unsubscribe();
+    this.isEditGroupsLoading = false;
+    this.editGroupsLoadFailed = false;
+    this.setEditGroupList([]);
+    const adUser = this.editEmployeeList.find((employee) => employee.value === employeeId)?.adUser;
+    if (!adUser) return;
+
+    this.isEditGroupsLoading = true;
+    this.editGroupRequest = this.empAdService.getAdUserGroups(adUser).subscribe({
+      next: (res) => {
+        const user = Array.isArray(res) ? res[0] : res;
+        this.setEditGroupList(user?.groups ?? []);
+        this.isEditGroupsLoading = false;
+        this.cdr.detectChanges();
+      },
+      error: () => {
+        this.isEditGroupsLoading = false;
+        this.editGroupsLoadFailed = true;
+        this.swalService.error('ไม่สามารถโหลด Groups ของพนักงานได้');
+        this.cdr.detectChanges();
+      },
+    });
+  }
+
+  private setEditGroupList(selectedGroups: { name: string; distinguishedName: string }[]) {
+    const selected = new Set(selectedGroups.map((group) => group.distinguishedName));
+    const groups = [...this.editAllGroups, ...selectedGroups].filter(
+      (group) =>
+        typeof group?.name === 'string' &&
+        group.name.trim().length > 0 &&
+        typeof group.distinguishedName === 'string' &&
+        group.distinguishedName.trim().length > 0,
+    );
+    this.editGroupList = [
+      ...new Map(groups.map((group) => [group.distinguishedName, group])).values(),
+    ].map((group) => ({
+      key: group.distinguishedName,
+      title: group.name,
+      direction: selected.has(group.distinguishedName) ? 'right' : 'left',
+    }));
+  }
+
+  private loadEditEmployees(page = 1) {
+    const costCent = this.editEmp.department?.split(' ')[0];
+    this.editRequests.add(
+      this.settingService
+        .getEmployee({
+          companyCode: this.editEmp.companyCode,
+          costCent,
+          page,
+          pageSize: 500,
+        })
+        .subscribe({
+          next: (res) => {
+            const items = Array.isArray(res) ? res : (res.data ?? []);
+            this.editEmployeeList = [
+              ...this.editEmployeeList,
+              ...items.map((employee: any) => ({
+                value: employee.UserID,
+                label: `${employee.UserID} - ${employee.FullNameThai ?? ''}`.trim(),
+                adUser: employee.ADUsername ?? employee.ADUser ?? '',
+              })),
+            ];
+            if (items.length === 500) this.loadEditEmployees(page + 1);
+            this.cdr.detectChanges();
+          },
+          error: () => this.swalService.error('ไม่สามารถโหลดรายชื่อพนักงานได้'),
+        }),
+    );
   }
 
   validateEditTel(event?: Event) {
@@ -333,7 +500,7 @@ export class EmpployeeAdManagement {
   }
 
   confirmReset() {
-    if (!this.resetNewPassword || !this.resetEmp) return;
+    if (getPasswordError(this.resetNewPassword) !== '' || !this.resetEmp) return;
 
     this.empAdService.resetPassword(this.resetEmp.adUser, this.resetNewPassword).subscribe({
       next: () => {
@@ -423,7 +590,14 @@ export class EmpployeeAdManagement {
   }
 
   confirmEdit() {
-    if (!this.editEmp) return;
+    if (
+      !this.editEmp ||
+      this.isEditSaving ||
+      this.isEditGroupsLoading ||
+      this.editGroupsLoadFailed ||
+      this.validateEditTel()
+    )
+      return;
 
     const emp = this.editEmp;
     const payload = {
@@ -435,12 +609,15 @@ export class EmpployeeAdManagement {
       lastName: emp.nameEng2 ?? emp.lastName ?? '',
       displayName: `${emp.nameThai1 ?? ''} ${emp.nameThai2 ?? ''}`.trim(),
       email: this.editEmail,
-      tel: this.editTel,
+      USR_MOBILE: this.editTel,
       jobTitle: emp.position ?? '',
       department: emp.department ?? '',
       company: emp.companyCode ?? '',
       description: '',
       adUserOld: emp.adUser ?? '',
+      AD_GROUPS: this.editGroupList
+        .filter((group) => group.direction === 'right')
+        .map((group) => group['key'] as string),
     };
 
     this.isEditSaving = true;

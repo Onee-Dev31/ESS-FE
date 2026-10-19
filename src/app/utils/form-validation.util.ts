@@ -7,6 +7,17 @@ export const FORM_VALIDATION_PATTERNS = {
   phone: /^\d{3}-\d{3}-\d{4}$/,
 } as const;
 
+export function getPasswordError(value: string): string {
+  if (!value) return 'กรุณากรอกรหัสผ่าน';
+  if (value.length < 8) return 'รหัสผ่านต้องยาวอย่างน้อย 8 อักษร';
+  if (!/[A-Z]/.test(value)) return 'รหัสผ่านต้องมีตัวพิมพ์ใหญ่';
+  if (!/[a-z]/.test(value)) return 'รหัสผ่านต้องมีตัวพิมพ์เล็ก';
+  if (!/[0-9]/.test(value)) return 'รหัสผ่านต้องมีตัวเลข';
+  if (!/[^A-Za-z0-9\s]/.test(value)) return 'รหัสผ่านต้องมีอักขระพิเศษ';
+  if (!/^[!-~]+$/.test(value)) return 'รหัสผ่านต้องใช้ตัวอักษรอังกฤษพิมใหญ่ พิมเล็ก ตัวเลข หรืออักขระพิเศษ โดยไม่มีช่องว่าง';
+  return '';
+}
+
 export function sanitizeThaiName(value: string): string {
   return value.replace(/[^\u0E00-\u0E7F .'-]/g, '');
 }
