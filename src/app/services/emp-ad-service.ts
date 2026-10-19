@@ -133,7 +133,6 @@ export class EmpAdService {
     jobTitle?: string;
     department?: string;
     company?: string;
-    description?: string;
     adUserOld?: string;
     AD_GROUPS?: string[];
   }): Observable<any> {
@@ -149,7 +148,6 @@ export class EmpAdService {
     if (params.jobTitle) httpParams = httpParams.set('jobTitle', params.jobTitle);
     if (params.department) httpParams = httpParams.set('department', params.department);
     if (params.company) httpParams = httpParams.set('company', params.company);
-    if (params.description) httpParams = httpParams.set('description', params.description);
     if (params.adUserOld) httpParams = httpParams.set('adUserOld', params.adUserOld);
     return this._http.put(
       `${this.baseUrl}/Employee/UpdateEmployeeX1`,

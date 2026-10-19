@@ -562,10 +562,60 @@
 }
 
 // ==================== EDIT MODAL ====================
-:host ::ng-deep .edit-groups-field .ant-transfer-list {
+.group-item-title {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.edit-groups-field ::ng-deep .ant-transfer-list-content-item .ant-checkbox-wrapper {
+  width: 100%;
+  min-width: 0;
+
+  > span:last-child {
+    display: flex;
+    flex: 1;
+    align-items: center;
+    min-width: 0;
+  }
+}
+
+.edit-groups-field ::ng-deep .ant-transfer-list-content-item {
+  position: relative;
+  padding-right: 36px;
+}
+
+.group-remove-button {
+  position: absolute;
+  top: 50%;
+  right: 12px;
+  transform: translateY(-50%);
+  padding: 0 4px;
+  border: 0;
+  background: transparent;
+  color: #bfbfbf;
+  cursor: pointer;
+
+  &:hover:not(:disabled) {
+    color: #ff2727;
+  }
+
+  &:disabled {
+    color: var(--text-muted);
+    cursor: not-allowed;
+  }
+}
+
+.edit-groups-field ::ng-deep .ant-transfer-list {
   min-width: 0;
   border-radius: 8px;
   overflow: hidden;
+
+  &[data-direction='right'] {
+    border-color: var(--success);
+  }
 }
 
 .edit-modal-body {

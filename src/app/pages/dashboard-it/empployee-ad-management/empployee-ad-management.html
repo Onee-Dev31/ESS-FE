@@ -354,11 +354,11 @@
           </div>
           @if (!editEmp.adUser) {
             <div class="edit-field">
-              <label>Employee</label>
+              <label>พนักงานต้นแบบ</label>
               <nz-select
                 nzShowSearch
                 nzAllowClear
-                nzPlaceHolder="เลือกพนักงาน"
+                nzPlaceHolder="เลือกพนักงานต้นแบบ"
                 [ngModel]="editSelectedEmployee"
                 (ngModelChange)="onEditEmployeeChange($event)"
                 [nzDisabled]="isEditGroupsLoading || isEditSaving"
@@ -388,12 +388,15 @@
               </button>
             }
             <nz-transfer
+              #editGroupsTransfer
               [nzDataSource]="editGroupList"
-              [nzOneWay]="true"
+              [nzRender]="editGroupItem"
               [nzShowSearch]="true"
               [nzTitles]="['Source', 'Target']"
+              nzItemUnit="รายการ"
+              nzItemsUnit="รายการ"
               nzSearchPlaceholder="ค้นหา Groups"
-              [nzListStyle]="{ width: '100%', height: '300px' }"
+              [nzListStyle]="{ flex: '1 1', height: '300px' }"
               [nzDisabled]="
                 isEditGroupsLoading ||
                 isEditSaving ||
@@ -401,6 +404,20 @@
                 (!editEmp.adUser && !editSelectedEmployee)
               "
             />
+            <ng-template #editGroupItem let-item>
+              <span class="group-item-title" [title]="item.title">{{ item.title }}</span>
+              @if (item.direction === 'right') {
+                <button
+                  type="button"
+                  class="group-remove-button"
+                  [disabled]="editGroupsTransfer.nzDisabled || item.disabled"
+                  [attr.aria-label]="'ลบกลุ่ม ' + item.title"
+                  (click)="$event.stopPropagation(); $event.preventDefault(); removeEditGroup(item)"
+                >
+                  <nz-icon nzType="delete" nzTheme="outline" aria-hidden="true" />
+                </button>
+              }
+            </ng-template>
           </div>
           <div class="edit-field">
             <label>AD User ใหม่ <span style="color: #e53935">*</span></label>
@@ -487,7 +504,9 @@
                 [(ngModel)]="resetNewPassword"
                 #resetPassword="ngModel"
                 [class.invalid]="resetPassword.touched && getPasswordError(resetNewPassword) !== ''"
-                [attr.aria-invalid]="resetPassword.touched && getPasswordError(resetNewPassword) !== ''"
+                [attr.aria-invalid]="
+                  resetPassword.touched && getPasswordError(resetNewPassword) !== ''
+                "
                 aria-describedby="reset-password-error"
                 autocomplete="new-password"
                 placeholder="กรอก Password ใหม่"

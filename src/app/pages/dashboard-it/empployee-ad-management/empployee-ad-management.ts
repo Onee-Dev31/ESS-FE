@@ -6,6 +6,7 @@ import { catchError, finalize, map, mergeMap, toArray } from 'rxjs/operators';
 import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzModalModule } from 'ng-zorro-antd/modal';
 import { NzSelectModule } from 'ng-zorro-antd/select';
+import { NzIconModule } from 'ng-zorro-antd/icon';
 import { NzTransferModule, TransferItem } from 'ng-zorro-antd/transfer';
 import { SettingService } from '../../../services/setting.service';
 import { PageHeaderComponent } from '../../../components/shared/page-header/page-header';
@@ -29,6 +30,7 @@ import { getPasswordError } from '../../../utils/form-validation.util';
     NzButtonModule,
     NzModalModule,
     NzSelectModule,
+    NzIconModule,
     NzTransferModule,
     PageHeaderComponent,
     PaginationComponent,
@@ -351,6 +353,12 @@ export class EmpployeeAdManagement implements OnDestroy {
     });
   }
 
+  removeEditGroup(item: TransferItem) {
+    this.editGroupList = this.editGroupList.map((group) =>
+      group === item ? { ...group, direction: 'left', checked: false } : group,
+    );
+  }
+
   private setEditGroupList(selectedGroups: { name: string; distinguishedName: string }[]) {
     const selected = new Set(selectedGroups.map((group) => group.distinguishedName));
     const groups = [...this.editAllGroups, ...selectedGroups].filter(
@@ -613,7 +621,6 @@ export class EmpployeeAdManagement implements OnDestroy {
       jobTitle: emp.position ?? '',
       department: emp.department ?? '',
       company: emp.companyCode ?? '',
-      description: '',
       adUserOld: emp.adUser ?? '',
       AD_GROUPS: this.editGroupList
         .filter((group) => group.direction === 'right')

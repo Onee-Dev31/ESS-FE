@@ -103,7 +103,8 @@
         <div class="field-group">
           <label>TitleName (Thai) <span class="req">*</span></label>
           <nz-select
-            [(ngModel)]="addForm.titleThai"
+            [ngModel]="addForm.titleThai"
+            (ngModelChange)="onTitleChange($event, 'th')"
             name="titleThai"
             nzShowSearch
             nzAllowClear
@@ -149,7 +150,8 @@
         <div class="field-group">
           <label>TitleName (English) <span class="req">*</span></label>
           <nz-select
-            [(ngModel)]="addForm.titleEng"
+            [ngModel]="addForm.titleEng"
+            (ngModelChange)="onTitleChange($event, 'en')"
             name="titleEng"
             nzShowSearch
             nzAllowClear
@@ -290,11 +292,11 @@
           </nz-select>
         </div>
         <div class="field-group span-2" *ngIf="!isRequestUser">
-          <label>Employee</label>
+          <label>พนักงานต้นแบบ</label>
           <nz-select
             nzShowSearch
             nzAllowClear
-            nzPlaceHolder="เลือกพนักงาน"
+            nzPlaceHolder="เลือกพนักงานต้นแบบ"
             class="field-nz-select"
             [ngModel]="selectedEmployee"
             (ngModelChange)="onEmployeeChange($event)"
@@ -310,18 +312,52 @@
           <label>Groups</label>
           <nz-transfer
             [nzDataSource]="groupList"
-            [nzOneWay]="true"
+            [nzRender]="groupItem"
             [nzShowSearch]="true"
             [nzTitles]="['Source', 'Target']"
+            nzItemUnit="รายการ"
+            nzItemsUnit="รายการ"
             nzSearchPlaceholder="ค้นหา Groups"
             [nzListStyle]="{ width: '100%', height: '300px' }"
             [nzDisabled]="!selectedEmployee"
           >
           </nz-transfer>
+          <ng-template #groupItem let-item>
+            <span class="group-item-title" [title]="item.title">{{ item.title }}</span>
+            @if (item.direction === 'right') {
+              <button
+                type="button"
+                class="group-remove-button"
+                [disabled]="!selectedEmployee || item.disabled"
+                [attr.aria-label]="'ลบกลุ่ม ' + item.title"
+                (click)="$event.stopPropagation(); $event.preventDefault(); removeGroup(item)"
+              >
+                <nz-icon nzType="delete" nzTheme="outline" aria-hidden="true" />
+              </button>
+            }
+          </ng-template>
         </div>
         <div class="field-group span-2">
-          <label>Email</label>
-          <input type="email" [(ngModel)]="addForm.email" name="email" placeholder="Enter Email" />
+          <label for="add-employee-email">
+            Email
+            @if (!isRequestUser) {
+              <span class="req">*</span>
+            }
+          </label>
+          <input
+            id="add-employee-email"
+            type="email"
+            [(ngModel)]="addForm.email"
+            name="email"
+            placeholder="Enter Email"
+            [required]="!isRequestUser"
+            [class.invalid]="!isRequestUser && isInvalid('email')"
+            [attr.aria-invalid]="!isRequestUser && isInvalid('email')"
+            aria-describedby="add-employee-email-error"
+          />
+          @if (!isRequestUser && isInvalid('email')) {
+            <span id="add-employee-email-error" class="field-error">กรุณากรอก Email</span>
+          }
         </div>
         <div class="field-group span-2">
           <label>Mobile</label>
@@ -338,19 +374,14 @@
       <div class="form-grid">
         <div class="field-group span-2">
           <label>Head Employee Code <span class="req">*</span></label>
-          <nz-select
-            [(ngModel)]="addForm.headEmployeeCode"
-            name="headEmployeeCode"
-            nzShowSearch
-            nzAllowClear
-            nzPlaceHolder="Select HeadEmployee"
-            class="field-nz-select"
-            [nzStatus]="isInvalid('headEmployeeCode') ? 'error' : ''"
-          >
-            @for (h of headEmployeeList; track h.CODEMPID) {
-              <nz-option [nzValue]="h.CODEMPID" [nzLabel]="h.CODEMPID + ' - ' + h.NAMETHAI" />
-            }
-          </nz-select>
+          <input
+            type="text"
+            [value]="addForm.headEmployeeCode ? addForm.headEmployeeCode + ' - ' + addForm.headEmployeeName : ''"
+            placeholder="ระบบระบุหัวหน้าตามแผนกที่เลือก"
+            aria-label="Head Employee Code"
+            readonly
+            [class.invalid]="isInvalid('headEmployeeCode')"
+          />
         </div>
       </div>
       @if (!isRequestUser) {

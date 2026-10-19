@@ -171,9 +171,52 @@ input.invalid {
   min-width: 0;
 }
 
+.group-item-title {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+:host ::ng-deep .groups-field .ant-transfer-list-content-item .ant-checkbox-wrapper {
+  width: 100%;
+  min-width: 0;
+
+  > span:last-child {
+    display: flex;
+    flex: 1;
+    align-items: center;
+    min-width: 0;
+  }
+}
+
+.group-remove-button {
+  flex: none;
+  margin-left: 8px;
+  padding: 0 4px;
+  border: 0;
+  background: transparent;
+  color: #bfbfbf;
+  cursor: pointer;
+
+  &:hover:not(:disabled) {
+    color: #ff2727;
+  }
+
+  &:disabled {
+    color: var(--text-muted);
+    cursor: not-allowed;
+  }
+}
+
 :host ::ng-deep .groups-field .ant-transfer-list {
   border-radius: 8px;
   overflow: hidden;
+
+  &[data-direction='right'] {
+    border-color: var(--success);
+  }
 }
 
 :host ::ng-deep .groups-field .ant-transfer-list-body-customize-wrapper {

@@ -10,6 +10,7 @@ import {
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { NzSelectModule } from 'ng-zorro-antd/select';
+import { NzIconModule } from 'ng-zorro-antd/icon';
 import { NzDatePickerModule } from 'ng-zorro-antd/date-picker';
 import { NzTransferModule, TransferItem } from 'ng-zorro-antd/transfer';
 import { Subscription } from 'rxjs';
@@ -17,11 +18,12 @@ import { EmpAdService } from '../../../../services/emp-ad-service';
 import { MasterDataService } from '../../../../services/master-data.service';
 import { SwalService } from '../../../../services/swal.service';
 import { SettingService } from '../../../../services/setting.service';
+import { ApprovalSetupService } from '../../../../services/approval-setup.service';
 import { getPasswordError } from '../../../../utils/form-validation.util';
 
 @Component({
   selector: 'app-emp-ad-form',
-  imports: [CommonModule, FormsModule, NzSelectModule, NzTransferModule, NzDatePickerModule],
+  imports: [CommonModule, FormsModule, NzSelectModule, NzTransferModule, NzDatePickerModule, NzIconModule],
   templateUrl: './emp-ad-form.html',
   styleUrl: './emp-ad-form.scss',
 })
@@ -51,6 +53,7 @@ export class EmpAdForm implements OnChanges, OnDestroy {
     'companyCode',
     'department',
     'headEmployeeCode',
+    'email',
     'adUser',
     'adPassword',
     'adConfirmPassword',
@@ -111,6 +114,7 @@ export class EmpAdForm implements OnChanges, OnDestroy {
     email: '',
     mobile: '',
     headEmployeeCode: '',
+    headEmployeeName: '',
     adUser: '',
     adPassword: '',
     adConfirmPassword: '',
@@ -123,7 +127,6 @@ export class EmpAdForm implements OnChanges, OnDestroy {
   floorList: any[] = [];
   jobPositionList: any[] = [];
   employeeStatusList: any[] = [];
-  headEmployeeList: any[] = [];
   companyList: any[] = [];
   departmentList: any[] = [];
   filteredDepartmentList: any[] = [];
@@ -142,6 +145,7 @@ export class EmpAdForm implements OnChanges, OnDestroy {
   private employeeRequest?: Subscription;
   private groupRequest?: Subscription;
   private allGroupsRequest?: Subscription;
+  private headEmployeeRequest?: Subscription;
 
   constructor(
     private empAdService: EmpAdService,
@@ -149,7 +153,15 @@ export class EmpAdForm implements OnChanges, OnDestroy {
     private swalService: SwalService,
     private cdr: ChangeDetectorRef,
     private settingService: SettingService,
+    private approvalSetupService: ApprovalSetupService,
   ) {}
+
+  onTitleChange(title: string | null, language: 'th' | 'en') {
+    const options = language === 'th' ? this.titleOptions : this.titleEngOptions;
+    const index = options.indexOf(title ?? '');
+    this.addForm.titleThai = this.titleOptions[index] ?? '';
+    this.addForm.titleEng = this.titleEngOptions[index] ?? '';
+  }
 
   onCompanyChange(company: any) {
     this.selectedCompany = company;
@@ -157,6 +169,7 @@ export class EmpAdForm implements OnChanges, OnDestroy {
     this.addForm.companyName = company?.COMPANY_NAME ?? '';
     this.addForm.employeeCode = '';
     this.addForm.department = '';
+    this.resetHeadEmployee();
     this.allGroupsRequest?.unsubscribe();
     this.allGroups = [];
     this.resetEmployeeList();
@@ -184,11 +197,39 @@ export class EmpAdForm implements OnChanges, OnDestroy {
 
   onDepartmentChange() {
     this.resetEmployeeList();
-    if (this.isRequestUser) return;
+    this.resetHeadEmployee();
     const department = this.filteredDepartmentList.find(
       (d) => `${d.COSTCENT} ${d.NAMECOSTCENT}` === this.addForm.department,
     );
-    if (department) this.loadEmployees(department.COSTCENT);
+    if (department) {
+      if (!this.isRequestUser) this.loadEmployees(department.COSTCENT);
+      this.loadHeadEmployee(department.COSTCENT);
+    }
+  }
+
+  private resetHeadEmployee() {
+    this.headEmployeeRequest?.unsubscribe();
+    this.addForm.headEmployeeCode = '';
+    this.addForm.headEmployeeName = '';
+  }
+
+  private loadHeadEmployee(costCent: string) {
+    this.headEmployeeRequest = this.approvalSetupService
+      .getApprovalSetupByCostCenter(costCent)
+      .subscribe({
+        next: (res) => {
+          this.addForm.headEmployeeCode = String(res?.data?.Approver1EmpNo ?? '').trim();
+          this.addForm.headEmployeeName = res?.data?.Approver1Name ?? '';
+          if (!this.addForm.headEmployeeCode) {
+            this.swalService.error('ไม่พบผู้อนุมัติลำดับที่ 1 ของแผนกนี้');
+          }
+          this.cdr.detectChanges();
+        },
+        error: () => {
+          this.swalService.error('ไม่สามารถโหลดหัวหน้าของแผนกได้ กรุณาเลือกแผนกอีกครั้ง');
+          this.cdr.detectChanges();
+        },
+      });
   }
 
   onEmployeeChange(employeeId: string | null) {
@@ -211,6 +252,12 @@ export class EmpAdForm implements OnChanges, OnDestroy {
         this.swalService.error('ไม่สามารถโหลด Groups ของพนักงานได้');
       },
     });
+  }
+
+  removeGroup(item: TransferItem) {
+    this.groupList = this.groupList.map((group) =>
+      group === item ? { ...group, direction: 'left', checked: false } : group,
+    );
   }
 
   private setGroupList(selectedGroups: { name: string; distinguishedName: string }[]) {
@@ -263,6 +310,7 @@ export class EmpAdForm implements OnChanges, OnDestroy {
   }
 
   ngOnDestroy() {
+    this.headEmployeeRequest?.unsubscribe();
     this.employeeRequest?.unsubscribe();
     this.groupRequest?.unsubscribe();
     this.allGroupsRequest?.unsubscribe();
@@ -325,13 +373,6 @@ export class EmpAdForm implements OnChanges, OnDestroy {
       },
       error: () => {},
     });
-    this.empAdService.getEmployeeBasicInfo().subscribe({
-      next: (res) => {
-        this.headEmployeeList = Array.isArray(res) ? res : (res.data ?? []);
-        this.cdr.detectChanges();
-      },
-      error: () => {},
-    });
     this.masterService.getCompanyMaster().subscribe({
       next: (res) => {
         this.companyList = Array.isArray(res) ? res : (res.data ?? []);
@@ -364,6 +405,7 @@ export class EmpAdForm implements OnChanges, OnDestroy {
           'jobPosition',
           'statusEmployee',
           'floor',
+          'email',
           'adUser',
           'adPassword',
           'adConfirmPassword',
@@ -387,9 +429,6 @@ export class EmpAdForm implements OnChanges, OnDestroy {
       (s) => s.StatusCode == this.addForm.statusEmployee,
     );
     const selectedFloor = this.floorList.find((f) => f.FloorID == this.addForm.floor);
-    const selectedHead = this.headEmployeeList.find(
-      (h) => h.CODEMPID == this.addForm.headEmployeeCode,
-    );
 
     const payload = {
       CODEMPID: this.addForm.employeeCode,
@@ -417,7 +456,7 @@ export class EmpAdForm implements OnChanges, OnDestroy {
       COMPANY_NAME: this.addForm.companyName,
       DEPARTMENT: this.addForm.department,
       CODEMPIDH: this.addForm.headEmployeeCode,
-      HEAD_NAME: selectedHead?.NAMETHAI ?? '',
+      HEAD_NAME: this.addForm.headEmployeeName,
       USR_MOBILE: this.addForm.mobile,
       EMAIL: this.addForm.email,
       AD_USER: this.addForm.adUser,
@@ -507,6 +546,7 @@ export class EmpAdForm implements OnChanges, OnDestroy {
   }
 
   private resetAddForm() {
+    this.resetHeadEmployee();
     this.addShowPassword = false;
     this.addShowConfirmPassword = false;
     this.allGroupsRequest?.unsubscribe();
@@ -535,6 +575,7 @@ export class EmpAdForm implements OnChanges, OnDestroy {
       email: '',
       mobile: '',
       headEmployeeCode: '',
+      headEmployeeName: '',
       adUser: '',
       adPassword: '',
       adConfirmPassword: '',
