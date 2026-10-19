@@ -111,14 +111,59 @@
 <section class="setting-card detail-card">
   <div class="section-title">
     <h2>รายละเอียด</h2>
-    <span>{{ filtered.length }} รายการ</span>
+    <div class="document-list-controls">
+      <span>{{ filtered.length }} รายการ</span>
+      <button type="button" class="folder-control" (click)="toggleAllDocumentGroups()">
+        <i
+          [class]="
+            areAllDocumentGroupsExpanded
+              ? 'fa-solid fa-angles-up'
+              : 'fa-solid fa-angles-down'
+          "
+          aria-hidden="true"
+        ></i>
+        {{ areAllDocumentGroupsExpanded ? 'ย่อทั้งหมด' : 'ขยายทั้งหมด' }}
+      </button>
+    </div>
   </div>
   @if (loading()) {
     <div class="empty">กำลังโหลด...</div>
   } @else {
-    <div class="document-list">
-      @for (doc of filtered; track doc.id) {
-        <article>
+    <div class="document-folders">
+      @for (group of documentGroups; track group.name) {
+        <section
+          class="document-folder"
+          [class.expanded]="isDocumentGroupExpanded(group.name)"
+          [class.ungrouped]="!group.name"
+        >
+          @if (group.name) {
+            <button
+              type="button"
+              class="document-folder-header"
+              [attr.aria-expanded]="isDocumentGroupExpanded(group.name)"
+              (click)="toggleDocumentGroup(group.name)"
+            >
+              <span class="folder-title">
+                <i
+                  [class]="
+                    isDocumentGroupExpanded(group.name)
+                      ? 'fa-solid fa-folder-open'
+                      : 'fa-solid fa-folder'
+                  "
+                  aria-hidden="true"
+                ></i>
+                <strong>{{ group.name }}</strong>
+              </span>
+              <span class="folder-meta">
+                {{ group.documents.length }} รายการ
+                <i class="fa-solid fa-chevron-down folder-chevron" aria-hidden="true"></i>
+              </span>
+            </button>
+          }
+          @if (!group.name || isDocumentGroupExpanded(group.name)) {
+            <div class="document-list">
+              @for (doc of group.documents; track doc.id) {
+                <article>
           <div class="doc-info">
             <strong>{{ doc.name }}</strong>
             @if (doc.groupName) {
@@ -300,7 +345,11 @@
               </div>
             </div>
           }
-        </article>
+                </article>
+              }
+            </div>
+          }
+        </section>
       } @empty {
         <div class="empty">ไม่พบเอกสาร</div>
       }

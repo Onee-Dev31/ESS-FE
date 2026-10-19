@@ -23,6 +23,11 @@ interface GuideDocument {
   reaction: 'LIKE' | 'UNLIKE' | null;
 }
 
+interface GuideDocumentGroup {
+  name: string;
+  documents: GuideDocument[];
+}
+
 @Component({
   selector: 'app-guide-document-settings',
   standalone: true,
@@ -46,6 +51,7 @@ export class GuideDocumentSettings implements OnInit {
   filePath = '';
   groupName = '';
   showGroupNameDropdown = false;
+  expandedDocumentGroups = new Set<string>();
   isActive = true;
   search = '';
 
@@ -71,7 +77,7 @@ export class GuideDocumentSettings implements OnInit {
               description: String(item.Description ?? item.description ?? '').trim(),
               fileUrl: item.File_Url ?? item.fileUrl,
               filePath: item.File_Path ?? item.filePath,
-              groupName: String(item.GroupName ?? '').trim(),
+              groupName: this.normalizeGroupName(item.GroupName),
               isActive: item.IsActive ?? item.isActive,
               createdBy: String(item.Created_by ?? '').trim(),
               updatedBy: String(item.Update_by ?? '').trim(),
@@ -94,6 +100,7 @@ export class GuideDocumentSettings implements OnInit {
             }))
             .sort((a: any, b: any) => Number(b.isActive) - Number(a.isActive) || a.id - b.id),
         );
+        this.expandAllDocumentGroups();
         this.loading.set(false);
       },
       error: () => {
@@ -162,6 +169,14 @@ export class GuideDocumentSettings implements OnInit {
     return reaction === 'LIKE' || reaction === 'UNLIKE' ? reaction : null;
   }
 
+  private normalizeGroupName(value: unknown): string {
+    const groupName = String(value ?? '')
+      .replace(/[\u200B-\u200D\uFEFF]/g, '')
+      .trim();
+
+    return /^(null|undefined)$/i.test(groupName) ? '' : groupName;
+  }
+
   viewGuideDocument(id: number): void {
     if (!this.readOnly) return;
 
@@ -185,6 +200,67 @@ export class GuideDocumentSettings implements OnInit {
       (d) =>
         !q || `${d.name} ${d.description} ${d.fileUrl} ${d.groupName}`.toLowerCase().includes(q),
     );
+  }
+
+  get documentGroups(): GuideDocumentGroup[] {
+    const groups = new Map<string, GuideDocument[]>();
+
+    for (const document of this.filtered) {
+      const groupName = this.normalizeGroupName(document.groupName);
+      const documents = groups.get(groupName) ?? [];
+      documents.push(document);
+      groups.set(groupName, documents);
+    }
+
+    return [...groups.entries()]
+      .map(([name, documents]) => ({ name, documents }))
+      .sort((a, b) => {
+        if (!a.name) return 1;
+        if (!b.name) return -1;
+        if (a.name === 'อื่นๆ') return 1;
+        if (b.name === 'อื่นๆ') return -1;
+        return a.name.localeCompare(b.name, 'th');
+      });
+  }
+
+  isDocumentGroupExpanded(groupName: string): boolean {
+    return this.expandedDocumentGroups.has(groupName);
+  }
+
+  toggleDocumentGroup(groupName: string): void {
+    if (this.expandedDocumentGroups.has(groupName)) {
+      this.expandedDocumentGroups.delete(groupName);
+      return;
+    }
+
+    this.expandedDocumentGroups.add(groupName);
+  }
+
+  expandAllDocumentGroups(): void {
+    this.expandedDocumentGroups = new Set(
+      this.documentGroups.filter((group) => group.name).map((group) => group.name),
+    );
+  }
+
+  collapseAllDocumentGroups(): void {
+    this.expandedDocumentGroups = new Set();
+  }
+
+  get areAllDocumentGroupsExpanded(): boolean {
+    const groupNames = this.documentGroups.filter((group) => group.name).map((group) => group.name);
+    return (
+      groupNames.length > 0 &&
+      groupNames.every((name) => this.expandedDocumentGroups.has(name))
+    );
+  }
+
+  toggleAllDocumentGroups(): void {
+    if (this.areAllDocumentGroupsExpanded) {
+      this.collapseAllDocumentGroups();
+      return;
+    }
+
+    this.expandAllDocumentGroups();
   }
 
   get groupNameOptions(): string[] {
