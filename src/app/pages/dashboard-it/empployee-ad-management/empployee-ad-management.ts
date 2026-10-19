@@ -65,6 +65,9 @@ export class EmpployeeAdManagement implements OnDestroy {
   private editRequests = new Subscription();
   private editGroupRequest?: Subscription;
 
+  filterGroup = (query: string, item: TransferItem): boolean =>
+    (item.title ?? '').toLowerCase().includes(query.trim().toLowerCase());
+
   isResetOpen = false;
   resetEmp: any = null;
   resetNewPassword = '';

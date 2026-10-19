@@ -23,7 +23,14 @@ import { getPasswordError } from '../../../../utils/form-validation.util';
 
 @Component({
   selector: 'app-emp-ad-form',
-  imports: [CommonModule, FormsModule, NzSelectModule, NzTransferModule, NzDatePickerModule, NzIconModule],
+  imports: [
+    CommonModule,
+    FormsModule,
+    NzSelectModule,
+    NzTransferModule,
+    NzDatePickerModule,
+    NzIconModule,
+  ],
   templateUrl: './emp-ad-form.html',
   styleUrl: './emp-ad-form.scss',
 })
@@ -135,6 +142,9 @@ export class EmpAdForm implements OnChanges, OnDestroy {
   employeeList: any[] = [];
   groupList: TransferItem[] = [];
   allGroups: any[] = [];
+
+  filterGroup = (query: string, item: TransferItem): boolean =>
+    (item.title ?? '').toLowerCase().includes(query.trim().toLowerCase());
 
   get selectedGroups(): string[] {
     return this.groupList
