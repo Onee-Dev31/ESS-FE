@@ -35,7 +35,7 @@ interface EmployeeApprovalOverride {
   level: number;
   head_codeempid: string;
   head_name: string;
-  emp_nickname?: string | null;
+  head_nickname?: string | null;
   head_department?: string | null;
   head_post?: string | null;
   reason?: string;
@@ -352,7 +352,7 @@ export class EmployeeSetup implements OnInit {
       return {
         empNo: override.head_codeempid,
         empName: override.head_name,
-        empNickName: override.emp_nickname ?? '',
+        empNickName: override.head_nickname ?? '',
         department: override.head_department ?? '',
         post: override.head_post ?? '',
         isOverride: true,
@@ -437,7 +437,13 @@ export class EmployeeSetup implements OnInit {
       approve2EmpNickName: emp.HeadOfApprover1Nickname,
       approve2Post: emp.HeadOfApprover1Post,
       approve2Dept: emp.HeadOfApprover1Department,
-      hrApprovers: this.mapHrApprovers(emp.HREmpNo, emp.HRUsers, emp.HRPosts, emp.HRDepartments, emp.HRNicknames),
+      hrApprovers: this.mapHrApprovers(
+        emp.HREmpNo,
+        emp.HRUsers,
+        emp.HRPosts,
+        emp.HRDepartments,
+        emp.HRNicknames,
+      ),
       hrType: emp.HRType,
       hrNickNames: emp.HRNicknames,
       itDirectorEmpNo: emp.ITDirectorEmpNo,
