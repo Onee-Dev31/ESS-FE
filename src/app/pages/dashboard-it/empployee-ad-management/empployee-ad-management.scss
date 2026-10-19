@@ -562,6 +562,16 @@
 }
 
 // ==================== EDIT MODAL ====================
+.edit-employee-select {
+  width: 100%;
+
+  ::ng-deep .ant-select-selector {
+    height: 40px !important;
+    padding: 0 14px !important;
+    border-radius: 8px !important;
+  }
+}
+
 .group-item-title {
   flex: 1;
   min-width: 0;

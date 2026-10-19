@@ -359,6 +359,7 @@
                 nzShowSearch
                 nzAllowClear
                 nzPlaceHolder="เลือกพนักงานต้นแบบ"
+                class="edit-employee-select"
                 [ngModel]="editSelectedEmployee"
                 (ngModelChange)="onEditEmployeeChange($event)"
                 [nzDisabled]="isEditGroupsLoading || isEditSaving"
