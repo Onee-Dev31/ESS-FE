@@ -170,7 +170,23 @@
               <span class="group-name-badge">{{ doc.groupName }}</span>
             }
             @if (doc.description) {
-              <small class="doc-description">{{ doc.description }}</small>
+              @if (isDescriptionLong(doc.description)) {
+                <small
+                  class="doc-description"
+                  [class.clamped]="!isDescriptionExpanded(doc.id)"
+                  >{{ doc.description }}</small
+                >
+                <button
+                  type="button"
+                  class="description-toggle"
+                  [attr.aria-expanded]="isDescriptionExpanded(doc.id)"
+                  (click)="toggleDescription(doc.id)"
+                >
+                  {{ isDescriptionExpanded(doc.id) ? 'แสดงน้อยลง' : 'แสดงเพิ่มเติม' }}
+                </button>
+              } @else {
+                <small class="doc-description">{{ doc.description }}</small>
+              }
             }
             @if (readOnly && (doc.createdDate || doc.updatedDate)) {
               <span class="audit-meta">

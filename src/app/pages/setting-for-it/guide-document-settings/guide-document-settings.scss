@@ -16,8 +16,31 @@
 .doc-info .doc-description {
   overflow: visible;
   text-overflow: initial;
-  white-space: pre-line;
+  white-space: pre-wrap;
   overflow-wrap: anywhere;
+
+  &.clamped {
+    display: -webkit-box;
+    overflow: hidden;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 3;
+    line-clamp: 3;
+  }
+}
+
+.doc-info .description-toggle {
+  display: block;
+  margin-top: 4px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--primary);
+  font-size: 12px;
+  cursor: pointer;
+
+  &:hover {
+    text-decoration: underline;
+  }
 }
 
 .document-folders {

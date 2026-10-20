@@ -52,6 +52,7 @@ export class GuideDocumentSettings implements OnInit {
   groupName = '';
   showGroupNameDropdown = false;
   expandedDocumentGroups = new Set<string>();
+  expandedDescriptionIds = new Set<number>();
   isActive = true;
   search = '';
 
@@ -221,6 +222,23 @@ export class GuideDocumentSettings implements OnInit {
         if (b.name === 'อื่นๆ') return -1;
         return a.name.localeCompare(b.name, 'th');
       });
+  }
+
+  isDescriptionLong(description: string): boolean {
+    return description.split('\n').length > 3 || description.length > 200;
+  }
+
+  isDescriptionExpanded(id: number): boolean {
+    return this.expandedDescriptionIds.has(id);
+  }
+
+  toggleDescription(id: number): void {
+    if (this.expandedDescriptionIds.has(id)) {
+      this.expandedDescriptionIds.delete(id);
+      return;
+    }
+
+    this.expandedDescriptionIds.add(id);
   }
 
   isDocumentGroupExpanded(groupName: string): boolean {
