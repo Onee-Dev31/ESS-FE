@@ -584,8 +584,8 @@
 
 .tk-left__filter-col {
   display: flex;
-  flex-direction: column;
-  align-items: flex-end;
+  flex-direction: row;
+  align-items: center;
   gap: 10px;
 }
 
@@ -865,7 +865,8 @@
 
 .tk-left__top {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
+  flex-wrap: wrap;
   justify-content: space-between;
   gap: 12px;
   padding: 14px;
@@ -917,7 +918,7 @@
 .tk-left__select {
   width: 140px;
   height: 34px;
-  flex: 0 0 34px;
+  flex: 0 0 140px;
 }
 
 :host ::ng-deep .tk-left__select.ant-select .ant-select-selector {

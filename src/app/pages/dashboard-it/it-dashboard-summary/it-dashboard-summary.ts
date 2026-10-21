@@ -80,7 +80,7 @@ export class ItDashboardSummary {
   kpis: KpiCard[] = [
     {
       status: 'All',
-      title: 'All Tickets',
+      title: 'All',                                                                 
       value: 0,
       delta: 0,
       hint: 'Tickets ทั้งหมดทุกสถานะ',
@@ -88,7 +88,7 @@ export class ItDashboardSummary {
     },
     {
       status: 'Open',
-      title: 'Open tickets',
+      title: 'Open',
       value: 0,
       delta: 0,
       // hint: 'Tickets ทั้งหมดทุกสถานะ',
@@ -96,7 +96,7 @@ export class ItDashboardSummary {
     },
     {
       status: 'ReOpened',
-      title: 'Re-Opened tickets',
+      title: 'Re-Opened',
       value: 0,
       delta: 0,
       // hint: 'Tickets ทั้งหมดทุกสถานะ',
@@ -104,7 +104,7 @@ export class ItDashboardSummary {
     },
     // {
     //   status: 'In Progress',
-    //   title: 'In Progress Tickets',
+    //   title: 'In Progress',
     //   value: 0,
     //   delta: 0,
     //   hint: 'Tickets ที่กำลังดำเนินการ',
@@ -112,7 +112,7 @@ export class ItDashboardSummary {
     // },
     {
       status: 'Assigned',
-      title: 'In Progress Tickets',
+      title: 'In Progress',
       value: 0,
       delta: 0,
       // hint: 'Tickets ที่ได้รับมอบหมาย',
@@ -120,7 +120,7 @@ export class ItDashboardSummary {
     },
     {
       status: 'done',
-      title: 'Closed Tickets',
+      title: 'Closed',
       value: 0,
       delta: 0,
       // hint: 'Tickets ที่ได้รับมอบหมาย',
@@ -128,7 +128,7 @@ export class ItDashboardSummary {
     },
     {
       status: 'Hold',
-      title: 'Hold Tickets',
+      title: 'Hold',
       value: 0,
       delta: 0,
       // hint: 'Tickets ที่หยุดทำการ',
@@ -136,7 +136,7 @@ export class ItDashboardSummary {
     },
     {
       status: 'Deny',
-      title: 'Deny Tickets',
+      title: 'Deny',
       value: 0,
       delta: 0,
       // hint: 'Tickets ที่ถูกปฏิเสธ',
@@ -264,28 +264,28 @@ export class ItDashboardSummary {
     this.kpis = [
       {
         status: 'all',
-        title: 'All Tickets',
+        title: 'All',
         value: summary.all ?? 0,
         delta: 0,
         icon: 'fa-solid fa-border-all',
       },
       {
         status: 'open',
-        title: 'New tickets',
+        title: 'New',
         value: summary.open ?? 0,
         delta: 0,
         icon: 'fa-solid fa-folder-open',
       },
       {
         status: 'reopen',
-        title: 'Re-Opened tickets',
+        title: 'Re-Opened',
         value: summary.reopen ?? 0,
         delta: 0,
         icon: 'fa-solid fa-repeat',
       },
       {
         status: 'assigned',
-        title: 'In Progress Ticket',
+        title: 'In Progress',
         value: summary.assigned ?? 0,
         delta: 0,
 
@@ -293,21 +293,21 @@ export class ItDashboardSummary {
       },
       {
         status: 'done',
-        title: 'Closed Tickets',
+        title: 'Closed',
         value: summary.closed ?? 0,
         delta: 0,
         icon: 'fa-solid fa-circle-check',
       },
       {
         status: 'hold',
-        title: 'Hold Tickets',
+        title: 'Hold',
         value: summary.hold ?? 0,
         delta: 0,
         icon: 'fa-solid fa-pause',
       },
       {
         status: 'denied',
-        title: 'Deny Tickets',
+        title: 'Deny',
         value: summary.denied ?? 0,
         delta: 0,
         icon: 'fa-solid fa-ban',

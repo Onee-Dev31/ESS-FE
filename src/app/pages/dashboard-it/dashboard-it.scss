@@ -9,7 +9,6 @@
 }
 
 .btn-command {
-  // padding: 18px 18px 0 0;
   display: flex;
   justify-content: flex-end;
   align-items: end;
@@ -17,15 +16,44 @@
   flex-wrap: wrap;
 
   button {
-    border-radius: 16px;
+    white-space: nowrap;
+    border-radius: 10px;
     padding: 2px 10px;
-    cursor: pointer;
+    border: 1px solid var(--btn-border);
+    background: var(--btn-border);
     color: var(--text);
+    cursor: pointer;
+    transition: 0.2s;
+
+    @media (min-width: 576px) and (max-width: 1366px) {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      height: 34px;
+      padding: 0 24px;
+      font-size: $font-size-label;
+      font-weight: 600;
+
+      @include tablet {
+        padding: 0 12px;
+      }
+    }
+
+    &:hover {
+      background: color-mix(in srgb, var(--btn-border), var(--text) 5%);
+      transform: translateY(-0.5px);
+    }
+
+    &:active {
+      background: color-mix(in srgb, var(--btn-border), var(--text) 10%);
+      transform: translateY(2px);
+    }
   }
 
   .employeeInfo {
-    --btn-border: var(--green);
-    --btn-bg: var(--green-light);
+    --btn-border: #379c4c;
+    --btn-bg: #379c4c;
   }
 
   .approve-out {
@@ -47,26 +75,14 @@
     --btn-border: var(--btn-service-border);
     --btn-bg: var(--btn-service-bg);
   }
-
-  .btn-type {
-    border: 1px solid var(--btn-border);
-    background: var(--btn-bg);
-    transition: 0.2s;
-  }
-
-  .btn-type:hover {
-    background: color-mix(in srgb, var(--btn-bg), var(--text) 5%);
-    transform: translateY(-0.5px);
-  }
-
-  .btn-type:active {
-    background: color-mix(in srgb, var(--btn-bg), var(--text) 10%);
-    transform: translateY(2px);
-  }
 }
 
 .btn-report {
   @include btn-primary;
+
+  @media (min-width: 576px) and (max-width: 1366px) {
+    height: 34px;
+  }
 }
 
 @media (max-width: 860px) {
@@ -74,5 +90,37 @@
     align-items: flex-start;
     flex-wrap: wrap;
     gap: 12px;
+  }
+
+  .btn-command {
+    width: 100%;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 8px;
+  }
+}
+
+@media (min-width: 576px) and (max-width: 1366px) {
+  .top-bar {
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 6px;
+  }
+
+  .top-bar > div:first-child {
+    flex-shrink: 0;
+  }
+
+  .btn-command {
+    display: contents;
+  }
+
+  .btn-command button,
+  .btn-report {
+    flex-shrink: 0;
+    padding: 0 8px;
+    font-size: 12px;
+    gap: 4px;
   }
 }
