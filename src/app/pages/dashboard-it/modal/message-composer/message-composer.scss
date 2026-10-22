@@ -396,6 +396,121 @@
   gap: 6px;
 }
 
+.guide-document-groups {
+  display: grid;
+  gap: 10px;
+}
+
+.guide-list-controls {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 8px;
+  color: var(--text-muted);
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+.guide-toggle-all {
+  display: inline-flex;
+  height: 34px;
+  padding: 0 12px;
+  align-items: center;
+  gap: 7px;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  color: var(--text-muted);
+  background: var(--bg-card);
+  font: inherit;
+  cursor: pointer;
+
+  &:hover {
+    border-color: var(--primary);
+    color: var(--primary);
+  }
+}
+
+.guide-document-group {
+  overflow: hidden;
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  background: var(--bg-card);
+
+  &.ungrouped {
+    overflow: visible;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+  }
+}
+
+.guide-group-header {
+  display: flex;
+  width: 100%;
+  min-height: 48px;
+  padding: 10px 14px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  border: 0;
+  background: transparent;
+  color: var(--text-header);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+
+  &:hover {
+    background: var(--bg-table-hover);
+  }
+}
+
+.guide-group-title,
+.guide-group-meta {
+  display: inline-flex;
+  min-width: 0;
+  align-items: center;
+  gap: 9px;
+}
+
+.guide-group-title {
+  strong {
+    overflow: hidden;
+    font-size: 13px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  i {
+    flex: 0 0 auto;
+    color: #f4b740;
+    font-size: 18px;
+  }
+}
+
+.guide-group-meta {
+  flex: 0 0 auto;
+  color: var(--text-muted);
+  font-size: 11px;
+}
+
+.guide-group-chevron {
+  transition: transform 0.2s ease;
+
+  &.expanded {
+    transform: rotate(180deg);
+  }
+}
+
+.guide-group-documents {
+  padding: 6px;
+  border-top: 1px solid var(--border-color);
+}
+
+.guide-document-group.ungrouped .guide-group-documents {
+  padding: 0;
+  border-top: 0;
+}
+
 .template-option {
   display: flex;
   align-items: center;

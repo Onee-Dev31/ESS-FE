@@ -14,7 +14,7 @@
     </span>
   </button>
   <button type="button" class="btn-open-template" (click)="openGuideModal()" [disabled]="busy">
-    <span class="template-selector-icon"><i class="fa-regular fa-folder-open"></i></span>
+    <span class="template-selector-icon"><i class="fa-solid fa-folder-open"></i></span>
     <span class="template-selector-content"><strong>เอกสารคู่มือ</strong></span>
     <span class="template-selector-action"
       >เลือกคู่มือ <i class="fa-solid fa-chevron-right"></i
@@ -131,7 +131,7 @@
                   class="btn-template-cancel btn-select-guide"
                   (click)="openGuideModal('template')"
                 >
-                  <i class="fa-regular fa-folder-open"></i> เลือกเอกสารคู่มือจาก Master
+                  <i class="fa-solid fa-folder-open"></i> เลือกเอกสารคู่มือจาก Master
                 </button>
                 <div class="template-actions template-detail-actions">
                   <button type="button" class="btn-template-cancel" (click)="cancelTemplateEdit()">
@@ -254,7 +254,7 @@
                             class="btn-template-cancel btn-select-guide"
                             (click)="openGuideModal('template')"
                           >
-                            <i class="fa-regular fa-folder-open"></i> เลือกเอกสารคู่มือจาก Master
+                            <i class="fa-solid fa-folder-open"></i> เลือกเอกสารคู่มือจาก Master
                           </button>
                           <div class="template-actions template-detail-actions">
                             <button
@@ -303,7 +303,7 @@
                 </div>
               } @empty {
                 <div class="template-state">
-                  <i class="fa-regular fa-folder-open"></i>
+                  <i class="fa-solid fa-folder-open"></i>
                   ไม่พบเทมเพลตที่ตรงกับการค้นหา
                 </div>
               }
@@ -326,7 +326,7 @@
       <header class="template-modal-header">
         <div>
           <h3 id="guide-modal-title">
-            <i class="fa-regular fa-folder-open"></i> เลือกเอกสารคู่มือ
+            <i class="fa-solid fa-folder-open"></i> เลือกเอกสารคู่มือ
           </h3>
         </div>
         <button
@@ -343,6 +343,20 @@
           <i class="fa-solid fa-magnifying-glass"></i
           ><input type="search" [(ngModel)]="guideSearch" placeholder="ค้นหาชื่อเอกสาร..." />
         </div>
+        <div class="guide-list-controls">
+          <span>{{ filteredGuideDocuments.length }} รายการ</span>
+          <button type="button" class="guide-toggle-all" (click)="toggleAllGuideGroups()">
+            <i
+              [class]="
+                areAllGuideGroupsExpanded
+                  ? 'fa-solid fa-angles-up'
+                  : 'fa-solid fa-angles-down'
+              "
+              aria-hidden="true"
+            ></i>
+            {{ areAllGuideGroupsExpanded ? 'ย่อทั้งหมด' : 'ขยายทั้งหมด' }}
+          </button>
+        </div>
       </div>
       <div class="template-modal-body">
         @if (guideLoading()) {
@@ -350,25 +364,55 @@
             <i class="fa-solid fa-spinner fa-spin"></i> กำลังโหลดเอกสาร...
           </div>
         } @else {
-          <div class="template-modal-list">
-            @for (document of filteredGuideDocuments; track document.id) {
-              <div class="template-option">
-                <span class="template-option-icon">
-                  <i class="fa-regular fa-file-lines"></i>
-                </span>
-                <span class="template-option-content">
-                  <span class="template-option-heading">
-                    <strong>{{ document.name }}</strong>
-                  </span>
-                </span>
-                <button
-                  type="button"
-                  class="btn-template-cancel template-use"
-                  (click)="insertGuideDocument(document)"
-                >
-                  <i class="fa-solid fa-link"></i> แทรกในข้อความ
-                </button>
-              </div>
+          <div class="guide-document-groups">
+            @for (group of guideDocumentGroups; track group.name) {
+              <section class="guide-document-group" [class.ungrouped]="!group.name">
+                @if (group.name) {
+                  <button
+                    type="button"
+                    class="guide-group-header"
+                    [attr.aria-expanded]="isGuideGroupExpanded(group.name)"
+                    (click)="toggleGuideGroup(group.name)"
+                  >
+                    <span class="guide-group-title">
+                      <i class="fa-solid fa-folder-open" aria-hidden="true"></i>
+                      <strong>{{ group.name }}</strong>
+                    </span>
+                    <span class="guide-group-meta">
+                      {{ group.documents.length }} รายการ
+                      <i
+                        class="fa-solid fa-chevron-down guide-group-chevron"
+                        [class.expanded]="isGuideGroupExpanded(group.name)"
+                        aria-hidden="true"
+                      ></i>
+                    </span>
+                  </button>
+                }
+
+                @if (!group.name || isGuideGroupExpanded(group.name)) {
+                  <div class="template-modal-list guide-group-documents">
+                    @for (document of group.documents; track document.id) {
+                      <div class="template-option">
+                        <span class="template-option-icon">
+                          <i class="fa-regular fa-file-lines"></i>
+                        </span>
+                        <span class="template-option-content">
+                          <span class="template-option-heading">
+                            <strong>{{ document.name }}</strong>
+                          </span>
+                        </span>
+                        <button
+                          type="button"
+                          class="btn-template-cancel template-use"
+                          (click)="insertGuideDocument(document)"
+                        >
+                          <i class="fa-solid fa-link"></i> แทรกในข้อความ
+                        </button>
+                      </div>
+                    }
+                  </div>
+                }
+              </section>
             } @empty {
               <div class="template-state">ไม่พบเอกสารคู่มือ</div>
             }

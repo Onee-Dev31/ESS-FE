@@ -21,6 +21,11 @@ interface GuideDocumentOption {
   name: string;
   fileUrl: string;
   isActive: boolean;
+  groupName: string;
+}
+interface GuideDocumentGroup {
+  name: string;
+  documents: GuideDocumentOption[];
 }
 
 @Component({
@@ -49,6 +54,7 @@ export class MessageComposer implements OnInit {
   guideSearch = '';
   guideDocuments = signal<GuideDocumentOption[]>([]);
   guideLoading = signal(false);
+  expandedGuideGroups = new Set<string>();
   guideInsertTarget: 'reply' | 'template' = 'reply';
   expandedTemplateId: number | null = null;
   editingTemplateId: number | null = null;
@@ -164,16 +170,17 @@ export class MessageComposer implements OnInit {
       .subscribe({
         next: (res) => {
           const rows = Array.isArray(res) ? res : (res?.data ?? []);
-          this.guideDocuments.set(
-            rows
-              .map((item: any) => ({
-                id: item.Id ?? item.id,
-                name: item.Name ?? item.name,
-                fileUrl: item.File_Url ?? item.fileUrl,
-                isActive: item.IsActive ?? item.isActive,
-              }))
-              .filter((item: GuideDocumentOption) => item.isActive),
-          );
+          const documents: GuideDocumentOption[] = rows
+            .map((item: any) => ({
+              id: item.Id ?? item.id,
+              name: item.Name ?? item.name,
+              fileUrl: item.File_Url ?? item.fileUrl,
+              isActive: item.IsActive ?? item.isActive,
+              groupName: this.normalizeGuideGroupName(item.GroupName ?? item.groupName),
+            }))
+            .filter((item: GuideDocumentOption) => item.isActive);
+          this.guideDocuments.set(documents);
+          this.expandedGuideGroups = new Set();
           this.guideLoading.set(false);
         },
         error: () => {
@@ -186,8 +193,68 @@ export class MessageComposer implements OnInit {
   get filteredGuideDocuments(): GuideDocumentOption[] {
     const query = this.guideSearch.trim().toLowerCase();
     return this.guideDocuments().filter(
-      (item) => !query || `${item.name} ${item.fileUrl}`.toLowerCase().includes(query),
+      (item) =>
+        !query || `${item.name} ${item.fileUrl} ${item.groupName}`.toLowerCase().includes(query),
     );
+  }
+
+  get guideDocumentGroups(): GuideDocumentGroup[] {
+    const groups = new Map<string, GuideDocumentOption[]>();
+    for (const document of this.filteredGuideDocuments) {
+      const documents = groups.get(document.groupName) ?? [];
+      documents.push(document);
+      groups.set(document.groupName, documents);
+    }
+
+    return [...groups.entries()]
+      .map(([name, documents]) => ({ name, documents }))
+      .sort((a, b) => {
+        if (!a.name) return 1;
+        if (!b.name) return -1;
+        if (a.name === 'อื่นๆ') return 1;
+        if (b.name === 'อื่นๆ') return -1;
+        return a.name.localeCompare(b.name, 'th');
+      });
+  }
+
+  isGuideGroupExpanded(groupName: string): boolean {
+    return !!this.guideSearch.trim() || this.expandedGuideGroups.has(groupName);
+  }
+
+  toggleGuideGroup(groupName: string): void {
+    if (this.expandedGuideGroups.has(groupName)) {
+      this.expandedGuideGroups.delete(groupName);
+      return;
+    }
+    this.expandedGuideGroups.add(groupName);
+  }
+
+  get areAllGuideGroupsExpanded(): boolean {
+    const groupNames = this.guideDocumentGroups
+      .filter((group) => group.name)
+      .map((group) => group.name);
+    return (
+      groupNames.length > 0 &&
+      groupNames.every((groupName) => this.expandedGuideGroups.has(groupName))
+    );
+  }
+
+  toggleAllGuideGroups(): void {
+    if (this.areAllGuideGroupsExpanded) {
+      this.expandedGuideGroups = new Set();
+      return;
+    }
+
+    this.expandedGuideGroups = new Set(
+      this.guideDocumentGroups.filter((group) => group.name).map((group) => group.name),
+    );
+  }
+
+  private normalizeGuideGroupName(value: unknown): string {
+    const groupName = String(value ?? '')
+      .replace(/[\u200B-\u200D\uFEFF]/g, '')
+      .trim();
+    return /^(null|undefined)$/i.test(groupName) ? '' : groupName;
   }
 
   insertGuideDocument(document: GuideDocumentOption): void {
