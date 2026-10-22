@@ -52,9 +52,16 @@
   overflow: hidden;
 }
 
-.it-no-see {
-  background: color-mix(in srgb, var(--warning), var(--text-reverse) 90%);
-  // border: 1px solid var(--warning);
+.kpi-waitingapproval {
+  background: var(--status-waiting-approval-bg);
+}
+
+.kpi-referred-back {
+  background: var(--status-referred-back-bg);
+}
+
+.kpi-rejected {
+  background: var(--status-rejected-bg);
 }
 
 .kpi:hover {
@@ -99,9 +106,9 @@
 }
 
 .pill-open {
-  background: var(--status-open-bg);
-  color: var(--status-open-text);
-  border-color: color-mix(in srgb, var(--status-open-text), transparent 70%);
+  background: var(--status-new-bg);
+  color: var(--status-new-text);
+  border-color: color-mix(in srgb, var(--status-new-text), transparent 70%);
 }
 
 .pill-reopen {
@@ -141,21 +148,21 @@
 }
 
 .pill-waitingapproval {
-  background: var(--status-progress-bg);
-  color: var(--status-progress-text);
-  border-color: color-mix(in srgb, var(--status-progress-text), transparent 70%);
+  background: var(--status-waiting-approval-bg);
+  color: var(--status-waiting-approval-text);
+  border-color: color-mix(in srgb, var(--status-waiting-approval-text), transparent 70%);
 }
 
 .pill-referredBack {
-  background: var(--status-pending-bg);
-  color: var(--status-pending-text);
-  border-color: color-mix(in srgb, var(--status-pending-text), transparent 70%);
+  background: var(--status-referred-back-bg);
+  color: var(--status-referred-back-text);
+  border-color: color-mix(in srgb, var(--status-referred-back-text), transparent 70%);
 }
 
 .pill-rejected {
-  background: var(--status-deny-bg);
-  color: var(--status-deny-text);
-  border-color: color-mix(in srgb, var(--status-deny-text), transparent 70%);
+  background: var(--status-rejected-bg);
+  color: var(--status-rejected-text);
+  border-color: color-mix(in srgb, var(--status-rejected-text), transparent 70%);
 }
 
 .kpi-value {
@@ -220,12 +227,11 @@
 /* ===== CHART ===== */
 .chart-row {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 14px;
   padding: 12px 16px;
 
   @include large-tablet {
-    display: grid;
     grid-template-columns: repeat(2, 1fr);
   }
 
@@ -233,6 +239,11 @@
     display: grid;
     grid-template-columns: repeat(1, 1fr);
   }
+}
+
+.distribution-card {
+  grid-column: 1 / -1;
+  padding: 12px 16px;
 }
 
 // .chart-card {
@@ -280,8 +291,185 @@
 
 .chart-title {
   font-weight: 800;
-  margin-bottom: 10px;
   color: var(--text-header);
+}
+
+.status-bar-wrap {
+  display: flex;
+  min-height: 88px;
+  flex-direction: column;
+  justify-content: center;
+  gap: 12px;
+}
+
+.status-stacked-bar {
+  display: flex;
+  position: relative;
+  width: 100%;
+  height: 28px;
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  background: var(--bg-slate);
+}
+
+.status-segment {
+  display: inline-flex;
+  position: relative;
+  min-width: 0;
+  height: 100%;
+  padding: 0;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  border-right: 2px solid var(--bg-card);
+  color: #fff;
+  font-family: $font-main;
+  font-size: $font-size-mini;
+  font-weight: 700;
+  gap: 4px;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: filter 0.15s ease;
+
+  &:last-child {
+    border-right: 0;
+    border-radius: 0 5px 5px 0;
+  }
+
+  &:first-child {
+    border-radius: 5px 0 0 5px;
+  }
+
+  &:hover,
+  &:focus-visible {
+    filter: brightness(1.08);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: -2px;
+  }
+
+  &::before,
+  &::after {
+    position: absolute;
+    left: 50%;
+    z-index: 5;
+    pointer-events: none;
+    opacity: 0;
+    transform: translate(-50%, 4px);
+    transition:
+      opacity 0.15s ease,
+      transform 0.15s ease;
+  }
+
+  &::before {
+    content: '';
+    bottom: calc(100% + 5px);
+    border: 5px solid transparent;
+    border-top-color: var(--text-header);
+  }
+
+  &::after {
+    content: attr(data-tooltip);
+    bottom: calc(100% + 15px);
+    width: max-content;
+    max-width: 180px;
+    padding: 6px 9px;
+    border-radius: 6px;
+    background: var(--text-header);
+    box-shadow: 0 4px 12px rgb(15 23 42 / 18%);
+    color: var(--bg-card);
+    font-size: $font-size-mini;
+    font-weight: 600;
+    line-height: 1.35;
+    white-space: nowrap;
+  }
+
+  &:hover,
+  &:focus-visible {
+    &::before,
+    &::after {
+      opacity: 1;
+      transform: translate(-50%, 0);
+    }
+  }
+}
+
+.segment-label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.segment-percent {
+  flex: 0 0 auto;
+  font-size: 10px;
+}
+
+.segment-assigned {
+  background: var(--status-progress-text);
+}
+
+.segment-open {
+  background: var(--status-new-text);
+}
+
+.segment-reopen {
+  background: var(--status-reopen-text);
+}
+
+.segment-waitingapproval {
+  background: var(--status-waiting-approval-text);
+}
+
+.segment-referredBack {
+  background: var(--status-referred-back-text);
+}
+
+.segment-rejected {
+  background: var(--status-rejected-text);
+}
+
+.segment-denied {
+  background: var(--status-deny-text);
+}
+
+.segment-hold {
+  background: var(--status-hold-text);
+}
+
+.segment-service-1 {
+  background: var(--btn-service-border);
+}
+
+.segment-service-2 {
+  background: var(--btn-repair-border);
+}
+
+.segment-service-3 {
+  background: var(--btn-problem-border);
+}
+
+.status-bar-legend {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px 14px;
+  color: var(--text-muted);
+  font-size: $font-size-mini;
+
+  span {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+  }
+}
+
+.status-legend-color {
+  width: 16px;
+  height: 8px;
+  flex: 0 0 auto;
+  border-radius: 3px;
 }
 
 /* ✅ ขนาดกราฟ */
@@ -1184,15 +1372,15 @@ body[data-theme='dark'] {
   }
 
   .pill-waitingapproval {
-    color: var(--status-progress-text);
+    color: var(--status-waiting-approval-text);
   }
 
   .pill-referredBack {
-    color: var(--status-pending-text);
+    color: var(--status-referred-back-text);
   }
 
   .pill-rejected {
-    color: var(--status-deny-text);
+    color: var(--status-rejected-text);
   }
 }
 
@@ -1348,6 +1536,14 @@ body[data-theme='dark'] {
 }
 
 @media (max-width: 450px) {
+  .segment-label {
+    display: none;
+  }
+
+  .segment-percent {
+    font-size: 9px;
+  }
+
   .kpi {
     padding: 4px 10px;
   }

@@ -52,9 +52,9 @@
     *ngFor="let k of kpis; trackBy: trackByStatus"
     [class.active]="activeStatus === k.status"
     (click)="selectStatus(k.status, true)"
-    [class.it-no-see]="
-      k.status === 'waitingapproval' || k.status === 'referredBack' || k.status === 'rejected'
-    "
+    [class.kpi-waitingapproval]="k.status === 'waitingapproval'"
+    [class.kpi-referred-back]="k.status === 'referredBack'"
+    [class.kpi-rejected]="k.status === 'rejected'"
   >
     <div class="kpi-top">
       <div class="kpi-title">{{ k.title }}</div>
@@ -93,30 +93,100 @@
 <!-- ================= CHART ROW ================= -->
 
 <div class="chart-row">
-  <!-- Status Pie -->
-  <div class="chart-card">
+  <!-- Status stacked bar (HTML/CSS only) -->
+  <div class="chart-card distribution-card">
     <div class="chart-title">Status Distribution</div>
 
-    <div
-      echarts
-      class="echart"
-      [options]="statusPieOption"
-      (chartInit)="onStatusChartInit($event)"
-      (chartClick)="onStatusPieClick($event)"
-    ></div>
+    <div class="status-bar-wrap">
+      <div class="status-stacked-bar" role="img" aria-label="Status distribution">
+        <button
+          *ngFor="let k of statusDistributionKpis; trackBy: trackByStatus"
+          type="button"
+          class="status-segment"
+          [class.segment-assigned]="k.status === 'assigned'"
+          [class.segment-open]="k.status === 'open'"
+          [class.segment-reopen]="k.status === 'reopen'"
+          [class.segment-waitingapproval]="k.status === 'waitingapproval'"
+          [class.segment-referredBack]="k.status === 'referredBack'"
+          [class.segment-rejected]="k.status === 'rejected'"
+          [class.segment-hold]="k.status === 'hold'"
+          [class.segment-denied]="k.status === 'denied'"
+          [style.width.%]="getStatusDistributionPercent(k)"
+          [attr.data-tooltip]="
+            k.title + ': ' + k.value + ' (' + getStatusDistributionPercent(k) + '%)'
+          "
+          [attr.aria-label]="
+            k.title + ': ' + k.value + ' (' + getStatusDistributionPercent(k) + '%)'
+          "
+          (click)="selectStatus(k.status)"
+        >
+          <span class="segment-label" *ngIf="getStatusDistributionPercent(k) >= 24">
+            {{ k.title }}
+          </span>
+          <span class="segment-percent">{{ getStatusDistributionPercent(k) }}%</span>
+        </button>
+      </div>
+
+      <div class="status-bar-legend">
+        <span *ngFor="let k of statusDistributionLegendKpis; trackBy: trackByStatus">
+          <i
+            class="status-legend-color"
+            [class.segment-assigned]="k.status === 'assigned'"
+            [class.segment-open]="k.status === 'open'"
+            [class.segment-reopen]="k.status === 'reopen'"
+            [class.segment-waitingapproval]="k.status === 'waitingapproval'"
+            [class.segment-referredBack]="k.status === 'referredBack'"
+            [class.segment-rejected]="k.status === 'rejected'"
+            [class.segment-hold]="k.status === 'hold'"
+            [class.segment-denied]="k.status === 'denied'"
+          ></i>
+          {{ k.title }}
+        </span>
+      </div>
+    </div>
   </div>
 
-  <!-- Service Pie -->
-  <div class="chart-card">
+  <!-- Service Type stacked bar (HTML/CSS only) -->
+  <div class="chart-card distribution-card">
     <div class="chart-title">Service Type</div>
 
-    <div
-      echarts
-      class="echart"
-      [options]="servicePieOption"
-      (chartInit)="onServiceChartInit($event)"
-      (chartClick)="onServiceTypePieClick($event)"
-    ></div>
+    <div class="status-bar-wrap">
+      <div class="status-stacked-bar" role="img" aria-label="Service type distribution">
+        <button
+          *ngFor="let item of serviceDistributionData"
+          type="button"
+          class="status-segment"
+          [class.segment-service-1]="item.key === '0'"
+          [class.segment-service-2]="item.key === '1'"
+          [class.segment-service-3]="item.key === '2'"
+          [style.width.%]="getServiceDistributionPercent(item)"
+          [attr.data-tooltip]="
+            item.name + ': ' + item.value + ' (' + getServiceDistributionPercent(item) + '%)'
+          "
+          [attr.aria-label]="
+            item.name + ': ' + item.value + ' (' + getServiceDistributionPercent(item) + '%)'
+          "
+          (click)="onServiceTypePieClick({ data: item })"
+        >
+          <span class="segment-label" *ngIf="getServiceDistributionPercent(item) >= 24">
+            {{ item.name }}
+          </span>
+          <span class="segment-percent">{{ getServiceDistributionPercent(item) }}%</span>
+        </button>
+      </div>
+
+      <div class="status-bar-legend">
+        <span *ngFor="let item of serviceDistributionLegendData">
+          <i
+            class="status-legend-color"
+            [class.segment-service-1]="item.key === '0'"
+            [class.segment-service-2]="item.key === '1'"
+            [class.segment-service-3]="item.key === '2'"
+          ></i>
+          {{ item.name }}
+        </span>
+      </div>
+    </div>
   </div>
 
   <!-- Company Bar -->

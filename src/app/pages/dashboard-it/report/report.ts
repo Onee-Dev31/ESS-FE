@@ -157,20 +157,22 @@ export class Report {
   }
   statusPieOption!: EChartsOption;
   servicePieOption!: EChartsOption;
+  serviceDistributionData: PieDatum[] = [];
+  serviceDistributionLegendData: PieDatum[] = [];
   companyBarOption!: EChartsOption;
   private statusChart?: ECharts;
 
   // map key -> index ใน pie (ต้องตรงกับ data ที่ใส่ใน option)
   private statusIndexMap: Record<string, number> = {
-    done: 0,
-    assigned: 1,
-    open: 2,
-    reopen: 3,
-    waitingapproval: 4,
-    referredBack: 5,
-    rejected: 6,
-    hold: 7,
-    denied: 8,
+    done: -1,
+    assigned: 0,
+    open: 1,
+    reopen: 2,
+    waitingapproval: 3,
+    referredBack: 4,
+    rejected: 5,
+    hold: 6,
+    denied: 7,
     all: -1,
   };
   private deptTop5Map: Record<
@@ -409,7 +411,6 @@ export class Report {
 
   private buildStatusPie(summary: any) {
     const data: PieDatum[] = [
-      { name: 'Closed', value: summary.closed ?? 0, key: 'done' },
       { name: 'In Progress', value: summary.assigned ?? 0, key: 'assigned' },
       { name: 'New', value: summary.open ?? 0, key: 'open' },
       { name: 'Re-Opened', value: summary.reopen ?? 0, key: 'reopen' },
@@ -422,14 +423,19 @@ export class Report {
 
     const total = data.reduce((s, x) => s + x.value, 0);
 
-    this.statusPieOption = this.makeDonutOption('Status Distribution', data, total, 'Total');
+    this.statusPieOption = this.makeStatusStackedBarOption(data, total);
   }
   // ====== 2) Service Donut ======
   private buildServicePie(res: any[]) {
-    const data: PieDatum[] = res.map((x) => ({
+    const allData: PieDatum[] = res.map((x, index) => ({
       name: x.name_th,
-      value: x.ticket_count,
+      value: Number(x.ticket_count ?? 0),
+      key: String(index),
     }));
+    const data = allData.filter((item) => item.value > 0);
+
+    this.serviceDistributionLegendData = allData;
+    this.serviceDistributionData = data;
 
     const total = data.reduce((s, x) => s + x.value, 0);
 
@@ -626,6 +632,71 @@ export class Report {
     this.deptTop5Map = map;
   }
 
+  private makeStatusStackedBarOption(data: PieDatum[], total: number): EChartsOption {
+    const colors = [
+      this.getCssVar('--status-progress-text'),
+      this.getCssVar('--status-open-text'),
+      this.getCssVar('--status-reopen-text'),
+      this.getCssVar('--status-progress-bg'),
+      this.getCssVar('--status-pending-bg'),
+      this.getCssVar('--status-deny-bg'),
+      this.getCssVar('--status-hold-text'),
+      this.getCssVar('--status-deny-text'),
+    ];
+
+    return {
+      legend: {
+        top: 0,
+        left: 'center',
+        itemWidth: 22,
+        itemHeight: 10,
+        itemGap: 10,
+        icon: 'roundRect',
+        textStyle: {
+          fontSize: 10,
+          color: this.getCssVar('--text-header') || '#0f172a',
+        },
+      },
+      tooltip: {
+        trigger: 'item',
+        backgroundColor: this.getCssVar('--bg-card') || '#ffffff',
+        textStyle: { color: this.getCssVar('--text-header') || '#0f172a' },
+        formatter: (params: any) => {
+          const value = Number(params?.data?.rawValue ?? 0);
+          const percent = Number(params?.data?.value ?? 0);
+          return `${params?.seriesName ?? ''}: ${value} (${percent.toFixed(1)}%)`;
+        },
+      },
+      grid: { left: 12, right: 12, top: 52, bottom: 18, containLabel: false },
+      xAxis: { type: 'value', max: 100, show: false },
+      yAxis: { type: 'category', data: [''], show: false },
+      series: data.map((item, index) => {
+        const percent = total > 0 ? (item.value / total) * 100 : 0;
+        return {
+          name: item.name,
+          type: 'bar',
+          stack: 'status-total',
+          barWidth: 24,
+          emphasis: { focus: 'series' },
+          itemStyle: {
+            color: colors[index],
+            borderColor: this.getCssVar('--bg-card') || '#ffffff',
+            borderWidth: 1,
+          },
+          label: {
+            show: percent >= 4,
+            position: 'inside',
+            formatter: `${Math.round(percent)}%`,
+            color: '#ffffff',
+            fontSize: 11,
+            fontWeight: 700,
+          },
+          data: [{ value: percent, rawValue: item.value, key: item.key }],
+        };
+      }),
+    };
+  }
+
   private makeDonutOption(
     title: string,
     data: PieDatum[],
@@ -820,9 +891,54 @@ export class Report {
     return percentages.find((card) => card.status === k.status)?.value ?? 0;
   }
 
+  get statusDistributionKpis(): KpiCard[] {
+    return this.kpis.filter(
+      (card) => !['all', 'done'].includes(card.status.toLowerCase()) && card.value > 0,
+    );
+  }
+
+  get statusDistributionLegendKpis(): KpiCard[] {
+    return this.kpis.filter(
+      (card) => !['all', 'done'].includes(card.status.toLowerCase()),
+    );
+  }
+
+  getStatusDistributionPercent(k: KpiCard): number {
+    const statuses = this.statusDistributionKpis;
+    const total = statuses.reduce((sum, card) => sum + card.value, 0);
+    if (!total) return 0;
+
+    const percentages = statuses.map((card, index) => {
+      const percent = (card.value / total) * 100;
+      return { status: card.status, index, value: Math.floor(percent), remainder: percent % 1 };
+    });
+    const remaining = 100 - percentages.reduce((sum, card) => sum + card.value, 0);
+
+    percentages.sort((a, b) => b.remainder - a.remainder || a.index - b.index);
+    for (let i = 0; i < remaining; i++) percentages[i].value++;
+
+    return percentages.find((card) => card.status === k.status)?.value ?? 0;
+  }
+
+  getServiceDistributionPercent(item: PieDatum): number {
+    const total = this.serviceDistributionData.reduce((sum, service) => sum + service.value, 0);
+    if (!total) return 0;
+
+    const percentages = this.serviceDistributionData.map((service, index) => {
+      const percent = (service.value / total) * 100;
+      return { index, value: Math.floor(percent), remainder: percent % 1 };
+    });
+    const remaining = 100 - percentages.reduce((sum, service) => sum + service.value, 0);
+
+    percentages.sort((a, b) => b.remainder - a.remainder || a.index - b.index);
+    for (let i = 0; i < remaining; i++) percentages[i].value++;
+
+    const itemIndex = this.serviceDistributionData.indexOf(item);
+    return percentages.find((service) => service.index === itemIndex)?.value ?? 0;
+  }
+
   onStatusChartInit(ec: any) {
     this.statusChart = ec;
-    this.applyStatusCenter('all');
   }
 
   onStatusPieClick(e: any) {
@@ -842,8 +958,6 @@ export class Report {
     this.statusChange.emit(k);
 
     this.highlightStatusSlice(k);
-
-    this.applyStatusCenter(k);
   }
 
   onServiceTypePieClick(e: any) {
@@ -906,71 +1020,24 @@ export class Report {
     if (!this.statusChart) return;
 
     // ล้าง highlight ทุกอันก่อน
-    this.statusChart.dispatchAction({ type: 'downplay', seriesIndex: 0 });
+    this.statusChart.dispatchAction({ type: 'downplay' });
 
-    const dataIndex = this.statusIndexMap[k];
-    if (dataIndex >= 0) {
+    const seriesIndex = this.statusIndexMap[k];
+    if (seriesIndex >= 0) {
       this.statusChart.dispatchAction({
         type: 'highlight',
-        seriesIndex: 0,
-        dataIndex,
+        seriesIndex,
+        dataIndex: 0,
       });
 
       this.statusChart.dispatchAction({
         type: 'showTip',
-        seriesIndex: 0,
-        dataIndex,
+        seriesIndex,
+        dataIndex: 0,
       });
     } else {
       this.statusChart.dispatchAction({ type: 'hideTip' });
     }
-  }
-
-  private applyStatusCenter(k: string) {
-    const data = (this.statusPieOption?.series as any)?.[0]?.data as any[] | undefined;
-    if (!data?.length) return;
-
-    const total = data.reduce((s, x) => s + Number(x.value ?? 0), 0);
-
-    let centerValue = total;
-    let centerLabel = 'Total';
-
-    if (k !== 'all') {
-      const idx = this.statusIndexMap[k];
-      if (idx >= 0) {
-        centerValue = Number(data[idx].value ?? 0);
-        centerLabel = String(data[idx].name ?? '');
-      }
-    }
-
-    const opt = this.statusPieOption as any;
-    opt.graphic = [
-      {
-        type: 'text',
-        left: 'center',
-        top: '57%',
-        style: {
-          text: String(centerValue),
-          fontSize: 28,
-          fontWeight: 800,
-          fill:
-            getComputedStyle(document.body).getPropertyValue('--text-header').trim() || '#0f172a',
-        },
-      },
-      {
-        type: 'text',
-        left: 'center',
-        top: '68%',
-        style: {
-          text: centerLabel,
-          fontSize: 12,
-          fill:
-            getComputedStyle(document.body).getPropertyValue('--text-muted').trim() || '#64748b',
-        },
-      },
-    ];
-
-    this.statusChart?.setOption(opt, { notMerge: false, lazyUpdate: true });
   }
 
   onCompanyBarClick(e: any) {
@@ -1606,7 +1673,10 @@ export class Report {
       ],
       series: [{ label: { color: text } }],
     };
-    this.statusChart?.setOption(pieColors);
+    this.statusChart?.setOption({
+      legend: { textStyle: { color: text } },
+      tooltip: { backgroundColor: bg, textStyle: { color: text } },
+    });
     this.serviceChart?.setOption(pieColors);
 
     this.companyChart?.setOption({
@@ -1642,7 +1712,7 @@ export class Report {
     const origDeptSize = getSize(this.deptChart);
 
     // Resize chart ก่อน export เพื่อให้มีพื้นที่สำหรับ label
-    this.statusChart?.resize(PIE_EXPORT);
+    this.statusChart?.resize(BAR_EXPORT);
     this.serviceChart?.resize(PIE_EXPORT);
     this.companyChart?.resize(BAR_EXPORT);
     this.deptChart?.resize(BAR_EXPORT);
@@ -1659,11 +1729,9 @@ export class Report {
       ],
     };
 
-    this.statusChart?.setOption(pieExportLabel);
     this.serviceChart?.setOption(pieExportLabel);
 
     // ย่อ radius ให้ label มีพื้นที่โผล่รอบวง ไม่ถูก clip
-    this.statusChart?.setOption({ series: [{ radius: ['40%', '62%'], center: ['50%', '55%'] }] });
     this.serviceChart?.setOption({ series: [{ radius: ['40%', '62%'], center: ['50%', '55%'] }] });
 
     this.companyChart?.setOption({
@@ -1677,7 +1745,7 @@ export class Report {
     await new Promise((r) => setTimeout(r, 600));
 
     const charts = [
-      { chart: this.statusChart, name: 'Status Distribution', size: PIE_EXPORT },
+      { chart: this.statusChart, name: 'Status Distribution', size: BAR_EXPORT },
       { chart: this.serviceChart, name: 'Service Type', size: PIE_EXPORT },
       { chart: this.companyChart, name: 'Top Companies', size: BAR_EXPORT },
       { chart: this.deptChart, name: 'Top Departments', size: BAR_EXPORT },
@@ -1733,9 +1801,6 @@ export class Report {
     document.body.removeChild(a);
 
     // Restore label, resize กลับขนาด container เดิม และ restore สีตาม theme ปัจจุบัน
-    this.statusChart?.setOption({
-      series: [{ label: { show: false }, labelLine: { show: false } }],
-    });
     this.serviceChart?.setOption({
       series: [{ label: { show: false }, labelLine: { show: false } }],
     });

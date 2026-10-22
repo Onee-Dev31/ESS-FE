@@ -116,8 +116,10 @@
   --status-deny-text: #dc2626;
   --status-waiting-bg: rgba(178, 38, 220, 0.15);
   --status-waiting-text: #be26dc;
-  --status-rejected-bg: rgba(220, 38, 38, 0.15);
-  --status-rejected-text: #dc2626;
+  --status-waiting-approval-bg: rgba(20, 184, 166, 0.15);
+  --status-waiting-approval-text: #0f9488;
+  --status-rejected-bg: rgba(139, 92, 246, 0.15);
+  --status-rejected-text: #8b5cf6;
   --status-approved-bg: rgba(22, 163, 74, 0.15);
   --status-approved-text: #16a34a;
   --status-verified-bg: rgba(22, 163, 74, 0.15);
@@ -264,8 +266,10 @@
   --status-deny-text: #f87171;
   --status-waiting-bg: rgba(201, 103, 231, 0.2);
   --status-waiting-text: #cf5fe6;
-  --status-rejected-bg: rgba(239, 68, 68, 0.22);
-  --status-rejected-text: #f87171;
+  --status-waiting-approval-bg: rgba(45, 212, 191, 0.22);
+  --status-waiting-approval-text: #2dd4bf;
+  --status-rejected-bg: rgba(167, 139, 250, 0.22);
+  --status-rejected-text: #a78bfa;
   --status-approved-bg: rgba(22, 163, 74, 0.2);
   --status-approved-text: #86efac;
   --status-verified-bg: rgba(22, 163, 74, 0.2);
