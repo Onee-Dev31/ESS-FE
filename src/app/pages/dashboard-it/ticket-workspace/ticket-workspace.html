@@ -8,8 +8,15 @@
     @if (showTicketList) {
       <aside class="tk-left" id="tickets-zone" tabindex="-1">
         <div class="tk-left__top">
-          <div class="tk-left__title">Tickets</div>
           <div class="tk-left__filter-col">
+            <label
+              nz-checkbox
+              class="checkbox-my-ticket"
+              [(ngModel)]="myTicket"
+              (ngModelChange)="onMyTicketChange()"
+            >
+              My Ticket
+            </label>
             <nz-select
               class="tk-left__select"
               [ngClass]="'status-select--' + filterStatus"
@@ -46,14 +53,6 @@
                 {{ selected.nzLabel }}
               </span>
             </ng-template>
-            <label
-              nz-checkbox
-              class="checkbox-my-ticket"
-              [(ngModel)]="myTicket"
-              (ngModelChange)="onMyTicketChange()"
-            >
-              My Ticket
-            </label>
           </div>
         </div>
 
