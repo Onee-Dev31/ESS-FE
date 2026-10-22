@@ -58,7 +58,7 @@
 
   &:hover:not(:disabled) {
     transform: translateY(-1px);
-    background: color-mix(in srgb, var(--btn-bg), var(--btn-border) 12%);
+    background: color-mix(in srgb, var(--btn-bg), #000000 10%);
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12);
   }
 
@@ -88,37 +88,37 @@
 
 // Employee Info
 .btn-command .employeeInfo {
-  --btn-bg: var(--btn-employee-bg);
+  --btn-bg: var(--btn-employee-border);
   --btn-border: var(--btn-employee-border);
-  --btn-text: var(--btn-employee-text);
+  --btn-text: #ffffff;
 }
 
 // อนุมัติพนักงานลาออก
 .btn-command .approve-out {
-  --btn-bg: var(--btn-approve-bg);
+  --btn-bg: var(--btn-approve-border);
   --btn-border: var(--btn-approve-border);
-  --btn-text: var(--btn-approve-text);
+  --btn-text: #ffffff;
 }
 
 // แจ้งปัญหา
 .btn-command .problem {
-  --btn-bg: var(--btn-problem-bg);
+  --btn-bg: var(--btn-problem-border);
   --btn-border: var(--btn-problem-border);
-  --btn-text: var(--text);
+  --btn-text: #ffffff;
 }
 
 // แจ้งซ่อม
 .btn-command .repair {
-  --btn-bg: var(--btn-repair-bg);
+  --btn-bg: var(--btn-repair-border);
   --btn-border: var(--btn-repair-border);
-  --btn-text: var(--text);
+  --btn-text: #ffffff;
 }
 
 // แจ้งขอใช้บริการ
 .btn-command .service {
-  --btn-bg: var(--btn-service-bg);
+  --btn-bg: var(--btn-service-border);
   --btn-border: var(--btn-service-border);
-  --btn-text: var(--text);
+  --btn-text: #ffffff;
 }
 
 // Tablet / Notebook
