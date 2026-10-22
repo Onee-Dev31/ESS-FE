@@ -101,6 +101,17 @@
                   <nz-option [nzValue]="group.id" [nzLabel]="group.group_name" />
                 }
               </nz-select>
+              <nz-select
+                class="ticket-team-filter"
+                [(ngModel)]="selectedTicketTypeId"
+                (ngModelChange)="onTicketFilterChange()"
+                nzAllowClear
+                nzPlaceHolder="ทุกประเภทงาน"
+              >
+                <nz-option [nzValue]="1" nzLabel="แจ้งซ่อม" />
+                <nz-option [nzValue]="2" nzLabel="แจ้งปัญหา" />
+                <nz-option [nzValue]="3" nzLabel="ขอใช้บริการ" />
+              </nz-select>
             </div>
           }
         </div>

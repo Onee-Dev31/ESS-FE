@@ -355,6 +355,7 @@ export class TicketWorkspaceComponent implements OnInit, OnChanges {
   showFilter = false;
   teamGroups = signal<TeamGroupOption[]>([]);
   selectedTeamGroupId: number | null = null;
+  selectedTicketTypeId: number | null = null;
 
   @ViewChild('ticketList') ticketList!: ElementRef;
 
@@ -1595,6 +1596,9 @@ export class TicketWorkspaceComponent implements OnInit, OnChanges {
         myTicket: this.myTicket ? this.authService.userData().AD_USER : null,
         dateFrom,
         dateTo,
+        ticketTypeId: this.selectedTicketTypeId
+          ? String(this.selectedTicketTypeId)
+          : undefined,
         assignGroupId: this.selectedTeamGroupId ? String(this.selectedTeamGroupId) : undefined,
       })
       .pipe(
