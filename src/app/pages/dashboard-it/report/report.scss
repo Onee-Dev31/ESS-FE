@@ -932,8 +932,78 @@ body[data-theme='dark'] {
   align-items: center;
 }
 
-.form-input.dateRange {
-  background: var(--bg-card) !important;
+.filter-row-break,
+.quick-row-break {
+  display: none;
+}
+
+.date-picker-group {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: center;
+  width: 200px;
+  height: 44px;
+  min-height: 44px;
+  max-height: 44px;
+  box-sizing: border-box;
+  border: 1px solid var(--border-table-head);
+  border-radius: 8px;
+  background: var(--bg-card);
+
+  &:hover {
+    border-color: var(--primary);
+  }
+
+  nz-date-picker {
+    display: block;
+    width: 100%;
+    min-width: 0;
+  }
+}
+
+.date-separator {
+  position: absolute;
+  z-index: 1;
+  top: 50%;
+  left: 50%;
+  line-height: 1;
+  color: var(--text-muted);
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+}
+
+:host ::ng-deep .filter .date-picker-group {
+  .ant-picker {
+    width: 100%;
+    min-width: 0;
+    height: 42px;
+    padding-inline: 8px;
+    padding: 0;
+    border: 0 !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+  }
+
+  .ant-picker-input,
+  .ant-picker-input > input {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .ant-picker-input > input {
+    height: 42px !important;
+    padding: 0;
+    outline: 0 !important;
+    font-size: $font-size-label;
+    line-height: 42px !important;
+    text-align: center;
+  }
+
+  .ant-picker-suffix {
+    display: none;
+  }
 }
 
 .btn-export {
@@ -942,6 +1012,51 @@ body[data-theme='dark'] {
 
 .btn-clear {
   @include btn-outline;
+}
+
+.quick-range-select {
+  display: block;
+  width: 110px;
+  min-width: 110px;
+  height: 44px;
+  min-height: 44px;
+  max-height: 44px;
+  box-sizing: border-box;
+}
+
+:host ::ng-deep .filter .quick-range-select.ant-select-single {
+  .ant-select-selector {
+    height: 44px;
+    min-height: 44px;
+    max-height: 44px;
+    box-sizing: border-box;
+    padding: 0 24px 0 10px !important;
+    border-color: var(--border-table-head);
+    border-radius: 10px;
+    background: var(--bg-card);
+  }
+
+  .ant-select-arrow {
+    right: 8px;
+  }
+
+  .ant-select-selection-item,
+  .ant-select-selection-placeholder {
+    padding-inline-end: 0 !important;
+    font-size: $font-size-label;
+    line-height: 42px;
+  }
+
+  .ant-select-selection-search {
+    padding-inline-end: 0 !important;
+  }
+}
+
+.filter .btn-export {
+  height: 44px;
+  min-height: 44px;
+  max-height: 44px;
+  box-sizing: border-box;
 }
 
 // Ant Design controls use the global theme; this page only owns sizing/layout.
@@ -1130,6 +1245,19 @@ body[data-theme='dark'] {
   .kpi-top {
     gap: 4px;
   }
+
+  .date-picker-group {
+    width: 170px;
+  }
+
+  .filter {
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    gap: 6px;
+  }
+  .quick-range-select {
+    width: 95px;
+  }
 }
 
 @media (max-width: 480px) {
@@ -1188,9 +1316,79 @@ body[data-theme='dark'] {
   .kpi-row {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
+
+  .date-picker-group,
+  .quick-range-select,
+  .filter .btn-export {
+    height: 38px;
+    min-height: 38px;
+    max-height: 38px;
+  }
+
+  :host ::ng-deep .filter .date-picker-group {
+    .ant-picker,
+    .ant-picker-input > input {
+      height: 36px !important;
+      line-height: 36px !important;
+    }
+  }
+
+  :host ::ng-deep .filter .quick-range-select.ant-select-single {
+    .ant-select-selector {
+      height: 38px;
+      min-height: 38px;
+      max-height: 38px;
+    }
+
+    .ant-select-selection-item,
+    .ant-select-selection-placeholder {
+      line-height: 36px;
+    }
+  }
 }
 
 @media (max-width: 450px) {
+  .kpi {
+    padding: 4px 10px;
+  }
+  .top-bar {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .filter {
+    display: grid;
+    grid-template-columns: repeat(10, minmax(0, 1fr));
+    width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+
+    > .form-field {
+      grid-column: span 7;
+    }
+
+    .quick-range-select {
+      grid-column: span 3;
+    }
+
+    .btn-export {
+      grid-column: span 5;
+    }
+
+    > .form-field,
+    .date-picker-group,
+    .quick-range-select,
+    .btn-export {
+      width: 100%;
+      min-width: 0;
+    }
+  }
+
+  .quick-row-break,
+  .filter-row-break {
+    display: none;
+  }
+
   .kpi-title {
     font-size: $font-size-mini;
   }

@@ -1330,10 +1330,56 @@ export class Report {
     dateRange: [dayjs().startOf('year').toDate(), dayjs().endOf('year').toDate()] as
       [Date, Date] | null,
   };
+  quickRange = 'year';
 
   applyFilterAll() {
     // console.log(this.filterAll.dateRange);
     this.getAllTickets();
+  }
+
+  onStartDateChange(date: Date): void {
+    const endDate = this.filterAll.dateRange?.[1] ?? date;
+    this.filterAll.dateRange = [date, endDate];
+    this.quickRange = '';
+    this.applyFilterAll();
+  }
+
+  onEndDateChange(date: Date): void {
+    const startDate = this.filterAll.dateRange?.[0] ?? date;
+    this.filterAll.dateRange = [startDate, date];
+    this.quickRange = '';
+    this.applyFilterAll();
+  }
+
+  onQuickRangeChange(range: string): void {
+    const today = dayjs();
+    let startDate = today;
+    let endDate = today;
+
+    switch (range) {
+      case '7days':
+        startDate = today.subtract(6, 'day');
+        break;
+      case '15days':
+        startDate = today.subtract(14, 'day');
+        break;
+      case '30days':
+        startDate = today.subtract(29, 'day');
+        break;
+      case '90days':
+        startDate = today.subtract(89, 'day');
+        break;
+      case 'year':
+        startDate = today.startOf('year');
+        endDate = today.endOf('year');
+        break;
+      case 'today':
+      default:
+        break;
+    }
+
+    this.filterAll.dateRange = [startDate.toDate(), endDate.toDate()];
+    this.applyFilterAll();
   }
 
   resetFilter() {

@@ -1,20 +1,46 @@
 <div class="top-bar">
   <div class="filter">
     <div class="form-field">
-      <nz-range-picker
-        nzFormat="dd/MM/yyyy"
-        [(ngModel)]="filterAll.dateRange"
-        (ngModelChange)="applyFilterAll()"
-        class="form-input dateRange custom-range-picker"
-        nzDropdownClassName="custom-range-picker-popup"
-      />
+      <div class="date-picker-group">
+        <nz-date-picker
+          [ngModel]="filterAll.dateRange?.[0] ?? null"
+          (ngModelChange)="onStartDateChange($event)"
+          nzFormat="dd/MM/yyyy"
+          [nzAllowClear]="false"
+          nzDropdownClassName="custom-range-picker-popup"
+          aria-label="Start date"
+        />
+        <span class="date-separator" aria-hidden="true">–</span>
+        <nz-date-picker
+          [ngModel]="filterAll.dateRange?.[1] ?? null"
+          (ngModelChange)="onEndDateChange($event)"
+          nzFormat="dd/MM/yyyy"
+          [nzAllowClear]="false"
+          nzDropdownClassName="custom-range-picker-popup"
+          aria-label="End date"
+        />
+      </div>
     </div>
-    <button class="btn-export" (click)="export()"><i class="fa-solid fa-upload"></i>Export</button>
-    <button class="btn-clear" (click)="clearFilter()">
-      <i class="fa-solid fa-arrows-rotate"></i>Clear
+    <span class="quick-row-break" aria-hidden="true"></span>
+    <nz-select
+      class="quick-range-select"
+      [(ngModel)]="quickRange"
+      (ngModelChange)="onQuickRangeChange($event)"
+      aria-label="Quick Select"
+    >
+      <nz-option nzValue="today" nzLabel="Today" />
+      <nz-option nzValue="7days" nzLabel="7 วัน" />
+      <nz-option nzValue="15days" nzLabel="15 วัน" />
+      <nz-option nzValue="30days" nzLabel="30 วัน" />
+      <nz-option nzValue="90days" nzLabel="90 วัน" />
+      <nz-option nzValue="year" nzLabel="1 ปี" />
+    </nz-select>
+    <span class="filter-row-break" aria-hidden="true"></span>
+    <button class="btn-export" (click)="export()">
+      <i class="fa-solid fa-file-excel"></i>Export
     </button>
     <button class="btn-export" (click)="exportCharts()">
-      <i class="fa-solid fa-upload"></i>Export Chart
+      <i class="fa-solid fa-chart-line"></i>Export Chart
     </button>
   </div>
 </div>
