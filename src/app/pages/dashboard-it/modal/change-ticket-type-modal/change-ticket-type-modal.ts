@@ -21,7 +21,6 @@ import {
   FilePreviewItem,
   FilePreviewModalComponent,
 } from '../../../../components/modals/file-preview-modal/file-preview-modal';
-import { environment } from '../../../../../environments/environment';
 
 @Component({
   selector: 'app-change-ticket-type-modal',
@@ -64,17 +63,11 @@ export class ChangeTicketTypeModal implements OnChanges, OnDestroy {
   readonly fileConfig = IT_ATTACHMENT_FILE_CONFIG;
 
   get ticketTypes(): { id: number; label: string }[] {
-    const types = [{ id: 2, label: 'แจ้งปัญหา' }];
-
-    if (!environment.production) {
-      types.push({ id: 1, label: 'แจ้งซ่อม' });
-    }
-
-    // if (this.canAccessAdditionalTicketTypes) {
-    types.push({ id: 3, label: 'ขอใช้บริการ' });
-    // }
-
-    return types;
+    return [
+      { id: 2, label: 'แจ้งปัญหา' },
+      { id: 1, label: 'แจ้งซ่อม' },
+      { id: 3, label: 'ขอใช้บริการ' },
+    ];
   }
 
   // private get canAccessAdditionalTicketTypes(): boolean {
@@ -271,6 +264,8 @@ export class ChangeTicketTypeModal implements OnChanges, OnDestroy {
       this.repairCostType = null;
       this.attachments = [];
       this.showAttachmentError = false;
+    } else if (this.problemDetailsOnly) {
+      this.repairCostType = 'free';
     } else {
       this.repairCostType = this.lastRepairCostType;
     }

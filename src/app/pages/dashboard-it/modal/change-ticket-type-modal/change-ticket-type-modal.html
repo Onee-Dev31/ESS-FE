@@ -8,27 +8,25 @@
   (closeModal)="closeModal.emit()"
 >
   <div class="content">
-    @if (!problemDetailsOnly) {
-      <div class="field-label">เลือกประเภทงาน<span>*</span></div>
-      <div class="type-options">
-        @for (type of ticketTypes; track type.id) {
-          <button
-            type="button"
-            class="type-option"
-            [class.selected]="selectedTypeId === type.id"
-            [disabled]="isTypeChangeLocked"
-            (click)="selectType(type.id)"
-          >
-            {{ type.label }}
-          </button>
-        }
-      </div>
-      @if (selectedTypeId === 3 && originalTypeId !== 3) {
-        <div class="service-change-warning" role="alert">
-          <i class="fas fa-exclamation-circle"></i>
-          การเปลี่ยนเป็น “ขอใช้บริการ” จะไม่มีการส่งกลับไปอนุมัติ (Approve)
-        </div>
+    <div class="field-label">เลือกประเภทงาน<span>*</span></div>
+    <div class="type-options">
+      @for (type of ticketTypes; track type.id) {
+        <button
+          type="button"
+          class="type-option"
+          [class.selected]="selectedTypeId === type.id"
+          [disabled]="isTypeChangeLocked"
+          (click)="selectType(type.id)"
+        >
+          {{ type.label }}
+        </button>
       }
+    </div>
+    @if (!problemDetailsOnly && selectedTypeId === 3 && originalTypeId !== 3) {
+      <div class="service-change-warning" role="alert">
+        <i class="fas fa-exclamation-circle"></i>
+        การเปลี่ยนเป็น “ขอใช้บริการ” จะไม่มีการส่งกลับไปอนุมัติ (Approve)
+      </div>
     }
     @if (selectedTypeId === 2) {
       <fieldset class="problem-field">
@@ -155,15 +153,17 @@
       <div class="repair-cost-card">
         <div class="field-label">ประเภทค่าใช้จ่าย<span>*</span></div>
         <div class="type-options">
-          <button
-            type="button"
-            class="type-option"
-            [class.selected]="repairCostType === 'paid'"
-            [disabled]="isTypeChangeLocked"
-            (click)="selectRepairCostType('paid')"
-          >
-            ขออนุมัติ Budget ต้นสังกัด
-          </button>
+          @if (!problemDetailsOnly) {
+            <button
+              type="button"
+              class="type-option"
+              [class.selected]="repairCostType === 'paid'"
+              [disabled]="isTypeChangeLocked"
+              (click)="selectRepairCostType('paid')"
+            >
+              ขออนุมัติ Budget ต้นสังกัด
+            </button>
+          }
           <button
             type="button"
             class="type-option"

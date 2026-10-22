@@ -1520,9 +1520,7 @@ export class TicketWorkspaceComponent implements OnInit, OnChanges {
       const mine = readers.find((r) => r.userCodeempid === codeempid);
       if (mine && mine.lastReadReplyId >= latestReply.id) return readers;
       return mine
-        ? readers.map((r) =>
-            r === mine ? { ...r, lastReadReplyId: latestReply.id } : r,
-          )
+        ? readers.map((r) => (r === mine ? { ...r, lastReadReplyId: latestReply.id } : r))
         : [...readers, { userCodeempid: codeempid, nickName: '', lastReadReplyId: latestReply.id }];
     });
     this.itServiceService.markReplyRead(ticketId, codeempid, latestReply.id).subscribe({
@@ -2181,8 +2179,7 @@ export class TicketWorkspaceComponent implements OnInit, OnChanges {
 
   openProblemDetailsModal(): void {
     const ticket = this.selectedTicket();
-    if (ticket?.status !== 'Closed' || Number(ticket.ticketTypeId ?? ticket.ticket_type_id) !== 2)
-      return;
+    if (ticket?.status !== 'Closed') return;
     this.problemDetailsTicket.set({ ...ticket });
   }
 
@@ -2191,16 +2188,26 @@ export class TicketWorkspaceComponent implements OnInit, OnChanges {
   }
 
   async submitProblemDetails(data: {
+    ticketTypeId: number;
     subCategoryId: number | null;
     subCategoryName?: string;
     problemSource: 'user' | 'system' | null;
+    serviceTypeIds: number[];
+    repairCostType?: 'paid' | 'free';
+    reason: string;
+    attachments: { name: string; size: number; file: File; description?: string }[];
   }): Promise<void> {
     const ticket = this.problemDetailsTicket();
+    const ticketTypeId = Number(data.ticketTypeId);
+
     if (
       !ticket?.ticketId ||
       this.savingProblemDetails() ||
-      !data.subCategoryId ||
-      (data.problemSource !== 'user' && data.problemSource !== 'system')
+      (ticketTypeId === 2 &&
+        (!data.subCategoryId ||
+          (data.problemSource !== 'user' && data.problemSource !== 'system'))) ||
+      (ticketTypeId === 3 && !data.serviceTypeIds.length) ||
+      (ticketTypeId === 1 && !data.repairCostType)
     )
       return;
 
@@ -2208,9 +2215,10 @@ export class TicketWorkspaceComponent implements OnInit, OnChanges {
     const categoryText = document.createElement('span');
     categoryText.textContent = data.subCategoryName ?? '-';
     const result = await this.swalService.confirm(
-      'ยืนยันการแก้ไขหมวดหมู่และปัญหา',
+      'ยืนยันการแก้ไขข้อมูล Ticket',
       undefined,
-      `<div class="problem-details-confirm">
+      ticketTypeId === 2
+        ? `<div class="problem-details-confirm">
         <div class="problem-details-confirm-row">
           <span class="problem-details-confirm-label">หมวดหมู่ปัญหา</span>
           <strong class="problem-details-confirm-value">${categoryText.innerHTML}</strong>
@@ -2219,7 +2227,8 @@ export class TicketWorkspaceComponent implements OnInit, OnChanges {
           <span class="problem-details-confirm-label">ปัญหา</span>
           <strong class="problem-details-confirm-badge">${data.problemSource}</strong>
         </div>
-      </div>`,
+      </div>`
+        : undefined,
       { confirmButtonText: 'ยืนยันบันทึก' },
     );
     if (!result.isConfirmed || this.destroyRef.destroyed) {
@@ -2227,10 +2236,15 @@ export class TicketWorkspaceComponent implements OnInit, OnChanges {
       return;
     }
     this.itServiceService
-      .updateSubcatProblemby({
+      .updateTicketAfterClosed({
         ticketID: Number(ticket.ticketId),
-        subCategoryID: data.subCategoryId,
-        problemBy: data.problemSource,
+        ticketTypeID: ticketTypeId,
+        subCategoryID: ticketTypeId === 2 ? (data.subCategoryId ?? 0) : 0,
+        problemBy: ticketTypeId === 2 ? (data.problemSource ?? '') : '',
+        serviceTypeIDs: ticketTypeId === 3 ? data.serviceTypeIds : [],
+        repairCostType: ticketTypeId === 1 ? 'free' : '',
+        reason: data.reason,
+        codeEmpId: String(this.authService.userData()?.CODEMPID ?? ''),
       })
       .pipe(finalize(() => this.savingProblemDetails.set(false)))
       .subscribe({
@@ -2243,19 +2257,24 @@ export class TicketWorkspaceComponent implements OnInit, OnChanges {
             item && isSameTicketId(item.ticketId, ticket.ticketId)
               ? {
                   ...item,
-                  subCategoryId: data.subCategoryId,
-                  sub_category_id: data.subCategoryId,
-                  ticketCategory: data.subCategoryName,
-                  sub_category_name: data.subCategoryName,
-                  problemBy: data.problemSource,
+                  ticketTypeId,
+                  ticket_type_id: ticketTypeId,
+                  subCategoryId: ticketTypeId === 2 ? data.subCategoryId : null,
+                  sub_category_id: ticketTypeId === 2 ? data.subCategoryId : null,
+                  ticketCategory: ticketTypeId === 2 ? data.subCategoryName : null,
+                  sub_category_name: ticketTypeId === 2 ? data.subCategoryName : null,
+                  problemBy: ticketTypeId === 2 ? data.problemSource : null,
+                  repair_cost_type: ticketTypeId === 1 ? (data.repairCostType ?? 'free') : null,
                 }
               : item;
           this.selectedTicket.update(update);
           this.Tickets.update((items) => items.map(update));
           this.problemDetailsTicket.set(null);
-          this.swalService.success('บันทึกหมวดหมู่และปัญหาสำเร็จ');
+          this.swalService.success('บันทึกข้อมูล Ticket สำเร็จ');
+          this.selectTicket(String(ticket.ticketId));
+          this.getAllTickets();
         },
-        error: () => this.swalService.warning('บันทึกหมวดหมู่และปัญหาไม่สำเร็จ กรุณาลองใหม่'),
+        error: () => this.swalService.warning('บันทึกข้อมูล Ticket ไม่สำเร็จ กรุณาลองใหม่'),
       });
   }
 
@@ -2313,6 +2332,7 @@ export class TicketWorkspaceComponent implements OnInit, OnChanges {
       needsTicketUpdate ? 'กำลังเปลี่ยนประเภทคำขอ...' : 'กำลังบันทึกข้อมูล...',
     );
     this.closeChangeTicketTypeModal();
+    this.problemDetailsTicket.set(null);
 
     let typeChanged = false;
 

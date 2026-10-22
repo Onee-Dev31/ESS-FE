@@ -398,14 +398,11 @@
         <button type="button" class="btn btn-reply" (click)="openEmailReply()">
           <i class="fa-solid btn-action-icon fa-reply-all"></i> ตอบกลับ
         </button>
-        <button
-          type="button"
-          class="btn btn-change-type"
-          *ngIf="+(t.ticketTypeId ?? t.ticket_type_id) === 2"
-          (click)="openProblemDetailsModal()"
-        >
-          <i class="fas fa-pen"></i> แก้ไขหมวดหมู่ปัญหา
-        </button>
+        @if (selectedTicket()?.status === 'Closed') {
+          <button type="button" class="btn btn-change-type" (click)="openProblemDetailsModal()">
+            <i class="fas fa-pen"></i> แก้ไขหมวดหมู่ปัญหา
+          </button>
+        }
       </div>
     </section>
   </ng-template>

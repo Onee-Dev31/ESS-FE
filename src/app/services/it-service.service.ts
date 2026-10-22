@@ -474,6 +474,19 @@ export class ItServiceService {
     return this._http.post(`${this.baseUrl}/it/updateSubcatProblemby`, payload);
   }
 
+  updateTicketAfterClosed(payload: {
+    ticketID: number;
+    ticketTypeID: number;
+    subCategoryID: number;
+    problemBy: string;
+    serviceTypeIDs: number[];
+    repairCostType: string;
+    reason: string;
+    codeEmpId: string;
+  }): Observable<any> {
+    return this._http.post(`${this.baseUrl}/it/UpdateTicketAfterClosed`, payload);
+  }
+
   updateChangeSubCatService(payload: {
     ticketID: number;
     serviceTypeIDs: number[];
