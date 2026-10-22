@@ -374,15 +374,27 @@
       <div class="section-title">Hierarchy Information</div>
       <div class="form-grid">
         <div class="field-group span-2">
-          <label>Head Employee Code <span class="req">*</span></label>
+          <label for="add-head-employee-code">Head Employee Code <span class="req">*</span></label>
           <input
+            id="add-head-employee-code"
             type="text"
-            [value]="addForm.headEmployeeCode ? addForm.headEmployeeCode + ' - ' + addForm.headEmployeeName : ''"
+            [value]="
+              addForm.headEmployeeCode
+                ? addForm.headEmployeeCode + ' - ' + addForm.headEmployeeName
+                : ''
+            "
             placeholder="ระบบระบุหัวหน้าตามแผนกที่เลือก"
             aria-label="Head Employee Code"
             readonly
             [class.invalid]="isInvalid('headEmployeeCode')"
+            [attr.aria-invalid]="isInvalid('headEmployeeCode')"
+            aria-describedby="add-head-employee-code-error"
           />
+          @if (isInvalid('headEmployeeCode')) {
+            <small id="add-head-employee-code-error" class="field-error" role="alert">
+              กรุณาเลือกแผนกที่มีข้อมูลหัวหน้าพนักงาน
+            </small>
+          }
         </div>
       </div>
       @if (!isRequestUser) {
@@ -394,10 +406,20 @@
               id="add-ad-user"
               type="text"
               [(ngModel)]="addForm.adUser"
+              (ngModelChange)="onAdUserChange($event)"
               name="adUser"
               placeholder="Enter AD User"
-              [class.invalid]="isInvalid('adUser')"
+              [class.invalid]="isInvalid('adUser') || adUserDuplicate"
+              [attr.aria-invalid]="isInvalid('adUser') || adUserDuplicate"
+              aria-describedby="add-ad-user-error"
             />
+            @if (adUserChecking) {
+              <small class="field-hint">กำลังตรวจสอบ AD User...</small>
+            } @else if (adUserDuplicate) {
+              <small id="add-ad-user-error" class="password-error" role="alert">
+                AD User นี้มีอยู่ในระบบแล้ว กรุณาใช้ชื่ออื่น
+              </small>
+            }
           </div>
           <div class="field-group span-2">
             <label for="add-ad-password">Password <span class="req">*</span></label>
@@ -451,8 +473,14 @@
                 required
                 autocomplete="new-password"
                 placeholder="Confirm Password"
-                [class.invalid]="(submitted || adConfirmPassword.touched) && passwordsMismatch"
-                [attr.aria-invalid]="(submitted || adConfirmPassword.touched) && passwordsMismatch"
+                [class.invalid]="
+                  isInvalid('adConfirmPassword') ||
+                  ((submitted || adConfirmPassword.touched) && passwordsMismatch)
+                "
+                [attr.aria-invalid]="
+                  isInvalid('adConfirmPassword') ||
+                  ((submitted || adConfirmPassword.touched) && passwordsMismatch)
+                "
                 aria-describedby="add-ad-confirm-password-error"
               />
               <button
@@ -471,9 +499,12 @@
                 ></i>
               </button>
             </div>
-            @if ((submitted || adConfirmPassword.touched) && passwordsMismatch) {
+            @if (
+              isInvalid('adConfirmPassword') ||
+              ((submitted || adConfirmPassword.touched) && passwordsMismatch)
+            ) {
               <small id="add-ad-confirm-password-error" class="password-error" role="alert">
-                รหัสผ่านไม่ตรงกัน
+                {{ !addForm.adConfirmPassword ? 'กรุณากรอกยืนยันรหัสผ่าน' : 'รหัสผ่านไม่ตรงกัน' }}
               </small>
             }
           </div>
@@ -486,10 +517,18 @@
               [(ngModel)]="addForm.adExpireDate"
               name="expireDate"
               required
+              [class.invalid]="isInvalid('adExpireDate')"
               [nzStatus]="isInvalid('adExpireDate') ? 'error' : ''"
+              [attr.aria-invalid]="isInvalid('adExpireDate')"
+              aria-describedby="add-ad-expire-date-error"
               nzFormat="dd/MM/yyyy"
               nzPlaceHolder="เลือกวันที่หมดอายุ"
             />
+            @if (isInvalid('adExpireDate')) {
+              <small id="add-ad-expire-date-error" class="password-error" role="alert">
+                กรุณาเลือกวันที่หมดอายุ
+              </small>
+            }
           </div>
         </div>
       }

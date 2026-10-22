@@ -103,8 +103,17 @@
   grid-column: span 2;
 }
 
-.password-error {
+.password-error,
+.field-error {
+  display: block;
+  margin-top: 4px;
   color: #dc3545;
+  font-size: 12px;
+  line-height: 1.35;
+}
+
+.field-hint {
+  color: var(--text-muted);
 }
 
 .password-input-wrap {
@@ -159,6 +168,11 @@ input.invalid {
   &.ant-picker-focused {
     border-color: $primary;
     box-shadow: none;
+  }
+
+  &.invalid {
+    border-color: #e53935 !important;
+    background: #fff5f5 !important;
   }
 }
 

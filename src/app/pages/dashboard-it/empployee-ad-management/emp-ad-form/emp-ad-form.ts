@@ -2,6 +2,7 @@ import { CommonModule, formatDate } from '@angular/common';
 import {
   ChangeDetectorRef,
   Component,
+  ElementRef,
   EventEmitter,
   Input,
   OnChanges,
@@ -13,7 +14,7 @@ import { NzSelectModule } from 'ng-zorro-antd/select';
 import { NzIconModule } from 'ng-zorro-antd/icon';
 import { NzDatePickerModule } from 'ng-zorro-antd/date-picker';
 import { NzTransferModule, TransferItem } from 'ng-zorro-antd/transfer';
-import { Subscription } from 'rxjs';
+import { firstValueFrom, Subscription } from 'rxjs';
 import { EmpAdService } from '../../../../services/emp-ad-service';
 import { MasterDataService } from '../../../../services/master-data.service';
 import { SwalService } from '../../../../services/swal.service';
@@ -44,6 +45,8 @@ export class EmpAdForm implements OnChanges, OnDestroy {
   isSaving = false;
   isReadOnly = true;
   submitted = false;
+  adUserChecking = false;
+  adUserDuplicate = false;
 
   requiredFields: (keyof typeof this.addForm)[] = [
     'employeeCode',
@@ -156,6 +159,9 @@ export class EmpAdForm implements OnChanges, OnDestroy {
   private groupRequest?: Subscription;
   private allGroupsRequest?: Subscription;
   private headEmployeeRequest?: Subscription;
+  private adUserCheckTimer?: ReturnType<typeof setTimeout>;
+  private existingEmployees: any[] = [];
+  private existingEmployeesRequest?: Promise<void>;
 
   constructor(
     private empAdService: EmpAdService,
@@ -164,6 +170,7 @@ export class EmpAdForm implements OnChanges, OnDestroy {
     private cdr: ChangeDetectorRef,
     private settingService: SettingService,
     private approvalSetupService: ApprovalSetupService,
+    private elementRef: ElementRef<HTMLElement>,
   ) {}
 
   onTitleChange(title: string | null, language: 'th' | 'en') {
@@ -320,6 +327,7 @@ export class EmpAdForm implements OnChanges, OnDestroy {
   }
 
   ngOnDestroy() {
+    if (this.adUserCheckTimer) clearTimeout(this.adUserCheckTimer);
     this.headEmployeeRequest?.unsubscribe();
     this.employeeRequest?.unsubscribe();
     this.groupRequest?.unsubscribe();
@@ -362,6 +370,7 @@ export class EmpAdForm implements OnChanges, OnDestroy {
   }
 
   loadMasterData() {
+    if (!this.isRequestUser) void this.loadExistingEmployees().catch(() => undefined);
     this.empAdService.getEmployeeFloors().subscribe({
       next: (res) => {
         this.floorList = Array.isArray(res) ? res : (res.data ?? []);
@@ -407,7 +416,78 @@ export class EmpAdForm implements OnChanges, OnDestroy {
     return !this.isRequestUser && this.addForm.adPassword !== this.addForm.adConfirmPassword;
   }
 
-  saveEmployee() {
+  onAdUserChange(value: string): void {
+    this.addForm.adUser = String(value ?? '').toLowerCase();
+    this.adUserDuplicate = false;
+    this.adUserChecking = false;
+    if (this.adUserCheckTimer) clearTimeout(this.adUserCheckTimer);
+
+    const adUser = this.addForm.adUser.trim();
+    if (!adUser) return;
+
+    this.adUserChecking = true;
+    this.adUserCheckTimer = setTimeout(async () => {
+      try {
+        const isDuplicate = await this.checkAdUserDuplicate(adUser);
+        if (this.addForm.adUser.trim() === adUser) this.adUserDuplicate = isDuplicate;
+      } catch {
+        // Save will perform the required final duplicate check and report API errors.
+      } finally {
+        if (this.addForm.adUser.trim() === adUser) this.adUserChecking = false;
+        this.cdr.detectChanges();
+      }
+    }, 500);
+  }
+
+  private async checkAdUserDuplicate(adUser: string): Promise<boolean> {
+    const normalizedAdUser = adUser.trim().toLowerCase();
+    await this.loadExistingEmployees();
+    return this.existingEmployees.some(
+      (employee: any) =>
+        String(employee?.ADUser ?? '')
+          .trim()
+          .toLowerCase() === normalizedAdUser,
+    );
+  }
+
+  private loadExistingEmployees(): Promise<void> {
+    if (this.existingEmployeesRequest) return this.existingEmployeesRequest;
+
+    this.existingEmployeesRequest = firstValueFrom(
+      this.empAdService.getEmployees({
+        pageNumber: 1,
+        pageSize: 2000,
+        filterAD_USER: 'ALL',
+      }),
+    )
+      .then((res: any) => {
+        this.existingEmployees = Array.isArray(res) ? res : (res?.data ?? []);
+      })
+      .catch((error) => {
+        this.existingEmployeesRequest = undefined;
+        throw error;
+      });
+
+    return this.existingEmployeesRequest;
+  }
+
+  private scrollToFirstInvalidField(): void {
+    this.cdr.detectChanges();
+    requestAnimationFrame(() => {
+      const invalidElement = this.elementRef.nativeElement.querySelector<HTMLElement>(
+        'input.invalid, textarea.invalid, .invalid-select, .field-nz-datepicker.invalid',
+      );
+      if (!invalidElement) return;
+
+      invalidElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      const focusTarget = invalidElement.matches('input, textarea, button')
+        ? invalidElement
+        : invalidElement.querySelector<HTMLElement>('input, textarea, button');
+      focusTarget?.focus({ preventScroll: true });
+    });
+  }
+
+  async saveEmployee(): Promise<void> {
     this.submitted = true;
     const excludedFields = this.isRequestUser
       ? [
@@ -430,7 +510,31 @@ export class EmpAdForm implements OnChanges, OnDestroy {
     const hasInvalidPassword =
       !this.isRequestUser && getPasswordError(this.addForm.adPassword) !== '';
 
-    if (hasError || hasInvalidPassword || this.passwordsMismatch) return;
+    if (hasError || hasInvalidPassword || this.passwordsMismatch || this.adUserDuplicate) {
+      this.scrollToFirstInvalidField();
+      return;
+    }
+
+    this.addForm.adUser = this.addForm.adUser.trim().toLowerCase();
+
+    if (!this.isRequestUser) {
+      this.isSaving = true;
+      try {
+        const isDuplicate = await this.checkAdUserDuplicate(this.addForm.adUser);
+
+        if (isDuplicate) {
+          this.isSaving = false;
+          this.adUserDuplicate = true;
+          this.swalService.warning(`AD User “${this.addForm.adUser}” มีอยู่ในระบบแล้ว`);
+          this.scrollToFirstInvalidField();
+          return;
+        }
+      } catch {
+        this.isSaving = false;
+        this.swalService.error('ไม่สามารถตรวจสอบ AD User ซ้ำได้ กรุณาลองใหม่อีกครั้ง');
+        return;
+      }
+    }
 
     const selectedJob = this.jobPositionList.find(
       (j) => j.JobPositionID == this.addForm.jobPosition,
@@ -496,6 +600,7 @@ export class EmpAdForm implements OnChanges, OnDestroy {
         next: (_) => {
           this.isSaving = false;
           this.submitted = false;
+          this.existingEmployees.push({ ADUser: payload.AD_USER });
           this.swalService.success(`เพิ่มพนักงาน ${payload.CODEMPID} เรียบร้อยแล้ว`);
         },
         error: (err) => {
@@ -556,6 +661,9 @@ export class EmpAdForm implements OnChanges, OnDestroy {
   }
 
   private resetAddForm() {
+    if (this.adUserCheckTimer) clearTimeout(this.adUserCheckTimer);
+    this.adUserChecking = false;
+    this.adUserDuplicate = false;
     this.resetHeadEmployee();
     this.addShowPassword = false;
     this.addShowConfirmPassword = false;
