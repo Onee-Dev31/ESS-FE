@@ -5,7 +5,6 @@ import {
   Input,
   Output,
   signal,
-  ViewChild,
 } from '@angular/core';
 import { KpiCard, StatusKey } from '../../../interfaces/it-dashboard.interface';
 import { CommonModule } from '@angular/common';
@@ -13,7 +12,6 @@ import { FormsModule } from '@angular/forms';
 import { NzSelectModule } from 'ng-zorro-antd/select';
 import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzIconModule } from 'ng-zorro-antd/icon';
-import { NgxEchartsDirective, NgxEchartsModule } from 'ngx-echarts';
 import type { EChartsOption } from 'echarts';
 import type { ECharts } from 'echarts'; // ✅ ไม่ใช้ EChartsType
 import { ItServiceService } from '../../../services/it-service.service';
@@ -40,8 +38,6 @@ import { exportTicketLogsToExcel } from '../../../utils/ticket-log-excel.util';
     NzSelectModule,
     NzButtonModule,
     NzIconModule,
-    NgxEchartsDirective,
-    NgxEchartsModule,
     NzTableModule,
     NzModalModule,
     NzPaginationModule,
@@ -159,6 +155,13 @@ export class Report {
   servicePieOption!: EChartsOption;
   serviceDistributionData: PieDatum[] = [];
   serviceDistributionLegendData: PieDatum[] = [];
+  companyDistributionData: Array<{ value: number; code: string; name: string }> = [];
+  departmentDistributionData: Array<{
+    name: string;
+    value: number;
+    costcent?: string;
+    companyCode?: string;
+  }> = [];
   companyBarOption!: EChartsOption;
   private statusChart?: ECharts;
 
@@ -441,7 +444,7 @@ export class Report {
 
     this.servicePieOption = this.makeDonutOptionService('Service Type', data, total, 'Total');
   }
-  // ====== 3) Top Companies Bar ======
+  // ====== 3) Companies Bar ======
   private remapCompanyCode(code: string): string {
     if (code === 'OTD') return 'ONEE';
     if (code === 'OTV') return 'ONE31';
@@ -449,11 +452,17 @@ export class Report {
   }
 
   private buildCompanyBar(res: any[]) {
-    const chartData = res.map((x) => ({
-      value: x.ticket_count,
-      code: this.remapCompanyCode(x.COMPANY_CODE),
-      name: this.remapCompanyCode(x.COMPANY_NAME),
-    }));
+    const chartData = res
+      .map((x) => ({
+        value: Number(x.ticket_count ?? 0),
+        code: this.remapCompanyCode(x.COMPANY_CODE),
+        name: this.remapCompanyCode(x.COMPANY_NAME),
+      }))
+      .filter(
+        (company) => company.code?.toUpperCase() !== 'ALL' && company.name?.toUpperCase() !== 'ALL',
+      );
+
+    this.companyDistributionData = chartData;
 
     const labels = chartData.map((x) => x.code);
 
@@ -571,13 +580,9 @@ export class Report {
       ],
     };
 
-    const firstCompany = labels[0];
-    this.selectedCompany = firstCompany;
-    this.showDeptBar = !!firstCompany;
-
-    if (firstCompany) {
-      this.buildDeptBar(firstCompany, this.deptTop5Map[firstCompany] ?? []);
-    }
+    this.selectedCompany = null;
+    this.showDeptBar = true;
+    this.buildDeptBar('ALL', this.deptTop5Map['ALL'] ?? []);
   }
 
   private buildDeptTop5Map(rows: any[]) {
@@ -587,7 +592,7 @@ export class Report {
     > = {};
     const allMap: Record<
       string,
-      { value: number; company: string; costcent: string; companyCode: string }
+      { label: string; value: number; company: string; costcent: string; companyCode: string }
     > = {};
 
     for (const row of rows ?? []) {
@@ -602,9 +607,10 @@ export class Report {
         companyCode: row.COMPANY_CODE,
       });
 
-      const key = row.dept_display;
+      const key = `${companyCode}::${row.dept_display}`;
       if (!allMap[key]) {
         allMap[key] = {
+          label: row.dept_display,
           value: 0,
           company: companyCode,
           costcent: row.COSTCENT,
@@ -619,15 +625,15 @@ export class Report {
     //   .sort((a, b) => b.value - a.value)
     //   .slice(0, 5);
 
-    map['ALL'] = Object.entries(allMap)
-      .map(([label, { value, company, costcent, companyCode }]) => ({
+    map['ALL'] = Object.values(allMap)
+      .map(({ label, value, company, costcent, companyCode }) => ({
         label: `${label} (${company})`,
         value,
         costcent,
         companyCode,
       }))
       .sort((a, b) => b.value - a.value)
-      .slice(0, 5);
+      .slice(0, 10);
 
     this.deptTop5Map = map;
   }
@@ -898,9 +904,7 @@ export class Report {
   }
 
   get statusDistributionLegendKpis(): KpiCard[] {
-    return this.kpis.filter(
-      (card) => !['all', 'done'].includes(card.status.toLowerCase()),
-    );
+    return this.kpis.filter((card) => !['all', 'done'].includes(card.status.toLowerCase()));
   }
 
   getStatusDistributionPercent(k: KpiCard): number {
@@ -935,6 +939,25 @@ export class Report {
 
     const itemIndex = this.serviceDistributionData.indexOf(item);
     return percentages.find((service) => service.index === itemIndex)?.value ?? 0;
+  }
+
+  getCompanyBarPercent(value: number): number {
+    const max = Math.max(...this.companyDistributionData.map((company) => company.value), 0);
+    return max > 0 ? Math.max((value / max) * 85, 2) : 0;
+  }
+
+  getDepartmentBarPercent(value: number): number {
+    const max = Math.max(
+      ...this.departmentDistributionData.map((department) => department.value),
+      0,
+    );
+    return max > 0 ? Math.max((value / max) * 100, 1.5) : 0;
+  }
+
+  get departmentChartTitle(): string {
+    return this.selectedCompany
+      ? `Top 5 Departments - ${this.selectedCompany}`
+      : 'Top 10 Departments - All Companies';
   }
 
   onStatusChartInit(ec: any) {
@@ -1051,6 +1074,13 @@ export class Report {
 
     if (!company) return;
 
+    if (this.selectedCompany === company) {
+      this.selectedCompany = null;
+      this.showDeptBar = true;
+      this.buildDeptBar('ALL', this.deptTop5Map['ALL'] ?? []);
+      return;
+    }
+
     this.selectedCompany = company;
     this.showDeptBar = true;
 
@@ -1063,14 +1093,16 @@ export class Report {
     rows: Array<{ label: string; value: number; costcent?: string; companyCode?: string }>,
   ) {
     const data = [...rows]
-      .sort((a, b) => a.value - b.value)
-      .slice(0, 5)
+      .sort((a, b) => b.value - a.value)
+      .slice(0, company === 'ALL' ? 10 : 5)
       .map((x) => ({
         name: x.label,
         value: x.value,
         costcent: x.costcent,
         companyCode: x.companyCode,
       }));
+
+    this.departmentDistributionData = data;
 
     // console.log(rows, data);
 
@@ -1081,7 +1113,10 @@ export class Report {
 
     this.deptBarOption = {
       title: {
-        text: `Top 5 Departments - ${company}`,
+        text:
+          company === 'ALL'
+            ? 'Top 10 Departments - All Companies'
+            : `Top 5 Departments - ${company}`,
         left: 'left',
         top: 0,
         textStyle: { fontSize: 14, fontWeight: 800, color: textColor },
@@ -1641,8 +1676,6 @@ export class Report {
     this.applyFilter();
   }
 
-  @ViewChildren(NgxEchartsDirective) charts!: QueryList<NgxEchartsDirective>;
-
   private serviceChart?: ECharts;
   private companyChart?: ECharts;
   private deptChart?: ECharts;
@@ -1696,6 +1729,324 @@ export class Report {
   async exportCharts() {
     this.isExporting = true;
     this.cdr.detectChanges();
+
+    try {
+      await new Promise((resolve) => setTimeout(resolve, 50));
+      const canvas = this.createChartsExportCanvas();
+
+      const link = document.createElement('a');
+      link.href = canvas.toDataURL('image/png');
+      link.download = `dashboard_charts_${dayjs().format('YYYYMMDD_HHmmss')}.png`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } catch (error) {
+      console.error('Export charts error:', error);
+    } finally {
+      this.isExporting = false;
+      this.cdr.detectChanges();
+    }
+  }
+
+  private createChartsExportCanvas(): HTMLCanvasElement {
+    const width = 1400;
+    const padding = 28;
+    const gap = 18;
+    const exportDepartments = (this.deptTop5Map['ALL'] ?? [])
+      .slice(0, 10)
+      .map((item) => ({ name: item.label, value: item.value }));
+    const kpiHeight = 206;
+    const statusHeight = 170;
+    const serviceHeight = 170;
+    const companyHeight = 330;
+    const departmentHeight = 78 + Math.max(exportDepartments.length, 1) * 34;
+    const height =
+      padding * 2 +
+      kpiHeight +
+      statusHeight +
+      serviceHeight +
+      companyHeight +
+      departmentHeight +
+      gap * 4;
+    const pixelRatio = 2;
+    const canvas = document.createElement('canvas');
+    canvas.width = width * pixelRatio;
+    canvas.height = height * pixelRatio;
+    const ctx = canvas.getContext('2d')!;
+    ctx.scale(pixelRatio, pixelRatio);
+
+    const cardWidth = width - padding * 2;
+    const textColor = '#334155';
+    const mutedColor = '#64748b';
+    const borderColor = '#e2e8f0';
+    const trackColor = '#e7eef8';
+    const primaryColor = this.getCssVar('--primary') || '#1a73e8';
+
+    const roundedRect = (x: number, y: number, w: number, h: number, radius: number) => {
+      const r = Math.min(radius, w / 2, h / 2);
+      ctx.beginPath();
+      ctx.moveTo(x + r, y);
+      ctx.lineTo(x + w - r, y);
+      ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+      ctx.lineTo(x + w, y + h - r);
+      ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+      ctx.lineTo(x + r, y + h);
+      ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+      ctx.lineTo(x, y + r);
+      ctx.quadraticCurveTo(x, y, x + r, y);
+      ctx.closePath();
+    };
+    const drawCard = (title: string, y: number, h: number) => {
+      ctx.fillStyle = '#ffffff';
+      roundedRect(padding, y, cardWidth, h, 16);
+      ctx.fill();
+      ctx.fillStyle = textColor;
+      ctx.font = "800 16px Inter, 'IBM Plex Sans Thai Looped', Arial, sans-serif";
+      ctx.fillText(title, padding + 20, y + 30);
+    };
+    const fitText = (text: string, maxWidth: number) => {
+      if (ctx.measureText(text).width <= maxWidth) return text;
+      let result = text;
+      while (result.length && ctx.measureText(`${result}…`).width > maxWidth) result = result.slice(0, -1);
+      return `${result}…`;
+    };
+    const statusColor = (status: string) => {
+      const colors: Record<string, string> = {
+        assigned: this.getCssVar('--status-progress-text') || '#d97706',
+        done: this.getCssVar('--status-closed-text') || '#229b4f',
+        open: this.getCssVar('--status-new-text') || '#2563eb',
+        reopen: this.getCssVar('--status-reopen-text') || '#0ea5e9',
+        waitingapproval: this.getCssVar('--status-waiting-approval-text') || '#0f9488',
+        referredBack: this.getCssVar('--status-referred-back-text') || '#a16207',
+        rejected: this.getCssVar('--status-rejected-text') || '#8b5cf6',
+        denied: this.getCssVar('--status-deny-text') || '#dc2626',
+        hold: this.getCssVar('--status-hold-text') || '#616161',
+        all: this.getCssVar('--text-table-head') || '#64748b',
+      };
+      return colors[status] || mutedColor;
+    };
+    const kpiCardBackground = (status: string) => {
+      const colors: Record<string, string> = {
+        waitingapproval:
+          this.getCssVar('--status-waiting-approval-bg') || 'rgba(20, 184, 166, 0.15)',
+        referredBack:
+          this.getCssVar('--status-referred-back-bg') || 'rgba(234, 179, 8, 0.18)',
+        rejected: this.getCssVar('--status-rejected-bg') || 'rgba(139, 92, 246, 0.15)',
+      };
+      return colors[status] || '#ffffff';
+    };
+    const kpiIconBackground = (status: string) => {
+      const colors: Record<string, string> = {
+        done: this.getCssVar('--status-closed-bg') || 'rgba(47, 185, 142, 0.15)',
+        assigned: this.getCssVar('--status-progress-bg') || 'rgba(255, 152, 34, 0.15)',
+        open: this.getCssVar('--status-new-bg') || 'rgba(14, 165, 233, 0.15)',
+        reopen: this.getCssVar('--status-reopen-bg') || 'rgba(37, 100, 235, 0.15)',
+        waitingapproval:
+          this.getCssVar('--status-waiting-approval-bg') || 'rgba(20, 184, 166, 0.15)',
+        referredBack:
+          this.getCssVar('--status-referred-back-bg') || 'rgba(234, 179, 8, 0.18)',
+        rejected: this.getCssVar('--status-rejected-bg') || 'rgba(139, 92, 246, 0.15)',
+        denied: this.getCssVar('--status-deny-bg') || 'rgba(220, 38, 38, 0.15)',
+        hold: this.getCssVar('--status-hold-bg') || 'rgba(141, 141, 141, 0.15)',
+      };
+      return colors[status] || '#f1f5f9';
+    };
+    const serviceColor = (key?: string) => {
+      const colors = [
+        this.getCssVar('--btn-service-border') || '#3b82f6',
+        this.getCssVar('--btn-repair-border') || '#f43f5e',
+        this.getCssVar('--btn-problem-border') || '#f59e0b',
+      ];
+      return colors[Number(key ?? 0)] || primaryColor;
+    };
+    const drawStackedBar = <T extends { name: string; value: number; color: string }>(
+      data: T[],
+      legend: T[],
+      y: number,
+    ) => {
+      const x = padding + 20;
+      const barY = y + 58;
+      const barWidth = cardWidth - 40;
+      const barHeight = 28;
+      const total = data.reduce((sum, item) => sum + item.value, 0);
+      let currentX = x;
+      for (const item of data) {
+        const segmentWidth = total ? (item.value / total) * barWidth : 0;
+        ctx.fillStyle = item.color;
+        ctx.fillRect(currentX, barY, segmentWidth, barHeight);
+        const percent = total ? Math.round((item.value / total) * 100) : 0;
+        if (segmentWidth >= 26) {
+          ctx.fillStyle = '#ffffff';
+          ctx.font = '700 11px Arial, sans-serif';
+          ctx.textAlign = 'center';
+          const label = segmentWidth >= 125 ? `${item.name} ${percent}%` : `${percent}%`;
+          ctx.fillText(label, currentX + segmentWidth / 2, barY + 18);
+        }
+        currentX += segmentWidth;
+      }
+      ctx.textAlign = 'left';
+      let legendX = x;
+      let legendY = barY + 55;
+      ctx.font = '11px Arial, sans-serif';
+      for (const item of legend) {
+        const itemWidth = 24 + ctx.measureText(item.name).width;
+        if (legendX + itemWidth > x + barWidth) {
+          legendX = x;
+          legendY += 22;
+        }
+        ctx.fillStyle = item.color;
+        roundedRect(legendX, legendY - 8, 15, 8, 3);
+        ctx.fill();
+        ctx.fillStyle = mutedColor;
+        ctx.fillText(item.name, legendX + 21, legendY);
+        legendX += itemWidth + 18;
+      }
+    };
+
+    ctx.fillStyle = '#f8f9fa';
+    ctx.fillRect(0, 0, width, height);
+
+    let y = padding;
+    const kpiGap = 14;
+    const kpiColumns = 5;
+    const kpiCardWidth = (cardWidth - kpiGap * (kpiColumns - 1)) / kpiColumns;
+    const kpiCardHeight = 96;
+    for (let index = 0; index < this.kpis.length; index++) {
+      const item = this.kpis[index];
+      const column = index % kpiColumns;
+      const row = Math.floor(index / kpiColumns);
+      const cardX = padding + column * (kpiCardWidth + kpiGap);
+      const cardY = y + row * (kpiCardHeight + kpiGap);
+      const color = statusColor(item.status);
+      ctx.fillStyle = kpiCardBackground(item.status);
+      roundedRect(cardX, cardY, kpiCardWidth, kpiCardHeight, 14);
+      ctx.fill();
+      ctx.strokeStyle = borderColor;
+      ctx.lineWidth = 1;
+      ctx.stroke();
+
+      ctx.fillStyle = mutedColor;
+      ctx.font = "600 12px Inter, 'IBM Plex Sans Thai Looped', Arial, sans-serif";
+      ctx.fillText(item.title, cardX + 14, cardY + 24);
+
+      ctx.fillStyle = kpiIconBackground(item.status);
+      roundedRect(cardX + kpiCardWidth - 42, cardY + 13, 28, 28, 8);
+      ctx.fill();
+      ctx.strokeStyle = color;
+      ctx.lineWidth = 1;
+      ctx.stroke();
+      ctx.fillStyle = color;
+      ctx.beginPath();
+      ctx.arc(cardX + kpiCardWidth - 28, cardY + 27, 4, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.fillStyle = textColor;
+      ctx.font = '800 25px Arial, sans-serif';
+      ctx.fillText(String(item.value), cardX + 14, cardY + 70);
+      const valueWidth = ctx.measureText(String(item.value)).width;
+      const percent = this.getPercent(item);
+      const percentText = `${percent}%`;
+      ctx.font = '600 10px Arial, sans-serif';
+      const percentWidth = ctx.measureText(percentText).width + 12;
+      ctx.fillStyle = '#f1f5f9';
+      roundedRect(cardX + 20 + valueWidth, cardY + 53, percentWidth, 20, 7);
+      ctx.fill();
+      ctx.fillStyle = '#94a3b8';
+      ctx.fillText(percentText, cardX + 26 + valueWidth, cardY + 67);
+    }
+
+    y += kpiHeight + gap;
+    drawCard('Status Distribution', y, statusHeight);
+    drawStackedBar(
+      this.statusDistributionKpis.map((item) => ({
+        name: item.title,
+        value: item.value,
+        color: statusColor(item.status),
+      })),
+      this.statusDistributionLegendKpis.map((item) => ({
+        name: item.title,
+        value: item.value,
+        color: statusColor(item.status),
+      })),
+      y,
+    );
+
+    y += statusHeight + gap;
+    drawCard('Service Type', y, serviceHeight);
+    drawStackedBar(
+      this.serviceDistributionData.map((item) => ({
+        name: item.name,
+        value: item.value,
+        color: serviceColor(item.key),
+      })),
+      this.serviceDistributionLegendData.map((item) => ({
+        name: item.name,
+        value: item.value,
+        color: serviceColor(item.key),
+      })),
+      y,
+    );
+
+    y += serviceHeight + gap;
+    drawCard('Companies', y, companyHeight);
+    const companyInnerX = padding + 20;
+    const companyInnerWidth = cardWidth - 40;
+    const companyMax = Math.max(...this.companyDistributionData.map((item) => item.value), 1);
+    const companyCount = Math.max(this.companyDistributionData.length, 1);
+    const companyGap = 10;
+    const companyCellWidth = (companyInnerWidth - companyGap * (companyCount - 1)) / companyCount;
+    const companyBaseY = y + companyHeight - 42;
+    for (let index = 0; index < this.companyDistributionData.length; index++) {
+      const item = this.companyDistributionData[index];
+      const cellX = companyInnerX + index * (companyCellWidth + companyGap);
+      ctx.strokeStyle = borderColor;
+      roundedRect(cellX, y + 48, companyCellWidth, companyHeight - 66, 10);
+      ctx.stroke();
+      const barHeight = Math.max((item.value / companyMax) * 190, 3);
+      const barWidth = Math.min(44, companyCellWidth * 0.42);
+      const barX = cellX + (companyCellWidth - barWidth) / 2;
+      const barY = companyBaseY - 22 - barHeight;
+      ctx.fillStyle = primaryColor;
+      roundedRect(barX, barY, barWidth, barHeight, Math.min(10, barWidth / 2));
+      ctx.fill();
+      ctx.fillStyle = textColor;
+      ctx.textAlign = 'center';
+      ctx.font = '800 11px Arial, sans-serif';
+      ctx.fillText(String(item.value), cellX + companyCellWidth / 2, barY - 7);
+      ctx.fillText(fitText(item.code, companyCellWidth - 8), cellX + companyCellWidth / 2, companyBaseY);
+    }
+    ctx.textAlign = 'left';
+
+    y += companyHeight + gap;
+    drawCard('Top 10 Departments - All Companies', y, departmentHeight);
+    const departmentLabelWidth = 360;
+    const departmentBarX = padding + 20 + departmentLabelWidth;
+    const departmentBarWidth = cardWidth - 76 - departmentLabelWidth;
+    const departmentMax = Math.max(...exportDepartments.map((item) => item.value), 1);
+    ctx.font = "700 11px Inter, 'IBM Plex Sans Thai Looped', Arial, sans-serif";
+    for (let index = 0; index < exportDepartments.length; index++) {
+      const item = exportDepartments[index];
+      const rowY = y + 62 + index * 34;
+      ctx.fillStyle = textColor;
+      ctx.fillText(fitText(item.name, departmentLabelWidth - 22), padding + 20, rowY + 11);
+      ctx.fillStyle = trackColor;
+      roundedRect(departmentBarX, rowY, departmentBarWidth, 16, 8);
+      ctx.fill();
+      ctx.fillStyle = primaryColor;
+      roundedRect(departmentBarX, rowY, Math.max((item.value / departmentMax) * departmentBarWidth, 4), 16, 8);
+      ctx.fill();
+      ctx.fillStyle = textColor;
+      ctx.textAlign = 'right';
+      ctx.fillText(String(item.value), width - padding - 20, rowY + 12);
+      ctx.textAlign = 'left';
+    }
+
+    return canvas;
+  }
+
+  private async exportChartsLegacy() {
+    this.isExporting = true;
+    this.cdr.detectChanges();
     await new Promise((r) => setTimeout(r, 50)); // รอให้ loading render ก่อน
 
     const PIE_EXPORT = { width: 540, height: 420 };
@@ -1747,8 +2098,8 @@ export class Report {
     const charts = [
       { chart: this.statusChart, name: 'Status Distribution', size: BAR_EXPORT },
       { chart: this.serviceChart, name: 'Service Type', size: PIE_EXPORT },
-      { chart: this.companyChart, name: 'Top Companies', size: BAR_EXPORT },
-      { chart: this.deptChart, name: 'Top Departments', size: BAR_EXPORT },
+      { chart: this.companyChart, name: 'Companies', size: BAR_EXPORT },
+      { chart: this.deptChart, name: 'Top 5 Departments', size: BAR_EXPORT },
     ];
 
     const validCharts = charts.filter((c) => !!c.chart);

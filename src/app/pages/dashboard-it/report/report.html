@@ -191,25 +191,52 @@
 
   <!-- Company Bar -->
   <div class="chart-card bar-card">
-    <div class="chart-title">Top 5 Companies</div>
-    <div
-      echarts
-      class="echart bar"
-      [options]="companyBarOption"
-      (chartInit)="onCompanyChartInit($event)"
-      (chartClick)="onCompanyBarClick($event)"
-    ></div>
+    <div class="chart-title">Companies</div>
+    <div class="company-bars" role="img" aria-label="Tickets by company">
+      <button
+        *ngFor="let company of companyDistributionData"
+        type="button"
+        class="company-bar-item"
+        [class.is-selected]="selectedCompany === company.code"
+        [attr.aria-label]="company.name + ', ' + company.value + ' tickets'"
+        (click)="onCompanyBarClick({ data: company })"
+      >
+        <span class="company-bar-plot">
+          <span class="company-bar-value">{{ company.value }}</span>
+          <span
+            class="company-bar-fill"
+            [style.--company-size]="getCompanyBarPercent(company.value) + '%'"
+          ></span>
+        </span>
+        <span class="company-bar-label">{{ company.code }}</span>
+      </button>
+    </div>
   </div>
   <div class="chart-card bar-card">
-    <div class="chart-title">Top 5 Deparment</div>
+    <div class="chart-title">{{ departmentChartTitle }}</div>
     <div class="dept-drill">
-      <div
-        echarts
-        class="echart dept"
-        [options]="deptBarOption"
-        (chartInit)="onDeptChartInit($event)"
-        (chartClick)="onDepartmentPieClick($event)"
-      ></div>
+      <div class="department-bars" role="img" aria-label="Top departments">
+        <div
+          *ngFor="let department of departmentDistributionData"
+          class="department-bar-item"
+        >
+          <span class="department-name" [title]="department.name">{{ department.name }}</span>
+          <span class="department-chart-area">
+            <button
+              type="button"
+              class="department-track"
+              [attr.aria-label]="department.name + ', ' + department.value + ' tickets'"
+              (click)="onDepartmentPieClick({ data: department })"
+            >
+              <span
+                class="department-fill"
+                [style.width.%]="getDepartmentBarPercent(department.value)"
+              ></span>
+            </button>
+            <span class="department-value">{{ department.value }}</span>
+          </span>
+        </div>
+      </div>
     </div>
   </div>
 </div>
