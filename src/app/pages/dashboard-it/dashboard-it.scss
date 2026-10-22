@@ -5,122 +5,188 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 18px 18px 0 18px;
+  gap: 12px;
+  padding: 18px 16px 0;
 }
 
 .btn-command {
   display: flex;
   justify-content: flex-end;
-  align-items: end;
-  gap: 12px;
+  align-items: center;
+  gap: 8px;
   flex-wrap: wrap;
-
-  button {
-    white-space: nowrap;
-    border-radius: 10px;
-    padding: 2px 10px;
-    border: 1px solid var(--btn-border);
-    background: var(--btn-border);
-    color: var(--text);
-    cursor: pointer;
-    transition: 0.2s;
-
-    @media (min-width: 576px) and (max-width: 1366px) {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      height: 34px;
-      padding: 0 24px;
-      font-size: $font-size-label;
-      font-weight: 600;
-
-      @include tablet {
-        padding: 0 12px;
-      }
-    }
-
-    &:hover {
-      background: color-mix(in srgb, var(--btn-border), var(--text) 5%);
-      transform: translateY(-0.5px);
-    }
-
-    &:active {
-      background: color-mix(in srgb, var(--btn-border), var(--text) 10%);
-      transform: translateY(2px);
-    }
-  }
-
-  .employeeInfo {
-    --btn-border: #379c4c;
-    --btn-bg: #379c4c;
-  }
-
-  .approve-out {
-    --btn-border: var(--orange);
-    --btn-bg: var(--orange-light);
-  }
-
-  .problem {
-    --btn-border: var(--btn-problem-border);
-    --btn-bg: var(--btn-problem-bg);
-  }
-
-  .repair {
-    --btn-border: var(--btn-repair-border);
-    --btn-bg: var(--btn-repair-bg);
-  }
-
-  .service {
-    --btn-border: var(--btn-service-border);
-    --btn-bg: var(--btn-service-bg);
-  }
 }
 
-.btn-report {
-  @include btn-primary;
+// รูปแบบปุ่มทั้งหมด
+.btn-report,
+.btn-command .btn-type {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
 
-  @media (min-width: 576px) and (max-width: 1366px) {
-    height: 34px;
-  }
-}
+  height: 36px;
+  min-height: 30px;
+  padding: 0 14px;
 
-@media (max-width: 860px) {
-  .top-bar {
-    align-items: flex-start;
-    flex-wrap: wrap;
-    gap: 12px;
-  }
+  border: 1px solid var(--btn-border);
+  border-radius: 9px;
 
-  .btn-command {
-    width: 100%;
-    justify-content: flex-start;
-    align-items: center;
-    gap: 8px;
-  }
-}
+  background: var(--btn-bg);
+  color: var(--btn-text);
 
-@media (min-width: 576px) and (max-width: 1366px) {
-  .top-bar {
-    flex-wrap: wrap;
-    align-items: center;
-    justify-content: flex-start;
-    gap: 6px;
-  }
+  font-family: $font-main;
+  font-size: $font-size-label; // 12px - 14px
+  font-weight: 600;
+  line-height: 1.4;
 
-  .top-bar > div:first-child {
+  white-space: nowrap;
+  cursor: pointer;
+  box-sizing: border-box;
+
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08);
+
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    background 0.2s ease;
+
+  i {
+    font-size: 1em; // ขนาด Icon ตาม Font ของปุ่ม
     flex-shrink: 0;
+  }
+
+  &:hover:not(:disabled) {
+    transform: translateY(-1px);
+    background: color-mix(in srgb, var(--btn-bg), var(--btn-border) 12%);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12);
+  }
+
+  &:active:not(:disabled) {
+    transform: translateY(0);
+    box-shadow: none;
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+// Report
+.btn-report {
+  --btn-bg: var(--primary);
+  --btn-border: var(--primary);
+  --btn-text: #ffffff;
+
+  flex-shrink: 0;
+}
+
+// Employee Info
+.btn-command .employeeInfo {
+  --btn-bg: var(--btn-employee-bg);
+  --btn-border: var(--btn-employee-border);
+  --btn-text: var(--btn-employee-text);
+}
+
+// อนุมัติพนักงานลาออก
+.btn-command .approve-out {
+  --btn-bg: var(--btn-approve-bg);
+  --btn-border: var(--btn-approve-border);
+  --btn-text: var(--btn-approve-text);
+}
+
+// แจ้งปัญหา
+.btn-command .problem {
+  --btn-bg: var(--btn-problem-bg);
+  --btn-border: var(--btn-problem-border);
+  --btn-text: var(--text);
+}
+
+// แจ้งซ่อม
+.btn-command .repair {
+  --btn-bg: var(--btn-repair-bg);
+  --btn-border: var(--btn-repair-border);
+  --btn-text: var(--text);
+}
+
+// แจ้งขอใช้บริการ
+.btn-command .service {
+  --btn-bg: var(--btn-service-bg);
+  --btn-border: var(--btn-service-border);
+  --btn-text: var(--text);
+}
+
+// Tablet / Notebook
+@media (max-width: 1200px) {
+  .top-bar {
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    gap: 8px;
   }
 
   .btn-command {
     display: contents;
   }
 
-  .btn-command button,
-  .btn-report {
-    flex-shrink: 0;
-    padding: 0 8px;
-    font-size: 12px;
-    gap: 4px;
+  .btn-report,
+  .btn-command .btn-type {
+    flex: 0 0 auto;
+    height: 32px;
+    padding: 0 12px;
+  }
+}
+
+// Mobile
+@media (max-width: 860px) {
+  .top-bar {
+    align-items: center;
+    gap: 8px;
+    padding: 12px 12px 0;
+  }
+
+  .btn-report,
+  .btn-command .btn-type {
+    padding: 0 10px;
+    gap: 5px;
+  }
+}
+
+@media (max-width: 860px) {
+  .top-bar {
+    align-items: flex-start;
+    gap: 10px;
+    padding: 12px 12px 0;
+  }
+
+  .btn-report,
+  .btn-command .btn-type {
+    padding: 0 10px;
+  }
+}
+
+@media (max-width: 450px) {
+  .top-bar {
+    background: var(--bg-card);
+  }
+
+  .btn-report,
+  .btn-command .btn-type {
+    font-size: $font-size-hint;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .btn-report,
+  .btn-command .btn-type {
+    transition: none;
+
+    &:hover {
+      transform: none;
+    }
   }
 }

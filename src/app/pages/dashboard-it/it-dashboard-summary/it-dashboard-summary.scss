@@ -8,77 +8,12 @@
 }
 
 /* ===== KPI ===== */
+
 .kpi-row {
-  padding: 20px 16px;
   display: grid;
   grid-template-columns: repeat(7, minmax(0, 1fr));
-  gap: 14px;
-
-  @include large-tablet {
-    grid-template-columns: repeat(7, minmax(0, 1fr));
-    padding: 10px 16px;
-    gap: 8px;
-
-    .kpi-value {
-      font-size: $font-size-title;
-    }
-
-    .kpi-delta {
-      font-size: $font-size-label;
-    }
-  }
-
-  // Keep tablet cards compact in both orientations.
-  @media (max-width: 1200px) {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-  }
-
-  @include tablet {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 8px;
-
-    .kpi {
-      flex-direction: column;
-      align-items: stretch;
-      gap: 5px;
-      padding: 8px 10px 6px 6px;
-    }
-
-    .kpi-value {
-      margin-top: 0;
-      flex-shrink: 0;
-      text-align: left;
-    }
-
-    .kpi-top {
-      display: flex;
-      justify-content: space-between;
-      gap: 6px;
-    }
-
-    .kpi-title {
-      font-size: 12px;
-      color: #727d94;
-      white-space: nowrap;
-    }
-
-    .kpi-pill {
-      display: flex;
-      width: 24px;
-      height: 24px;
-      border-radius: 8px;
-      font-size: 12px;
-    }
-  }
-
-  @include mobile {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 8px;
-
-    .kpi-hint {
-      display: none;
-    }
-  }
+  gap: 10px;
+  padding: 8px 16px 0;
 }
 
 .kpi {
@@ -86,56 +21,62 @@
   flex-direction: column;
   justify-content: space-between;
   min-width: 0;
+  padding: 12px 14px;
+
   background: var(--bg-card);
-  border-radius: 16px;
-  border: 1px solid rgba(15, 23, 42, 0.06);
-  box-shadow: 0 10px 30px rgba(17, 24, 39, 0.08);
-  padding: 14px 14px 12px;
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
+
   cursor: pointer;
   transition:
-    transform 0.15s ease,
-    box-shadow 0.15s ease,
-    border-color 0.15s ease;
-  position: relative;
-  overflow: hidden;
-}
+    transform 0.2s ease,
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
 
-.kpi:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 16px 40px rgba(17, 24, 39, 0.12);
-}
+  &:hover {
+    transform: translateY(-2px);
+    border-color: color-mix(in srgb, var(--primary), transparent 65%);
+    box-shadow: 0 6px 16px rgba(15, 23, 42, 0.08);
+  }
 
-.kpi.active {
-  border-color: rgba(37, 99, 235, 0.3);
-  box-shadow: 0 18px 46px rgba(37, 99, 235, 0.16);
+  &.active {
+    border-color: color-mix(in srgb, var(--primary), transparent 45%);
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--primary), transparent 92%);
+  }
 }
 
 .kpi-top {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
-  gap: 10px;
+  gap: 8px;
 }
 
 .kpi-title {
-  font-size: 13px;
-  color: var(--text-header);
+  font-family: $font-main;
+  font-size: $font-size-label;
+  font-weight: 500;
+  color: var(--text-muted);
+  line-height: 1.4;
 }
 
 .kpi-pill {
-  flex-shrink: 0;
-  width: 36px;
-  height: 36px;
-  border-radius: 12px;
-  display: flex;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
-  border: 1px solid rgba(15, 23, 42, 0.08);
-  background: var(--bg-table-head);
-}
+  flex-shrink: 0;
 
-.kpi-pill nz-icon {
-  font-size: 18px;
+  width: 28px;
+  height: 28px;
+  border-radius: 9px;
+
+  border: 1px solid rgba(15, 23, 42, 0.08);
+
+  i {
+    font-size: $font-size-label;
+  }
 }
 
 .pill-open {
@@ -182,10 +123,12 @@
 
 .kpi-value {
   margin-top: 8px;
-  font-size: 28px;
-  font-weight: 600;
-  color: var(--text-header);
+  font-family: $font-main;
+  font-size: $font-size-title;
+  font-weight: 700;
+  line-height: 1.1;
   letter-spacing: -0.5px;
+  color: var(--text-header);
 }
 
 .kpi-foot {
@@ -200,7 +143,7 @@
   align-items: center;
   gap: 6px;
   font-weight: 800;
-  font-size: 12px;
+  font-size: $font-size-label;
   padding: 4px 8px;
   border-radius: 999px;
   border: 1px solid rgba(15, 23, 42, 0.08);
@@ -220,17 +163,17 @@
 }
 
 .kpi-delta nz-icon {
-  font-size: 14px;
+  font-size: $font-size-body;
 }
 
 .kpi-sub {
   color: var(--text-table-head);
-  font-size: 12px;
+  font-size: $font-size-hint;
 }
 
 .kpi-hint {
   margin-top: 10px;
-  font-size: 12px;
+  font-size: $font-size-hint;
   color: var(--text);
   background: var(--bg-slate);
   border: 1px dashed rgba(100, 116, 139, 0.35);
@@ -314,18 +257,6 @@
 
 .echart.bar {
   height: 240px;
-}
-
-/* responsive */
-@media (max-width: 1200px) {
-  .bar-card {
-    flex: 1;
-  }
-
-  .echart,
-  .echart.bar {
-    height: 220px;
-  }
 }
 
 .echart.dept {
@@ -1069,4 +1000,116 @@ body[data-theme='dark'] {
 
   font-size: 9px;
   font-weight: 700;
+}
+
+/* responsive */
+@media (max-width: 1200px) {
+  .kpi-row {
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    gap: 8px;
+    // padding-inline: 16px;
+  }
+
+  .kpi {
+    padding: 9px 10px;
+  }
+
+  .kpi-top {
+    gap: 4px;
+  }
+
+  .kpi-title {
+    font-size: $font-size-hint;
+    white-space: nowrap;
+  }
+
+  .kpi-pill {
+    width: 24px;
+    height: 24px;
+    border-radius: 8px;
+  }
+
+  .kpi-value {
+    margin-top: 0;
+  }
+
+  .bar-card {
+    flex: 1;
+  }
+
+  .echart,
+  .echart.bar {
+    height: 220px;
+  }
+}
+
+@media (max-width: 860px) {
+  .kpi-row {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    padding: 8px 12px 0;
+  }
+  .top-bar {
+    gap: 6px;
+    padding: 12px 12px 0;
+  }
+}
+
+@media (max-width: 600px) {
+  .kpi-value {
+    margin-top: 0;
+    font-family: $font-main;
+    font-size: $font-size-title;
+    font-weight: 600;
+  }
+
+  .kpi {
+    padding: 10px 12px;
+  }
+
+  .kpi-pill {
+    width: 7px;
+    height: 7px;
+    margin-top: 3px;
+    background: currentColor;
+    border-width: 0;
+    border-radius: 50%;
+
+    i {
+      display: none;
+    }
+  }
+}
+
+@media (max-width: 450px) {
+  .kpi-row {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .kpi-title {
+    font-size: $font-size-mini;
+  }
+
+  .kpi-value {
+    font-size: $font-size-header;
+  }
+
+  .kpi {
+    padding: 8px 8px;
+  }
+}
+
+@media (max-width: 350px) {
+  .kpi-row {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .kpi {
+    transition: none;
+
+    &:hover {
+      transform: none;
+    }
+  }
 }

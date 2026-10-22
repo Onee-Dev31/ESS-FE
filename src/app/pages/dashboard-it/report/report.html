@@ -54,16 +54,7 @@
     <div class="kpi-value">
       {{ k.value | number }}
       <!-- <span> -->
-      <span
-        class="kpi-delta"
-        [class.pill-blue]="k.status === 'open'"
-        [class.pill-cyan]="k.status === 'assigned'"
-        [class.pill-orange]="k.status === 'inprogress'"
-        [class.pill-green]="k.status === 'done'"
-        [class.pill-red]="k.status === 'denied'"
-        [class.pill-hold]="k.status === 'hold'"
-        [class.pill-gray]="k.status === 'all'"
-      >
+      <span class="kpi-delta">
         <span>{{ getPercent(k) }}%</span>
       </span>
       <!-- </span> -->
@@ -294,12 +285,12 @@
         </div>
 
         <div class="filter-actions">
-        <button class="export-btn" (click)="exportData()">
-          <i class="fas fa-file-excel"></i> Export
-        </button>
-        <button class="btn-clear" (click)="clearFilter()">
-          <i class="fa-solid fa-arrows-rotate"></i>Clear
-        </button>
+          <button class="export-btn" (click)="exportData()">
+            <i class="fas fa-file-excel"></i> Export
+          </button>
+          <button class="btn-clear" (click)="clearFilter()">
+            <i class="fa-solid fa-arrows-rotate"></i>Clear
+          </button>
         </div>
       </div>
       <div class="log-summary">ทั้งหมด {{ listing.totalItems() }} รายการ</div>

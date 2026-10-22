@@ -1,27 +1,43 @@
 <app-it-ticket-workspace #workspace>
   <div workspaceHeader>
     <div class="top-bar">
-      <div>
-        <button (click)="workspace.viewExport()" class="btn-report">
-          <i class="fa-solid fa-folder-open"></i>report
-        </button>
-      </div>
+      <button type="button" (click)="workspace.viewExport()" class="btn-report">
+        <i class="fa-solid fa-folder-open"></i>
+        <span>Report</span>
+      </button>
 
       <div class="btn-command">
-        <button class="btn-type employeeInfo" (click)="workspace.viewEmployeeInfo()">
-          <i class="fa-solid fa-address-card"></i> employee Info
+        <button type="button" class="btn-type employeeInfo" (click)="workspace.viewEmployeeInfo()">
+          <i class="fa-solid fa-address-card"></i>
+          <span>Employee Info</span>
         </button>
-        <button class="btn-type approve-out" (click)="workspace.viewApproveResign()">
-          <i class="fa-solid fa-person-walking-arrow-right"></i> อนุมัติพนักงานลาออก
+
+        <button type="button" class="btn-type approve-out" (click)="workspace.viewApproveResign()">
+          <i class="fa-solid fa-person-walking-arrow-right"></i>
+          <span>อนุมัติพนักงานลาออก</span>
         </button>
-        <button class="btn-type problem" (click)="workspace.IS_OPEN_IT_SERVICE.set(2)">
-          <i class="fas fa-exclamation-triangle"></i> แจ้งปัญหา
+
+        <button
+          type="button"
+          class="btn-type problem"
+          (click)="workspace.IS_OPEN_IT_SERVICE.set(2)"
+        >
+          <i class="fas fa-exclamation-triangle"></i>
+          <span>แจ้งปัญหา</span>
         </button>
-        <button class="btn-type repair" (click)="workspace.IS_OPEN_IT_SERVICE.set(1)">
-          <i class="fas fa-tools"></i> แจ้งซ่อม
+
+        <button type="button" class="btn-type repair" (click)="workspace.IS_OPEN_IT_SERVICE.set(1)">
+          <i class="fas fa-tools"></i>
+          <span>แจ้งซ่อม</span>
         </button>
-        <button class="btn-type service" (click)="workspace.IS_OPEN_IT_SERVICE.set(3)">
-          <i class="fas fa-concierge-bell"></i> แจ้งขอใช้บริการ
+
+        <button
+          type="button"
+          class="btn-type service"
+          (click)="workspace.IS_OPEN_IT_SERVICE.set(3)"
+        >
+          <i class="fas fa-concierge-bell"></i>
+          <span>แจ้งขอใช้บริการ</span>
         </button>
       </div>
     </div>

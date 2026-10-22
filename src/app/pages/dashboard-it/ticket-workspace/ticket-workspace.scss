@@ -649,7 +649,7 @@
 
   @media (min-width: 1024px) and (max-width: 1440px) {
     gap: 8px;
-    padding: 10px;
+    padding: 10px 18px;
   }
 }
 
@@ -1174,8 +1174,13 @@
   background: transparent;
   cursor: pointer;
 }
-.clear-search:hover { color: var(--text); background: var(--border-color); }
-.clear-search .material-symbols-outlined { font-size: 18px; }
+.clear-search:hover {
+  color: var(--text);
+  background: var(--border-color);
+}
+.clear-search .material-symbols-outlined {
+  font-size: 18px;
+}
 
 /* pills */
 .tk-pill {
@@ -3862,6 +3867,7 @@ app-expand-icon {
     grid-template-columns: minmax(0, 1fr);
     height: auto;
     overflow: visible;
+    padding: 12px;
 
     .tk-center,
     .tk-right {
